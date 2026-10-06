@@ -6,14 +6,6 @@
 夏洛: 大招, 宣誓, 原皮大
 月歌: 大招, 连击
 # 回合 = OD（后置1或2或3，0为不开od）; 队伍+技能（技能位置，指向角色编号）
-# if Turn == 1:
-#     switch_skill(game, 3,2)
-# if Turn in (1,7): # (1,5,6,9,10,14)
-#     time.sleep(1)
-#     if Turn == 1:
-#         click_in_game(game, member[1])
-#     else:
-#         click_in_game(game, member[2])
 skip
 1 = 0; 苍井: 1,0; 夏洛: 1,1; 白河: 3,0
 2 = 0; 苍井: 2,0; 白河: 1,0; 吹雪: 1,0

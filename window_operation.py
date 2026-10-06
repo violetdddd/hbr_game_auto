@@ -20,7 +20,7 @@ def find_window(title = "HeavenBurnsRed"):
     return windows[0]  # 取第一个匹配窗口
 
 # 2. 定义函数：点击窗口内某个坐标（相对左上角）
-def click_in_game(game, position, jitter = 10):
+def click_in_game(game, position, jitter = 10, sleep=True):
     x, y = position
 
     # 获取窗口左上角位置
@@ -30,8 +30,9 @@ def click_in_game(game, position, jitter = 10):
     abs_x, abs_y = win_left + x, win_top + y
     abs_x, abs_y = human_position(abs_x, abs_y, jitter)
 
-    # 点击
-    time.sleep(human_time())
+    # 先经过一定延迟再点击
+    if sleep:
+        time.sleep(human_time())
     pyautogui.click(abs_x, abs_y)
 
 def drag_in_game(game, trajectory, duration=0.3):
@@ -56,14 +57,17 @@ def position_monitor():
     except KeyboardInterrupt:
         print("\n坐标记录结束！")
 
-def capture_window(game, region=None):  # 要求传相对左上角的坐标（包括标题栏边框等）x,y,w,h
+def capture_window(game, region:tuple=(0,0,0,0)):  # 要求传相对左上角的坐标（包括标题栏边框等）x,y,w,h
 
     win_x, win_y, win_w, win_h = game.left, game.top, game.width, game.height
-    if region is not None:
-        region_x, region_y, region_w, region_h = region
-    else:
-        region_x, region_y, region_w, region_h = 0, 0, win_w, win_h
 
+    region_x, region_y, region_w, region_h = region
+
+    # 默认的0，0，0，0是截游戏全屏
+    if region == (0,0,0,0):
+        region_w, region_h = win_w, win_h
+
+    # 截图region的绝对坐标
     region = (win_x+region_x, win_y+region_y, region_w, region_h)
 
     screenshot = pyautogui.screenshot(region=region)
