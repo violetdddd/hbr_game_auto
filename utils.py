@@ -1,7 +1,7 @@
 import time
 import cv2
 import numpy as np
-from config import no_where
+from config.config import no_where
 from window_operation import click_in_game, drag_in_game, find_window, capture_window
 
 # 需要特殊处理image通道时可以调用这个，不需特殊处理则直接使用detect_button即可

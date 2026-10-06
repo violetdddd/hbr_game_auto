@@ -1,5 +1,5 @@
 from window_operation import click_in_game, find_window, position_monitor, drag_in_game
-from config import repeat_combat, OK_fig, again_fig, stone_fig, resolution, properties, wash_well_config, eazy_31C_fig, end_cardgame_fig, home_cardgame_fig, start_cardgame_position, skill_4_drug, no_where, stone_spare_fig, stone_tili_fig, ticket_orb_fig, use_most_fig, kaishi_fig, tiaozhan_fig, OD, od_figs_big, back_fig, retry_fig
+from config.config import repeat_combat, OK_fig, again_fig, stone_fig, resolution, properties, wash_well_config, eazy_31C_fig, end_cardgame_fig, home_cardgame_fig, start_cardgame_position, skill_4_drug, no_where, stone_spare_fig, stone_tili_fig, ticket_orb_fig, use_most_fig, kaishi_fig, tiaozhan_fig, OD, od_figs_big, back_fig, retry_fig
 from fight import fight, parse_hbrf_file, detect_start_button, operate_one_turn
 from utils import wait_and_click, detect_button, wait_until
 import time

@@ -1,7 +1,7 @@
 import time
 import cv2
 import numpy as np
-from config import resolution, skip, skill_123, member, next_turn, OD, start_action_fig, skip_fig, change, ok, skill_4_drug, od_figs, od_figs_big, switch_skills, no_where, auto_on_fig, auto_off_fig, kelian_change_fig, Siling_GuiShenHua_fig
+from config.config import resolution, skip, skill_123, member, next_turn, OD, start_action_fig, skip_fig, change, ok, skill_4_drug, od_figs, od_figs_big, switch_skills, no_where, auto_on_fig, auto_off_fig, kelian_change_fig, Siling_GuiShenHua_fig
 from window_operation import click_in_game, drag_in_game, find_window, capture_window
 from utils import match_template, detect_button, wait_and_click, wait_until, wait_until_any_template
 # from window_operation import position_monitor
