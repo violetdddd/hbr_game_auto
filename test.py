@@ -1,0 +1,1 @@
+print("auhguashdo".count("1"))
