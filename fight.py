@@ -1,79 +1,31 @@
 import time
 import cv2
-import numpy as np
-from config.config import resolution, skip, skill_123, member, next_turn, OD, start_action_fig, skip_fig, change, ok, skill_4_drug, od_figs, od_figs_big, switch_skills, no_where, auto_on_fig, auto_off_fig, kelian_change_fig, Siling_GuiShenHua_fig
+# import numpy as np
+from config.settings import resolution
+from config import positions as pos
+from config import templates as tpl
+from vision.images import load_template
 from window_operation import click_in_game, drag_in_game, find_window, capture_window
 from utils import match_template, detect_button, wait_and_click, wait_until, wait_until_any_template
-# from window_operation import position_monitor
+from hbrf import model as mod
+from paths import SCRIPTS_DIR
 
-def parse_hbrf_file(filepath):  
-    """返回一个列表，每个元素为一个回合的行动列表，包括OD状态、前排角色位置和技能"""
-    with open(filepath, encoding='utf-8') as f:
-        lines = [line.strip() for line in f if line.strip()]
-
-    # 1. 解析角色定义
-    role_dict = {}
-    role_skill_num = []
-    lines_without_comments = [line for line in lines if not line.startswith('#')]
-    role_lines = lines_without_comments[:6]
-    for idx, line in enumerate(role_lines, start=1):
-        name = line.split(':')[0].strip()
-        role_skill_num.append(line.count(",")+1)  # 统计多少逗号来确定技能数
-        role_dict[name] = idx
-
-    # 2. 解析行动部分
-    actions = []
-    actions.append(role_skill_num)  # actions里第一个元素是角色用到的技能数量
-
-    for line in lines_without_comments[6:]:
-        if line.startswith('skip'):
-            actions.append(0)  # 0表示需要点skip
-        elif line.startswith('change'):
-            actions.append(1)  # 0表示需要切换队伍
-        elif line.startswith('前置OD'):  # 在V4改版后弃用此条
-            actions.append(2)  # 2表示开启前置od
-        elif line.startswith('reset'):
-            turn, rest = line.split('=')
-            reset_positions = list(map(int, rest.split(',')))
-            actions.append(reset_positions)  # 2表示开启前置od
-
-        else:
-            turn, rest = line.split('=')
-            rest_parts = [p.strip() for p in rest.split(';')]
-
-            od = int(rest_parts[0])  # 取 OD
-            moves = rest_parts[1:]   # 角色动作
-
-            curr_pos = []
-            skills = []
-
-            for i, move in enumerate(moves, start=1):
-
-                parts = move.split(':')
-                name = parts[0].strip()
-                skill_tuple = tuple(map(int, parts[1].split(',')))
-                skills.append(skill_tuple)
-                curr_pos.append(role_dict[name])
-                    
-            actions.append([turn.strip(), od, curr_pos.copy(), skills])
-
-    return actions
 
 def close_auto_fight(game):
     region = (0,0,resolution[0]//4,resolution[1]//8)
-    templates = {"off": auto_off_fig, "on":auto_on_fig}
+    templates = {"off": load_template(tpl.auto_off_fig), "on":load_template(tpl.auto_on_fig)}
 
     # 未找到会抛出异常
-    name, pos = wait_until_any_template(game, templates, region=region, interval=0.1, warning="未匹配到自动战斗按钮")
+    name, pt = wait_until_any_template(game, templates, region=region, interval=0.1, warning="未匹配到自动战斗按钮")
 
     if name == "on":
-        click_in_game(game, pos)
+        click_in_game(game, pt)
 
     return name
 
 def detect_start_button(game):
     # 用r通道减g通道获得粉色信息
-    template = cv2.subtract(start_action_fig[:, :, 2], start_action_fig[:, :, 1])
+    template = cv2.subtract(load_template(tpl.start_action_fig)[:, :, 2], load_template(tpl.start_action_fig)[:, :, 1])
     region = (resolution[0]*3//4,resolution[1]//2,resolution[0]//4,resolution[1]//2)
 
     # 截取窗口区域
@@ -87,20 +39,51 @@ def detect_start_button(game):
 
 def detect_skip_button(game):
     region=(resolution[0]*2//3, 0, resolution[0]//3, resolution[1]//4)
-    return detect_button(game, skip_fig, region=region)
+    return detect_button(game, load_template(tpl.skip_fig), region=region)
 
 def detect_od_button(game, od_mode):
     region=(resolution[0]*3//4, 0, resolution[0]//4, resolution[1]//4)
-    template = od_figs[od_mode-1]
+    template = load_template(tpl.od_figs[od_mode-1])
 
     return detect_button(game, template, region=region)
 
-def switch_skill(game, member_index, skill_index):
-    click_in_game(game, member[member_index-1])
-    click_in_game(game, switch_skills[skill_index-1])
-    click_in_game(game, member[member_index-1])
+def ensure_front(game, old_member_position, role):
+    i = old_member_position.index(role)
+    # 角色已经在前排
+    if i < 3:
+        return i
 
-def operate_one_turn(game, old_member_position, OD_mode, new_member_position, skills_setting, role_skill_num):
+    # 角色在后排先换到前排第一个
+    click_in_game(game, pos.member[i])
+    click_in_game(game, pos.member[0])
+    old_member_position[i], old_member_position[0] = old_member_position[0], old_member_position[i]
+    return 0
+
+def operate_skill_switch(game, member_pos, member_slot, skill_index, role_skill_num: dict):
+    """
+    已经在前排的角色使用此函数进行技能属性切换
+    """
+    click_in_game(game, pos.member[member_pos])
+    if skill_index in (1,2,3):
+        click_in_game(game, pos.switch_skills[skill_index-1])
+    # validate过，认为一定不会超过角色技能数，同时技能数不超过6
+    else:
+        drag_in_game(game, pos.skill_4_drug)
+        # 获取该角色最大技能数
+        role_skill_max = role_skill_num[member_slot]
+        # 可以兼容技能数4-6
+        click_in_game(game, pos.switch_skills[2+skill_index-role_skill_max])
+    click_in_game(game, pos.member[member_pos])
+
+def operate_role_button(game, button: str, member_position):
+    """
+    已经在前排的角色使用此函数发动技能小按钮
+    """
+    click_in_game(game, pos.member[member_position])
+    wait_and_click(game, load_template(tpl.ROLE_BUTTON_CONFIG[button]), warning=f"未匹配到{button}按钮")
+    time.sleep(3)
+
+def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mod.BattleTurn):
     """
     操作游戏一回合，包含前置OD、调整位置、选择技能、后置OD
     """
@@ -117,8 +100,8 @@ def operate_one_turn(game, old_member_position, OD_mode, new_member_position, sk
     
     def swap_position(swap_steps):
         for step in swap_steps:
-            click_in_game(game, member[step[0]])
-            click_in_game(game, member[step[1]])
+            click_in_game(game, pos.member[step[0]])
+            click_in_game(game, pos.member[step[1]])
 
     def arrange_skills(member_position_output, skills_setting: list):  # 元素为元组，（技能，指向角色）
         for i in range(3):  # 前排的3名角色
@@ -126,41 +109,48 @@ def operate_one_turn(game, old_member_position, OD_mode, new_member_position, sk
             target_position = skills_setting[i][1]
             if skill_position != 0:  # 不是普通攻击
                 # 点击角色
-                click_in_game(game, member[i])
+                click_in_game(game, pos.member[i])
 
                 # 选择技能
                 if skill_position <= 3:  # 不需要滑动
-                    click_in_game(game, skill_123[skill_position])
+                    click_in_game(game, pos.skill_123[skill_position])
                 else:  # 只支持最多6个技能，先滑动再点击3个技能的位置
-                    drag_in_game(game, skill_4_drug)
-                    # 角色编号到指标的映射要-1
-                    role_skill_max = role_skill_num[member_position_output[i]-1]
+                    drag_in_game(game, pos.skill_4_drug)
+                    # 获取该角色最大技能数
+                    role_skill_max = role_skill_num[member_position_output[i]]
                     # 可以兼容技能数4-6
-                    click_in_game(game, skill_123[3+skill_position-role_skill_max])
+                    click_in_game(game, pos.skill_123[3+skill_position-role_skill_max])
 
                 # 选择技能目标
-                if target_position != 0:  # 有指向角色
-                    click_in_game(game, member[member_position_output.index(target_position)]) 
+                if target_position is not None:  # 有指向角色
+                    click_in_game(game, pos.member[member_position_output.index(target_position)]) 
 
-    def OD_condition():
-        pos = detect_button(game, od_figs_big[0])
-        if pos:
+    def OD_condition(OD_mode):
+        pt = detect_button(game, load_template(tpl.od_figs_big[0]))
+        if pt:
             time.sleep(0.1)
-            wait_and_click(game, od_figs_big[OD_mode-1], warning=f"未匹配到目标OD{OD_mode}按钮")
-            return pos
+            wait_and_click(game, load_template(tpl.od_figs_big[OD_mode-1]), 
+                           timeout=60,
+                           warning=f"未匹配到目标OD{OD_mode}按钮")
+            return pt
         else:
             # time.sleep(0.1)
-            click_in_game(game, OD, sleep=False)
+            click_in_game(game, pos.OD, sleep=False)
 
     # 稍微等待防止点击过快
     time.sleep(0.3)
 
+    # 提取action中数据
+    OD_mode = action.od
+    new_member_position = [move.role for move in action.actions]
+    skills_setting = [(move.skill, move.target) for move in action.actions]
+
     # V4改版后的前置OD
     if OD_mode < 0:
-        click_in_game(game, OD)
+        click_in_game(game, pos.OD)
         time.sleep(0.2)
         od_index = abs(OD_mode)-1
-        wait_and_click(game, od_figs_big[od_index], warning=f"未匹配到OD{od_index+1}按钮")
+        wait_and_click(game, load_template(tpl.od_figs_big[od_index]), warning=f"未匹配到OD{od_index+1}按钮")
         wait_until(lambda: detect_start_button(game), 
                    warning="开OD后未匹配到回合结束按钮")
         time.sleep(0.2)
@@ -174,16 +164,17 @@ def operate_one_turn(game, old_member_position, OD_mode, new_member_position, sk
     arrange_skills(member_position_output, skills_setting)
 
     # 下一回合
-    click_in_game(game, next_turn)
+    click_in_game(game, pos.next_turn)
 
     # 后置OD
     if OD_mode > 0:
         # 防止动画过短点不到，先快速点一次OD
         time.sleep(0.02)
-        click_in_game(game, OD, sleep=False)
+        click_in_game(game, pos.OD, sleep=False)
 
         # 每次循环匹配OD1按钮，匹配到则点击所需OD，未匹配到继续点右上角OD按钮
-        wait_until(OD_condition,
+        wait_until(lambda: OD_condition(OD_mode),
+                   timeout=5*60,
                    interval=0.1,
                    warning=f"未匹配到OD{OD_mode}按钮")
 
@@ -193,62 +184,78 @@ def operate_one_turn(game, old_member_position, OD_mode, new_member_position, sk
 
     return member_position_output
 
-def fight(game, fight_config, auto_close=False, need_switch=False):
+def fight(game, script: mod.BattleScript, auto_close=False):
     if auto_close:
         close_auto_fight(game)
 
+    # 初始化位置和角色技能数量
     old_member_position = [1,2,3,4,5,6]  # 初始位置
+    # 角色slot到角色技能数量的映射
+    role_skill_num = {role.slot: len(role.skills) for role in script.roles}
 
-    role_skill_num = fight_config[0]  # 各角色所用技能数量
+    for action in script.actions:
 
-    for turn_idx in range(1,len(fight_config)):
-        turn_action = fight_config[turn_idx]
-
-        if turn_action == 0:  # 表示需要点击skip按钮
+        if isinstance(action, mod.SkipEvent):  # 表示需要点击skip按钮
             print("now skipping the dialog.")
-            pos = wait_until(lambda: detect_skip_button(game),
+            pt = wait_until(lambda: detect_skip_button(game),
                        timeout=5*60,
                        warning="未检测到跳过剧情按钮")
-            if pos:
+            if pt:
                 time.sleep(1)
-                click_in_game(game, pos)
+                click_in_game(game, pt)
                 time.sleep(3)
 
-        elif turn_action == 1:  # 表示需要切换队伍
+        elif isinstance(action, mod.ChangeTeamEvent):  # 表示需要切换队伍
             print(f"now switching team.")
-            click_in_game(game, change)
+            click_in_game(game, pos.change)
             time.sleep(0.2)
-            click_in_game(game, ok)
-            
-        else:  # 表示正常进行行动回合
-            pos = wait_until(lambda: detect_start_button(game),
+            click_in_game(game, pos.ok)
+
+        elif isinstance(action, mod.ResetPositions):
+            print(f"now resetting team positions.")
+            old_member_position = action.positions.copy()
+
+        elif isinstance(action, mod.SpecialRoleButton):
+            wait_until(lambda: detect_start_button(game),
                        timeout=5*60,
                        warning="未检测到回合结束按钮")
-            if pos:  # 到下一个回合了
-                # 为了异时层一二队重新设置角色位置，其他时候并不需要
-                if isinstance(turn_action, list) and len(turn_action) == 6:
-                    print(f"now resetting team positions.")
-                    old_member_position = turn_action
-                else:
-                    Turn = turn_action[0]
-                    print(f"now fighting turn {Turn}.")
-                    """技能/状态切换"""
-                    if need_switch:
-                        # if Turn == "1":
-                        #     switch_skill(game, 3,2)
-                        if Turn in ("5","6-od1","7-od2/2-追加"): # (1,5,6,9,10,14)
-                            time.sleep(1)
-                            if Turn == "1":
-                                click_in_game(game, member[2])
-                            else:
-                                click_in_game(game, member[2])
-                            # wait_and_click(game, kelian_change_fig, warning="未匹配到可怜切换按钮")
-                            wait_and_click(game, Siling_GuiShenHua_fig, warning="未匹配到司令鬼神化按钮")
-                            time.sleep(3)
-                    """技能/状态切换"""
-                    old_member_position = operate_one_turn(game, old_member_position.copy(), *turn_action[1:], role_skill_num)
-                    # 防止重复点击，可等待一段时间
-                    time.sleep(3)
+            print(f"now activating {action.button} button.")
+
+            now_pos = ensure_front(game, old_member_position, action.role)
+            operate_role_button(game, action.button, now_pos)
+
+        elif isinstance(action, mod.SkillSwitch):
+            wait_until(lambda: detect_start_button(game),
+                        timeout=5*60,
+                        warning="未检测到回合结束按钮")
+            print(f"now switching skill.")
+            now_pos = ensure_front(game, old_member_position, action.role)
+            # 如果角色本来就在前排
+            operate_skill_switch(game, now_pos, action.role, action.skill, role_skill_num)
+
+        elif isinstance(action, mod.SpecialGlobalButton):
+            wait_until(lambda: detect_start_button(game),
+                        timeout=5*60,
+                        warning="未检测到回合结束按钮")
+            print(f"now activating {action.button} button.")
+            wait_and_click(game, load_template(tpl.GLOBAL_BUTTON_CONFIG[action.button]), warning=f"未检测到{action.button}按钮")
+            
+        elif isinstance(action, mod.BattleTurn):  # 表示正常进行行动回合
+            # 到下一个回合了
+            wait_until(lambda: detect_start_button(game),
+                       timeout=5*60,
+                       warning="未检测到回合结束按钮")
+            
+            Turn = action.label
+            print(f"now fighting turn {Turn}.")
+
+            old_member_position = operate_one_turn(
+                game=game, 
+                old_member_position=old_member_position.copy(), 
+                role_skill_num=role_skill_num,
+                action=action)
+            # 防止重复点击，可等待一段时间
+            time.sleep(3)
 
 import ctypes
 
@@ -265,8 +272,8 @@ if __name__ == "__main__":
     # position_monitor()
     print(is_admin())
     game = find_window()
-    fight_config = parse_hbrf_file('hbrf/Encounter4.hbrf')
-    """异时层由于有很多剧情，暂时不能自动关闭auto战斗"""
-    fight(game, fight_config, auto_close=False, need_switch=True)
+    fight_script = mod.load_hbrf(SCRIPTS_DIR / "test.hbrf")
+    # """异时层由于有很多剧情，暂时不能自动关闭auto战斗"""
+    fight(game, fight_script, auto_close=False)
     # fight(game, fight_config, auto_close=True)
 

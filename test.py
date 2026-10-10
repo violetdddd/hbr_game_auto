@@ -1,1 +1,2 @@
-print("auhguashdo".count("1"))
+from window_operation import position_monitor
+position_monitor()

@@ -43,8 +43,11 @@ def drag_in_game(game, trajectory, duration=0.3):
     abs_x1, abs_y1 = human_position(win_left + x1, win_top + y1)
     abs_x2, abs_y2 = human_position(win_left + x2, win_top + y2)
 
+    time.sleep(human_time())
+
     pyautogui.moveTo(abs_x1, abs_y1)
     pyautogui.dragTo(abs_x2, abs_y2, duration=human_time(duration, 0.1))
+
     time.sleep(human_time(1))
 
 def position_monitor():

@@ -1,8 +1,8 @@
 import time
 import cv2
-import numpy as np
-from config.config import no_where
-from window_operation import click_in_game, drag_in_game, find_window, capture_window
+# import numpy as np
+from config.positions import no_where
+from window_operation import click_in_game, capture_window
 
 # 需要特殊处理image通道时可以调用这个，不需特殊处理则直接使用detect_button即可
 def match_template(template, image, offset:tuple=(0,0), threshold=0.8):
