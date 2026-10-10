@@ -1,0 +1,127 @@
+{
+  "31A": {
+    "status": "processed",
+    "output": "with_elements\\31A.json",
+    "matched": 59,
+    "missing": [],
+    "ambiguous": [],
+    "invalid": []
+  },
+  "31B": {
+    "status": "processed",
+    "output": "with_elements\\31B.json",
+    "matched": 45,
+    "missing": [],
+    "ambiguous": [],
+    "invalid": []
+  },
+  "31C": {
+    "status": "processed",
+    "output": "with_elements\\31C.json",
+    "matched": 45,
+    "missing": [
+      {
+        "character": "豐後 彌生",
+        "style": "邪惡軍團開始進軍餒！",
+        "jp": "悪の軍団進軍開始でゲス!"
+      }
+    ],
+    "ambiguous": [],
+    "invalid": []
+  },
+  "30G": {
+    "status": "processed",
+    "output": "with_elements\\30G.json",
+    "matched": 48,
+    "missing": [],
+    "ambiguous": [],
+    "invalid": []
+  },
+  "31D": {
+    "status": "processed",
+    "output": "with_elements\\31D.json",
+    "matched": 38,
+    "missing": [
+      {
+        "character": "二階堂 三鄉",
+        "style": "甜蜜的悠閒時光",
+        "jp": "甘い悠々時光"
+      },
+      {
+        "character": "伊達 朱里",
+        "style": "勇往直前永不放棄！",
+        "jp": "前進ネバーギブアップ！ "
+      }
+    ],
+    "ambiguous": [],
+    "invalid": []
+  },
+  "31E": {
+    "status": "processed",
+    "output": "with_elements\\31E.json",
+    "matched": 38,
+    "missing": [
+      {
+        "character": "大島 五十鈴",
+        "style": "平穩的風情",
+        "jp": "穏やかな風情"
+      }
+    ],
+    "ambiguous": [],
+    "invalid": []
+  },
+  "31F": {
+    "status": "processed",
+    "output": "with_elements\\31F.json",
+    "matched": 37,
+    "missing": [],
+    "ambiguous": [],
+    "invalid": []
+  },
+  "31X": {
+    "status": "processed",
+    "output": "with_elements\\31X.json",
+    "matched": 44,
+    "missing": [
+      {
+        "character": "芙里提卡 巴拉克里希南",
+        "style": "連繫未來的戰略會議 ",
+        "jp": " 未来へつなぐ戦略会議"
+      }
+    ],
+    "ambiguous": [],
+    "invalid": []
+  },
+  "Command": {
+    "status": "processed",
+    "output": "with_elements\\Command.json",
+    "matched": 3,
+    "missing": [],
+    "ambiguous": [],
+    "invalid": []
+  },
+  "P5R": {
+    "status": "processed",
+    "output": "with_elements\\P5R.json",
+    "matched": 3,
+    "missing": [],
+    "ambiguous": [],
+    "invalid": []
+  },
+  "31AB": {
+    "status": "processed",
+    "output": "with_elements\\31AB.json",
+    "matched": 10,
+    "missing": [],
+    "ambiguous": [],
+    "invalid": []
+  },
+  "19A": {
+    "status": "processed",
+    "output": "with_elements\\19A.json",
+    "matched": 1,
+    "missing": [],
+    "ambiguous": [],
+    "invalid": []
+  }
+}

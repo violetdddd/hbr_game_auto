@@ -1,12 +1,7 @@
 {
   "Mona": {
     "value": "Mona",
-    "names": {
-      "zh-TW": "Mona",
-      "jp": "モナ",
-      "zh-CN": "Mona",
-      "zh-CN-CN": "Mona"
-    },
+    "names": { "zh-TW": "Mona", "jp": "モナ", "zh-CN": "Mona", "zh-CN-CN": "Mona" },
     "english name": "Mona",
     "style": {
       "黎明的魔術師": {
@@ -17,32 +12,19 @@
           "zh-CN": "黎明的魔术师",
           "zh-CN-CN": "黎明的魔术师"
         },
-        "id": "001",
-        "ele": [
-          "Dark"
-        ]
+        "id": "001"
       }
     },
     "skill": {
       "common": {
         "迪亞拉翰": {
           "value": "迪亞拉翰",
-          "names": {
-            "zh-TW": "迪亞拉翰",
-            "jp": "ディアラハン",
-            "zh-CN": "迪亚拉翰",
-            "zh-CN-CN": "迪亚拉翰"
-          },
+          "names": { "zh-TW": "迪亞拉翰", "jp": "ディアラハン", "zh-CN": "迪亚拉翰", "zh-CN-CN": "迪亚拉翰" },
           "sp": 8
         },
         "加爾達因": {
           "value": "加爾達因",
-          "names": {
-            "zh-TW": "加爾達因",
-            "jp": "ガルダイン",
-            "zh-CN": "加尔达因",
-            "zh-CN-CN": "加尔达因"
-          },
+          "names": { "zh-TW": "加爾達因", "jp": "ガルダイン", "zh-CN": "加尔达因", "zh-CN-CN": "加尔达因" },
           "sp": 9
         }
       }
@@ -51,12 +33,7 @@
   },
   "Queen": {
     "value": "Queen",
-    "names": {
-      "zh-TW": "Queen",
-      "jp": "クイーン",
-      "zh-CN": "Queen",
-      "zh-CN-CN": "Queen"
-    },
+    "names": { "zh-TW": "Queen", "jp": "クイーン", "zh-CN": "Queen", "zh-CN-CN": "Queen" },
     "english name": "Queen",
     "style": {
       "慧眼的女教皇": {
@@ -67,8 +44,7 @@
           "zh-CN": "慧眼的女教皇",
           "zh-CN-CN": "慧眼的女教皇"
         },
-        "id": "001",
-        "ele": []
+        "id": "001"
       }
     },
     "skill": {
@@ -111,12 +87,7 @@
   },
   "Violet": {
     "value": "Violet",
-    "names": {
-      "zh-TW": "Violet",
-      "jp": "ヴァイオレット",
-      "zh-CN": "Violet",
-      "zh-CN-CN": "Violet"
-    },
+    "names": { "zh-TW": "Violet", "jp": "ヴァイオレット", "zh-CN": "Violet", "zh-CN-CN": "Violet" },
     "english name": "Violet",
     "style": {
       "堅定的信念": {
@@ -127,10 +98,7 @@
           "zh-CN": "坚定的信念",
           "zh-CN-CN": "坚定的信念"
         },
-        "id": "001",
-        "ele": [
-          "Light"
-        ]
+        "id": "001"
       }
     },
     "skill": {
