@@ -20,7 +20,8 @@
         "id": "001",
         "ele": [
           "Light"
-        ]
+        ],
+        "tier": "SSR"
       },
       "翱穹之劍": {
         "value": "翱穹之劍",
@@ -33,7 +34,8 @@
         "id": "002",
         "ele": [
           "Ice"
-        ]
+        ],
+        "tier": "SSR"
       }
     },
     "skill": {
@@ -125,7 +127,8 @@
         "id": "001",
         "ele": [
           "Fire"
-        ]
+        ],
+        "tier": "SSR"
       },
       "平凡的非日常": {
         "value": "平凡的非日常",
@@ -138,7 +141,8 @@
         "id": "002",
         "ele": [
           "Ice"
-        ]
+        ],
+        "tier": "SSR"
       }
     },
     "skill": {
@@ -228,7 +232,8 @@
           "zh-CN-CN": "Pure Cosmos"
         },
         "id": "001",
-        "ele": []
+        "ele": [],
+        "tier": "S"
       },
       "Faraway Eden": {
         "value": "Faraway Eden",
@@ -241,7 +246,8 @@
         "id": "002",
         "ele": [
           "Ice"
-        ]
+        ],
+        "tier": "SSR"
       }
     },
     "skill": {
@@ -323,7 +329,8 @@
         "id": "001",
         "ele": [
           "Ice"
-        ]
+        ],
+        "tier": "S"
       }
     },
     "skill": {
@@ -371,7 +378,8 @@
           "zh-CN-CN": "温暖的记忆"
         },
         "id": "001",
-        "ele": []
+        "ele": [],
+        "tier": "S"
       }
     },
     "skill": {
@@ -421,7 +429,8 @@
         "id": "001",
         "ele": [
           "Ice"
-        ]
+        ],
+        "tier": "SSR"
       }
     },
     "skill": {
@@ -481,7 +490,8 @@
         "id": "001",
         "ele": [
           "Ice"
-        ]
+        ],
+        "tier": "SSR"
       }
     },
     "skill": {

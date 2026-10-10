@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Merge SeraphDB card ele into 12 existing team JSON files. Standard library only."""
+"""Merge SeraphDB card ele and tier into 12 existing team JSON files. Standard library only."""
 import argparse
 import json
 from collections import defaultdict
@@ -25,9 +25,9 @@ def build_index(characters):
         team = character.get('team')
         for card in character.get('cards', []):
             key = (team, card.get('name'))
-            if not isinstance(card.get('ele'), list):
+            if not isinstance(card.get('ele'), list) or not isinstance(card.get('tier'), str):
                 continue
-            index[key].append({'ele': card['ele'], 'card_id': card.get('id'), 'character': character.get('label')})
+            index[key].append({'ele': card['ele'], 'tier': card['tier'], 'card_id': card.get('id'), 'character': character.get('label')})
     return index
 
 def merge_team(data, team, index, bilingual=False):
@@ -51,6 +51,7 @@ def merge_team(data, team, index, bilingual=False):
                 stats['invalid'].append({**info, 'ele': ele})
                 continue
             style['ele'] = ele.copy()
+            style['tier'] = matches[0]['tier']
             if bilingual:
                 style['element'] = [{'zh': ELEMENTS[x], 'en': x.lower()} for x in ele]
             stats['matched'] += 1
@@ -60,7 +61,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--source', type=Path, default=Path('characters.json'))
     p.add_argument('--input-dir', type=Path, default=Path('.'))
-    p.add_argument('--output-dir', type=Path, default=Path('with_elements'))
+    p.add_argument('--output-dir', type=Path, default=Path('with_elements_tier'))
     p.add_argument('--bilingual', action='store_true', help='Also write element as a bilingual list')
     args = p.parse_args()
     index = build_index(read_json(args.source))

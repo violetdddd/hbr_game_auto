@@ -20,7 +20,8 @@
         "id": "001",
         "ele": [
           "Thunder"
-        ]
+        ],
+        "tier": "SSR"
       },
       "約定在晨曦的彼端": {
         "value": "約定在晨曦的彼端",
@@ -33,7 +34,8 @@
         "id": "002",
         "ele": [
           "Thunder"
-        ]
+        ],
+        "tier": "SSR"
       }
     },
     "skill": {
@@ -137,7 +139,8 @@
         "id": "001",
         "ele": [
           "Thunder"
-        ]
+        ],
+        "tier": "SSR"
       }
     },
     "skill": {
