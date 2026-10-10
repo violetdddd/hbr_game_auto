@@ -1,0 +1,142 @@
+{
+  "Mona": {
+    "value": "Mona",
+    "names": { "zh-TW": "Mona", "jp": "モナ", "zh-CN": "Mona", "zh-CN-CN": "Mona" },
+    "english name": "Mona",
+    "style": {
+      "黎明的魔術師": {
+        "value": "黎明的魔術師",
+        "names": {
+          "zh-TW": "黎明的魔術師",
+          "jp": "黎明の魔術師",
+          "zh-CN": "黎明的魔术师",
+          "zh-CN-CN": "黎明的魔术师"
+        },
+        "id": "001"
+      }
+    },
+    "skill": {
+      "common": {
+        "迪亞拉翰": {
+          "value": "迪亞拉翰",
+          "names": { "zh-TW": "迪亞拉翰", "jp": "ディアラハン", "zh-CN": "迪亚拉翰", "zh-CN-CN": "迪亚拉翰" },
+          "sp": 8
+        },
+        "加爾達因": {
+          "value": "加爾達因",
+          "names": { "zh-TW": "加爾達因", "jp": "ガルダイン", "zh-CN": "加尔达因", "zh-CN-CN": "加尔达因" },
+          "sp": 9
+        }
+      }
+    },
+    "passive skill": {}
+  },
+  "Queen": {
+    "value": "Queen",
+    "names": { "zh-TW": "Queen", "jp": "クイーン", "zh-CN": "Queen", "zh-CN-CN": "Queen" },
+    "english name": "Queen",
+    "style": {
+      "慧眼的女教皇": {
+        "value": "慧眼的女教皇",
+        "names": {
+          "zh-TW": "慧眼的女教皇",
+          "jp": "慧眼の女教皇",
+          "zh-CN": "慧眼的女教皇",
+          "zh-CN-CN": "慧眼的女教皇"
+        },
+        "id": "001"
+      }
+    },
+    "skill": {
+      "common": {
+        "瑪哈拉庫卡加": {
+          "value": "瑪哈拉庫卡加",
+          "names": {
+            "zh-TW": "瑪哈拉庫卡加",
+            "jp": "マハラクカジャ",
+            "zh-CN": "玛哈拉库卡加",
+            "zh-CN-CN": "玛哈拉库卡加"
+          },
+          "sp": 12
+        },
+        "梅迪亞拉翰": {
+          "value": "梅迪亞拉翰",
+          "names": {
+            "zh-TW": "梅迪亞拉翰",
+            "jp": "メディアラハン",
+            "zh-CN": "梅迪亚拉翰",
+            "zh-CN-CN": "梅迪亚拉翰"
+          },
+          "sp": 10
+        }
+      },
+      "慧眼的女教皇": {
+        "原子火焰": {
+          "value": "原子火焰",
+          "names": {
+            "zh-TW": "原子火焰",
+            "jp": "アトミックフレア",
+            "zh-CN": "原子火焰",
+            "zh-CN-CN": "原子火焰"
+          },
+          "sp": 16
+        }
+      }
+    },
+    "passive skill": {}
+  },
+  "Violet": {
+    "value": "Violet",
+    "names": { "zh-TW": "Violet", "jp": "ヴァイオレット", "zh-CN": "Violet", "zh-CN-CN": "Violet" },
+    "english name": "Violet",
+    "style": {
+      "堅定的信念": {
+        "value": "堅定的信念",
+        "names": {
+          "zh-TW": "堅定的信念",
+          "jp": "揺るぎなき信念",
+          "zh-CN": "坚定的信念",
+          "zh-CN-CN": "坚定的信念"
+        },
+        "id": "001"
+      }
+    },
+    "skill": {
+      "common": {
+        "瑪哈克加翁": {
+          "value": "瑪哈克加翁",
+          "names": {
+            "zh-TW": "瑪哈克加翁",
+            "jp": "マハコウガオン",
+            "zh-CN": "玛哈克加翁",
+            "zh-CN-CN": "玛哈克加翁"
+          },
+          "sp": 8
+        },
+        "勇氣步伐": {
+          "value": "勇氣步伐",
+          "names": {
+            "zh-TW": "勇氣步伐",
+            "jp": "ブレイブステップ",
+            "zh-CN": "勇气步伐",
+            "zh-CN-CN": "勇气步伐"
+          },
+          "sp": 12
+        }
+      },
+      "堅定的信念": {
+        "劍之舞": {
+          "value": "劍之舞",
+          "names": {
+            "zh-TW": "劍之舞",
+            "jp": "剣の舞",
+            "zh-CN": "剑之舞",
+            "zh-CN-CN": "剑之舞"
+          },
+          "sp": 16
+        }
+      }
+    },
+    "passive skill": {}
+  }
+}
