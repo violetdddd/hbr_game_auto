@@ -51,11 +51,13 @@ class SpecialGlobalButton:
 class SkillSwitch:
     role: int
     skill: int
+    position: int  # 这里直接0，1，2但写在脚本里+1变成更易读的1，2，3
 
 # 可怜/司令的前排技能按钮 施工中
 @dataclass
 class SpecialRoleButton:
     role: int
+    position: int  # 这里直接0，1，2但写在脚本里+1变成更易读的1，2，3
     button: str
 
 # 整个战斗脚本
@@ -98,6 +100,10 @@ def validate_hbrf(script: BattleScript):
                 raise ValueError(
                     f"{action.button}的对应角色: {action.role}不存在"
                 )
+            if action.position not in (0,1,2):
+                raise ValueError(
+                    f"{action.button}的对应角色必须站在前排"
+                )
             
         elif isinstance(action, SkillSwitch):
             if action.role not in (1,2,3,4,5,6):
@@ -107,6 +113,10 @@ def validate_hbrf(script: BattleScript):
             if not 1 <= action.skill <= len(role_by_id[action.role].skills):
                 raise ValueError(
                     f"切换非法技能编号: {action.skill}"
+                )
+            if action.position not in (0,1,2):
+                raise ValueError(
+                    f"切换技能的对应角色必须站在前排"
                 )
 
         elif isinstance(action, SpecialGlobalButton):
@@ -230,39 +240,49 @@ def load_hbrf(filepath) -> BattleScript:
             actions.append(SpecialGlobalButton(line))
             continue
 
-        # 可怜/司令这种前排点击技能按钮或切换技能的行动
+        # 可怜/司令这种前排点击技能按钮或切换技能的行动：code | name | 技能/无 | 位置
         if "|" in line:
             parts = [x.strip() for x in line.split("|")]
             command = parts[0]
 
             # 可怜/司令这种前排点击技能按钮的行动
-            if command in tpl.ROLE_BUTTON_CONFIG and len(parts) == 2:
-                name = parts[1]
+            if command in tpl.ROLE_BUTTON_CONFIG and len(parts) == 3:
+                name, need_pos = parts[1], int(parts[2])
                 if name not in role_by_name:
                     raise ValueError(
                         f"{command}指示的角色名: {name}不存在"
+                    )
+                if need_pos not in (1,2,3):
+                    raise ValueError(
+                        f"{command}的对应角色必须站在前排"
                     )
 
                 actions.append(
                     SpecialRoleButton(
                         role=role_by_name[name].slot,
-                        button=command
+                        button=command,
+                        position=need_pos-1
                     )
                 )
                 continue
 
             # 切换某角色的技能属性
-            elif command == "skill" and len(parts) == 3:
-                switch_role_name, switch_skill = parts[1], int(parts[2])
+            elif command == "skill" and len(parts) == 4:
+                switch_role_name, switch_skill, need_pos = parts[1], int(parts[2]), int(parts[3])
                 if switch_role_name not in role_by_name:
                     raise ValueError(
                         f"未知角色: {switch_role_name}"
+                    )
+                if need_pos not in (1,2,3):
+                    raise ValueError(
+                        f"{command}的对应角色必须站在前排"
                     )
                 # 技能编号的大小问题将在validate中验证
                 actions.append(
                     SkillSwitch(
                         role=role_by_name[switch_role_name].slot,
-                        skill=switch_skill
+                        skill=switch_skill,
+                        position=need_pos-1
                     )
                 )
                 continue
@@ -402,10 +422,10 @@ def save_hbrf(script: BattleScript, filepath):
                 f.write(f"{action.button}\n")
 
             elif isinstance(action, SpecialRoleButton):
-                f.write(f"{action.button} | {role_by_id[action.role].name}\n")
+                f.write(f"{action.button} | {role_by_id[action.role].name} | {action.position+1}\n")
 
             elif isinstance(action, SkillSwitch):
-                f.write(f"skill | {role_by_id[action.role].name} | {action.skill}\n")
+                f.write(f"skill | {role_by_id[action.role].name} | {action.skill} | {action.position+1}\n")
 
             elif isinstance(action, ResetPositions):
                 positions = ",".join(

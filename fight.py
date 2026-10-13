@@ -47,17 +47,20 @@ def detect_od_button(game, od_mode):
 
     return detect_button(game, template, region=region)
 
-def ensure_front(game, old_member_position, role):
+def ensure_front(game, old_member_position, role, position):
+    if position >2 :
+        raise ValueError("特殊技能发动要求角色处于前排，请检查hbrf文件")
+    
     i = old_member_position.index(role)
-    # 角色已经在前排
-    if i < 3:
-        return i
+    # 角色已经在正确位置
+    if i == position:
+        return
 
-    # 角色在后排先换到前排第一个
+    # 角色在后排先换到前排正确位置
     click_in_game(game, pos.member[i])
-    click_in_game(game, pos.member[0])
-    old_member_position[i], old_member_position[0] = old_member_position[0], old_member_position[i]
-    return 0
+    click_in_game(game, pos.member[position])
+    old_member_position[i], old_member_position[position] = old_member_position[position], old_member_position[i]
+    return 
 
 def operate_skill_switch(game, member_pos, member_slot, skill_index, role_skill_num: dict):
     """
@@ -221,17 +224,17 @@ def fight(game, script: mod.BattleScript, auto_close=False):
                        warning="未检测到回合结束按钮")
             print(f"now activating {action.button} button.")
 
-            now_pos = ensure_front(game, old_member_position, action.role)
-            operate_role_button(game, action.button, now_pos)
+            ensure_front(game, old_member_position, action.role, action.position)
+            operate_role_button(game, action.button, action.position)
 
         elif isinstance(action, mod.SkillSwitch):
             wait_until(lambda: detect_start_button(game),
                         timeout=5*60,
                         warning="未检测到回合结束按钮")
             print(f"now switching skill.")
-            now_pos = ensure_front(game, old_member_position, action.role)
+            ensure_front(game, old_member_position, action.role, action.position)
             # 如果角色本来就在前排
-            operate_skill_switch(game, now_pos, action.role, action.skill, role_skill_num)
+            operate_skill_switch(game, action.position, action.role, action.skill, role_skill_num)
 
         elif isinstance(action, mod.SpecialGlobalButton):
             wait_until(lambda: detect_start_button(game),

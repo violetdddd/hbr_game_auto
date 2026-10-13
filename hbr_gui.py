@@ -15,7 +15,7 @@ from PySide6.QtGui import QIcon, QPixmap, QPainter, QPainterPath
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QGridLayout, QLabel, QPushButton, QComboBox, QSpinBox, QLineEdit, QScrollArea,
     QFileDialog, QMessageBox, QDialog, QDialogButtonBox, QCheckBox, QGroupBox,
-    QTabWidget, QTextEdit, QFormLayout)
+    QTabWidget, QTextEdit, QFormLayout, QInputDialog)
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / 'assets' / 'char-data'
@@ -56,6 +56,19 @@ class Catalog:
         self.styles: list[Style] = []
         self.common_global: list[str] = []
         self.common_by_name: dict[str, list[str]] = {}
+        self.skill_data = {}
+        self.switch_pairs = {}
+        self.special_styles = {}
+        special_file = DATA / 'special_skills.json'
+        if special_file.exists():
+            special = json.loads(special_file.read_text(encoding='utf-8'))
+            self.special_styles = special.get('exclude', {})
+            for character, groups in special.get('switchable', {}).items():
+                for style_name, entries in groups.items():
+                    for name, entry in entries.items():
+                        self.switch_pairs[(character, name)] = entry['link']
+                        self.skill_data[name] = entry
+        self._command_styles = set()
         if not DATA.exists():
             return
         for path in sorted(DATA.glob('*.json')):
@@ -63,7 +76,9 @@ class Catalog:
             if path.stem == 'common_skills':
                 self.common_global = [x['value'] for x in raw.get('defaultSkills', [])
                                       if isinstance(x, dict) and 'value' in x]
-            else:
+                for x in raw.get('defaultSkills', []):
+                    if isinstance(x, dict) and 'value' in x: self.skill_data[x['value']] = x
+            elif path.stem != 'special_skills':
                 self._load_team(raw, path.stem)
 
     def _load_team(self, raw, team):
@@ -75,14 +90,34 @@ class Catalog:
             groups = ch.get('skill', {})
             common = active_skill_names(groups.get('common', {}))
             self.common_by_name[name] = list(dict.fromkeys(common))
+            for group in groups.values():
+                if isinstance(group, dict):
+                    for key, entry in group.items():
+                        if isinstance(entry, dict) and 'sp' in entry:
+                            self.skill_data[entry.get('value', key)] = entry
             for style_key, entry in ch.get('style', {}).items():
                 sid_value = entry.get('id', '')
                 ids = sid_value if isinstance(sid_value, list) else [sid_value]
                 title = entry.get('value', style_key)
                 skills = active_skill_names(groups.get(style_key, {}))
+                # 司令的鬼神化和waki的魔界骑兵忽略
+                if style_key == "希望的晨曦":
+                    skills.remove("鬼神化")
+                if style_key == "高傲魔王的凱旋歸來":
+                    skills.remove("魔界騎兵起動！")
+                command_group = groups.get(style_key, {}).get('command action', {})
+                if isinstance(command_group, dict) and command_group:
+                    self._command_styles.add((name, title))
+                    for key, entry_command in command_group.items():
+                        if isinstance(entry_command, dict) and 'sp' in entry_command:
+                            skills.insert(0, entry_command.get('value', key))
+                            self.skill_data[entry_command.get('value', key)] = entry_command
                 # A multi-ID style may supply different "owner" skills. Keep all
                 # ordinary skills for that style; skill selection is still style-wide.
                 for sid in ids:
+                    # 可怜只保留009-1
+                    if style_key == "CODE:Virtual Killer" and sid == "009-2":
+                        continue
                     sid = str(sid)
                     image_path = IMAGES / team / english / f'{sid}.webp'
                     self.styles.append(Style(
@@ -99,6 +134,29 @@ class Catalog:
         return list(dict.fromkeys(style.skills +
                                   self.common_by_name.get(style.name, []) +
                                   self.common_global))
+
+    def default_action(self, style):
+        if style is None: return '普通攻击'
+        # Styles containing the command action cannot use an ordinary attack.
+        return '指揮行動' if (style.name, style.title) in self.command_styles else '普通攻击'
+
+    @property
+    def command_styles(self):
+        return getattr(self, '_command_styles', set())
+
+    def special_for(self, style):
+        return self.special_styles.get(style.name, {}).get(style.title) if style else None
+
+    def skill_label(self, name):
+        if name == '普通攻击': return '普通攻击'
+        if name == '指揮行動': return '指挥行动'
+        if name in ('切换姿态', '鬼神化'): return f'{name}（特殊行动）'
+        data = self.skill_data.get(name, {})
+        localized = display_name(data, name)
+        return f'{localized}（{data.get("sp", "?")} SP）'
+
+    def linked(self, style, skill):
+        return self.switch_pairs.get((style.name, skill)) if style else None
 
     def find_character(self, name):
         normalized = name.replace(' ', '').replace('　', '')
@@ -266,6 +324,7 @@ class TurnRow(QGroupBox):
             b = QPushButton(label); b.clicked.connect(callback); head.addWidget(b)
         outer.addLayout(head)
         body = QHBoxLayout()
+        self._syncing = False
         self.roles, self.skills, self.targets = [], [], []
         for i in range(3):
             col = QVBoxLayout()
@@ -288,52 +347,83 @@ class TurnRow(QGroupBox):
                     other.blockSignals(True)
                     other.setCurrentIndex(0)
                     other.blockSignals(False)
-                    self.update_skills(j, "普通攻击", 0)
+                    self.update_skills(j)
         self.update_skills(index)
 
     def refresh_roles(self, saved=None):
-        saved = saved or [(r.currentData(), s.currentText(), t.currentData()) for r,s,t in zip(self.roles,self.skills,self.targets)]
-        for i, (r,_,_) in enumerate(zip(self.roles,self.skills,self.targets)):
+        saved = saved or [(r.currentData(), s.currentData(), t.currentData()) for r,s,t in zip(self.roles,self.skills,self.targets)]
+        for i, r in enumerate(self.roles):
             r.blockSignals(True); r.clear()
             r.addItem('选择角色', 0)
             for j, style in enumerate(self.editor.slots, 1):
-                if style: r.addItem(f'{j} · {style.label}', j)
-            ix = r.findData(saved[i][0])
-            r.setCurrentIndex(ix if ix >= 0 else 0); r.blockSignals(False)
+                if style: r.addItem(f'{j} · {self.editor.nickname(j)}', j)
+            ix = r.findData(saved[i][0]); r.setCurrentIndex(ix if ix >= 0 else 0)
+            r.blockSignals(False)
             self.update_skills(i, saved[i][1], saved[i][2])
         for i, r in enumerate(self.roles):
             if r.currentData():
                 for j in range(i):
                     if self.roles[j].currentData() == r.currentData():
-                        self.roles[j].blockSignals(True)
-                        self.roles[j].setCurrentIndex(0)
+                        self.roles[j].blockSignals(True); self.roles[j].setCurrentIndex(0)
                         self.roles[j].blockSignals(False)
-                        self.update_skills(j, "普通攻击", 0)
+                        self.update_skills(j)
+        self._sync_special()
 
     def update_skills(self, i, skill=None, target=None):
         r, s, t = self.roles[i], self.skills[i], self.targets[i]
-        if skill is None: skill = s.currentText()
+        if skill is None: skill = s.currentData()
         if target is None: target = t.currentData()
         slot = r.currentData() or 0
         style = self.editor.slots[slot - 1] if slot else None
-        s.clear(); s.addItem('普通攻击', None)
-        for name in self.editor.catalog.skills_for(style): s.addItem(name, name)
-        ix = s.findText(skill)
-        if ix < 0 and skill and skill != '普通攻击': s.addItem(skill, skill); ix = s.count() - 1
-        s.setCurrentIndex(max(0, ix))
+        default = self.editor.catalog.default_action(style)
+        s.blockSignals(True); t.blockSignals(True)
+        s.clear()
+        special = self.editor.catalog.special_for(style)
+        if special: s.addItem(f'{special}（特殊行动）', f'@special:{special}')
+        s.addItem(self.editor.catalog.skill_label(default), default)
+        for name in self.editor.catalog.skills_for(style):
+            if name != default: s.addItem(self.editor.catalog.skill_label(name), name)
+        ix = s.findData(skill)
+        s.setCurrentIndex(ix if ix >= 0 else 0)
         t.clear(); t.addItem('无目标', None)
         for j, selected_style in enumerate(self.editor.slots, 1):
-            if selected_style:
-                t.addItem(selected_style.label, j)
+            if selected_style: t.addItem(self.editor.nickname(j), j)
         ix = t.findData(target); t.setCurrentIndex(max(0, ix))
+        s.blockSignals(False); t.blockSignals(False)
         self._skill_changed(i)
 
     def _skill_changed(self, i):
-        is_attack = self.skills[i].currentData() is None
-        target = self.targets[i]
-        if is_attack:
-            target.setCurrentIndex(0)
-        target.setEnabled(not is_attack)
+        skill = self.skills[i].currentData()
+        default = skill in ('普通攻击', '指揮行動') or (isinstance(skill,str) and skill.startswith('@special:'))
+        if default: self.targets[i].setCurrentIndex(0)
+        self.targets[i].setEnabled(not default)
+        self._sync_special(i)
+
+    def _sync_special(self, source=None):
+        if getattr(self, '_syncing', False): return
+        self._syncing = True
+        try:
+            special_indices = [i for i, s in enumerate(self.skills) if str(s.currentData() or '').startswith('@special:')]
+            if len(special_indices) > 1 and source in special_indices:
+                special_indices = [source]
+            if special_indices:
+                active = special_indices[0]
+                for i, s in enumerate(self.skills):
+                    if i != active:
+                        slot = self.roles[i].currentData() or 0
+                        style = self.editor.slots[slot-1] if slot else None
+                        default = self.editor.catalog.default_action(style)
+                        ix = s.findData(default)
+                        if ix >= 0: s.setCurrentIndex(ix)
+                        self.targets[i].setCurrentIndex(0)
+                        s.setEnabled(False); self.targets[i].setEnabled(False)
+                    else: s.setEnabled(True)
+            else:
+                for i, s in enumerate(self.skills):
+                    s.setEnabled(True)
+                    self.targets[i].setEnabled(s.currentData() not in ('普通攻击','指揮行動'))
+        finally:
+            self._syncing = False
 
     def refresh_bonus(self):
         previous = self.bonus.currentText()
@@ -344,9 +434,12 @@ class TurnRow(QGroupBox):
             self.bonus.addItem('无 Bonus')
             self.bonus.setEnabled(False)
         else:
+            if self.od_value() > 0:
+                self.bonus.addItem('无 Bonus')
             self.bonus.setEnabled(True)
             for j in range(1, od + 1):
                 self.bonus.addItem(f'OD{od}-bonus{j}')
+
         selected = self.bonus.findText(previous)
         self.bonus.setCurrentIndex(selected if selected >= 0 else 0)
         self.bonus.blockSignals(False)
@@ -365,7 +458,7 @@ class TurnRow(QGroupBox):
     def state(self):
         return dict(turn=self.turn_no.currentIndex(), extra=self.extra.currentIndex(), bonus=self.bonus.currentIndex(), bonus_text=self.bonus.currentText(),
                     od=self.od.currentIndex(), label=self.custom_label.text(),
-                    moves=[(r.currentData(),s.currentText(),t.currentData()) for r,s,t in zip(self.roles,self.skills,self.targets)])
+                    moves=[(r.currentData(),s.currentData(),t.currentData()) for r,s,t in zip(self.roles,self.skills,self.targets)])
 
     def load_state(self, state):
         self.turn_no.setCurrentIndex(state.get('turn',0))
@@ -377,6 +470,51 @@ class TurnRow(QGroupBox):
         self.bonus.setCurrentIndex(index if 0 <= index < self.bonus.count() else 0)
         self.custom_label.setText(state.get('label',''))
         self.refresh_roles(state.get('moves',[(0,'普通攻击',None)]*3))
+
+class EventRow(QGroupBox):
+    remove_requested = Signal(object)
+    copy_requested = Signal(object)
+    move_requested = Signal(object, int)
+
+    def __init__(self, kind, state=None, available=None):
+        super().__init__('异时层行动' if kind == 'yishi' else '特殊回合行动')
+        self.kind = kind
+        layout = QHBoxLayout(self)
+        layout.addWidget(QLabel('行动'))
+        self.action = NoWheelComboBox()
+        if kind == 'yishi':
+            self.action.addItem('跳过剧情', 'skip')
+            self.action.addItem('切换队伍', 'change')
+        else:
+            self.refresh_choices(available or [])
+        layout.addWidget(self.action, 1)
+        for label, callback in [('↑',lambda: self.move_requested.emit(self,-1)),
+                                ('↓',lambda: self.move_requested.emit(self,1)),
+                                ('复制',lambda: self.copy_requested.emit(self)),
+                                ('删除',lambda: self.remove_requested.emit(self))]:
+            b=QPushButton(label); b.clicked.connect(callback); layout.addWidget(b)
+        if state:
+            ix=self.action.findData(state['action'])
+            if ix>=0: self.action.setCurrentIndex(ix)
+
+    def refresh_choices(self, available):
+        if self.kind != 'special': return
+        from config import templates as tpl
+        current = self.action.currentData()
+        labels = {'waki': '魔界骑兵', 'attack': '总攻击'}
+        self.action.blockSignals(True)
+        self.action.clear()
+        for command in tpl.GLOBAL_BUTTON_CONFIG:
+            if command in available:
+                self.action.addItem(labels.get(command, command), command)
+        index = self.action.findData(current)
+        if index >= 0: self.action.setCurrentIndex(index)
+        self.action.setEnabled(self.action.count() > 0)
+        self.action.blockSignals(False)
+
+    def state(self):
+        return {'action': self.action.currentData(), 'kind': self.kind}
+
 
 class Worker(QThread):
     finished_text = Signal(str)
@@ -396,8 +534,9 @@ class MainWindow(QMainWindow):
         self.resize(1120, 840)
         self.catalog = Catalog()
         self.slots = [None] * 6
+        self.nicknames = [''] * 6
         self.rows = []
-        self.other_actions = [] # (turn index before which to insert, Action)
+        self.other_actions = [] # Legacy actions not yet supported by the editor
         self.current_path = None
         self.worker = None
         self._build()
@@ -408,8 +547,7 @@ class MainWindow(QMainWindow):
         edit = QWidget(); tabs.addTab(edit, 'HBRF 编辑器')
         root = QVBoxLayout(edit)
         toolbar = QHBoxLayout()
-        for title, callback in [('新建',self.new),('打开 HBRF',self.open_file),('保存',self.save),('另存为',lambda: self.save(True)),
-                                ('添加回合',lambda: self.add_row())]:
+        for title, callback in [('新建',self.new),('打开 HBRF',self.open_file),('保存',self.save),('另存为',lambda: self.save(True))]:
             b = QPushButton(title); b.clicked.connect(callback); toolbar.addWidget(b)
         toolbar.addStretch(); root.addLayout(toolbar)
         slots_box = QGroupBox('队伍 · Slot 1–6（点击设置风格；右键清空）')
@@ -421,7 +559,9 @@ class MainWindow(QMainWindow):
             b.clicked.connect(lambda _=False, ix=i: self.choose_style(ix))
             b.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             b.customContextMenuRequested.connect(lambda _=None, ix=i: self.clear_style(ix))
-            label = QLabel(f'Slot {i+1}'); label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            label = QLineEdit(); label.setPlaceholderText(f'Slot {i+1} · 昵称（可选）')
+            label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            label.editingFinished.connect(lambda ix=i, w=label: self.change_nickname(ix, w.text()))
             col.addWidget(b, alignment=Qt.AlignmentFlag.AlignCenter); col.addWidget(label)
             slots_layout.addLayout(col); self.slot_buttons.append((b,label))
         root.addWidget(slots_box)
@@ -429,6 +569,12 @@ class MainWindow(QMainWindow):
         self.rows_holder = QWidget(); self.rows_layout = QVBoxLayout(self.rows_holder)
         self.rows_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.scroll.setWidget(self.rows_holder); root.addWidget(self.scroll)
+        add_actions = QHBoxLayout()
+        for title, kind in [('异时层行动', 'yishi'), ('添加回合', 'turn'), ('特殊回合行动', 'special')]:
+            b = QPushButton('＋ ' + title)
+            b.clicked.connect(lambda _=False, k=kind: self.add_row(kind=k))
+            add_actions.addWidget(b, 1 if kind != 'turn' else 2)
+        root.addLayout(add_actions)
         root.addWidget(QLabel('提示：HBRF 限制每回合恰好 3 个不同角色，且每名角色最多记录 6 个技能。'))
         runner = QWidget(); tabs.addTab(runner, '运行游戏')
         form = QFormLayout(runner)
@@ -465,34 +611,69 @@ class MainWindow(QMainWindow):
             style = self.slots[i]
             if style:
                 b.setText(''); b.setIcon(QIcon(round_pixmap(style.image)))
-                b.setIconSize(QSize(80,80)); label.setText(f'{i+1} · {style.label}\n{style.localized_title[:14]}')
+                b.setIconSize(QSize(80,80))
+                label.setPlaceholderText(f'{style.label}（可改昵称）')
+                if label.text() != self.nicknames[i]: label.setText(self.nicknames[i])
             else:
-                b.setIcon(QIcon()); b.setText('＋'); label.setText(f'Slot {i+1}')
-        for row in self.rows: row.refresh_roles()
+                b.setIcon(QIcon()); b.setText('＋'); label.setPlaceholderText(f'Slot {i+1}')
+                label.clear(); self.nicknames[i] = ''
+        for row in self.rows:
+            if isinstance(row, TurnRow): row.refresh_roles()
+            elif isinstance(row, EventRow): row.refresh_choices(self.available_global_buttons())
+
+    def available_global_buttons(self):
+        from config import templates as tpl
+        styles = [s for s in self.slots if s]
+        allowed = set()
+        if any(s.title == "高傲魔王的凱旋歸來" for s in styles):
+            allowed.add('waki')
+        if any(s.team == 'P5R' for s in styles):
+            allowed.add('attack')
+        return allowed.intersection(tpl.GLOBAL_BUTTON_CONFIG)
+
+    def nickname(self, slot):
+        style = self.slots[slot-1]
+        return self.nicknames[slot-1] or (style.label if style else f'空位{slot}')
+
+    def change_nickname(self, index, name):
+        if not self.slots[index]: return
+        self.nicknames[index] = name.strip().replace(' ','').replace('　','')
+        for row in self.rows:
+            if isinstance(row, TurnRow): row.refresh_roles()
 
     def choose_style(self, index):
         taken = {s.name for i,s in enumerate(self.slots) if s and i != index}
         dialog = StyleDialog(self.catalog, taken, self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.slots[index] = dialog.chosen
+            self.nicknames[index] = ''
             self.refresh_slots()
 
     def clear_style(self, index):
-        self.slots[index] = None; self.refresh_slots()
+        self.slots[index] = None; self.nicknames[index] = ''; self.refresh_slots()
 
-    def add_row(self, state=None, index=None):
-        row = TurnRow(self, state)
+    def add_row(self, state=None, index=None, kind='turn', scroll=True):
+        available = self.available_global_buttons() if kind == 'special' else None
+        if kind == 'special' and not available and state is None:
+            QMessageBox.information(self, '无法添加特殊回合行动', '队伍中需要魔王山胁才能使用魔界骑兵，或需要 P5R 角色才能使用总攻击。')
+            return None
+        row = TurnRow(self, state) if kind == 'turn' else EventRow(kind, state, available)
         row.remove_requested.connect(self.remove_row)
         row.copy_requested.connect(self.copy_row)
         row.move_requested.connect(self.move_row)
         if index is None: index = len(self.rows)
-        self.rows.insert(index,row); self.rows_layout.insertWidget(index,row)
+        self.rows.insert(index,row)
+        self.rows_layout.insertWidget(index,row)
+        if scroll:
+            QTimer.singleShot(10, lambda: self.scroll.verticalScrollBar().setValue(
+                self.scroll.verticalScrollBar().maximum()
+            ))
         return row
 
     def remove_row(self, row):
         self.rows.remove(row); row.setParent(None); row.deleteLater()
 
-    def copy_row(self, row): self.add_row(row.state(), self.rows.index(row)+1)
+    def copy_row(self, row): self.add_row(row.state(), self.rows.index(row)+1, 'turn' if isinstance(row, TurnRow) else row.kind)
 
     def move_row(self, row, shift):
         i = self.rows.index(row); j = i + shift
@@ -501,7 +682,7 @@ class MainWindow(QMainWindow):
         self.rows_layout.removeWidget(row); self.rows_layout.insertWidget(j,row)
 
     def new(self):
-        self.current_path = None; self.slots = [None]*6; self.other_actions=[]
+        self.current_path = None; self.slots = [None]*6; self.nicknames=['']*6; self.other_actions=[]
         for row in list(self.rows): self.remove_row(row)
         self.refresh_slots(); self.add_row()
 
@@ -524,6 +705,7 @@ class MainWindow(QMainWindow):
             script = m.load_hbrf(path)
             notes = self._style_notes(path)
             chosen = [None] * 6
+            loaded_nicknames = [''] * 6
             occupied = set()
             for i, role in enumerate(script.roles):
                 # Placeholder roles in both new and older GUI versions.
@@ -533,9 +715,7 @@ class MainWindow(QMainWindow):
                 style = None
                 if note is not None:
                     style = self.catalog.find_style(note.get('team'), note.get('english'), note.get('id'))
-                    # Metadata and role name both must be compatible; catch stale hand edits.
-                    if style and role.name.replace(' ', '') not in (style.name.replace(' ', ''), style.label.replace(' ', '')):
-                        style = None
+                    # Metadata is authoritative even if role.name is a user nickname.
                 if style is None:
                     question = QMessageBox(self)
                     question.setWindowTitle('角色 / 风格未匹配')
@@ -555,27 +735,70 @@ class MainWindow(QMainWindow):
                 if style and style.name in occupied:
                     raise ValueError(f'同一角色重复上场：{style.name}')
                 chosen[i] = style
-                if style: occupied.add(style.name)
+                if style:
+                    occupied.add(style.name)
+                    canonical = style.label.replace(' ', '').replace('　','')
+                    loaded_nicknames[i] = role.name if role.name != canonical else ''
 
             # Do not mutate the current editor until the whole import succeeds.
             self.new()
             self.current_path = Path(path)
             self.slots = chosen
+            self.nicknames = loaded_nicknames
             self.refresh_slots()
             for row in list(self.rows): self.remove_row(row)
-            turn_index = 0
+            # Switches and character buttons immediately preceding a turn are
+            # represented as its selected skill, not as standalone event rows.
+            active = {}
+            for role in script.roles:
+                for index, item in enumerate(role.skills, 1):
+                    if '/' in item:
+                        active[(role.slot, index)] = item.split('/', 1)[0]
+            pending = []
             for a in script.actions:
+                if isinstance(a, m.SkillSwitch):
+                    pending.append(a)
+                    pair = script.roles[a.role-1].skills[a.skill-1].split('/')
+                    if len(pair) == 2:
+                        old = active.get((a.role,a.skill),pair[0])
+                        active[(a.role,a.skill)] = pair[1] if old == pair[0] else pair[0]
+                    continue
+                if isinstance(a, m.SpecialRoleButton):
+                    pending.append(a); continue
+                if pending and not isinstance(a,m.BattleTurn):
+                    self.other_actions.extend((len(self.rows),x) for x in pending)
+                    pending = []
+                if isinstance(a, (m.SkipEvent,m.ChangeTeamEvent)):
+                    self.add_row({'action':'skip' if isinstance(a,m.SkipEvent) else 'change'},kind='yishi'); continue
+                if isinstance(a, m.SpecialGlobalButton):
+                    self.add_row({'action':a.button},kind='special'); continue
                 if not isinstance(a, m.BattleTurn):
-                    self.other_actions.append((turn_index, a)); continue
-                moves = []
+                    self.other_actions.append((len(self.rows), a)); continue
+                moves=[]
                 for mv in a.actions:
-                    old_role = script.roles[mv.role-1]
-                    text = '普通攻击' if mv.skill == 0 else old_role.skills[mv.skill-1]
-                    moves.append((mv.role if chosen[mv.role-1] else 0, text,
+                    old_role=script.roles[mv.role-1]
+                    if mv.skill==0: text=self.catalog.default_action(chosen[mv.role-1])
+                    else:
+                        value=old_role.skills[mv.skill-1]
+                        text=active.get((mv.role,mv.skill),value.split('/',1)[0])
+                    moves.append((mv.role if chosen[mv.role-1] else 0,text,
                                   mv.target if mv.target is not None and chosen[mv.target-1] else None))
-                od_idx = -a.od if a.od < 0 else (a.od+3 if a.od>0 else 0)
-                state = dict(turn=0, extra=0, bonus=0, od=od_idx, label=a.label, moves=moves)
-                self.add_row(state); turn_index += 1
+                for event in pending:
+                    if isinstance(event,m.SkillSwitch):
+                        entry=script.roles[event.role-1].skills[event.skill-1]
+                        if '/' not in entry:
+                            self.other_actions.append((len(self.rows), event))
+                    if isinstance(event,m.SpecialRoleButton):
+                        index=next((i for i,v in enumerate(moves) if v[0]==event.role),None)
+                        if index is not None and index==event.position:
+                            name={'kelian':'切换姿态','siling':'鬼神化'}.get(event.button)
+                            if name: moves[index]=(event.role,'@special:'+name,None)
+                            else: self.other_actions.append((len(self.rows),event))
+                        else: self.other_actions.append((len(self.rows),event))
+                pending=[]
+                od_idx=-a.od if a.od<0 else (a.od+3 if a.od>0 else 0)
+                self.add_row(dict(turn=0,extra=0,bonus=0,od=od_idx,label=a.label,moves=moves),scroll=False)
+            self.other_actions.extend((len(self.rows),x) for x in pending)
             self.run_path.setText(str(path))
             self.statusBar().showMessage(f'已打开：{path}')
         except Exception as e:
@@ -583,59 +806,100 @@ class MainWindow(QMainWindow):
 
     def build_script(self):
         from hbrf import model as m
-        # Map old GUI slots to compact HBRF slots, keeping unused slots at the end.
         present = [i for i, style in enumerate(self.slots) if style is not None]
         order = present + [i for i in range(6) if i not in present]
         slot_map = {old+1: new+1 for new, old in enumerate(order)}
         compact_styles = [self.slots[i] for i in order]
-        roles = [m.Role(i+1, s.name.replace(' ', '').replace('　', '') if s else f'空位{i+1}', [])
-                 for i, s in enumerate(compact_styles)]
-        moves_by_role = [[] for _ in range(6)]
+        roles = [m.Role(i+1, (self.nicknames[old] or self.slots[old].label).replace(' ','').replace('　','') if self.slots[old] else f'空位{i+1}', [])
+                 for i, old in enumerate(order)]
+        if len({r.name for r in roles}) != 6: raise ValueError('角色昵称不能重复')
+        used = [[] for _ in range(6)]
+        used_pairs = {}  # (compact slot, unordered pair) -> (selected names)
         for row in self.rows:
-            state = row.state(); seen = set()
-            for slot, skill, target in state['moves']:
-                if not slot or not self.slots[slot-1]:
-                    raise ValueError(f'{row.label_text()}：有未选择的角色')
-                if slot in seen: raise ValueError(f'{row.label_text()}：同一回合角色重复')
-                if skill == '普通攻击' and target is not None:
-                    raise ValueError(f'{row.label_text()}：普通攻击不能指定目标')
+            if not isinstance(row, TurnRow): continue
+            seen = set()
+            moves = row.state()['moves']
+            special = [i for i, (_,sk,_) in enumerate(moves) if str(sk or '').startswith('@special:')]
+            if len(special)>1: raise ValueError(f'{row.label_text()}：只能选择一个特殊前排行动')
+            for position,(slot,skill,target) in enumerate(moves):
+                if not slot or not self.slots[slot-1]: raise ValueError(f'{row.label_text()}：有未选择的角色')
+                if slot in seen: raise ValueError(f'{row.label_text()}：角色重复')
                 seen.add(slot)
-                if skill != '普通攻击' and skill not in moves_by_role[slot_map[slot]-1]:
-                    moves_by_role[slot_map[slot]-1].append(skill)
-        for i, names in enumerate(moves_by_role):
-            if len(names) > 6:
-                raise ValueError(f'Slot {i+1} 使用了 {len(names)} 个技能，超过 HBRF 上限 6')
-            roles[i].skills = names
-        actions = []
-        events = {}
-        for i, a in self.other_actions: events.setdefault(i, []).append(a)
-
-        def remap_event(a):
-            if isinstance(a, (m.SpecialRoleButton, m.SkillSwitch)):
-                if not self.slots[a.role-1]:
-                    raise ValueError('特殊 Action 引用了已舍弃的角色；请删除或替换该 Action')
-                if isinstance(a, m.SpecialRoleButton):
-                    return m.SpecialRoleButton(slot_map[a.role], a.button)
-                return m.SkillSwitch(slot_map[a.role], a.skill)
-            if isinstance(a, m.ResetPositions):
-                return m.ResetPositions([slot_map[x] for x in a.positions])
-            return a
-
-        for i, row in enumerate(self.rows):
-            actions.extend(remap_event(a) for a in events.get(i, []))
-            moves = []
-            for slot, skill, target in row.state()['moves']:
-                new_slot = slot_map[slot]
-                skill_id = 0 if skill == '普通攻击' else roles[new_slot-1].skills.index(skill) + 1
-                moves.append(m.SkillAction(new_slot, skill_id,
-                                           slot_map[target] if target is not None else None))
-            actions.append(m.BattleTurn(row.label_text(), row.od_value(), moves))
-        for i, items in events.items():
-            if i >= len(self.rows):
-                actions.extend(remap_event(a) for a in items)
-        script = m.BattleScript(roles, actions)
+                style=self.slots[slot-1]
+                default=self.catalog.default_action(style)
+                if skill in (default, '普通攻击') or str(skill).startswith('@special:'):
+                    if target is not None: raise ValueError(f'{row.label_text()}：默认/特殊行动不能指定目标')
+                else:
+                    if skill not in self.catalog.skills_for(style): raise ValueError(f'{self.nickname(slot)} 无法使用 {skill}')
+                    link=self.catalog.linked(style,skill)
+                    if link:
+                        key=(slot_map[slot], frozenset((skill,link)))
+                        used_pairs.setdefault(key, (skill,link))
+                        item=key[1]
+                    else: item=skill
+                    if item not in used[slot_map[slot]-1]: used[slot_map[slot]-1].append(item)
+            if special:
+                for i,(slot,skill,target) in enumerate(moves):
+                    if i != special[0] and skill != self.catalog.default_action(self.slots[slot-1]):
+                        raise ValueError(f'{row.label_text()}：特殊前排行动时其他角色必须使用默认行动')
+        # Ask which of each switchable pair is the initially selected skill.
+        defaults = {}
+        for (slot,pair),(a,b) in used_pairs.items():
+            options=[self.catalog.skill_label(a),self.catalog.skill_label(b)]
+            selection,ok=QInputDialog.getItem(self, '选择初始切换技能',
+                f'{roles[slot-1].name}：请选择初始默认技能', options, 0, False)
+            if not ok: raise ValueError('已取消技能初始状态选择')
+            defaults[(slot,pair)] = a if selection == options[0] else b
+        for index, items in enumerate(used):
+            if len(items)>6: raise ValueError(f'{roles[index].name}：使用技能超过6个')
+            names=[]
+            for item in items:
+                if isinstance(item,frozenset):
+                    first=defaults[(index+1,item)]; second=next(x for x in item if x!=first)
+                    names.append(first+'/'+second)
+                else: names.append(item)
+            roles[index].skills=names
+        current = dict(defaults)
+        actions=[]
+        for row in self.rows:
+            if isinstance(row, EventRow):
+                action=row.action.currentData()
+                if row.kind == 'special' and action not in self.available_global_buttons():
+                    raise ValueError('特殊回合行动与当前队伍不匹配，请重新选择角色或删除该行动')
+                if action == 'skip': actions.append(m.SkipEvent())
+                elif action == 'change': actions.append(m.ChangeTeamEvent())
+                else: actions.append(m.SpecialGlobalButton(action))
+                continue
+            moves=[]; special_action=None
+            for position,(slot,skill,target) in enumerate(row.state()['moves']):
+                new_slot=slot_map[slot]; style=self.slots[slot-1]
+                default=self.catalog.default_action(style)
+                if str(skill or '').startswith('@special:'):
+                    special_action=(new_slot,position,skill.partition(':')[2]); skill_id=0
+                elif skill in (default,'普通攻击'):
+                    skill_id=0
+                else:
+                    link=self.catalog.linked(style,skill)
+                    if link:
+                        pair=frozenset((skill,link)); key=(new_slot,pair)
+                        if current[key]!=skill:
+                            idx=used[new_slot-1].index(pair)+1
+                            actions.append(m.SkillSwitch(new_slot, idx, position))
+                            current[key]=skill
+                        skill_id=used[new_slot-1].index(pair)+1
+                    else: skill_id=used[new_slot-1].index(skill)+1
+                moves.append(m.SkillAction(new_slot,skill_id,slot_map[target] if target else None))
+            if special_action:
+                role,position,name=special_action
+                button={'切换姿态':'kelian','鬼神化':'siling'}.get(name)
+                if not button: raise ValueError(f'未知特殊行动：{name}')
+                actions.append(m.SpecialRoleButton(role,position,button))
+            actions.append(m.BattleTurn(row.label_text(),row.od_value(),moves))
+        if self.other_actions:
+            raise ValueError('有无法表示的原始 Action，已拒绝保存以免丢失信息')
+        script=m.BattleScript(roles,actions)
         m.validate_hbrf(script)
-        return script, compact_styles
+        return script,compact_styles
 
     def save(self, save_as=False):
         try: script, compact_styles=self.build_script()
