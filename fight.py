@@ -124,9 +124,25 @@ def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mo
                     # 可以兼容技能数4-6
                     click_in_game(game, pos.skill_123[3+skill_position-role_skill_max])
 
-                # 选择技能目标
-                if target_position is not None:  # 有指向角色
-                    click_in_game(game, pos.member[member_position_output.index(target_position)]) 
+                # 选择技能目标我方角色
+                if target_position in {1,2,3,4,5,6}:
+                    click_in_game(game, pos.member[member_position_output.index(target_position)])
+
+                # 区分指向星癌体
+                elif target_position in {7,8,9}:
+                    # 不知道为啥一定点两次才起作用
+                    click_in_game(game, pos.monster[target_position-7])
+                    click_in_game(game, pos.monster[target_position-7])
+
+            elif target_position in {7,8,9}:
+                # 点击2次角色
+                click_in_game(game, pos.member[i])
+                time.sleep(1.5)
+                click_in_game(game, pos.member[i])
+                time.sleep(1)
+                # 不知道为啥一定点两次才起作用
+                click_in_game(game, pos.monster[target_position-7])
+                click_in_game(game, pos.monster[target_position-7])
 
     def OD_condition(OD_mode):
         pt = detect_button(game, load_template(tpl.od_figs_big[0]))
@@ -210,9 +226,10 @@ def fight(game, script: mod.BattleScript, auto_close=False):
 
         elif isinstance(action, mod.ChangeTeamEvent):  # 表示需要切换队伍
             print(f"now switching team.")
-            click_in_game(game, pos.change)
-            time.sleep(0.2)
-            click_in_game(game, pos.ok)
+            wait_and_click(game, load_template(tpl.change_fig),
+                           warning="未检测到切换队伍按钮")
+            wait_and_click(game, load_template(tpl.OK_electric_fig),
+                           warning="未检测到切换队伍后的OK按钮")
 
         elif isinstance(action, mod.ResetPositions):
             print(f"now resetting team positions.")
@@ -275,7 +292,7 @@ if __name__ == "__main__":
     # position_monitor()
     print(is_admin())
     game = find_window()
-    fight_script = mod.load_hbrf(SCRIPTS_DIR / "test.hbrf")
+    fight_script = mod.load_hbrf(SCRIPTS_DIR / "test111.hbrf")
     # """异时层由于有很多剧情，暂时不能自动关闭auto战斗"""
     fight(game, fight_script, auto_close=False)
     # fight(game, fight_config, auto_close=True)

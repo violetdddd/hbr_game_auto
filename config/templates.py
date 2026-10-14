@@ -3,6 +3,7 @@ from paths import TEMPLATE_DIR
 # 图片匹配模板
 start_action_fig = TEMPLATE_DIR / "start_action.png"
 skip_fig = TEMPLATE_DIR / "skip.png"
+change_fig = TEMPLATE_DIR / "change.png"
 od_fig_1 = TEMPLATE_DIR / "od_1.png"
 od_fig_2 = TEMPLATE_DIR / "od_2.png"
 od_fig_3 = TEMPLATE_DIR / "od_3.png"

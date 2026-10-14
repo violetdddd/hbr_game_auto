@@ -25,7 +25,8 @@ ICONS = ROOT / 'assets' / 'icons'
 # Database layout: each team JSON maps character names to character records.
 # Each character has style, skill.common, and skill[style_name].
 def display_name(record, fallback=''):
-    return record.get('names', {}).get('zh-CN', record.get('value', fallback))
+    names = record.get('names', {})
+    return names.get('zh-CN-CN') or names.get('zh-CN') or record.get('value', fallback)
 
 
 def active_skill_names(group):
@@ -154,6 +155,9 @@ class Catalog:
         data = self.skill_data.get(name, {})
         localized = display_name(data, name)
         return f'{localized}（{data.get("sp", "?")} SP）'
+    
+    def skill_zh(self, name):
+        return display_name(self.skill_data.get(name, {}), name)
 
     def linked(self, style, skill):
         return self.switch_pairs.get((style.name, skill)) if style else None
@@ -314,10 +318,13 @@ class TurnRow(QGroupBox):
         self.turn_no = NoWheelComboBox(); self.turn_no.addItems([f'T{i}' for i in range(1, 21)])
         self.extra = NoWheelComboBox(); self.extra.addItems(['普通回合', '追加回合'])
         self.bonus = NoWheelComboBox(); self.bonus.setMinimumWidth(155); self.bonus.addItem('无 Bonus')
+        # 内部把-3到3映射为0到6
         self.od = NoWheelComboBox(); self.od.addItems(['无 OD', '前置 OD1', '前置 OD2', '前置 OD3', '后置 OD1', '后置 OD2', '后置 OD3'])
         self.od.currentIndexChanged.connect(self.refresh_bonus)
+        self.activate_od = QCheckBox('发动')
         self.custom_label = QLineEdit(); self.custom_label.setPlaceholderText('自定义 label（非空时优先使用）')
-        for w in (self.turn_no, self.extra, self.bonus, self.od): head.addWidget(w)
+        for w in (self.turn_no, self.extra, self.bonus, self.od, self.activate_od):
+            head.addWidget(w)
         head.addWidget(self.custom_label, 2)
         for label, callback in [('↑',lambda: self.move_requested.emit(self,-1)),('↓',lambda: self.move_requested.emit(self,1)),
                                 ('复制',lambda: self.copy_requested.emit(self)),('删除',lambda: self.remove_requested.emit(self))]:
@@ -388,15 +395,18 @@ class TurnRow(QGroupBox):
         t.clear(); t.addItem('无目标', None)
         for j, selected_style in enumerate(self.editor.slots, 1):
             if selected_style: t.addItem(self.editor.nickname(j), j)
+        t.addItem('双体左 / 三体中', 8)
+        t.addItem('双体右 / 三体右', 9)
+        t.addItem('三体左', 7)
         ix = t.findData(target); t.setCurrentIndex(max(0, ix))
         s.blockSignals(False); t.blockSignals(False)
         self._skill_changed(i)
 
     def _skill_changed(self, i):
         skill = self.skills[i].currentData()
-        default = skill in ('普通攻击', '指揮行動') or (isinstance(skill,str) and skill.startswith('@special:'))
-        if default: self.targets[i].setCurrentIndex(0)
-        self.targets[i].setEnabled(not default)
+        no_target = skill == '指揮行動' or (isinstance(skill,str) and skill.startswith('@special:'))
+        if no_target: self.targets[i].setCurrentIndex(0)
+        self.targets[i].setEnabled(not no_target)
         self._sync_special(i)
 
     def _sync_special(self, source=None):
@@ -421,7 +431,8 @@ class TurnRow(QGroupBox):
             else:
                 for i, s in enumerate(self.skills):
                     s.setEnabled(True)
-                    self.targets[i].setEnabled(s.currentData() not in ('普通攻击','指揮行動'))
+                    skill = s.currentData()
+                    self.targets[i].setEnabled(skill != '指揮行動' and not str(skill or '').startswith('@special:'))
         finally:
             self._syncing = False
 
@@ -435,7 +446,7 @@ class TurnRow(QGroupBox):
             self.bonus.setEnabled(False)
         else:
             if self.od_value() > 0:
-                self.bonus.addItem('无 Bonus')
+                self.bonus.addItem(f'OD前')
             self.bonus.setEnabled(True)
             for j in range(1, od + 1):
                 self.bonus.addItem(f'OD{od}-bonus{j}')
@@ -447,23 +458,61 @@ class TurnRow(QGroupBox):
     def label_text(self):
         if self.custom_label.text().strip(): return self.custom_label.text().strip()
         chunks = [self.turn_no.currentText()]
+        
+        if self.od_value() != 0: 
+            prefix = "前置" if self.od_value() < 0 else "后置"
+            bonus = self.bonus.currentText()
+            chunks.append(prefix + (f'OD{abs(self.od_value())}-OD前' if bonus == 'OD前' else bonus))
         if self.extra.currentIndex(): chunks.append('追加')
-        if self.od_value() != 0: chunks.append(self.bonus.currentText())
         return '-'.join(chunks)
+
+    @staticmethod
+    def parse_label(label, execution_od=0):
+        match = re.fullmatch(
+            r'T(20|1\d|[1-9])(?:-(前置|后置)(OD([123])-bonus([123])|OD([123])-OD前))?(-追加)?',
+            label
+        )
+        if not match:
+            return dict(label=label)
+
+        turn, direction, bonus_text, level, bonus, pre_level, extra = match.groups()
+        level = int(level or pre_level or 0)
+
+        if bonus and int(bonus) > level:
+            return dict(label=label)
+
+        if execution_od:
+            if not direction or level != abs(execution_od) or (execution_od < 0) != (direction == '前置'):
+                return dict(label=label)
+            od = -execution_od if execution_od < 0 else execution_od + 3
+        else:
+            od = (level if direction == '前置' else level + 3) if direction else 0
+
+        return dict(
+            turn=int(turn)-1,
+            extra=int(bool(extra)),
+            od=od,
+            bonus_text='OD前' if pre_level else (bonus_text or '无 Bonus'),
+            label=''
+        )
 
     def od_value(self):
         ix = self.od.currentIndex()
         return 0 if ix == 0 else -ix if ix <= 3 else ix - 3
 
+    def execution_od(self):
+        return self.od_value() if self.activate_od.isChecked() else 0
+
     def state(self):
         return dict(turn=self.turn_no.currentIndex(), extra=self.extra.currentIndex(), bonus=self.bonus.currentIndex(), bonus_text=self.bonus.currentText(),
-                    od=self.od.currentIndex(), label=self.custom_label.text(),
-                    moves=[(r.currentData(),s.currentData(),t.currentData()) for r,s,t in zip(self.roles,self.skills,self.targets)])
+        od=self.od.currentIndex(), activate_od=self.activate_od.isChecked(), label=self.custom_label.text(),
+        moves=[(r.currentData(),s.currentData(),t.currentData()) for r,s,t in zip(self.roles,self.skills,self.targets)])
 
     def load_state(self, state):
         self.turn_no.setCurrentIndex(state.get('turn',0))
         self.extra.setCurrentIndex(state.get('extra',0))
         self.od.setCurrentIndex(state.get('od',0))
+        self.activate_od.setChecked(state.get('activate_od', False))
         self.refresh_bonus()
         bonus = state.get('bonus_text', '')
         index = self.bonus.findText(bonus) if bonus else state.get('bonus', 0)
@@ -585,6 +634,7 @@ class MainWindow(QMainWindow):
         admin = QPushButton('以管理员身份重启 GUI（Windows）'); admin.clicked.connect(self.restart_admin)
         form.addRow(admin)
         self.run_path = QLineEdit(); self.run_path.setPlaceholderText('未指定则使用当前编辑器脚本')
+        self.run_path.editingFinished.connect(self.preview_run_file)
         select = QPushButton('选择脚本'); select.clicked.connect(self.select_run_file)
         pathrow = QHBoxLayout(); pathrow.addWidget(self.run_path); pathrow.addWidget(select)
         form.addRow('HBRF 路径', pathrow)
@@ -747,33 +797,51 @@ class MainWindow(QMainWindow):
             self.nicknames = loaded_nicknames
             self.refresh_slots()
             for row in list(self.rows): self.remove_row(row)
-            # Switches and character buttons immediately preceding a turn are
-            # represented as its selected skill, not as standalone event rows.
+            # active代表可切换技能目前启用的那一个
             active = {}
             for role in script.roles:
                 for index, item in enumerate(role.skills, 1):
                     if '/' in item:
                         active[(role.slot, index)] = item.split('/', 1)[0]
-            pending = []
             for a in script.actions:
+                # 交换active
                 if isinstance(a, m.SkillSwitch):
-                    pending.append(a)
                     pair = script.roles[a.role-1].skills[a.skill-1].split('/')
                     if len(pair) == 2:
                         old = active.get((a.role,a.skill),pair[0])
                         active[(a.role,a.skill)] = pair[1] if old == pair[0] else pair[0]
                     continue
                 if isinstance(a, m.SpecialRoleButton):
-                    pending.append(a); continue
-                if pending and not isinstance(a,m.BattleTurn):
-                    self.other_actions.extend((len(self.rows),x) for x in pending)
-                    pending = []
+                    name = {'kelian': '切换姿态', 'siling': '鬼神化'}.get(a.button)
+                    if not name or not chosen[a.role-1]:
+                        self.other_actions.append((len(self.rows), a))
+                        continue
+
+                    # HBRF 的 SpecialRoleButton 只保存操作角色和前排位置。
+                    moves = [(0, '普通攻击', None) for _ in range(3)]
+                    moves[a.position] = (a.role, '@special:' + name, None)
+
+                    # 尽量沿用之前回合的另外两名角色。
+                    previous = next((r for r in reversed(self.rows) if isinstance(r, TurnRow)), None)
+                    candidates = [slot for slot, _, _ in previous.state()['moves']] if previous else []
+                    candidates += [i for i, style in enumerate(chosen, 1) if style]
+
+                    for i in range(3):
+                        if i == a.position: continue
+                        slot = next((s for s in candidates if s and s != a.role
+                                    and s not in [v[0] for v in moves]), 0)
+                        if slot:
+                            moves[i] = (slot, self.catalog.default_action(chosen[slot-1]), None)
+
+                    self.add_row({'moves': moves}, scroll=False)
+                    continue
                 if isinstance(a, (m.SkipEvent,m.ChangeTeamEvent)):
                     self.add_row({'action':'skip' if isinstance(a,m.SkipEvent) else 'change'},kind='yishi'); continue
                 if isinstance(a, m.SpecialGlobalButton):
                     self.add_row({'action':a.button},kind='special'); continue
                 if not isinstance(a, m.BattleTurn):
                     self.other_actions.append((len(self.rows), a)); continue
+                # 是BattleTurn
                 moves=[]
                 for mv in a.actions:
                     old_role=script.roles[mv.role-1]
@@ -782,23 +850,11 @@ class MainWindow(QMainWindow):
                         value=old_role.skills[mv.skill-1]
                         text=active.get((mv.role,mv.skill),value.split('/',1)[0])
                     moves.append((mv.role if chosen[mv.role-1] else 0,text,
-                                  mv.target if mv.target is not None and chosen[mv.target-1] else None))
-                for event in pending:
-                    if isinstance(event,m.SkillSwitch):
-                        entry=script.roles[event.role-1].skills[event.skill-1]
-                        if '/' not in entry:
-                            self.other_actions.append((len(self.rows), event))
-                    if isinstance(event,m.SpecialRoleButton):
-                        index=next((i for i,v in enumerate(moves) if v[0]==event.role),None)
-                        if index is not None and index==event.position:
-                            name={'kelian':'切换姿态','siling':'鬼神化'}.get(event.button)
-                            if name: moves[index]=(event.role,'@special:'+name,None)
-                            else: self.other_actions.append((len(self.rows),event))
-                        else: self.other_actions.append((len(self.rows),event))
-                pending=[]
-                od_idx=-a.od if a.od<0 else (a.od+3 if a.od>0 else 0)
-                self.add_row(dict(turn=0,extra=0,bonus=0,od=od_idx,label=a.label,moves=moves),scroll=False)
-            self.other_actions.extend((len(self.rows),x) for x in pending)
+                                  mv.target if mv.target in (7,8,9) or (mv.target is not None and chosen[mv.target-1]) else None))
+                state = TurnRow.parse_label(a.label, a.od)
+                state.setdefault('od', -a.od if a.od < 0 else (a.od + 3 if a.od > 0 else 0))
+                state.update(activate_od=a.od != 0, moves=moves)
+                self.add_row(state, scroll=False)
             self.run_path.setText(str(path))
             self.statusBar().showMessage(f'已打开：{path}')
         except Exception as e:
@@ -826,9 +882,11 @@ class MainWindow(QMainWindow):
                 if slot in seen: raise ValueError(f'{row.label_text()}：角色重复')
                 seen.add(slot)
                 style=self.slots[slot-1]
-                default=self.catalog.default_action(style)
-                if skill in (default, '普通攻击') or str(skill).startswith('@special:'):
-                    if target is not None: raise ValueError(f'{row.label_text()}：默认/特殊行动不能指定目标')
+                # default=self.catalog.default_action(style)
+                if skill == "指揮行動" or str(skill).startswith('@special:'):
+                    if target is not None: raise ValueError(f'{row.label_text()}：指挥/特殊行动不能指定目标')
+                elif skill == '普通攻击':
+                    pass
                 else:
                     if skill not in self.catalog.skills_for(style): raise ValueError(f'{self.nickname(slot)} 无法使用 {skill}')
                     link=self.catalog.linked(style,skill)
@@ -851,7 +909,7 @@ class MainWindow(QMainWindow):
             if not ok: raise ValueError('已取消技能初始状态选择')
             defaults[(slot,pair)] = a if selection == options[0] else b
         for index, items in enumerate(used):
-            if len(items)>6: raise ValueError(f'{roles[index].name}：使用技能超过6个')
+            if len(items)>6: raise ValueError(f'{roles[index].name}：使用技能超过6个，目前暂不支持')
             names=[]
             for item in items:
                 if isinstance(item,frozenset):
@@ -888,13 +946,17 @@ class MainWindow(QMainWindow):
                             current[key]=skill
                         skill_id=used[new_slot-1].index(pair)+1
                     else: skill_id=used[new_slot-1].index(skill)+1
-                moves.append(m.SkillAction(new_slot,skill_id,slot_map[target] if target else None))
+                moves.append(m.SkillAction(new_slot,skill_id,
+                            slot_map[target] if target and target <= 6 else target))
             if special_action:
+                if row.execution_od():
+                    raise ValueError('特殊前排行动不能同时发动 OD')
                 role,position,name=special_action
                 button={'切换姿态':'kelian','鬼神化':'siling'}.get(name)
                 if not button: raise ValueError(f'未知特殊行动：{name}')
                 actions.append(m.SpecialRoleButton(role,position,button))
-            actions.append(m.BattleTurn(row.label_text(),row.od_value(),moves))
+                continue
+            actions.append(m.BattleTurn(row.label_text(),row.execution_od(),moves))
         if self.other_actions:
             raise ValueError('有无法表示的原始 Action，已拒绝保存以免丢失信息')
         script=m.BattleScript(roles,actions)
@@ -915,7 +977,7 @@ class MainWindow(QMainWindow):
             m.save_hbrf(script,path)
             # Include style metadata as comments to retain compatibility with model.load_hbrf.
             with Path(path).open('a', encoding='utf-8') as f:
-                f.write('\n# HBRTool style metadata (ignored by the HBRF parser)\n')
+                f.write('\n# HBRTool style metadata\n')
                 for slot, style in enumerate(compact_styles, 1):
                     if style:
                         meta = dict(team=style.team, english=style.english, id=style.sid)
@@ -927,9 +989,35 @@ class MainWindow(QMainWindow):
         except Exception as e:
             QMessageBox.critical(self,'保存失败',str(e)); return False
 
+    def preview_run_file(self):
+        path = self.run_path.text().strip()
+        if not path: return
+        try:
+            self.show_run_roles(path)
+        except Exception as e:
+            QMessageBox.warning(self, '读取脚本失败', str(e))
+    
+    def show_run_roles(self, path):
+        from hbrf import model as m
+        script = m.load_hbrf(path)
+        self.log.append(f'\n脚本：{Path(path).name}')
+        for role in script.roles:
+            if role.name.startswith(('空位', '__EMPTY_SLOT_')):
+                self.log.append(f'位置{role.slot}：空位')
+                continue
+            skills = ['/'.join(self.catalog.skill_zh(s) for s in skill.split('/'))
+                    for skill in role.skills]
+            self.log.append(f'位置{role.slot}：{role.name}：{"、".join(skills) if skills else "无需要技能"}')
+        self.log.append(f'每名角色装备至少3个技能！')
+
     def select_run_file(self):
-        p,_=QFileDialog.getOpenFileName(self,'选择战斗脚本',str(ROOT),'HBRF (*.hbrf)')
-        if p: self.run_path.setText(p)
+        p, _ = QFileDialog.getOpenFileName(self, '选择战斗脚本', str(ROOT), 'HBRF (*.hbrf)')
+        if not p: return
+        self.run_path.setText(p)
+        try:
+            self.show_run_roles(p)
+        except Exception as e:
+            QMessageBox.warning(self, '读取脚本失败', str(e))
 
     @staticmethod
     def is_admin():

@@ -1,32 +1,24 @@
-# 配队和技能（用于初始化角色编号为1-6，目前支持技能数最多6个）
-东城司: 勿忘你終有一死+, 蜃景瞬間, 淚雨
-茅森月歌: 先導的領袖魅力, 迴旋斬, 勝利之弧, 夢幻泡影
-aoi: 連繫未來的蒼之意志, 護盾光線, 心動滑水道
-tama: 秘技！靈符龍捲風
-逢川惠: 剛強硬刃, 還要再炸一波！, 嗨到最高點！青春舞台-冰/嗨到最高點！青春舞台-雷
-立华奏: 天使光線, 洞察力, 天之心跳, 蓄力注入, 垂直力
+# 配队和技能（用于初始化角色编号为1-6，目前支持技能数最多6个，角色最少需要装备3个技能）
+白河结奈: 重點保養, 蒼焰迷宮/蒼焰螺旋
+手冢: 凌霄的鐵鎚
+七濑七海: 
+Mona: 
+朝仓可怜: 血腥之燃/芬布爾之舞
+丸山奏多: 
 
 # 回合 = OD; 角色: 技能,目标（od后置1或2或3，前置为负，0为不开od）
-T1 = 0; 东城司: 1,0; 茅森月歌: 1,0; aoi: 1,0
-T1-无 Bonus = 3; 东城司: 1,0; 茅森月歌: 2,0; aoi: 2,0
-T1-OD3-bonus1 = 3; tama: 1,0; 立华奏: 1,0; aoi: 3,0
-T1-OD3-bonus2 = 3; tama: 1,0; 立华奏: 1,0; 东城司: 1,0
-T1-OD3-bonus3 = 3; 东城司: 1,0; aoi: 1,0; 茅森月歌: 1,0
-T1-追加-OD3-bonus3 = 3; 东城司: 1,0; aoi: 3,0; 茅森月歌: 3,0
-T2-OD3-bonus1 = -3; 立华奏: 2,0; aoi: 3,0; 逢川惠: 1,0
-T2-OD3-bonus2 = -3; 立华奏: 2,0; aoi: 3,0; 逢川惠: 1,0
-T2-OD3-bonus3 = -3; 逢川惠: 1,0; aoi: 3,0; 茅森月歌: 1,0
-T2-追加-OD3-bonus3 = -3; 逢川惠: 1,0; aoi: 1,0; 茅森月歌: 4,0
-T2-无 Bonus = 3; tama: 1,0; 逢川惠: 2,0; 茅森月歌: 1,0
-T2-追加-无 Bonus = 3; tama: 1,0; 逢川惠: 2,0; 茅森月歌: 3,0
-T2-追加-OD3-bonus1 = 3; 立华奏: 3,0; 逢川惠: 3,0; aoi: 1,0
-T2-追加-OD3-bonus2 = 3; 立华奏: 4,0; 逢川惠: 3,0; 东城司: 2,0
-T2-追加-OD3-bonus3 = 3; 茅森月歌: 3,0; 立华奏: 5,0; 东城司: 3,0
+siling | 手冢 | 2
+T1 = 0; 白河结奈: 1,0; 手冢: 1,0; 朝仓可怜: 1,0
+T1-追加 = 0; 白河结奈: 0,0; 手冢: 0,0; 七濑七海: 0,0
+attack
+skill | 白河结奈 | 2 | 2
+skill | 朝仓可怜 | 1 | 3
+T2 = 0; Mona: 0,0; 白河结奈: 2,0; 朝仓可怜: 1,0
 
-# HBRTool style metadata (ignored by the HBRF parser)
-# HBRTOOL_STYLE 1 {"team": "31A", "english": "Tsukasa_Tojo", "id": "008"}
-# HBRTOOL_STYLE 2 {"team": "31A", "english": "Ruka_Kayamori", "id": "011"}
-# HBRTOOL_STYLE 3 {"team": "31B", "english": "Erika_Aoi", "id": "009"}
-# HBRTOOL_STYLE 4 {"team": "31A", "english": "Tama_Kunimi", "id": "010"}
-# HBRTOOL_STYLE 5 {"team": "31A", "english": "Megumi_Aikawa", "id": "008"}
-# HBRTOOL_STYLE 6 {"team": "31AB", "english": "Kanade_Tachibana", "id": "002"}
+# HBRTool style metadata
+# HBRTOOL_STYLE 1 {"team": "30G", "english": "Yuina_Shirakawa", "id": "007"}
+# HBRTOOL_STYLE 2 {"team": "Command", "english": "STezuka", "id": "001"}
+# HBRTOOL_STYLE 3 {"team": "Command", "english": "NNanase", "id": "002"}
+# HBRTOOL_STYLE 4 {"team": "P5R", "english": "Mona", "id": "001"}
+# HBRTOOL_STYLE 5 {"team": "31A", "english": "Karen_Asakura", "id": "008"}
+# HBRTOOL_STYLE 6 {"team": "31F", "english": "Kanata_Maruyama", "id": "007"}

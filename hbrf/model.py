@@ -74,6 +74,7 @@ def validate_hbrf(script: BattleScript):
 
     role_ids = {role.slot for role in script.roles}
     role_by_id = {role.slot: role for role in script.roles}
+    moster_ids = {7, 8, 9}
 
     if role_ids != {1, 2, 3, 4, 5, 6}:
         raise ValueError("角色编号必须为1-6")
@@ -154,7 +155,7 @@ def validate_hbrf(script: BattleScript):
                         f"未知角色编号: {move.role}"
                     )
 
-                if move.target is not None and move.target not in role_ids:
+                if move.target is not None and move.target not in (role_ids | moster_ids):
                     raise ValueError(
                         f"非法技能目标: {move.target}"
                     )
@@ -394,7 +395,7 @@ def save_hbrf(script: BattleScript, filepath):
 
     with filepath.open("w", encoding="utf-8") as f:
 
-        f.write("# 配队和技能（用于初始化角色编号为1-6，目前支持技能数最多6个）\n")
+        f.write("# 配队和技能（用于初始化角色编号为1-6，目前支持技能数最多6个，角色最少需要装备3个技能）\n")
 
         for role in sorted(script.roles, key=lambda r: r.slot):
             skills = ", ".join(role.skills)
