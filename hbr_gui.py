@@ -17,7 +17,8 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
     QFileDialog, QMessageBox, QDialog, QDialogButtonBox, QCheckBox, QGroupBox,
     QTabWidget, QTextEdit, QFormLayout, QInputDialog)
 
-ROOT = Path(__file__).resolve().parent
+from paths import ROOT_DIR
+ROOT = ROOT_DIR
 DATA = ROOT / 'assets' / 'char-data'
 IMAGES = ROOT / 'assets' / 'char-images'
 ICONS = ROOT / 'assets' / 'icons'
