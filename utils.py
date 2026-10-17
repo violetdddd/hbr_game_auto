@@ -3,8 +3,9 @@ import cv2
 # import numpy as np
 from config.positions import no_where
 from window_operation import click_in_game, capture_window
+from config import settings
 
-# 需要特殊处理image通道时可以调用这个，不需特殊处理则直接使用detect_button即可
+# 需要特殊处理image通道时可以直接调用这个，不需特殊处理则直接使用detect_button即可
 def match_template(template, image, offset:tuple=(0,0), threshold=0.8):
     """
     返回template在截图image中的匹配结果，未找到返回None，找到返回中点的相对坐标
@@ -12,7 +13,13 @@ def match_template(template, image, offset:tuple=(0,0), threshold=0.8):
     # 检查图片大小
     if template.shape[0] > image.shape[0] or template.shape[1] > image.shape[1]:
         raise ValueError("template is larger than screenshot region")
-    
+
+    # 用x方向做图片长和宽的scale
+    scale, _ = settings.template_scale()
+    if scale != 1:
+        template = cv2.resize(template, None, fx=scale, fy=scale,
+                              interpolation=cv2.INTER_LINEAR)
+
     # 模板匹配
     res = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
 

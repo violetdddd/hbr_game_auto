@@ -1,7 +1,7 @@
 import time
 import cv2
 # import numpy as np
-from config.settings import resolution
+from config import settings
 from config import positions as pos
 from config import templates as tpl
 from vision.images import load_template
@@ -9,9 +9,12 @@ from window_operation import click_in_game, drag_in_game, find_window, capture_w
 from utils import match_template, detect_button, wait_and_click, wait_until, wait_until_any_template
 from hbrf import model as mod
 from paths import SCRIPTS_DIR
+import logging
 
+log = logging.getLogger('hbr.fight')
 
 def close_auto_fight(game):
+    resolution = settings.current_resolution
     region = (0,0,resolution[0]//4,resolution[1]//8)
     templates = {"off": load_template(tpl.auto_off_fig), "on":load_template(tpl.auto_on_fig)}
 
@@ -24,6 +27,7 @@ def close_auto_fight(game):
     return name
 
 def detect_start_button(game):
+    resolution = settings.current_resolution
     # 用r通道减g通道获得粉色信息
     template = cv2.subtract(load_template(tpl.start_action_fig)[:, :, 2], load_template(tpl.start_action_fig)[:, :, 1])
     region = (resolution[0]*3//4,resolution[1]//2,resolution[0]//4,resolution[1]//2)
@@ -38,10 +42,12 @@ def detect_start_button(game):
     return match_template(template, channel, offset)
 
 def detect_skip_button(game):
+    resolution = settings.current_resolution
     region=(resolution[0]*2//3, 0, resolution[0]//3, resolution[1]//4)
     return detect_button(game, load_template(tpl.skip_fig), region=region)
 
 def detect_od_button(game, od_mode):
+    resolution = settings.current_resolution
     region=(resolution[0]*3//4, 0, resolution[0]//4, resolution[1]//4)
     template = load_template(tpl.od_figs[od_mode-1])
 
@@ -204,18 +210,23 @@ def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mo
     return member_position_output
 
 def fight(game, script: mod.BattleScript, auto_close=False):
-    if auto_close:
-        close_auto_fight(game)
 
     # 初始化位置和角色技能数量
     old_member_position = [1,2,3,4,5,6]  # 初始位置
     # 角色slot到角色技能数量的映射
     role_skill_num = {role.slot: len(role.skills) for role in script.roles}
+    # 设置关闭自动战斗flag
+    has_turn_off_auto = False
 
     for action in script.actions:
+        # 需要auto close并且遇到第一个不是mod.SkipEvent的行动
+        if auto_close and not has_turn_off_auto and not isinstance(action, mod.SkipEvent):
+            log.info("正在关闭自动战斗")
+            close_auto_fight(game)
+            has_turn_off_auto = True
 
         if isinstance(action, mod.SkipEvent):  # 表示需要点击skip按钮
-            print("now skipping the dialog.")
+            log.info("正在跳过剧情")
             pt = wait_until(lambda: detect_skip_button(game),
                        timeout=5*60,
                        warning="未检测到跳过剧情按钮")
@@ -225,49 +236,49 @@ def fight(game, script: mod.BattleScript, auto_close=False):
                 time.sleep(3)
 
         elif isinstance(action, mod.ChangeTeamEvent):  # 表示需要切换队伍
-            print(f"now switching team.")
+            log.info("正在切换队伍")
             wait_and_click(game, load_template(tpl.change_fig),
                            warning="未检测到切换队伍按钮")
             wait_and_click(game, load_template(tpl.OK_electric_fig),
                            warning="未检测到切换队伍后的OK按钮")
 
         elif isinstance(action, mod.ResetPositions):
-            print(f"now resetting team positions.")
+            log.info("正在重新设定角色位置")
             old_member_position = action.positions.copy()
 
         elif isinstance(action, mod.SpecialRoleButton):
+            log.info("正在启动 %s 按钮", action.button)
             wait_until(lambda: detect_start_button(game),
                        timeout=5*60,
                        warning="未检测到回合结束按钮")
-            print(f"now activating {action.button} button.")
 
             ensure_front(game, old_member_position, action.role, action.position)
             operate_role_button(game, action.button, action.position)
 
         elif isinstance(action, mod.SkillSwitch):
+            log.info("正在切换角色技能")
             wait_until(lambda: detect_start_button(game),
                         timeout=5*60,
                         warning="未检测到回合结束按钮")
-            print(f"now switching skill.")
             ensure_front(game, old_member_position, action.role, action.position)
             # 如果角色本来就在前排
             operate_skill_switch(game, action.position, action.role, action.skill, role_skill_num)
 
         elif isinstance(action, mod.SpecialGlobalButton):
+            log.info("正在使用 %s 小按钮", action.button)
             wait_until(lambda: detect_start_button(game),
                         timeout=5*60,
                         warning="未检测到回合结束按钮")
-            print(f"now activating {action.button} button.")
             wait_and_click(game, load_template(tpl.GLOBAL_BUTTON_CONFIG[action.button]), warning=f"未检测到{action.button}按钮")
             
         elif isinstance(action, mod.BattleTurn):  # 表示正常进行行动回合
+            Turn = action.label
+            log.info("正在进行 %s 回合行动", Turn)
             # 到下一个回合了
             wait_until(lambda: detect_start_button(game),
                        timeout=5*60,
                        warning="未检测到回合结束按钮")
             
-            Turn = action.label
-            print(f"now fighting turn {Turn}.")
 
             old_member_position = operate_one_turn(
                 game=game, 

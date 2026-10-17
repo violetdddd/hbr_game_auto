@@ -15,6 +15,7 @@ od_figs_big = [od_fig_1_big, od_fig_2_big, od_fig_3_big]
 stone_fig = TEMPLATE_DIR / "stone.png"
 OK_fig = TEMPLATE_DIR / "OK.png"
 again_fig = TEMPLATE_DIR / "again.png"
+go_for_fight_fig = TEMPLATE_DIR / "go_for_fight.png"
 
 zhihui = TEMPLATE_DIR / "zhihui.png"
 liliang = TEMPLATE_DIR / "liliang.png"

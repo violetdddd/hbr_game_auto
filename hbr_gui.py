@@ -4,6 +4,9 @@ Requires: pip install PySide6. Game automation dependencies are only imported wh
 from __future__ import annotations
 import json
 import re
+import subprocess
+import signal
+import os
 import sys
 import ctypes
 import traceback
@@ -15,6 +18,7 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
     QGridLayout, QLabel, QPushButton, QComboBox, QSpinBox, QLineEdit, QScrollArea,
     QFileDialog, QMessageBox, QDialog, QCheckBox, QGroupBox,
     QTabWidget, QTextEdit, QFormLayout, QInputDialog)
+from config import settings
 
 from paths import ROOT_DIR
 ROOT = ROOT_DIR
@@ -622,17 +626,62 @@ class EventRow(QGroupBox):
     def state(self):
         return {'action': self.action.currentData(), 'kind': self.kind}
 
-# 等待添加logger和终止程序按钮
+# 被Qt调用的线程，这里实际开启了一个新进程，运行run_battle.py，并把报错等传回日志框中。等待添加logger
 class Worker(QThread):
+    log_text = Signal(str)
     finished_text = Signal(str)
-    def __init__(self, fn, *args):
-        super().__init__(); self.fn, self.args = fn, args
+
+    def __init__(self, path, repeated, count, ticket, auto_close, title):
+        super().__init__()
+        self.args = [str(path), str(int(repeated)), str(count), ticket,
+                     str(int(auto_close)), title]
+        self.process = None
+        self.stopping = False
+
     def run(self):
+        flags = subprocess.CREATE_NEW_PROCESS_GROUP if sys.platform == 'win32' else 0
+        cmd = [sys.executable, '-X', 'utf8', '-u', str(ROOT / 'run_battle.py'), *self.args]
         try:
-            self.fn(*self.args)
-            self.finished_text.emit('执行完成')
+            self.process = subprocess.Popen(
+                cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                text=True, encoding='utf-8', errors='replace',
+                bufsize=1, creationflags=flags,
+                start_new_session=sys.platform != 'win32'
+            )
+            for line in self.process.stdout:
+                self.log_text.emit(line.rstrip('\r\n'))
+            code = self.process.wait()
+            if self.stopping:
+                self.finished_text.emit('战斗已终止')
+            elif code == 0:
+                self.finished_text.emit('执行完成')
+            else:
+                self.finished_text.emit(f'战斗执行失败，退出码：{code}')
         except Exception:
             self.finished_text.emit(traceback.format_exc())
+        finally:
+            if self.process and self.process.poll() is None:
+                self.process.kill()
+                self.process.wait()
+
+    # 终止进程函数
+    def stop(self):
+        # 第二次进入强制kill
+        if self.stopping:
+            if self.process and self.process.poll() is None:
+                self.process.kill()
+            return
+
+        # 首次先使用类Ctrl+C的终止信号
+        self.stopping = True
+        if not self.process or self.process.poll() is not None: return
+        try:
+            if sys.platform == 'win32':
+                self.process.send_signal(signal.CTRL_BREAK_EVENT)
+            else:
+                os.killpg(self.process.pid, signal.SIGINT)
+        except (OSError, ValueError):
+            self.process.terminate()
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -713,7 +762,9 @@ class MainWindow(QMainWindow):
         test = QPushButton('寻找并激活窗口'); test.clicked.connect(self.test_window)
         play = QPushButton('执行单次战斗'); play.clicked.connect(lambda: self.start_run(False))
         repeat = QPushButton('执行重复战斗'); repeat.clicked.connect(lambda: self.start_run(True))
-        form.addRow(test); form.addRow(play); form.addRow(repeat)
+        self.stop_button = QPushButton('终止当前战斗'); self.stop_button.clicked.connect(self.stop_run)
+        self.stop_button.setEnabled(False)  # 程序不运行时不能点击终止运行
+        form.addRow(test); form.addRow(play); form.addRow(repeat); form.addRow(self.stop_button)
         # 日志内容
         self.log = QTextEdit(); self.log.setReadOnly(True); form.addRow('状态', self.log)
         # 样式表设置在主窗口上，会影响它的子控件
@@ -1093,7 +1144,7 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self,'无法保存',str(e)); return False
         path = self.current_path
         if save_as or not path:
-            filename,_ = QFileDialog.getSaveFileName(self,'保存 HBRF',str(path or ROOT / 'new.hbrf'),'HBRF (*.hbrf)')
+            filename,_ = QFileDialog.getSaveFileName(self,'保存 HBRF',str(path or SCRIPTS / 'new.hbrf'),'HBRF (*.hbrf)')
             if not filename: return False
             path=Path(filename)
         try:
@@ -1138,7 +1189,7 @@ class MainWindow(QMainWindow):
 
     # 选择战斗脚本，选好后触发输出角色和技能顺序要求
     def select_run_file(self):
-        p, _ = QFileDialog.getOpenFileName(self, '选择战斗脚本', str(ROOT), 'HBRF (*.hbrf)')
+        p, _ = QFileDialog.getOpenFileName(self, '选择战斗脚本', str(SCRIPTS), 'HBRF (*.hbrf)')
         if not p: return
         self.run_path.setText(p)
         try:
@@ -1170,7 +1221,9 @@ class MainWindow(QMainWindow):
         try:
             from window_operation import find_window
             game = find_window(self.window_title.text().strip())
-            self.log.append(f'已找到：{game.title}，坐标=({game.left},{game.top})，尺寸={game.width}×{game.height}')
+            resolution = settings.detect_resolution(game)
+            self.log.append(f'已找到：{game.title}，坐标=({game.left},{game.top})，分辨率={resolution[0]}×{resolution[1]}')
+            settings.set_resolution(resolution=resolution)
         except Exception as e: QMessageBox.warning(self,'窗口检测失败，请检查游戏窗口名称是否正确',str(e))
 
     # 通过参数判断单次/repeat战斗，启动worker进行战斗
@@ -1195,23 +1248,26 @@ class MainWindow(QMainWindow):
         except Exception as e:
             QMessageBox.warning(self,'脚本无效',str(e)); return
         self.log.append('开始执行：'+('重复战斗' if repeated else '单次战斗'))
-        self.worker=Worker(self._run_game,script,repeated,self.run_count.value(),self.ticket.currentText(),
+        self.worker=Worker(path,repeated,self.run_count.value(),self.ticket.currentText(),
                            self.auto_close.isChecked(),self.window_title.text().strip())
         self.worker.finished_text.connect(self.log.append)
+        self.worker.log_text.connect(self.log.append)
+        self.worker.finished.connect(self.run_finished)
+        self.stop_button.setText('终止当前战斗')
+        self.stop_button.setEnabled(True)
         self.worker.start()
 
-    # worker执行的函数，集成常规的find_window+fight/repeat_fight流程
-    @staticmethod
-    def _run_game(script,repeated,count,ticket,auto_close,title):
-        from window_operation import find_window
-        game=find_window(title)
-        if repeated:
-            from repetition import repeat_fight
-            repeat_fight(game,script,count,ticket=ticket)
-        else:
-            from fight import fight
-            fight(game,script,auto_close=auto_close)
+    def stop_run(self):
+        if not self.worker or not self.worker.isRunning(): return
+        force = self.worker.stopping
+        self.stop_button.setText('强制结束' if not force else '终止当前战斗')
+        self.log.append('正在强制结束子进程' if force else '已发送中断请求')
+        self.worker.stop()
 
+    def run_finished(self):
+        self.stop_button.setText('终止当前战斗')
+        self.stop_button.setEnabled(False)
+    
 if __name__=='__main__':
     app=QApplication(sys.argv)
     window=MainWindow(); window.show()
