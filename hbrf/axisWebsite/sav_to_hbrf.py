@@ -1,14 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Convert HBR Tool SAV JSON to HBRF using make_js_mapping output.
-
-Usage:
-    python sav_to_hbrf.py input.sav mapping.json -o output.hbrf
-    from sav_to_hbrf import main
-    path, warnings = main("input.sav", "mapping.json")
-
-Special actions are intentionally not converted. Inspect the generated HBRF.
-"""
 from __future__ import annotations
 
 import argparse
