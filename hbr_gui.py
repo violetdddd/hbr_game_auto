@@ -330,6 +330,7 @@ class TurnRow(QGroupBox):
     move_requested = Signal(object, int)
     def __init__(self, parent_editor, state=None):
         super().__init__('回合')
+        self.setObjectName('turnRow')  # 用于单独改变背景颜色
         self.editor = parent_editor
         outer = QVBoxLayout(self)
         # head包括turn，od，bonus，追加，发动od和定制label，以及信号控件
@@ -337,6 +338,7 @@ class TurnRow(QGroupBox):
         self.turn_no = NoWheelComboBox(); self.turn_no.addItems([f'T{i}' for i in range(1, 21)])
         self.extra = NoWheelComboBox(); self.extra.addItems(['普通回合', '追加回合'])
         self.bonus = NoWheelComboBox(); self.bonus.setMinimumWidth(155); self.bonus.addItem('无 Bonus')
+        self.bonus.currentIndexChanged.connect(self.update_background)
         # 需要把index的0到6映射为-3到3
         self.od = NoWheelComboBox(); self.od.addItems(['无 OD', '前置 OD1', '前置 OD2', '前置 OD3', '后置 OD1', '后置 OD2', '后置 OD3'])
         # od变化要影响bonus选择
@@ -349,6 +351,8 @@ class TurnRow(QGroupBox):
         for label, callback in [('↑',lambda: self.move_requested.emit(self,-1)),('↓',lambda: self.move_requested.emit(self,1)),
                                 ('复制',lambda: self.copy_requested.emit(self)),('删除',lambda: self.remove_requested.emit(self))]:
             b = QPushButton(label); b.clicked.connect(callback); head.addWidget(b)
+        # 右上角标index
+        self.index_label = QLabel(); self.index_label.setStyleSheet('color: #7A8494; font-size: 9pt;'); head.addWidget(self.index_label)
         outer.addLayout(head)
         # body部分是role，skill和target
         body = QHBoxLayout()
@@ -394,6 +398,7 @@ class TurnRow(QGroupBox):
             ix = r.findData(saved[i][0]); r.setCurrentIndex(ix if ix >= 0 else 0)
             r.blockSignals(False)
             self.update_skills(i, saved[i][1], saved[i][2])
+        # 角色去重
         for i, r in enumerate(self.roles):
             if r.currentData():
                 for j in range(i):
@@ -422,7 +427,7 @@ class TurnRow(QGroupBox):
         # 添加其他skill
         for name in self.editor.catalog.skills_for(style):
             if name != default: s.addItem(self.editor.catalog.skill_label(name), name)
-        # 如果之前的选中的技能现在角色也有，则恢复技能
+        # 如果之前的选中的技能现在角色也有，则恢复技能，没有就默认技能
         ix = s.findData(skill)
         s.setCurrentIndex(ix if ix >= 0 else 0)
         # 目标也按类似处理
@@ -497,6 +502,7 @@ class TurnRow(QGroupBox):
         selected = self.bonus.findText(previous)
         self.bonus.setCurrentIndex(selected if selected >= 0 else 0)
         self.bonus.blockSignals(False)
+        self.update_background()
 
     # 根据head里的选项生成label
     def label_text(self):
@@ -556,6 +562,22 @@ class TurnRow(QGroupBox):
     def execution_od(self):
         return self.od_value() if self.activate_od.isChecked() else 0
 
+    # 改变背景颜色的函数，被bonus更改（和od更改）触发
+    def update_background(self):
+        colors = {
+            1: '#F8DFEA',  # OD1 粉
+            2: '#DDF5F1',  # OD2 青
+            3: '#FAEFC6',  # OD3 黄
+        }
+
+        bonus = self.bonus.currentText()
+        match = re.search(r'^OD([123])', bonus)
+        color = colors[int(match.group(1))] if match else 'white'
+
+        self.setStyleSheet(
+            f'QGroupBox#turnRow {{background-color: {color};}}'
+        )
+
     # 保存状态
     def state(self):
         return dict(turn=self.turn_no.currentIndex(), extra=self.extra.currentIndex(), bonus=self.bonus.currentIndex(), bonus_text=self.bonus.currentText(),
@@ -599,6 +621,8 @@ class EventRow(QGroupBox):
                                 ('复制',lambda: self.copy_requested.emit(self)),
                                 ('删除',lambda: self.remove_requested.emit(self))]:
             b=QPushButton(label); b.clicked.connect(callback); layout.addWidget(b)
+        # 右上角index编号
+        self.index_label = QLabel(); self.index_label.setStyleSheet('color: #7A8494; background: white; font-size: 9pt;'); layout.addWidget(self.index_label)
         if state:
             ix=self.action.findData(state['action'])
             if ix>=0: self.action.setCurrentIndex(ix)
@@ -768,7 +792,7 @@ class MainWindow(QMainWindow):
         # 日志内容
         self.log = QTextEdit(); self.log.setReadOnly(True); form.addRow('状态', self.log)
         # 样式表设置在主窗口上，会影响它的子控件
-        self.setStyleSheet('''QMainWindow,QWidget{background:#f7f8fa;color:#242933;font-size:10pt}
+        self.setStyleSheet('''QMainWindow{background: #f7f8fa;} QWidget{color: #242933;font-size: 10pt;}
             QGroupBox{border:1px solid #dce2eb;border-radius:12px;margin-top:12px;padding:14px;background:white}
             QGroupBox::title{subcontrol-origin:margin;left:14px;padding:0 5px}
             QPushButton{background:white;border:1px solid #d6deea;border-radius:9px;padding:7px}
@@ -864,11 +888,14 @@ class MainWindow(QMainWindow):
             QTimer.singleShot(10, lambda: self.scroll.verticalScrollBar().setValue(
                 self.scroll.verticalScrollBar().maximum()
             ))
+        # 刷新index
+        self.refresh_row_indices()
         return row
 
     # 删除row
     def remove_row(self, row):
         self.rows.remove(row); row.setParent(None); row.deleteLater()
+        self.refresh_row_indices()
 
     # 复制row，位置是被复制的行下方
     def copy_row(self, row): self.add_row(row.state(), self.rows.index(row)+1, 'turn' if isinstance(row, TurnRow) else row.kind)
@@ -879,12 +906,18 @@ class MainWindow(QMainWindow):
         if not 0 <= j < len(self.rows): return
         self.rows.pop(i); self.rows.insert(j,row)
         self.rows_layout.removeWidget(row); self.rows_layout.insertWidget(j,row)
+        self.refresh_row_indices()
 
     # 新建页面，全部清除后加一行空turn row
     def new(self):
         self.current_path = None; self.slots = [None]*6; self.nicknames=['']*6; self.other_actions=[]
         for row in list(self.rows): self.remove_row(row)
         self.refresh_slots(); self.add_row()
+
+    # 刷新所有块右上角index编号
+    def refresh_row_indices(self):
+        for i, row in enumerate(self.rows, 1):
+            row.index_label.setText(f'#{i}')
 
     # 匹配注释中的风格元数据，group(0)是整个匹配字符串，(1)是slot，(2)是字典
     @staticmethod
