@@ -18,7 +18,7 @@ from PySide6.QtGui import QIcon, QPixmap, QPainter, QPainterPath
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QGridLayout, QLabel, QPushButton, QComboBox, QSpinBox, QLineEdit, QScrollArea,
     QFileDialog, QMessageBox, QDialog, QCheckBox, QGroupBox,
-    QTabWidget, QTextEdit, QFormLayout, QInputDialog)
+    QTabWidget, QTextEdit, QFormLayout, QInputDialog, QSizePolicy)
 from config import settings
 
 from paths import ROOT_DIR
@@ -656,16 +656,19 @@ class Worker(QThread):
     log_text = Signal(str)
     finished_text = Signal(str)
 
-    def __init__(self, path, repeated, count, ticket, auto_close, title):
+    def __init__(self, path, repeated, count, ticket, auto_close, title, mode='battle'):
         super().__init__()
-        self.args = [str(path), str(int(repeated)), str(count), ticket,
-                     str(int(auto_close)), title]
+        self.mode = mode
+        self.args = ([str(count), title] if mode == 'card' else
+                     [str(path), str(int(repeated)), str(count), ticket,
+                      str(int(auto_close)), title])
         self.process = None
         self.stopping = False
 
     def run(self):
         flags = subprocess.CREATE_NEW_PROCESS_GROUP if sys.platform == 'win32' else 0
-        cmd = [sys.executable, '-X', 'utf8', '-u', str(ROOT / 'run_battle.py'), *self.args]
+        entry = 'run_card_game.py' if self.mode == 'card' else 'run_battle.py'
+        cmd = [sys.executable, '-X', 'utf8', '-u', str(ROOT / entry), *self.args]
         try:
             self.process = subprocess.Popen(
                 cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
@@ -677,11 +680,11 @@ class Worker(QThread):
                 self.log_text.emit(line.rstrip('\r\n'))
             code = self.process.wait()
             if self.stopping:
-                self.finished_text.emit('战斗已终止')
+                self.finished_text.emit('打牌已终止' if self.mode == 'card' else '战斗已终止')
             elif code == 0:
                 self.finished_text.emit('执行完成')
             else:
-                self.finished_text.emit(f'战斗执行失败，退出码：{code}')
+                self.finished_text.emit(f'执行失败，退出码：{code}')
         except Exception:
             self.finished_text.emit(traceback.format_exc())
         finally:
@@ -765,49 +768,46 @@ class MainWindow(QMainWindow):
             add_actions.addWidget(b, 1 if kind != 'turn' else 2)
         root.addLayout(add_actions)
         root.addWidget(QLabel('提示：HBRF 限制每回合恰好 3 个不同角色，且每名角色最多记录 6 个技能。'))
-        # 运行游戏tab
-        runner = QWidget(); tabs.addTab(runner, '运行游戏')
+        # 普通战斗 tab
+        runner = QWidget(); tabs.addTab(runner, '普通战斗')
         form = QFormLayout(runner)
         self.window_title = QLineEdit('HeavenBurnsRed')
         form.addRow('游戏窗口标题', self.window_title)
         self.admin_status = QLabel('管理员：' + ('是' if self.is_admin() else '否'))
         form.addRow('当前权限', self.admin_status)
-        admin = QPushButton('以管理员身份重启 GUI（Windows）'); admin.clicked.connect(self.restart_admin)
+        admin = QPushButton('以管理员身份重启 GUI（Windows）')
+        admin.clicked.connect(self.restart_admin)
         form.addRow(admin)
-        self.run_path = QLineEdit(); self.run_path.setPlaceholderText('未指定则使用当前编辑器脚本')
+        test = QPushButton('寻找并激活窗口')
+        test.clicked.connect(lambda: self.test_window())
+        form.addRow(test)
+        self.run_path = QLineEdit()
+        self.run_path.setPlaceholderText('未指定则使用当前编辑器脚本')
         self.run_path.editingFinished.connect(self.preview_run_file)
-        select = QPushButton('选择脚本'); select.clicked.connect(self.select_run_file)
+        select = QPushButton('选择脚本')
+        select.clicked.connect(self.select_run_file)
         pathrow = QHBoxLayout(); pathrow.addWidget(self.run_path); pathrow.addWidget(select)
         form.addRow('HBRF 路径', pathrow)
-        # 战斗前自动战斗开关：居中放置，说明自动战斗脚本的使用方式
         self.auto_close = QCheckBox(
             '战斗前关闭自动战斗（需要自动战斗则不勾选，并上传无任何行动的空 HBRF 文件）'
         )
         self.auto_close.setChecked(True)
         auto_close_row = QHBoxLayout()
-        auto_close_row.addStretch()
-        auto_close_row.addWidget(self.auto_close)
-        auto_close_row.addStretch()
+        auto_close_row.addStretch(); auto_close_row.addWidget(self.auto_close); auto_close_row.addStretch()
         form.addRow(auto_close_row)
 
-        test = QPushButton('寻找并激活窗口')
-        test.clicked.connect(self.test_window)
-        form.addRow(test)
-
-        # 单次战斗 / 重复刷取：并列两栏
+        # 等宽等高的两栏；高度只取右侧表单的建议高度，不占满页面
         battle_modes = QHBoxLayout()
         single_box = QGroupBox('执行单次战斗')
         single_layout = QVBoxLayout(single_box)
         play = QPushButton('执行单次战斗')
         play.clicked.connect(lambda: self.start_run(False))
         single_layout.addWidget(play)
-        single_layout.addStretch()
 
-        repeat_box = QGroupBox('棱镜战/光球重复刷取')
+        repeat_box = QGroupBox('光球重复刷取')
         repeat_layout = QFormLayout(repeat_box)
         self.run_count = QSpinBox()
-        self.run_count.setRange(1, 9999)
-        self.run_count.setValue(1)
+        self.run_count.setRange(1, 9999); self.run_count.setValue(1)
         self.ticket = QComboBox()
         self.ticket.addItem('体力石', 'stone')
         self.ticket.addItem('门票', 'ticket')
@@ -817,7 +817,8 @@ class MainWindow(QMainWindow):
         repeat = QPushButton('执行重复战斗')
         repeat.clicked.connect(lambda: self.start_run(True))
         repeat_layout.addRow(repeat)
-
+        for group in (single_box, repeat_box):
+            group.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         battle_modes.addWidget(single_box, 1)
         battle_modes.addWidget(repeat_box, 1)
         form.addRow(battle_modes)
@@ -826,8 +827,37 @@ class MainWindow(QMainWindow):
         self.stop_button.clicked.connect(self.stop_run)
         self.stop_button.setEnabled(False)
         form.addRow(self.stop_button)
-        # 日志内容
-        self.log = QTextEdit(); self.log.setReadOnly(True); form.addRow('状态', self.log)
+        self.log = QTextEdit(); self.log.setReadOnly(True)
+        form.addRow('状态', self.log)
+
+        # 技术模拟战 tab：与普通战斗使用同一 Worker/中断机制，不需要 HBRF
+        card_runner = QWidget(); tabs.addTab(card_runner, '技术模拟战')
+        card_form = QFormLayout(card_runner)
+        self.card_window_title = QLineEdit('HeavenBurnsRed')
+        card_form.addRow('游戏窗口标题', self.card_window_title)
+        self.card_admin_status = QLabel('管理员：' + ('是' if self.is_admin() else '否'))
+        card_form.addRow('当前权限', self.card_admin_status)
+        card_admin = QPushButton('以管理员身份重启 GUI（Windows）')
+        card_admin.clicked.connect(self.restart_admin)
+        card_form.addRow(card_admin)
+        card_test = QPushButton('寻找并激活窗口')
+        card_test.clicked.connect(lambda: self.test_window(self.card_window_title, self.card_log))
+        card_form.addRow(card_test)
+        self.card_count = QSpinBox()
+        self.card_count.setRange(1, 9999); self.card_count.setValue(1)
+        card_form.addRow('重复次数', self.card_count)
+        card_start = QPushButton('执行重复打牌')
+        card_start.clicked.connect(self.start_card_game)
+        card_form.addRow(card_start)
+        note = QLabel('注意：当前重复进行[31C]普通战斗，请保证屏幕中完整出现该战斗选择后执行重复打牌')
+        note.setWordWrap(True)
+        card_form.addRow(note)
+        self.card_stop_button = QPushButton('终止重复打牌')
+        self.card_stop_button.setEnabled(False)
+        self.card_stop_button.clicked.connect(self.stop_run)
+        card_form.addRow(self.card_stop_button)
+        self.card_log = QTextEdit(); self.card_log.setReadOnly(True)
+        card_form.addRow('状态', self.card_log)
         # 样式表设置在主窗口上，会影响它的子控件
         self.setStyleSheet('''QMainWindow{background: #f7f8fa;} QWidget{color: #242933;font-size: 10pt;}
             QGroupBox{border:1px solid #dce2eb;border-radius:12px;margin-top:12px;padding:14px;background:white}
@@ -836,6 +866,7 @@ class MainWindow(QMainWindow):
             QPushButton:hover{background:#eaf0fc} QLineEdit,QComboBox,QSpinBox,QTextEdit{
             background:white;border:1px solid #d6deea;border-radius:7px;padding:6px}
             QTabWidget::pane{border:0} QTabBar::tab{padding:10px 18px}''')
+        single_box.setMinimumHeight(repeat_box.sizeHint().height())
 
     # 选择风格、清除风格和新建的时候调用
     def refresh_slots(self):
@@ -1320,12 +1351,14 @@ class MainWindow(QMainWindow):
         else: QMessageBox.warning(self,'提权失败',f'ShellExecuteW 返回 {result}')
 
     # 尝试寻找游戏界面
-    def test_window(self):
+    def test_window(self, title_widget=None, log_widget=None):
+        title_widget = title_widget or self.window_title
+        log_widget = log_widget or self.log
         try:
             from window_operation import find_window
-            game = find_window(self.window_title.text().strip())
+            game = find_window(title_widget.text().strip())
             resolution = settings.detect_resolution(game)
-            self.log.append(f'已找到：{game.title}，坐标=({game.left},{game.top})，分辨率={resolution[0]}×{resolution[1]}')
+            log_widget.append(f'已找到：{game.title}，坐标=({game.left},{game.top})，分辨率={resolution[0]}×{resolution[1]}')
             settings.set_resolution(resolution=resolution)
         except Exception as e: QMessageBox.warning(self,'窗口检测失败，请检查游戏窗口名称是否正确',str(e))
 
@@ -1356,21 +1389,42 @@ class MainWindow(QMainWindow):
         self.worker.finished_text.connect(self.log.append)
         self.worker.log_text.connect(self.log.append)
         self.worker.finished.connect(self.run_finished)
+        self.card_stop_button.setEnabled(False)
         self.stop_button.setText('终止当前战斗')
         self.stop_button.setEnabled(True)
+        self.worker.start()
+
+    def start_card_game(self):
+        if self.worker and self.worker.isRunning():
+            QMessageBox.warning(self, '运行中', '已有任务正在运行'); return
+        self.card_log.append('开始执行：技术模拟战重复打牌')
+        self.worker = Worker(None, False, self.card_count.value(), 'stone', False,
+                             self.card_window_title.text().strip(), mode='card')
+        self.worker.log_text.connect(self.card_log.append)
+        self.worker.finished_text.connect(self.card_log.append)
+        self.worker.finished.connect(self.run_finished)
+        self.stop_button.setEnabled(False)
+        self.card_stop_button.setText('终止重复打牌')
+        self.card_stop_button.setEnabled(True)
         self.worker.start()
 
     def stop_run(self):
         if not self.worker or not self.worker.isRunning(): return
         force = self.worker.stopping
-        self.stop_button.setText('强制结束' if not force else '终止当前战斗')
-        self.log.append('正在强制结束子进程' if force else '已发送中断请求')
+        button = self.card_stop_button if self.worker.mode == 'card' else self.stop_button
+        log = self.card_log if self.worker.mode == 'card' else self.log
+        button.setText('强制结束' if not force else ('终止重复打牌' if self.worker.mode == 'card' else '终止当前战斗'))
+        log.append('正在强制结束子进程' if force else '已发送中断请求')
         self.worker.stop()
 
     def run_finished(self):
-        self.stop_button.setText('终止当前战斗')
-        self.stop_button.setEnabled(False)
-    
+        for button in (self.stop_button, self.card_stop_button):
+            if button == self.stop_button:
+                button.setText('终止当前战斗')
+            elif button == self.card_stop_button:
+                button.setText('终止重复打牌')
+            button.setEnabled(False)
+
 if __name__=='__main__':
     app=QApplication(sys.argv)
     window=MainWindow(); window.show()
