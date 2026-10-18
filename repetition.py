@@ -33,7 +33,7 @@ def repeat_fight(game, fight_config, times, ticket="stone", auto_close=False):
         wait_and_click(game, load_template(tpl.use_most_fig))
         wait_and_click(game, load_template(tpl.OK_fig))
 
-        # log.info("进行第 %d 次战斗", counter)
+        log.info("进行第 %d 次战斗", counter)
         counter += 1
 
     counter = 1
@@ -120,7 +120,7 @@ def card_game(game, times):
         # 点击开始挑战
         wait_and_click(game, load_template(tpl.tiaozhan_fig))
         # 随便等一会自动打牌
-        # log.info("开始第 %d 次打牌，等待自动结束中", i+1)
+        log.info("开始第 %d 次打牌，等待自动结束中", i+1)
         time.sleep(120)
 
         # 检测是否结束战斗，超20min没结束则报错退出
@@ -128,14 +128,14 @@ def card_game(game, times):
                    timeout=MAX_TIME,
                    interval=5,
                    warning="没成功结束31C战斗")
-        # log.info("第 %d 次打牌自动战斗结束", i+1)
+        log.info("第 %d 次打牌自动战斗结束", i+1)
 
         # 等待奖励领取完毕并检测是否回到主页面
         wait_until(home_condition,
                    timeout=MAX_TIME,
                    interval=1,
                    warning="战斗结束后没回到主界面")
-        # log.info("第 %d 次打牌刷取完成, 总计用时约 %d 分钟", i+1, (time.time()-start_time)//60)
+        log.info("第 %d 次打牌刷取完成, 总计用时约 %d 分钟", i+1, (time.time()-start_time)//60)
 
 # 已经刷完徽章，暂时不需要这个函数
 # def high_score_emblem(game, fight_config):

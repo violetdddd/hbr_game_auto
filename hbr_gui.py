@@ -1,4 +1,5 @@
-"""HBRTool desktop GUI. Put this file in the project root beside fight.py and hbrf/.
+"""
+HBRTool desktop GUI. Put this file in the project root beside fight.py and hbrf/.
 Requires: pip install PySide6. Game automation dependencies are only imported when running a fight.
 """
 from __future__ import annotations
@@ -730,7 +731,7 @@ class MainWindow(QMainWindow):
         root = QVBoxLayout(edit)
         # 新建、打开、保存工具栏
         toolbar = QHBoxLayout()
-        for title, callback in [('新建',self.new),('打开 HBRF',self.open_file),('保存',self.save),('另存为',lambda: self.save(True))]:
+        for title, callback in [('新建',self.new),('打开 HBRF',self.open_file),('打开 SAV',self.open_sav),('保存',self.save),('另存为',lambda: self.save(True))]:
             b = QPushButton(title); b.clicked.connect(callback); toolbar.addWidget(b)
         toolbar.addStretch(); root.addLayout(toolbar)
         # 角色slot
@@ -778,17 +779,53 @@ class MainWindow(QMainWindow):
         select = QPushButton('选择脚本'); select.clicked.connect(self.select_run_file)
         pathrow = QHBoxLayout(); pathrow.addWidget(self.run_path); pathrow.addWidget(select)
         form.addRow('HBRF 路径', pathrow)
-        self.auto_close = QCheckBox('战斗前关闭自动战斗'); self.auto_close.setChecked(True)
-        form.addRow(self.auto_close)
-        self.run_count = QSpinBox(); self.run_count.setRange(1,9999); self.run_count.setValue(1)
-        self.ticket = QComboBox(); self.ticket.addItems(['stone','ticket','spare'])
-        form.addRow('重复次数', self.run_count); form.addRow('体力类型', self.ticket)
-        test = QPushButton('寻找并激活窗口'); test.clicked.connect(self.test_window)
-        play = QPushButton('执行单次战斗'); play.clicked.connect(lambda: self.start_run(False))
-        repeat = QPushButton('执行重复战斗'); repeat.clicked.connect(lambda: self.start_run(True))
-        self.stop_button = QPushButton('终止当前战斗'); self.stop_button.clicked.connect(self.stop_run)
-        self.stop_button.setEnabled(False)  # 程序不运行时不能点击终止运行
-        form.addRow(test); form.addRow(play); form.addRow(repeat); form.addRow(self.stop_button)
+        # 战斗前自动战斗开关：居中放置，说明自动战斗脚本的使用方式
+        self.auto_close = QCheckBox(
+            '战斗前关闭自动战斗（需要自动战斗则不勾选，并上传无任何行动的空 HBRF 文件）'
+        )
+        self.auto_close.setChecked(True)
+        auto_close_row = QHBoxLayout()
+        auto_close_row.addStretch()
+        auto_close_row.addWidget(self.auto_close)
+        auto_close_row.addStretch()
+        form.addRow(auto_close_row)
+
+        test = QPushButton('寻找并激活窗口')
+        test.clicked.connect(self.test_window)
+        form.addRow(test)
+
+        # 单次战斗 / 重复刷取：并列两栏
+        battle_modes = QHBoxLayout()
+        single_box = QGroupBox('执行单次战斗')
+        single_layout = QVBoxLayout(single_box)
+        play = QPushButton('执行单次战斗')
+        play.clicked.connect(lambda: self.start_run(False))
+        single_layout.addWidget(play)
+        single_layout.addStretch()
+
+        repeat_box = QGroupBox('棱镜战/光球重复刷取')
+        repeat_layout = QFormLayout(repeat_box)
+        self.run_count = QSpinBox()
+        self.run_count.setRange(1, 9999)
+        self.run_count.setValue(1)
+        self.ticket = QComboBox()
+        self.ticket.addItem('体力石', 'stone')
+        self.ticket.addItem('门票', 'ticket')
+        self.ticket.addItem('备用体力石', 'spare')
+        repeat_layout.addRow('重复次数', self.run_count)
+        repeat_layout.addRow('体力类型', self.ticket)
+        repeat = QPushButton('执行重复战斗')
+        repeat.clicked.connect(lambda: self.start_run(True))
+        repeat_layout.addRow(repeat)
+
+        battle_modes.addWidget(single_box, 1)
+        battle_modes.addWidget(repeat_box, 1)
+        form.addRow(battle_modes)
+
+        self.stop_button = QPushButton('终止当前战斗')
+        self.stop_button.clicked.connect(self.stop_run)
+        self.stop_button.setEnabled(False)
+        form.addRow(self.stop_button)
         # 日志内容
         self.log = QTextEdit(); self.log.setReadOnly(True); form.addRow('状态', self.log)
         # 样式表设置在主窗口上，会影响它的子控件
@@ -930,9 +967,42 @@ class MainWindow(QMainWindow):
                 result[int(match.group(1))] = json.loads(match.group(2))
         return result
 
-    # 打开hbrf文件
-    def open_file(self):
-        path,_ = QFileDialog.getOpenFileName(self,'打开 HBRF',str(SCRIPTS),'HBRF (*.hbrf);;All files (*)')
+    # 打开从 hbr-tool.com 保存的 SAV，转换后复用现有 HBRF 编辑器导入逻辑
+    def open_sav(self):
+        QMessageBox.information(
+            self, 'SAV 文件来源',
+            '仅支持从 https://www.hbr-tool.com/ 网站保存的 .sav 文件。\n'
+            '转换结果不包含部分特殊行动等信息，导入后请检查并重新保存。'
+        )
+        sav_path, _ = QFileDialog.getOpenFileName(
+            self, '选择 SAV 文件', str(ROOT), 'SAV (*.sav);;All files (*)'
+        )
+        if not sav_path: return
+        output_path, _ = QFileDialog.getSaveFileName(
+            self, '保存转换后的 HBRF',
+            str(SCRIPTS / (Path(sav_path).stem + '.hbrf')),
+            'HBRF (*.hbrf)'
+        )
+        if not output_path: return
+        try:
+            from hbrf.axisWebsite.sav_to_hbrf import main as convert_sav
+            converted, warnings = convert_sav(sav_path, output_path=output_path)
+            self.open_file(str(converted))
+            if warnings:
+                unique = list(dict.fromkeys(warnings))
+                details = '\n'.join(unique[:12])
+                if len(unique) > 12:
+                    details += f'\n……另有 {len(unique)-12} 条警告'
+                QMessageBox.warning(self, 'SAV 转换提示', details)
+        except Exception as e:
+            QMessageBox.critical(self, 'SAV 转换失败', str(e))
+
+    # 打开 HBRF；指定 path 时复用原来的解析流程，不再弹出文件选择框
+    def open_file(self, path=None):
+        if not isinstance(path, (str, Path)):
+            path, _ = QFileDialog.getOpenFileName(
+                self, '打开 HBRF', str(SCRIPTS), 'HBRF (*.hbrf);;All files (*)'
+            )
         # 用户取消选择时path为空
         if not path: return
         try:
@@ -1281,7 +1351,7 @@ class MainWindow(QMainWindow):
         except Exception as e:
             QMessageBox.warning(self,'脚本无效',str(e)); return
         self.log.append('开始执行：'+('重复战斗' if repeated else '单次战斗'))
-        self.worker=Worker(path,repeated,self.run_count.value(),self.ticket.currentText(),
+        self.worker=Worker(path,repeated,self.run_count.value(),self.ticket.currentData(),
                            self.auto_close.isChecked(),self.window_title.text().strip())
         self.worker.finished_text.connect(self.log.append)
         self.worker.log_text.connect(self.log.append)
