@@ -21,9 +21,9 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
     QTabWidget, QTextEdit, QFormLayout, QInputDialog, QSizePolicy)
 from config import settings
 
-from paths import ROOT_DIR
+from paths import ROOT_DIR, SCRIPTS_DIR
 ROOT = ROOT_DIR
-SCRIPTS = ROOT / 'scripts'
+SCRIPTS = SCRIPTS_DIR
 DATA = ROOT / 'assets' / 'char-data'
 IMAGES = ROOT / 'assets' / 'char-images'
 ICONS = ROOT / 'assets' / 'icons'
@@ -669,7 +669,11 @@ class Worker(QThread):
         flags = subprocess.CREATE_NEW_PROCESS_GROUP if sys.platform == 'win32' else 0
         # 两种运行入口分别启动独立子进程，避免中断时直接终止 GUI 线程
         entry = 'run_card_game.py' if self.mode == 'card' else 'run_battle.py'
-        cmd = [sys.executable, '-X', 'utf8', '-u', str(ROOT / entry), *self.args]
+        # 打包后用同一个 EXE 的子命令进入工作模式，不再执行独立的 py 文件
+        if getattr(sys, 'frozen', False):
+            cmd = [sys.executable, '--hbr-worker', self.mode, *self.args]
+        else:
+            cmd = [sys.executable, '-X', 'utf8', '-u', str(ROOT / entry), *self.args]
         try:
             self.process = subprocess.Popen(
                 cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
@@ -1457,6 +1461,22 @@ class MainWindow(QMainWindow):
             button.setEnabled(False)
 
 if __name__=='__main__':
-    app=QApplication(sys.argv)
-    window=MainWindow(); window.show()
-    sys.exit(app.exec())
+    # EXE 子进程通过指定参数直接运行战斗函数，不创建 Qt 窗口
+    if len(sys.argv) >= 3 and sys.argv[1] == '--hbr-worker':
+        mode = sys.argv[2]
+        sys.argv = [sys.argv[0], *sys.argv[3:]]
+        if mode == 'battle':
+            from run_battle import main
+        elif mode == 'card':
+            from run_card_game import main
+        else:
+            raise ValueError(f'未知的工作模式：{mode}')
+        try:
+            main()
+        except KeyboardInterrupt:
+            print('用户中断任务', flush=True)
+            sys.exit(130)
+    else:
+        app=QApplication(sys.argv)
+        window=MainWindow(); window.show()
+        sys.exit(app.exec())

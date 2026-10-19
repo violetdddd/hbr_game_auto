@@ -9,9 +9,9 @@
 # 回合 = OD; 角色: 技能,目标（od后置1或2或3，前置为负，0为不开od）
 
 # HBRTool style metadata
-# HBRTOOL_STYLE 1 {"team": "31A", "english": "Ruka_Kayamori", "id": "004"}
-# HBRTOOL_STYLE 2 {"team": "31A", "english": "Yuki_Izumi", "id": "005"}
-# HBRTOOL_STYLE 3 {"team": "31A", "english": "Megumi_Aikawa", "id": "007"}
-# HBRTOOL_STYLE 4 {"team": "31A", "english": "Karen_Asakura", "id": "005"}
-# HBRTOOL_STYLE 5 {"team": "31A", "english": "Tama_Kunimi", "id": "006"}
-# HBRTOOL_STYLE 6 {"team": "31A", "english": "Tsukasa_Tojo", "id": "005"}
+# HBRTOOL_STYLE 1 {"team": "31A", "english": "Ruka_Kayamori", "id": "005"}
+# HBRTOOL_STYLE 2 {"team": "31A", "english": "Yuki_Izumi", "id": "004"}
+# HBRTOOL_STYLE 3 {"team": "31A", "english": "Megumi_Aikawa", "id": "003"}
+# HBRTOOL_STYLE 4 {"team": "31A", "english": "Karen_Asakura", "id": "004"}
+# HBRTOOL_STYLE 5 {"team": "31A", "english": "Tama_Kunimi", "id": "005"}
+# HBRTOOL_STYLE 6 {"team": "31A", "english": "Tsukasa_Tojo", "id": "003"}
