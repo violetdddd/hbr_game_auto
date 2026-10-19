@@ -651,6 +651,27 @@ class EventRow(QGroupBox):
     def state(self):
         return {'action': self.action.currentData(), 'kind': self.kind}
 
+def setup_worker_output():
+    """EXE 子进程使用 UTF-8 向 GUI 的 PIPE 输出日志。"""
+    import io
+    import msvcrt
+    import os
+    import ctypes
+
+    handle = ctypes.windll.kernel32.GetStdHandle(-11)  # STD_OUTPUT_HANDLE
+    if handle in (0, ctypes.c_void_p(-1).value):
+        raise OSError('子进程标准输出管道不可用')
+
+    fd = msvcrt.open_osfhandle(handle, os.O_WRONLY)
+    binary = os.fdopen(fd, 'wb', buffering=0)
+    sys.stdout = io.TextIOWrapper(
+        binary,
+        encoding='utf-8',
+        errors='replace',
+        write_through=True
+    )
+    sys.stderr = sys.stdout
+
 # 被Qt调用的线程，这里实际开启了一个新进程，运行run_battle.py，并把报错等传回日志框中。等待添加logger
 class Worker(QThread):
     log_text = Signal(str)
@@ -808,7 +829,8 @@ class MainWindow(QMainWindow):
         battle_modes = QHBoxLayout()
         single_box = QGroupBox('执行单次战斗')
         single_layout = QVBoxLayout(single_box)
-        resolution_note = QLabel(                           # 提示用户分辨率支持
+        # 提示用户分辨率支持
+        resolution_note = QLabel(                         
             '目前支持的分辨率为：\n'
             '(1680, 1050)、(1920, 1200)、(2560, 1600)、\n'
             '(2048, 1152)、(2160, 1215)、(2560, 1440)。\n'
@@ -816,17 +838,22 @@ class MainWindow(QMainWindow):
         )
         resolution_note.setWordWrap(True)
         resolution_note.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        single_layout.addWidget(resolution_note)
+        # 单次战斗按钮
         play = QPushButton('执行单次战斗')
         play.clicked.connect(lambda: self.start_run(False))
-        single_layout.addStretch(1)
-        single_layout.addWidget(play, 1)
+        # 尾部注意note
         single_note = QLabel('注意：请进入战斗后执行单次战斗')
         single_note.setWordWrap(True)
+        # 按顺序加入layout
+        single_layout.addWidget(resolution_note)
+        single_layout.addStretch(1)
+        single_layout.addWidget(play)
         single_layout.addWidget(single_note)
 
         repeat_box = QGroupBox('光球重复刷取')
-        repeat_layout = QFormLayout(repeat_box)
+        repeat_layout = QVBoxLayout(repeat_box)
+        # 选择战斗次数和道具表单
+        repeat_form = QFormLayout()
         self.run_count = QSpinBox()
         self.run_count.setRange(1, 9999); self.run_count.setValue(1)
         # 下拉栏显示中文，itemData 仍传给 repetition.py 的英文参数
@@ -834,14 +861,20 @@ class MainWindow(QMainWindow):
         self.ticket.addItem('体力石', 'stone')
         self.ticket.addItem('门票', 'ticket')
         self.ticket.addItem('备用体力石', 'spare')
-        repeat_layout.addRow('重复次数', self.run_count)
-        repeat_layout.addRow('体力类型', self.ticket)
+        repeat_form.addRow('重复次数', self.run_count)
+        repeat_form.addRow('体力类型', self.ticket)
+        # 执行重复战斗按钮
         repeat = QPushButton('执行重复战斗')
         repeat.clicked.connect(lambda: self.start_run(True))
-        repeat_layout.addRow(repeat)
+        # 尾部的note
         repeat_note = QLabel('注意：进入选择要使用的道具界面后执行重复战斗')
         repeat_note.setWordWrap(True)
-        repeat_layout.addRow(repeat_note)
+        # 按顺序加入layout
+        repeat_layout.addLayout(repeat_form)
+        repeat_layout.addStretch(1)
+        repeat_layout.addWidget(repeat)
+        repeat_layout.addWidget(repeat_note)
+
         for group in (single_box, repeat_box):
             group.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         battle_modes.addWidget(single_box, 1)
@@ -894,7 +927,23 @@ class MainWindow(QMainWindow):
             QPushButton{background:white;border:1px solid #d6deea;border-radius:9px;padding:7px}
             QPushButton:hover{background:#eaf0fc} QLineEdit,QComboBox,QSpinBox,QTextEdit{
             background:white;border:1px solid #d6deea;border-radius:7px;padding:6px}
-            QTabWidget::pane{border:0} QTabBar::tab{padding:10px 18px}''')
+            QTabWidget::pane{border:0} QTabBar::tab {
+                background: #f1f4f9;
+                border: 1px solid #dce2eb;
+                border-bottom: 0;
+                border-top-left-radius: 7px;
+                border-top-right-radius: 7px;
+                padding: 10px 18px;
+                margin-right: 3px;
+            }
+            QTabBar::tab:selected {
+                background: #dbeafe;
+                color: #1d4ed8;
+                font-weight: 600;
+            }
+            QTabBar::tab:hover:!selected {
+                background: #eaf0fc;
+            }''')
         # 左侧没有重复次数和体力类型，按右侧实际内容高度补齐
         single_box.setMinimumHeight(repeat_box.sizeHint().height())
 
@@ -1036,7 +1085,7 @@ class MainWindow(QMainWindow):
             '转换结果不包含部分特殊行动等信息，导入后请检查并重新保存。'
         )
         sav_path, _ = QFileDialog.getOpenFileName(
-            self, '选择 SAV 文件', str(ROOT), 'SAV (*.sav);;All files (*)'
+            self, '选择 SAV 文件', str(SCRIPTS), 'SAV (*.sav);;All files (*)'
         )
         if not sav_path: return
         # 转换结果先保存为 HBRF 文件，再交给原有编辑器载入
@@ -1398,6 +1447,16 @@ class MainWindow(QMainWindow):
     def start_run(self, repeated):
         if self.worker and self.worker.isRunning():
             QMessageBox.warning(self,'运行中','已有任务正在运行'); return
+        # 未取得管理员权限则不允许启动战斗
+        if not self.is_admin():
+            QMessageBox.warning(
+                self,
+                '操作游戏需要管理员权限',
+                '请先点击“以管理员身份重启 GUI（Windows）”，'
+                '获得管理员权限后再执行战斗。'
+            )
+            return
+
         path=self.run_path.text().strip()
         # 没有输入hbrf文件path则用编辑器刚刚保存的current_path
         if not path:
@@ -1429,6 +1488,16 @@ class MainWindow(QMainWindow):
     def start_card_game(self):
         if self.worker and self.worker.isRunning():
             QMessageBox.warning(self, '运行中', '已有任务正在运行'); return
+        # 未取得管理员权限则不允许启动打牌
+        if not self.is_admin():
+            QMessageBox.warning(
+                self,
+                '操作游戏需要管理员权限',
+                '请先点击“以管理员身份重启 GUI（Windows）”，'
+                '获得管理员权限后再执行重复打牌。'
+            )
+            return
+        
         self.card_log.append('开始执行：技术模拟战重复打牌')
         # mode='card' 时 Worker 运行 run_card_game.py，而不是 run_battle.py
         self.worker = Worker(None, False, self.card_count.value(), 'stone', False,
@@ -1463,6 +1532,10 @@ class MainWindow(QMainWindow):
 if __name__=='__main__':
     # EXE 子进程通过指定参数直接运行战斗函数，不创建 Qt 窗口
     if len(sys.argv) >= 3 and sys.argv[1] == '--hbr-worker':
+        # 打包后的子进程先恢复 UTF-8 标准输出
+        if getattr(sys, 'frozen', False):
+            setup_worker_output()
+
         mode = sys.argv[2]
         sys.argv = [sys.argv[0], *sys.argv[3:]]
         if mode == 'battle':
