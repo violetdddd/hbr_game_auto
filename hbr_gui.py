@@ -1400,7 +1400,7 @@ class MainWindow(QMainWindow):
             skills = ['/'.join(self.catalog.skill_zh(s) for s in skill.split('/'))
                     for skill in role.skills]
             self.log.append(f'位置{role.slot}：{role.name}：{"、".join(skills) if skills else "无"}')
-        self.log.append(f'使用的技能可以少于3个，但每名角色都必须装备至少3个主动技能，防止技能所在位置变化')
+        self.log.append(f'[注意] 使用的技能可以少于3个，但每名角色都必须装备至少3个主动技能，防止技能所在位置变化')
 
     # 选择战斗脚本，选好后触发输出角色和技能顺序要求
     def select_run_file(self):
@@ -1551,5 +1551,10 @@ if __name__=='__main__':
             sys.exit(130)
     else:
         app=QApplication(sys.argv)
-        window=MainWindow(); window.show()
+
+        # 统一设置所有 Qt 窗口的图标
+        app.setWindowIcon(QIcon(str(ROOT / 'logo.ico')))
+
+        window=MainWindow()
+        window.show()
         sys.exit(app.exec())
