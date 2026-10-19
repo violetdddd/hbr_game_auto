@@ -794,7 +794,7 @@ class MainWindow(QMainWindow):
             b.clicked.connect(lambda _=False, k=kind: self.add_row(kind=k))
             add_actions.addWidget(b, 1 if kind != 'turn' else 2)
         root.addLayout(add_actions)
-        root.addWidget(QLabel('提示：HBRF 限制每回合恰好 3 个不同角色，且每名角色最多记录 6 个技能。'))
+        root.addWidget(QLabel('提示：HBRF 限制每回合恰好 3 个不同角色行动，且每名角色最多记录 6 个技能。'))
         # 普通战斗 tab，先设置窗口权限与脚本，再选择单次或重复战斗
         runner = QWidget(); tabs.addTab(runner, '普通战斗')
         form = QFormLayout(runner)
@@ -911,7 +911,7 @@ class MainWindow(QMainWindow):
         card_start.clicked.connect(self.start_card_game)
         card_form.addRow(card_start)
         # 说明技术模拟战的启动界面要求
-        note = QLabel('注意：当前重复进行[31C]普通战斗，请保证屏幕中完整出现该战斗选择后执行重复打牌')
+        note = QLabel('注意：当前重复进行[31C]普通战斗，请保证屏幕中完整出现该战斗选项后执行重复打牌')
         note.setWordWrap(True)
         card_form.addRow(note)
         self.card_stop_button = QPushButton('终止重复打牌')
@@ -1400,7 +1400,7 @@ class MainWindow(QMainWindow):
             skills = ['/'.join(self.catalog.skill_zh(s) for s in skill.split('/'))
                     for skill in role.skills]
             self.log.append(f'位置{role.slot}：{role.name}：{"、".join(skills) if skills else "无"}')
-        self.log.append(f'可以不用但每名角色必须装备至少3个技能！')
+        self.log.append(f'使用的技能可以少于3个，但每名角色都必须装备至少3个主动技能，防止技能所在位置变化')
 
     # 选择战斗脚本，选好后触发输出角色和技能顺序要求
     def select_run_file(self):
