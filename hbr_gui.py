@@ -787,12 +787,20 @@ class MainWindow(QMainWindow):
         self.rows_holder = QWidget(); self.rows_layout = QVBoxLayout(self.rows_holder)
         self.rows_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.scroll.setWidget(self.rows_holder); root.addWidget(self.scroll)
-        # 添加底部行动按钮
+        # 添加底部行动按钮：左侧追加一个行动，右侧按指定序号批量插入
         add_actions = QHBoxLayout()
         for title, kind in [('异时层行动', 'yishi'), ('添加回合', 'turn'), ('特殊回合行动', 'special')]:
+            button_pair = QHBoxLayout()
+            button_pair.setSpacing(0)  # 两个按钮紧贴
             b = QPushButton('＋ ' + title)
+            b.setObjectName('normalAddButton')
             b.clicked.connect(lambda _=False, k=kind: self.add_row(kind=k))
-            add_actions.addWidget(b, 1 if kind != 'turn' else 2)
+            batch = QPushButton('批量添加')
+            batch.setObjectName('batchAddButton')
+            batch.clicked.connect(lambda _=False, k=kind: self.batch_add_rows(k))
+            button_pair.addWidget(b, 7)
+            button_pair.addWidget(batch, 3)
+            add_actions.addLayout(button_pair, 1 if kind != 'turn' else 2)
         root.addLayout(add_actions)
         root.addWidget(QLabel('提示：HBRF 限制每回合恰好 3 个不同角色行动，且每名角色最多记录 6 个技能。'))
         # 普通战斗 tab，先设置窗口权限与脚本，再选择单次或重复战斗
@@ -925,7 +933,21 @@ class MainWindow(QMainWindow):
             QGroupBox{border:1px solid #dce2eb;border-radius:12px;margin-top:12px;padding:14px;background:white}
             QGroupBox::title{subcontrol-origin:margin;left:14px;padding:0 5px}
             QPushButton{background:white;border:1px solid #d6deea;border-radius:9px;padding:7px}
-            QPushButton:hover{background:#eaf0fc} QLineEdit,QComboBox,QSpinBox,QTextEdit{
+            QPushButton:hover{background:#eaf0fc}
+            QPushButton#normalAddButton {
+                border-top-left-radius: 9px;
+                border-bottom-left-radius: 9px;
+                border-top-right-radius: 0px;
+                border-bottom-right-radius: 0px;
+            }
+            QPushButton#batchAddButton {
+                border-top-left-radius: 0px;
+                border-bottom-left-radius: 0px;
+                border-top-right-radius: 9px;
+                border-bottom-right-radius: 9px;
+                border-left: 0px;
+            }
+            QLineEdit,QComboBox,QSpinBox,QTextEdit{
             background:white;border:1px solid #d6deea;border-radius:7px;padding:6px}
             QTabWidget::pane{border:0} QTabBar::tab {
                 background: #f1f4f9;
@@ -1038,6 +1060,33 @@ class MainWindow(QMainWindow):
         # 刷新index
         self.refresh_row_indices()
         return row
+
+    # 按原有行动序号批量插入：1 表示原第 1 行之前，超过原行数则追加到末尾
+    def batch_add_rows(self, kind):
+        # 特殊回合行动需要队伍支持；先检查，避免弹窗输入后只插入一部分
+        if kind == 'special' and not self.available_global_buttons():
+            QMessageBox.information(
+                self, '无法添加特殊回合行动',
+                '队伍中需要魔王山胁才能使用魔界骑兵，或需要 P5R 角色才能使用总攻击。'
+            )
+            return
+
+        text, ok = QInputDialog.getText(
+            self, '批量添加行动',
+            '将在输入的位置前插入（从 1 开始，使用英文逗号分隔，例如 1,2,7）：'
+        )
+        if not ok:
+            return
+        parts = [part.strip() for part in text.split(',')]
+        if not all(part.isascii() and part.isdecimal() and int(part) > 0 for part in parts):
+            QMessageBox.warning(self, '输入错误', '请输入用英文逗号分隔的正整数，例如 1,2,7。')
+            return
+
+        # 所有位置都相对于插入前的行动列表；重复序号允许插入多个行动。
+        original_count = len(self.rows)
+        for position in sorted(map(int, parts), reverse=True):
+            index = min(position - 1, original_count)
+            self.add_row(index=index, kind=kind, scroll=False)
 
     # 删除row
     def remove_row(self, row):
