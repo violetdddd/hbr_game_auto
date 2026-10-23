@@ -1,20 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+HBR Tool .sav -> HBRF.  main(sav_path, mapping_path=None, output_path=None).
+Requires the project's ``hbrf.model`` when converting (not at import time).
+"""
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import re
+import zlib
 from collections import OrderedDict
 from pathlib import Path
-import zlib
-import base64
+from paths import ROOT_DIR
 
-DEFAULT_SKILLS = {1, 2, 3, 4, 5, 8001, 8002, 8003, 8004, 9999}
+DATA_DIR = ROOT_DIR / "assets" / "char-data"
+
+DEFAULT_SKILLS = {0, 1, 2, 3, 4, 5, 8001, 8002, 8003, 8004, 9999}
 POST_OD = {4: 1, 5: 2, 6: 3}
+KAREN_STYLES = {176: 1, 177: 2}  # 176=009-1(形态001), 177=009-2(形态002)
 INTRO = '# 此hbrf文件为解析https://www.hbr-tool.com/网站保存的sav文件生成，不包含特殊行动，需要手动检查调整并重新保存'
-TEAM_HEADER = '# 配队和技能（用于初始化角色编号为1-6，目前支持技能数最多6个，角色最少需要装备3个技能）'
-TURN_HEADER = '# 回合 = OD; 角色: 技能,目标（od后置1或2或3，前置为负，0为不开od）'
 
 
 def decode_sav(path):
@@ -23,178 +29,213 @@ def decode_sav(path):
 def read_json(path):
     return json.loads(Path(path).read_text(encoding='utf-8-sig'))
 
+def clean_name(value, strip_spaces=False):
+    value = str(value).replace('\r', ' ').replace('\n', ' ').replace(':', '：').replace(';', '；').replace(',', '，').strip()
+    return re.sub(r'\s+', '', value) if strip_spaces else value
 
-def text_field(obj, key):
-    value = obj.get(key)
-    return str(value).strip() if value is not None else ''
+def convert(axis: dict, mapping: dict, output_path):
+    """Convert already decoded data; save using hbrf.model. Return (Path, warnings)."""
+    from hbrf import model as m
 
-
-def format_name(name, *, strip_spaces=False):
-    name = str(name).replace('\r', ' ').replace('\n', ' ').replace(':', '：').replace(';', '；').replace(',', '，')
-    if strip_spaces:
-        name = re.sub(r'\s+', '', name)
-    return name.strip()
-
-
-def convert(axis: dict, mapping: dict):
     units = axis['unitDataList']
-    ops = axis['userOperationList']
+    operations = axis['userOperationList']
     if len(units) != 6:
-        raise ValueError('HBRF 队伍必须恰好有六名角色')
-
-    styles = mapping.get('style', {})
-    skills = mapping.get('skill', {})
-    style_ids = [int(row['style_id']) for row in units]
-    if len(set(style_ids)) != 6:
-        raise ValueError('队伍风格 ID 重复，无法生成唯一的角色顺序')
-
-    name_by_style = {}
-    style_info = {}
-    char_slot = {}
+        raise ValueError('HBRF 队伍必须有六名角色')
+    site_styles, site_skills = mapping.get('style', {}), mapping.get('skill', {})
     warnings = []
-    for slot, style_id in enumerate(style_ids, 1):
-        info = styles.get(str(style_id), {})
-        style_info[style_id] = info
-        character = info.get('character') or {}
-        name = format_name(character.get('zh-CN-CN') or f'未匹配角色{style_id}', strip_spaces=True)
-        name_by_style[style_id] = name
+    roles, metadata = [], []
+    style_to_slot = {}
+    char_slots = {}
+    # 解析角色部分，负责收集开头和结尾注释的信息
+    for slot, unit in enumerate(units, 1):
+        style_id = int(unit['style_id'])
+        info = site_styles.get(str(style_id)) or {}
+        char = info.get('character') or {}
+        name = clean_name(char.get('zh-CN-CN') or f'未匹配角色{style_id}', strip_spaces=True)
+        roles.append(m.Role(slot, name, []))
+        # 保存style_to_slot[网站风格id]=slot
+        style_to_slot[style_id] = slot
         char_id = info.get('website_character_id')
+        # 存储char_slots[网站角色id]=slot
         if char_id is not None:
-            char_slot[int(char_id)] = slot
+            char_id = int(char_id)
+            if char_id in char_slots:
+                raise ValueError(f'队伍有重复角色：网站角色 ID {char_id}')
+            char_slots[char_id] = slot
         if info.get('status') != 'matched':
-            warnings.append(f'队伍槽位 {slot}: 风格 {style_id} 未完全匹配')
-    if len(set(name_by_style.values())) != 6:
-        raise ValueError('队伍中出现相同的角色名称，无法按 HBRF 格式区分')
+            warnings.append(f'槽位 {slot}：风格 {style_id} 未完整匹配')
+        # 找本地数据库风格id
+        local_style_id = info.get('style_id')
+        # 可怜单独给一个赋值初始id，就是009-1
+        if style_id in KAREN_STYLES:
+            local_style_id = '009-1'
+            style_to_slot[style_id+1] = slot  # 认为可怜的第二个形态是第一形态的id+1
+        metadata.append({'team': info.get('team'), 'english': char.get('en'), 'id': local_style_id})
 
-    # First appearance in front-row operations determines the 1-based skill slot.
-    equipped = {style_id: OrderedDict() for style_id in style_ids}
-    for op_no, op in enumerate(ops, 1):
-        place = op.get('placeStyle') or []
-        selected = op.get('selectSkill') or []
-        if len(place) < 3 or len(selected) < 3:
-            raise ValueError(f'操作 {op_no}: 前排位置或技能不足 3 个')
-        for style_id, action in zip(place[:3], selected[:3]):
-            style_id = int(style_id)
-            if style_id not in equipped:
-                raise ValueError(f'操作 {op_no}: 风格 {style_id} 未在队伍中')
-            skill_id = int(action.get('skill_id') or 0)
-            if skill_id in DEFAULT_SKILLS or skill_id == 0:
+    # 给定技能id获取其技能名称
+    def skill_name(skill_id, index):
+        info = site_skills.get(str(skill_id)) or {}
+        label = info.get('value') or f'未匹配技能{skill_id}'
+        if not info.get('value') or info.get('status') in ('unmatched', 'ambiguous'):
+            warnings.append(f'操作 {index}：技能 {skill_id} 未完整匹配')
+        return label
+
+    def skill_id_of(skill_name_value):
+        for skill_id, skill_content in site_skills:
+            if skill_content.get("value") == skill_name_value:
+                return skill_id
+        return None
+
+    special_file = DATA_DIR / "special_skills.json"
+    special = json.loads(special_file.read_text(encoding="utf-8")) if special_file.exists() else {}
+    links = {}
+    for name, groups in special.get("switchable", {}).items():
+        # group是一个风格及其所对应的技能，这里保存了(skill id): link id
+        for group in groups.values():
+            links.update({skill_id_of(v["value"]): skill_id_of(v["link"]) for skill, v in group.items()})
+
+    # 第一次遍历：收集用过的skill信息
+    used = {slot: OrderedDict() for slot in range(1, 7)}
+    initial_selection = {}
+    for index, op in enumerate(operations, 1):
+        places, selections = op.get('placeStyle') or [], op.get('selectSkill') or []
+        if len(places) < 6 or len(selections) < 6:
+            raise ValueError(f'第{index}行行动的上场角色不满6人')
+        for style_id, selection in zip(places[:3], selections[:3]):
+            slot = style_to_slot[style_id]
+            sid = int(selection.get('skill_id') or 0)
+            if sid in DEFAULT_SKILLS:
                 continue
-            if skill_id not in equipped[style_id]:
-                mapped = skills.get(str(skill_id), {})
-                label = format_name(mapped.get('value') or f'未匹配技能{skill_id}')
-                if mapped.get('value') is None or mapped.get('status') in ('unmatched', 'ambiguous'):
-                    warnings.append(f'操作 {op_no}: 技能 {skill_id} 未完全匹配')
-                if label in equipped[style_id].values():
-                    warnings.append(f'角色 {name_by_style[style_id]}: 不同技能 ID 具有同一繁体名称 {label!r}')
-                equipped[style_id][skill_id] = label
-                if len(equipped[style_id]) > 6:
-                    raise ValueError(f'角色 {name_by_style[style_id]} 使用了超过6种非默认技能，无法全部存入HBRF')
+            pair = links.get(sid)  # 不是links则返回None
+            key = frozenset((sid, pair)) if pair else sid
+            if key not in used[slot]:
+                if pair:
+                    first_name = skill_name(sid, index)
+                    second_name = skill_name(pair, index)
+                    label = first_name + '/' + second_name
+                    # 保存切换技能里面初始选择的技能
+                    initial_selection[(slot, key)] = sid
+                else:
+                    label = skill_name(sid, index)
+                used[slot][key] = label
+                if len(used[slot]) > 6:
+                    raise ValueError(f'槽位 {slot}：超过 6 个不同的技能槽')
+    # 构建一个slot和技能id（pair是frozenset）到技能栏位的映射
+    skill_index = {slot: {key: i for i, key in enumerate(skills, 1)} for slot, skills in used.items()}
+    # 加入Role技能列表
+    for role in roles:
+        role.skills = list(used[role.slot].values())
 
-    skill_slots = {sid: {skill_id: i for i, skill_id in enumerate(records, 1)}
-                   for sid, records in equipped.items()}
-
-    result = [INTRO, "", TEAM_HEADER]
-    for style_id in style_ids:
-        labels = list(equipped[style_id].values())
-        result.append(f'{name_by_style[style_id]}: ' + ', '.join(labels))
-    result.extend(["", TURN_HEADER])
-
-    # Track the last OD trigger type/level for bonus labels.
-    # Note: phase persists for OD bonus rows, but a normal bonus=0 row does not belong to it.
-    phase = None   # ('前置'|'后置', level)
-    for op_no, op in enumerate(ops, 1):
+    # 第二次遍历，收集行动、od、label信息
+    # 收集od和label信息
+    phase = None
+    last_phase = None
+    for index, op in enumerate(operations, 1):
         trigger = bool(op.get('triggerOverDrive'))
         kb = int(op.get('kbAction') or 0)
+        turn_no = int(op.get('turnNumber') or 0)
+        bonus = int(op.get('overDriveNumber') or 0)
+        extra = int(op.get('additionalCount') or 0)
+        od = 0
         if trigger:
             level = int(op.get('overDriveLevel') or 0)
             if level not in (1, 2, 3):
-                raise ValueError(f'操作 {op_no}: 前置OD等级无效 {level}')
-            phase = ('前置', level)
-            od_value = -level
+                raise ValueError(f'操作 {index}：非法前置 OD {level}')
+            phase, od = ('前置', level), -level
+            last_phase = phase
         elif kb in POST_OD:
             level = POST_OD[kb]
-            phase = ('后置', level)
-            od_value = level
-        else:
-            od_value = 0
-
-        turn = int(op.get('turnNumber') or 0)
-        bonus = int(op.get('overDriveNumber') or 0)
-        additional = int(op.get('additionalCount') or 0)
-        label = f'T{turn}'
-        if phase is not None and (trigger or kb in POST_OD or bonus > 0):
-            kind, level = phase
-            label += f'-{kind}OD{level}'
-            if kind == '前置':
-                # Trigger row has bonus=0 but represents the first pre-OD action.
+            phase, od = ('后置', level), level
+            last_phase = phase
+        elif bonus == 0:
+            last_phase = None
+        label = f'T{turn_no}'
+        if last_phase:
+            direction, level = last_phase
+            label += f'-{direction}OD{level}'
+            if direction == '前置':
                 label += f'-bonus{max(1, bonus)}'
             elif bonus == 0:
                 label += '-OD前'
             else:
                 label += f'-bonus{bonus}'
-        if additional:
+        if extra:
             label += '-追加'
 
+        # 收集行动信息
         actions = []
-        for style_id, action in zip(op['placeStyle'][:3], op['selectSkill'][:3]):
+        active_form = {}  # 用1和2来表示可怜的两个形态，初始为1
+        active_skill = dict(initial_selection)
+        moves, switches = [], []
+        places, selections = op['placeStyle'][:3], op['selectSkill'][:3]
+        for position, (style_id, selection) in enumerate(zip(places, selections)):
             style_id = int(style_id)
-            skill_id = int(action.get('skill_id') or 0)
-            num = skill_slots[style_id].get(skill_id, 0)
-            target_id = action.get('buffTargetCharaId')
-            target = 0
-            if num != 0 and target_id is not None:
+            slot = style_to_slot[style_id]
+            # 处理额外的可怜切换action
+            if style_id in KAREN_STYLES:
+                new_form = KAREN_STYLES[style_id]
+                if slot in active_form and active_form[slot] != new_form:
+                    switches.append(m.SpecialRoleButton(slot, position, 'kelian'))
+                active_form[slot] = new_form
+            sid = int(selection.get('skill_id') or 0)
+            # 默认行动
+            if sid in DEFAULT_SKILLS:
+                number = 0
+            # 额外处理技能切换
+            else:
+                pair = links.get(sid)
+                key = frozenset((sid, pair)) if pair else sid
+                number = skill_index[slot][key]
+                if pair and active_skill[(slot, key)] != sid:
+                    switches.append(m.SkillSwitch(slot, number, position))
+                    active_skill[(slot, key)] = sid
+            # 收集一般的技能信息
+            target_id = selection.get('buffTargetCharaId')
+            target = None
+            if number and target_id not in (None, '', 0, '0'):
                 try:
-                    target = char_slot.get(int(target_id), 0)
-                    if not target:
-                        warnings.append(f'操作 {op_no}: 目标角色ID {target_id} 不在队伍中，改为0')
+                    target = char_slots.get(int(target_id))
+                    if target is None:
+                        warnings.append(f'操作 {index}：目标角色 {target_id} 不在队伍中，改为无目标')
                 except (TypeError, ValueError):
-                    warnings.append(f'操作 {op_no}: 非法目标角色ID {target_id!r}，改为0')
-            actions.append(f'{name_by_style[style_id]}: {num},{target}')
-        result.append(f'{label} = {od_value}; ' + '; '.join(actions))
+                    warnings.append(f'操作 {index}：非法目标 {target_id!r}，改为无目标')
+            moves.append(m.SkillAction(slot, number, target))
+        # 将特殊行动和一般战斗行动加入actions列表
+        actions.extend(switches)
+        actions.append(m.BattleTurn(label, od, moves))
 
-    result.extend(['', '# HBRTool style metadata'])
-    for slot, style_id in enumerate(style_ids, 1):
-        info = style_info[style_id]
-        character = info.get('character') or {}
-        meta = {'team': info.get('team'), 'english': character.get('en'), 'id': info.get('style_id')}
-        result.append(f'# HBRTOOL_STYLE {slot} ' + json.dumps(meta, ensure_ascii=False))
-    return '\n'.join(result) + '\n', warnings
+    script = m.BattleScript(roles, actions)
+    m.validate_hbrf(script)
+    output = Path(output_path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    m.save_hbrf(script, output)
+    body = output.read_text(encoding='utf-8')
+    footer = '\n# HBRTool style metadata\n' + ''.join(
+        f'# HBRTOOL_STYLE {slot} {json.dumps(info, ensure_ascii=False)}\n'
+        for slot, info in enumerate(metadata, 1)
+    )
+    output.write_text(INTRO + '\n\n' + body.rstrip('\n') + '\n' + footer, encoding='utf-8')
+    return output, warnings
 
 
 def main(sav_path, mapping_path=None, output_path=None):
-    """将 HBR Tool 的 .sav 转为 .hbrf，可从其他 Python 文件直接调用。
-
-    Args:
-        sav_path: SAV 文件路径。
-        mapping_path: 映射 JSON 路径；默认与本脚本同目录的 mapping.json。
-        output_path: 输出路径；默认替换 SAV 后缀为 .hbrf。
-
-    Returns:
-        (output_path: pathlib.Path, warnings: list[str])
-    """
-    sav_path = Path(sav_path)
-    mapping_path = (Path(mapping_path) if mapping_path is not None
-                    else Path(__file__).resolve().with_name('mapping.json'))
-    output_path = Path(output_path) if output_path is not None else sav_path.with_suffix('.hbrf')
-
-    axis = decode_sav(sav_path)
-    content, warnings = convert(axis, read_json(mapping_path))
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(content, encoding='utf-8')
-    return output_path, warnings
+    """GUI/other Python: main('xxx.sav') -> (Path, warnings)."""
+    source = Path(sav_path)
+    mapping_file = Path(mapping_path) if mapping_path is not None else Path(__file__).resolve().with_name('mapping.json')
+    output = Path(output_path) if output_path is not None else source.with_suffix('.hbrf')
+    return convert(decode_sav(source), read_json(mapping_file), output)
 
 
 def cli():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('sav', type=Path, help='网站导出的 SAV 路径')
-    parser.add_argument('mapping', nargs='?', type=Path, help='mapping.json 路径（默认脚本目录）')
-    parser.add_argument('-o', '--output', type=Path, help='输出 HBRF 路径')
+    parser.add_argument('sav', type=Path)
+    parser.add_argument('mapping', nargs='?', type=Path)
+    parser.add_argument('-o', '--output', type=Path)
     args = parser.parse_args()
     output, warnings = main(args.sav, args.mapping, args.output)
-    print(f'输出: {output} | 警告: {len(warnings)}')
-    for w in dict.fromkeys(warnings):
-        print('[警告]', w)
+    print(f'输出：{output}；警告：{len(warnings)}')
+    for warning in dict.fromkeys(warnings):
+        print('[警告]', warning)
 
 
 if __name__ == '__main__':
