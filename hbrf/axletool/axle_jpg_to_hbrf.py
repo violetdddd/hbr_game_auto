@@ -42,8 +42,13 @@ def convert_axle_data(data, output_path):
         name, title, team = item["character"], item["style"], item["team"]
         db = json.loads((DATA_DIR / f"{team}.json").read_text(encoding="utf-8"))
         record = db.get(name)
+        style_record = next(
+            (v for v in record.get("style", {}).values()
+            if isinstance(v, dict) and v.get("value") == title),
+            None
+        )
         # 在对应队伍json文件中找不到角色或者风格
-        if record is None or title not in record.get("style", {}):
+        if record is None or style_record is None:
             warnings.append(f"Slot {i} 风格未匹配：{team}/{name}/{title}")
         # 优先获取国服简中CN-CN
         zh = (record or {}).get("names", {}).get("zh-CN-CN") or (record or {}).get("names", {}).get("zh-CN") or name
@@ -64,7 +69,7 @@ def convert_axle_data(data, output_path):
             continue
         # group是一个风格及其所对应的技能，这里保存了(slot, skill名): link名
         for group in groups.values():
-            links.update({(style_slots[name], skill): v["link"] for skill, v in group.items()})
+            links.update({(style_slots[name], v["value"]): v["link"] for v in group.values()})
 
     # 第一次遍历：按出现顺序收集技能；可切换的一对技能仅占一个技能槽。
     used = {i: [] for i in range(1, 7)}
@@ -119,9 +124,12 @@ def convert_axle_data(data, output_path):
                 skill = None
             form = cell.get("activeFormId")
             if form is not None:
-                if slot in current_form and current_form[slot] != form:
+                # 可怜第一次见默认009-1
+                if slot not in current_form:
+                    current_form[slot] = "009-1"
+                if current_form[slot] != form:
                     switches.append(m.SpecialRoleButton(slot, position, "kelian"))
-                current_form[slot] = form  # 可怜第一次见会默认009-1
+                current_form[slot] = form
             # 确定一般技能行动
             if skill in (None, "", "普攻", "指揮行動"):
                 skill_id = 0
@@ -220,10 +228,5 @@ def main(image_path, output_path=None):
     )
 
 
-if __name__ == "__main__":
-    # main("hbrf/axletool/HS-66.jpg")
-    data = extract_axle_json("HS-66.jpg")
-    Path("HS-66.json").write_text(
-        json.dumps(data, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+# if __name__ == "__main__":
+#     main()

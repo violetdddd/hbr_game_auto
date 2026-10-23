@@ -75,7 +75,7 @@ class Catalog:
             for character, groups in special.get('switchable', {}).items():
                 for style_name, entries in groups.items():
                     for name, entry in entries.items():
-                        self.switch_pairs[(character, name)] = entry['link']
+                        self.switch_pairs[(character, entry["value"])] = entry['link']
         if not DATA.exists():
             return
         for path in sorted(DATA.glob('*.json')):
@@ -111,9 +111,9 @@ class Catalog:
                 title = entry.get('value', style_key)
                 skills = active_skill_names(groups.get(style_key, {}))
                 # 司令的鬼神化和waki的魔界骑兵忽略
-                if style_key == "希望的晨曦" and "鬼神化" in skills:
+                if title == "希望的晨曦" and "鬼神化" in skills:
                     skills.remove("鬼神化")
-                if style_key == "高傲魔王的凱旋歸來" and "魔界騎兵起動！" in skills:
+                if title == "高傲魔王的凱旋歸來" and "魔界騎兵起動！" in skills:
                     skills.remove("魔界騎兵起動！")
                 command_group = groups.get(style_key, {}).get('command action', {})
                 if isinstance(command_group, dict) and command_group:
@@ -126,7 +126,7 @@ class Catalog:
                 # 生成风格Style类
                 for sid in ids:
                     # 可怜只保留009-1
-                    if style_key == "CODE:Virtual Killer" and sid == "009-2":
+                    if title == "CODE:Virtual Killer" and sid == "009-2":
                         continue
                     sid = str(sid)
                     image_path = IMAGES / team / english / f'{sid}.webp'
@@ -761,7 +761,7 @@ class MainWindow(QMainWindow):
         root = QVBoxLayout(edit)
         # 新建、打开、保存工具栏
         toolbar = QHBoxLayout()
-        for title, callback in [('新建',self.new),('打开 HBRF',self.open_file),('打开 SAV',self.open_sav),('保存',self.save),('另存为',lambda: self.save(True))]:
+        for title, callback in [('新建',self.new),('打开 HBRF',self.open_file),('打开 SAV',self.open_sav),('打开 jpg',self.open_jpg),('保存',self.save),('另存为',lambda: self.save(True))]:
             b = QPushButton(title); b.clicked.connect(callback); toolbar.addWidget(b)
         toolbar.addStretch(); root.addLayout(toolbar)
         # 角色slot
@@ -1157,6 +1157,38 @@ class MainWindow(QMainWindow):
                 QMessageBox.warning(self, 'SAV 转换提示', details)
         except Exception as e:
             QMessageBox.critical(self, 'SAV 转换失败', str(e))
+
+    # 打开从 hbr-axletool.pages.dev 保存的 jpg，转换后复用现有 HBRF 编辑器导入逻辑
+    def open_jpg(self):
+        QMessageBox.information(
+            self, 'jpg 文件来源',
+            '仅支持从 https://hbr-axletool.pages.dev/ 网站保存的 .jpg 文件。\n'
+            '转换结果不包含部分特殊行动等信息，导入后请检查并重新保存。'
+        )
+        jpg_path, _ = QFileDialog.getOpenFileName(
+            self, '选择 jpg 文件', str(SCRIPTS), 'JPG (*.jpg);;All files (*)'
+        )
+        if not jpg_path: return
+        # 转换结果先保存为 HBRF 文件，再交给原有编辑器载入
+        output_path, _ = QFileDialog.getSaveFileName(
+            self, '保存转换后的 HBRF',
+            str(SCRIPTS / (Path(jpg_path).stem + '.hbrf')),
+            'HBRF (*.hbrf)'
+        )
+        if not output_path: return
+        try:
+            # 直接调用转换模块，保留未匹配技能/风格的警告
+            from hbrf.axletool.axle_jpg_to_hbrf import main as convert_jpg
+            converted, warnings = convert_jpg(jpg_path, output_path=output_path)
+            self.open_file(str(converted))  # 复用 HBRF 导入和风格匹配逻辑
+            if warnings:
+                unique = list(dict.fromkeys(warnings))
+                details = '\n'.join(unique[:12])
+                if len(unique) > 12:
+                    details += f'\n……另有 {len(unique)-12} 条警告'
+                QMessageBox.warning(self, 'jpg 转换提示', details)
+        except Exception as e:
+            QMessageBox.critical(self, 'jpg 转换失败', str(e))
 
     # 打开 HBRF；指定 path 时复用原来的解析流程，不再弹出文件选择框
     def open_file(self, path=None):

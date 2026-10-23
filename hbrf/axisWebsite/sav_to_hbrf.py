@@ -6,7 +6,6 @@ Requires the project's ``hbrf.model`` when converting (not at import time).
 """
 from __future__ import annotations
 
-import argparse
 import base64
 import json
 import re
@@ -50,6 +49,8 @@ def convert(axis: dict, mapping: dict, output_path):
     for slot, unit in enumerate(units, 1):
         style_id = int(unit['style_id'])
         info = site_styles.get(str(style_id)) or {}
+        if not info:
+            warnings.append(f"Slot {slot} 风格未匹配：网站id为{style_id}")
         char = info.get('character') or {}
         name = clean_name(char.get('zh-CN-CN') or f'未匹配角色{style_id}', strip_spaces=True)
         roles.append(m.Role(slot, name, []))
@@ -69,7 +70,8 @@ def convert(axis: dict, mapping: dict, output_path):
         # 可怜单独给一个赋值初始id，就是009-1
         if style_id in KAREN_STYLES:
             local_style_id = '009-1'
-            style_to_slot[style_id+1] = slot  # 认为可怜的第二个形态是第一形态的id+1
+            for kelian_id in KAREN_STYLES.keys():
+                style_to_slot[kelian_id] = slot
         metadata.append({'team': info.get('team'), 'english': char.get('en'), 'id': local_style_id})
 
     # 给定技能id获取其技能名称
@@ -174,7 +176,10 @@ def convert(axis: dict, mapping: dict, output_path):
             # 处理额外的可怜切换action
             if style_id in KAREN_STYLES:
                 new_form = KAREN_STYLES[style_id]
-                if slot in active_form and active_form[slot] != new_form:
+                # 第一次碰到可怜则初始化为001
+                if slot not in active_form:
+                    active_form[slot] = 1
+                if active_form[slot] != new_form:
                     switches.append(m.SpecialRoleButton(slot, position, 'kelian'))
                 active_form[slot] = new_form
             sid = int(selection.get('skill_id') or 0)
@@ -218,25 +223,12 @@ def convert(axis: dict, mapping: dict, output_path):
     return output, warnings
 
 
-def main(sav_path, mapping_path=None, output_path=None):
+def main(sav_path, output_path=None):
     """GUI/other Python: main('xxx.sav') -> (Path, warnings)."""
     source = Path(sav_path)
-    mapping_file = Path(mapping_path) if mapping_path is not None else Path(__file__).resolve().with_name('mapping.json')
+    mapping_file = Path(__file__).resolve().with_name('mapping.json')
     output = Path(output_path) if output_path is not None else source.with_suffix('.hbrf')
     return convert(decode_sav(source), read_json(mapping_file), output)
 
-
-def cli():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('sav', type=Path)
-    parser.add_argument('mapping', nargs='?', type=Path)
-    parser.add_argument('-o', '--output', type=Path)
-    args = parser.parse_args()
-    output, warnings = main(args.sav, args.mapping, args.output)
-    print(f'输出：{output}；警告：{len(warnings)}')
-    for warning in dict.fromkeys(warnings):
-        print('[警告]', warning)
-
-
-if __name__ == '__main__':
-    cli()
+# if __name__ == '__main__':
+#     main("sim_data.sav", "kelian_177_test.hbrf")
