@@ -26,7 +26,9 @@ current_resolution = (1920, 1200)
 
 def set_resolution(resolution):
     global current_resolution
-    if resolution not in RESOLUTIONS:
+    if resolution == (0,0):
+        raise ValueError(f'游戏当前可能处于最小化状态，无法正确识别分辨率')
+    elif resolution not in RESOLUTIONS:
         raise ValueError(f'不支持的分辨率：{resolution}')
     current_resolution = resolution
 
