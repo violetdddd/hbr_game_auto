@@ -81,10 +81,10 @@ def convert(axis: dict, mapping: dict, output_path):
         return label
 
     def skill_id_of(skill_name_value):
-        for skill_id, skill_content in site_skills:
+        for skill_id, skill_content in site_skills.items():
             if skill_content.get("value") == skill_name_value:
-                return skill_id
-        return None
+                return int(skill_id)
+        raise ValueError(f'未找到技能 {skill_name_value} 的网站技能ID')
 
     special_file = DATA_DIR / "special_skills.json"
     special = json.loads(special_file.read_text(encoding="utf-8")) if special_file.exists() else {}
@@ -130,6 +130,9 @@ def convert(axis: dict, mapping: dict, output_path):
     # 收集od和label信息
     phase = None
     last_phase = None
+    actions = []
+    active_form = {}  # 用1和2来表示可怜的两个形态，初始为1
+    active_skill = dict(initial_selection)
     for index, op in enumerate(operations, 1):
         trigger = bool(op.get('triggerOverDrive'))
         kb = int(op.get('kbAction') or 0)
@@ -163,9 +166,6 @@ def convert(axis: dict, mapping: dict, output_path):
             label += '-追加'
 
         # 收集行动信息
-        actions = []
-        active_form = {}  # 用1和2来表示可怜的两个形态，初始为1
-        active_skill = dict(initial_selection)
         moves, switches = [], []
         places, selections = op['placeStyle'][:3], op['selectSkill'][:3]
         for position, (style_id, selection) in enumerate(zip(places, selections)):
