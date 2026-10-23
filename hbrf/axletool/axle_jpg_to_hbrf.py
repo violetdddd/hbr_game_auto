@@ -201,6 +201,9 @@ def convert_axle_data(data, output_path):
                         "-追加" if turn.label.endswith("-追加") else "")
                     turn.od = level
 
+    # nnm的技能value在网站数据库中为英文逗号
+    for role in roles:
+        role.skills = [skill.replace(",", "，") for skill in role.skills]
     script = m.BattleScript(roles, actions)
     m.validate_hbrf(script)
     output = Path(output_path)
