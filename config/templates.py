@@ -4,13 +4,14 @@ from paths import TEMPLATE_DIR
 start_action_fig = TEMPLATE_DIR / "start_action.png"
 skip_fig = TEMPLATE_DIR / "skip.png"
 change_fig = TEMPLATE_DIR / "change.png"
+od_fig_0 = TEMPLATE_DIR / "od_0.png"
 od_fig_1 = TEMPLATE_DIR / "od_1.png"
 od_fig_2 = TEMPLATE_DIR / "od_2.png"
 od_fig_3 = TEMPLATE_DIR / "od_3.png"
 od_fig_1_big = TEMPLATE_DIR / "od_1_big.png"
 od_fig_2_big = TEMPLATE_DIR / "od_2_big.png"
 od_fig_3_big = TEMPLATE_DIR / "od_3_big.png"
-od_figs = [od_fig_1, od_fig_2, od_fig_3]
+od_figs = [od_fig_0, od_fig_1, od_fig_2, od_fig_3]
 od_figs_big = [od_fig_1_big, od_fig_2_big, od_fig_3_big]
 stone_fig = TEMPLATE_DIR / "stone.png"
 OK_fig = TEMPLATE_DIR / "OK.png"
