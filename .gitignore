@@ -5,3 +5,9 @@
 
 # VS Code files for those working on multiple tools
 .vscode/*
+hbrf/axisWebsite/database/*
+test.py
+*.spec
+build/*
+dist/*
+scripts/*
