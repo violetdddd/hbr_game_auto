@@ -26,10 +26,14 @@ def close_auto_fight(game):
 
     return name
 
-def detect_start_button(game):
+def detect_start_button(game, is_gray=False):
     resolution = settings.current_resolution
+    if is_gray:
+        t = tpl.start_action_gray_fig
+    else:
+        t = tpl.start_action_fig
     # 用r通道减g通道获得粉色信息
-    template = cv2.subtract(load_template(tpl.start_action_fig)[:, :, 2], load_template(tpl.start_action_fig)[:, :, 1])
+    template = cv2.subtract(load_template(t)[:, :, 2], load_template(t)[:, :, 1])
     region = (resolution[0]*3//4,resolution[1]//2,resolution[0]//4,resolution[1]//2)
 
     # 截取窗口区域
@@ -46,12 +50,22 @@ def detect_skip_button(game):
     region=(resolution[0]*2//3, 0, resolution[0]//3, resolution[1]//4)
     return detect_button(game, load_template(tpl.skip_fig), region=region)
 
-def detect_od_button(game, od_mode):
+def detect_od_button(game, od_mode, is_small=False):
     resolution = settings.current_resolution
-    region=(resolution[0]*3//4, 0, resolution[0]//4, resolution[1]//4)
-    template = load_template(tpl.od_figs[od_mode-1])
+    if is_small:  # 右上角小图标有od_0
+        region=(resolution[0]*3//4, 0, resolution[0]//4, resolution[1]//4)
+        template = load_template(tpl.od_figs[od_mode])
+    else:  # 中间大图标没有od_0
+        region=(0, resolution[1]//4, resolution[0], resolution[1]//2)
+        template = load_template(tpl.od_figs_big[od_mode-1])
+    return detect_button(game, template, region=region, threshold=0.85)
 
-    return detect_button(game, template, region=region)
+def detect_current_od(game):
+    for level in range(4):
+        if detect_od_button(game, level, is_small=True):
+            return level
+
+    raise RuntimeError("凹追击检测时未能识别当前 OD 等级")
 
 def ensure_front(game, old_member_position, role, position):
     if position >2 :
@@ -92,7 +106,7 @@ def operate_role_button(game, button: str, member_position):
     wait_and_click(game, load_template(tpl.ROLE_BUTTON_CONFIG[button]), warning=f"未匹配到{button}按钮")
     time.sleep(3)
 
-def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mod.BattleTurn):
+def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mod.BattleTurn, need_od_check=False):
     """
     操作游戏一回合，包含前置OD、调整位置、选择技能、后置OD
     """
@@ -154,7 +168,7 @@ def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mo
         pt = detect_button(game, load_template(tpl.od_figs_big[0]))
         if pt:
             time.sleep(0.1)
-            wait_and_click(game, load_template(tpl.od_figs_big[OD_mode-1]), 
+            wait_and_click(game, load_template(tpl.od_figs_big[OD_mode-1], threshold=0.85), 
                            timeout=60,
                            warning=f"未匹配到目标OD{OD_mode}按钮")
             return pt
@@ -175,7 +189,7 @@ def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mo
         click_in_game(game, pos.OD)
         time.sleep(0.2)
         od_index = abs(OD_mode)-1
-        wait_and_click(game, load_template(tpl.od_figs_big[od_index]), warning=f"未匹配到OD{od_index+1}按钮")
+        wait_and_click(game, load_template(tpl.od_figs_big[od_index]), warning=f"未匹配到OD{od_index+1}按钮", threshold=0.85)
         wait_until(lambda: detect_start_button(game), 
                    warning="开OD后未匹配到回合结束按钮")
         time.sleep(0.2)
@@ -194,18 +208,79 @@ def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mo
     # 后置OD
     if OD_mode > 0:
         # 防止动画过短点不到，先快速点一次OD
-        time.sleep(0.02)
+        time.sleep(0.05)
         click_in_game(game, pos.OD, sleep=False)
 
-        # 每次循环匹配OD1按钮，匹配到则点击所需OD，未匹配到继续点右上角OD按钮
-        wait_until(lambda: OD_condition(OD_mode),
-                   timeout=5*60,
-                   interval=0.1,
-                   warning=f"未匹配到OD{OD_mode}按钮")
+        # 不需要凹追击检测od
+        if not need_od_check:
+            # 每次循环匹配OD1按钮，匹配到则点击所需OD，未匹配到继续点右上角OD按钮
+            wait_until(lambda: OD_condition(OD_mode),
+                    timeout=5*60,
+                    interval=0.1,
+                    warning=f"未匹配到OD{OD_mode}按钮")
 
-        # 等到回合结束按钮重新出现
-        wait_until(lambda: detect_start_button(game), 
-                   warning="开OD后未匹配到回合结束按钮")
+            # 等到回合结束按钮重新出现
+            wait_until(lambda: detect_start_button(game), 
+                    warning="开OD后未匹配到回合结束按钮")
+        # 需要检测od
+        else:
+            def detect_od_window():
+
+                # 已进入下一回合，说明错过OD发动窗口
+                if detect_start_button(game):
+                    return "no"
+                
+                # OD选择窗口已经出现
+                if detect_od_button(game, 1):
+                    return "yes"
+
+                # 尝试重新点击OD按钮，目前有概率在下一回合开始OD充足也会返回yes
+                click_in_game(game, pos.OD, sleep=False)
+                return None
+
+            name = wait_until(
+                detect_od_window,
+                timeout=5 * 60,
+                interval=0.5,
+                warning="凹追击检测OD时未检测到OD选择界面或回合开始按钮"
+            )
+            pass_od_check = False
+            pre_od = False
+            current_od = 0
+            time.sleep(0.5)
+            if name == "yes":  # 进入了od界面，至少有od1
+                for i in range(3):  # 检查od等级
+                    if detect_od_button(game, 3-i):
+                        current_od = 3-i
+                        break
+                if current_od >= OD_mode:
+                    pass_od_check = True
+                time.sleep(0.5)
+                if detect_start_button(game, is_gray=True):  # 是前置od
+                    pre_od = True
+                    pass_od_check = False
+                # 没检测到对应od/进入前置就要点od1，并等待回合开始，然后再退出
+                if not pass_od_check:  
+                    wait_and_click(game, load_template(tpl.od_figs_big[0]), 
+                            timeout=60,
+                            warning=f"未匹配到目标OD1按钮")
+                    # 等到回合结束按钮重新出现
+                    wait_until(lambda: detect_start_button(game), 
+                                warning="开OD后未匹配到回合结束按钮")
+            if not pass_od_check:  # 此时要么在bonus1里要么在下一回合，可以退出
+                if pre_od:
+                    msg = f"需要 后置OD{OD_mode} ，当前进入 前置OD{current_od}"
+                else:
+                    msg = f"需要 OD{OD_mode} ，当前为 OD{current_od}"
+                raise mod.ODRetryRequired(msg)
+            else:  # 凹追击成功
+                log.info("%s 回合凹 OD%d 成功，继续战斗", action.label, OD_mode)
+                wait_and_click(game, load_template(tpl.od_figs_big[OD_mode-1]), 
+                               timeout=60,
+                               warning=f"未匹配到目标OD{OD_mode}按钮", threshold=0.85)
+                # 等到回合结束按钮重新出现
+                wait_until(lambda: detect_start_button(game), 
+                           warning="开OD后未匹配到回合结束按钮")
 
     return member_position_output
 
@@ -217,6 +292,8 @@ def fight(game, script: mod.BattleScript, auto_close=False):
     role_skill_num = {role.slot: len(role.skills) for role in script.roles}
     # 设置关闭自动战斗flag
     has_turn_off_auto = False
+    # 设置检查od凹追击flag，理论上只有CheckOD紧接BattleTurn才会触发检查
+    need_od_check = False
 
     for action in script.actions:
         # 需要auto close并且遇到第一个不是mod.SkipEvent的行动
@@ -224,6 +301,11 @@ def fight(game, script: mod.BattleScript, auto_close=False):
             log.info("正在关闭自动战斗")
             close_auto_fight(game)
             has_turn_off_auto = True
+
+        if isinstance(action, mod.CheckOD):  # check_od只负责修改flag
+            need_od_check = True
+            log.info("本回合需要凹追击")
+            continue
 
         if isinstance(action, mod.SkipEvent):  # 表示需要点击skip按钮
             log.info("正在跳过剧情")
@@ -278,15 +360,40 @@ def fight(game, script: mod.BattleScript, auto_close=False):
             wait_until(lambda: detect_start_button(game),
                        timeout=5*60,
                        warning="未检测到回合结束按钮")
-            
+
+            # 前置od需要凹追击时
+            if need_od_check and action.od < 0:
+                od_check = abs(action.od)
+                time.sleep(0.5)
+                current_od = detect_current_od(game)
+                # 没有成功则给出重新开始战斗信号，成功则继续运行
+                if current_od < od_check:
+                    raise mod.ODRetryRequired(
+                        f"需要 OD{od_check} ，当前为 OD{current_od}"
+                    )
+                else:
+                    log.info("%s 回合凹 OD%d 成功，当前为 OD%d，继续战斗", action.label, od_check, current_od)
 
             old_member_position = operate_one_turn(
                 game=game, 
                 old_member_position=old_member_position.copy(), 
                 role_skill_num=role_skill_num,
-                action=action)
+                action=action,
+                need_od_check=need_od_check)
             # 防止重复点击，可等待一段时间
             time.sleep(3)
+
+        need_od_check = False  # 还原need_od_check为false
+
+def restart_battle(game, attempt, e):
+    log.info(
+        "第 %d 次凹追击失败：%s",
+        attempt, e
+    )
+    wait_and_click(game, load_template(tpl.back_fig), warning="未检测到返回按钮")
+    wait_and_click(game, load_template(tpl.retry_fig), warning="未检测到重试按钮")
+    wait_and_click(game, load_template(tpl.OK_fig), warning="未检测到确定按钮")
+    time.sleep(2)  # 等待战斗重试加载
 
 import ctypes
 

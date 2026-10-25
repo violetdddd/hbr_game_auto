@@ -344,9 +344,15 @@ class TurnRow(QGroupBox):
         self.od = NoWheelComboBox(); self.od.addItems(['无 OD', '前置 OD1', '前置 OD2', '前置 OD3', '后置 OD1', '后置 OD2', '后置 OD3'])
         # od变化要影响bonus选择
         self.od.currentIndexChanged.connect(self.refresh_bonus)
+        self.od.currentIndexChanged.connect(self.refresh_check_od)
+        # OD发动设置和凹追击
         self.activate_od = QCheckBox('发动')
+        self.activate_od.toggled.connect(self.refresh_check_od)
+        self.check_od = QCheckBox('须凹追击')
+        self.check_od.setEnabled(False)
+        
         self.custom_label = QLineEdit(); self.custom_label.setPlaceholderText('自定义 label（非空时优先使用）')
-        for w in (self.turn_no, self.extra, self.bonus, self.od, self.activate_od):
+        for w in (self.turn_no, self.extra, self.bonus, self.od, self.activate_od, self.check_od):
             head.addWidget(w)
         head.addWidget(self.custom_label, 2)
         for label, callback in [('↑',lambda: self.move_requested.emit(self,-1)),('↓',lambda: self.move_requested.emit(self,1)),
@@ -375,6 +381,7 @@ class TurnRow(QGroupBox):
         else: 
             self.refresh_roles()
             self.refresh_bonus()
+            self.refresh_check_od()
 
     # 所选角色去重，重复的旧的恢复为“选择角色”默认项，最后更新当前的skill
     def _role_changed(self, index):
@@ -563,6 +570,41 @@ class TurnRow(QGroupBox):
     def execution_od(self):
         return self.od_value() if self.activate_od.isChecked() else 0
 
+    # 凹追击需要在execution_od情况下才允许勾选
+    def refresh_check_od(self):
+        def set_checkbox_color(checkbox, enabled):
+            if enabled:
+                checkbox.setStyleSheet("QCheckBox { color: black; }")
+            else:
+                checkbox.setStyleSheet("""
+                    QCheckBox {
+                        color: gray;
+                    }
+                    QCheckBox::indicator:disabled {
+                        background-color: #E0E0E0;
+                        border: 1px solid #999999;
+                        border-radius: 3px;
+                    }
+                """)
+        # 无 OD 时禁止勾选发动
+        has_od = self.od.currentIndex() != 0
+
+        if not has_od:
+            self.activate_od.setChecked(False)
+
+        self.activate_od.setEnabled(has_od)
+
+        # 只有勾选发动后才能勾选凹追击
+        enabled = has_od and self.activate_od.isChecked()
+
+        if not enabled:
+            self.check_od.setChecked(False)
+
+        self.check_od.setEnabled(enabled)
+
+        set_checkbox_color(self.activate_od, has_od)
+        set_checkbox_color(self.check_od, enabled)
+
     # 改变背景颜色的函数，被bonus更改（和od更改）触发
     def update_background(self):
         colors = {
@@ -582,7 +624,7 @@ class TurnRow(QGroupBox):
     # 保存状态
     def state(self):
         return dict(turn=self.turn_no.currentIndex(), extra=self.extra.currentIndex(), bonus=self.bonus.currentIndex(), bonus_text=self.bonus.currentText(),
-        od=self.od.currentIndex(), activate_od=self.activate_od.isChecked(), label=self.custom_label.text(),
+        od=self.od.currentIndex(), activate_od=self.activate_od.isChecked(), check_od=self.check_od.isChecked(), label=self.custom_label.text(),
         moves=[(r.currentData(),s.currentData(),t.currentData()) for r,s,t in zip(self.roles,self.skills,self.targets)])
 
     # 重新load已经存在的状态
@@ -591,6 +633,8 @@ class TurnRow(QGroupBox):
         self.extra.setCurrentIndex(state.get('extra',0))
         self.od.setCurrentIndex(state.get('od',0))
         self.activate_od.setChecked(state.get('activate_od', False))
+        self.refresh_check_od()
+        self.check_od.setChecked(state.get('check_od', False) and self.check_od.isEnabled())
         self.refresh_bonus()
         bonus = state.get('bonus_text', '')
         index = self.bonus.findText(bonus) if bonus else state.get('bonus', 0)
@@ -1255,7 +1299,12 @@ class MainWindow(QMainWindow):
                     if '/' in item:
                         active[(role.slot, index)] = item.split('/', 1)[0]
             # 还原每一行行动
+            check_next_turn = False  # CheckOD 对应下一条 BattleTurn
             for a in script.actions:
+                # 需要check下一个BattleTurn
+                if isinstance(a, m.CheckOD):
+                    check_next_turn = True
+                    continue
                 # 有switch的技能要交换active
                 if isinstance(a, m.SkillSwitch):
                     pair = script.roles[a.role-1].skills[a.skill-1].split('/')
@@ -1307,8 +1356,9 @@ class MainWindow(QMainWindow):
                 state = TurnRow.parse_label(a.label, a.od)
                 # 当od这个值不存在时添加默认值
                 state.setdefault('od', -a.od if a.od < 0 else (a.od + 3 if a.od > 0 else 0))
-                state.update(activate_od=a.od != 0, moves=moves)
+                state.update(activate_od=a.od != 0, check_od=check_next_turn,moves=moves)
                 self.add_row(state, scroll=False)
+                check_next_turn = False
             self.run_path.setText(str(path))
             self.statusBar().showMessage(f'已打开：{path}')
         except Exception as e:
@@ -1423,6 +1473,13 @@ class MainWindow(QMainWindow):
                 if not button: raise ValueError(f'未知特殊行动：{name}')
                 actions.append(m.SpecialRoleButton(role,position,button))
                 continue
+            # 不是特殊行动先看是否需要凹追击check od
+            if row.check_od.isChecked():
+                if row.execution_od() == 0:
+                    raise ValueError(
+                        f'{row.label_text()}：凹追击要求本回合发动 OD'
+                    )
+                actions.append(m.CheckOD())
             # 不是特殊行动则加入BattleTurn进action
             actions.append(m.BattleTurn(row.label_text(),row.execution_od(),moves))
         # 垃圾桶里真有东西

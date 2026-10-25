@@ -41,27 +41,35 @@ class ChangeTeamEvent:
 class ResetPositions:
     positions: list[int]
 
-# waki/总攻击的全局小按钮 施工中
+# waki/总攻击的全局小按钮
 @dataclass
 class SpecialGlobalButton:
     button: str
 
-# 切换技能属性 施工中
+# 切换技能属性
 @dataclass
 class SkillSwitch:
     role: int
     skill: int
     position: int  # 这里直接0，1，2但写在脚本里+1变成更易读的1，2，3
 
-# 可怜/司令的前排技能按钮 施工中
+# 可怜/司令的前排技能按钮
 @dataclass
 class SpecialRoleButton:
     role: int
     position: int  # 这里直接0，1，2但写在脚本里+1变成更易读的1，2，3
     button: str
 
+# 凹追击检测od行动
+@dataclass
+class CheckOD:
+    pass
+
+class ODRetryRequired(Exception):
+    pass
+
 # 整个战斗脚本
-BattleAction = BattleTurn | SkipEvent | ChangeTeamEvent | ResetPositions | SpecialGlobalButton | SkillSwitch | SpecialRoleButton
+BattleAction = BattleTurn | SkipEvent | ChangeTeamEvent | ResetPositions | SpecialGlobalButton | SkillSwitch | SpecialRoleButton | CheckOD
 @dataclass
 class BattleScript:
     roles: list[Role]
@@ -83,13 +91,24 @@ def validate_hbrf(script: BattleScript):
         if len(role.skills) > 6:
             raise ValueError("角色暂不支持超过6个技能")
 
-    for action in script.actions:
+    for i, action in enumerate(script.actions):
 
         if isinstance(action, ResetPositions):
-
             if sorted(action.positions) != [1,2,3,4,5,6]:
                 raise ValueError(
                     f"非法reset: {action.positions}"
+                )
+
+        if isinstance(action, CheckOD):
+            # od检测不能位于最后一个
+            if i+1 >= len(script.actions):
+                raise ValueError(
+                    f"OD检测后面没有战斗行动"
+                )
+            next_action = script.actions[i+1]
+            if not isinstance(next_action, BattleTurn) or next_action.od == 0:
+                raise ValueError(
+                    f"OD检测后面不是战斗行动或战斗行动不发动OD"
                 )
 
         elif isinstance(action, SpecialRoleButton):
@@ -311,6 +330,11 @@ def load_hbrf(filepath) -> BattleScript:
 
             continue
 
+        #增加check_od，为fight提供凹追击的信号
+        if line == "check_od":
+            actions.append(CheckOD())
+            continue
+
         # ---------- Normal battle turn ----------
         if "=" not in line:
             raise ValueError(f"无法识别HBRF语句: {line}")
@@ -418,6 +442,9 @@ def save_hbrf(script: BattleScript, filepath):
 
             elif isinstance(action, ChangeTeamEvent):
                 f.write("change\n")
+
+            elif isinstance(action, CheckOD):
+                f.write("check_od\n")
 
             elif isinstance(action, SpecialGlobalButton):
                 f.write(f"{action.button}\n")
