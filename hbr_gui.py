@@ -364,13 +364,19 @@ class TurnRow(QGroupBox):
         # body部分是role，skill和target
         body = QHBoxLayout()
         self._syncing = False
+        self._front_swap_source = None  # 存储第一次点击的source
+        self.position_buttons = []
         self.roles, self.skills, self.targets = [], [], []
         for i in range(3):
             col = QVBoxLayout()
             r = NoWheelComboBox(); s = NoWheelComboBox(); t = NoWheelComboBox()
             # 角色变化要影响技能选择
             r.currentIndexChanged.connect(lambda _=0, index=i: self._role_changed(index))
-            col.addWidget(QLabel(f'前排 {i+1}'))
+            position_button = QPushButton(f'前排 {i+1}  ⇄')
+            position_button.setToolTip('点击一个前排位置，再点击另一个位置以交换')
+            position_button.clicked.connect(lambda _=False, index=i: self.select_front_swap(index))
+            col.addWidget(position_button)
+            self.position_buttons.append(position_button)
             # 技能变化（特殊技能）影响其他人技能选择
             s.currentIndexChanged.connect(lambda _=0, index=i: self._skill_changed(index))
             col.addWidget(r); col.addWidget(s); col.addWidget(t)
@@ -382,6 +388,27 @@ class TurnRow(QGroupBox):
             self.refresh_roles()
             self.refresh_bonus()
             self.refresh_check_od()
+
+    # 点击两个前排标题即可交换完整行动（角色、技能和目标）。
+    def select_front_swap(self, index):
+        buttons = self.position_buttons
+        # 第一次点击，储存在_front_swap_source中并显示选中样式
+        if self._front_swap_source is None:
+            self._front_swap_source = index
+            buttons[index].setStyleSheet('QPushButton { background: #dbeafe; border: 1px solid #2563eb; }')
+            return
+        # 第二次点击，恢复_front_swap_source为空
+        source = self._front_swap_source
+        self._front_swap_source = None
+        for button in buttons:
+            button.setStyleSheet('')
+        # 如果第二次和第一次点击相同则不换位
+        if source == index:
+            return
+        # 第一次和第二次点击不同则换位
+        moves = self.state()['moves']
+        moves[source], moves[index] = moves[index], moves[source]
+        self.refresh_roles(moves)
 
     # 所选角色去重，重复的旧的恢复为“选择角色”默认项，最后更新当前的skill
     def _role_changed(self, index):
@@ -809,14 +836,19 @@ class MainWindow(QMainWindow):
             b = QPushButton(title); b.clicked.connect(callback); toolbar.addWidget(b)
         toolbar.addStretch(); root.addLayout(toolbar)
         # 角色slot
-        slots_box = QGroupBox('队伍 · Slot 1–6（点击设置风格；右键清空）')
+        slots_box = QGroupBox('队伍 · Slot 1–6（点击设置风格；右键清空；点击交换角色以调整位置）')
         slots_layout = QHBoxLayout(slots_box)
         self.slot_buttons = []
+        self.slot_swap_source = None  # 储存第一次点击的角色
+        self.slot_swap_mode = QPushButton('交换角色：关闭')
+        self.slot_swap_mode.setCheckable(True)
+        self.slot_swap_mode.toggled.connect(self.set_slot_swap_mode)
+        toolbar.addWidget(self.slot_swap_mode)
         for i in range(6):
             col = QVBoxLayout()
             b = QPushButton('＋'); b.setFixedSize(92,92)
-            # 左键选风格右键清除
-            b.clicked.connect(lambda _=False, ix=i: self.choose_style(ix))
+            # 普通模式点击选风格；交换模式点击两个槽位来交换
+            b.clicked.connect(lambda _=False, ix=i: self.handle_slot_click(ix))
             b.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             b.customContextMenuRequested.connect(lambda _=None, ix=i: self.clear_style(ix))
             # 昵称
@@ -1012,6 +1044,58 @@ class MainWindow(QMainWindow):
             }''')
         # 左侧没有重复次数和体力类型，按右侧实际内容高度补齐
         single_box.setMinimumHeight(repeat_box.sizeHint().height())
+
+    # 设置mod为swap，全部重置为可以交换角色的样式
+    def set_slot_swap_mode(self, enabled):
+        self.slot_swap_source = None
+        self.slot_swap_mode.setText('交换角色：开启' if enabled else '交换角色：关闭')
+        for button, _ in self.slot_buttons:  # 交换角色样式
+            button.setStyleSheet('QPushButton { border: 2px solid #2563eb; }' if enabled else '')
+
+    # 需要分mod处理slot点击事件
+    def handle_slot_click(self, index):
+        # 不是swap mod则展开style选择面板
+        if not self.slot_swap_mode.isChecked():
+            self.choose_style(index)
+            return
+        # swap mod内第一次点击角色，储存并更改样式
+        if self.slot_swap_source is None:
+            self.slot_swap_source = index
+            self.slot_buttons[index][0].setStyleSheet('QPushButton { border: 3px solid #16a34a; background: #dcfce7; }')
+            return
+        # 第二次点击角色，若重复则重置样式，不重复则交换slot
+        source = self.slot_swap_source
+        self.slot_swap_source = None
+        if source == index:
+            self.set_slot_swap_mode(True)
+            return
+        self.swap_team_slots(source, index)
+
+    # 交换slot
+    def swap_team_slots(self, first, second):
+        if not (0 <= first < 6 and 0 <= second < 6):
+            return
+        if first == second:
+            return
+        # 先交换队伍数据，再同步重映射行动，确保技能按交换后的角色校验。
+        a, b = first + 1, second + 1
+        self.slots[first], self.slots[second] = self.slots[second], self.slots[first]
+        self.nicknames[first], self.nicknames[second] = self.nicknames[second], self.nicknames[first]
+        for row in self.rows:
+            if isinstance(row, TurnRow):
+                moves = row.state()['moves']
+                remapped = []
+                for role, skill, target in moves:
+                    if role == a: role = b
+                    elif role == b: role = a
+                    if target == a: target = b
+                    elif target == b: target = a
+                    remapped.append((role, skill, target))
+                row.refresh_roles(remapped)
+
+        self.refresh_slots()
+        if self.slot_swap_mode.isChecked():
+            self.set_slot_swap_mode(True)
 
     # 选择风格、清除风格和新建的时候调用
     def refresh_slots(self):
