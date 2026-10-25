@@ -25,6 +25,8 @@ def match_template(template, image, offset:tuple=(0,0), threshold=0.8):
 
     _, max_val, _, max_loc = cv2.minMaxLoc(res)
 
+    # print(max_val)
+
     # 未匹配成功
     if max_val < threshold:
         return None
