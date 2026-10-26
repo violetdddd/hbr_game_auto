@@ -333,6 +333,8 @@ class TurnRow(QGroupBox):
         super().__init__('回合')
         self.setObjectName('turnRow')  # 用于单独改变背景颜色
         self.editor = parent_editor
+        # turnrow中单独保存属于哪一个team，来源于state或当前tab
+        self.team = (state or {}).get('team', parent_editor.current_team)
         outer = QVBoxLayout(self)
         # head包括turn，od，bonus，追加，发动od和定制label，以及信号控件
         head = QHBoxLayout()
@@ -388,8 +390,23 @@ class TurnRow(QGroupBox):
             self.refresh_roles()
             self.refresh_bonus()
             self.refresh_check_od()
+        # 当tab不是当前turn row的team时冻结编辑
+        self.set_team_frozen(self.team != self.editor.current_team)
 
-    # 点击两个前排标题即可交换完整行动（角色、技能和目标）。
+    def set_team_frozen(self, frozen):
+        """非当前编辑队伍的回合仅冻结角色/技能/目标，保留行操作。"""
+        self._team_frozen = frozen
+        for widget in [*self.roles, *self.skills, *self.targets, *self.position_buttons,
+                       self.od, self.activate_od, self.check_od, self.bonus, self.extra, self.turn_no]:
+            widget.setEnabled(not frozen)
+        self.custom_label.setEnabled(True)
+        # 由原有背景方法统一设置边框，避免OD背景覆盖冻结状态
+        self.update_background()
+        for button in self.findChildren(QPushButton):
+            if button.text() in ('↑', '↓', '复制', '删除'):
+                button.setEnabled(True)
+
+    # 点击两个前排标题即可交换完整行动（角色、技能和目标）
     def select_front_swap(self, index):
         buttons = self.position_buttons
         # 第一次点击，储存在_front_swap_source中并显示选中样式
@@ -428,8 +445,11 @@ class TurnRow(QGroupBox):
         for i, r in enumerate(self.roles):
             r.blockSignals(True); r.clear()
             r.addItem('选择角色', 0)
-            for j, style in enumerate(self.editor.slots, 1):
-                if style: r.addItem(f'{j} · {self.editor.nickname(j)}', j)
+            # 确保只用当前tab的角色
+            start = (self.team - 1) * 6
+            for local, style in enumerate(self.editor.slots[start:start+6], 1):
+                j = start + local
+                if style: r.addItem(f'{local} · {self.editor.nickname(j)}', j)
             ix = r.findData(saved[i][0]); r.setCurrentIndex(ix if ix >= 0 else 0)
             r.blockSignals(False)
             self.update_skills(i, saved[i][1], saved[i][2])
@@ -443,6 +463,9 @@ class TurnRow(QGroupBox):
                         self.roles[j].blockSignals(False)
                         self.update_skills(j)
         self._sync_special()
+        if getattr(self, '_team_frozen', False):  # frozen时不允许编辑
+            for widget in [*self.roles, *self.skills, *self.targets, *self.position_buttons]:
+                widget.setEnabled(False)
 
     def update_skills(self, i, skill=None, target=None):
         # 获取当前style，skill，target
@@ -465,13 +488,16 @@ class TurnRow(QGroupBox):
         # 如果之前的选中的技能现在角色也有，则恢复技能，没有就默认技能
         ix = s.findData(skill)
         s.setCurrentIndex(ix if ix >= 0 else 0)
-        # 目标也按类似处理
+        # 目标也按类似处理，确保只使用当前team的角色
         t.clear(); t.addItem('无目标', None)
-        for j, selected_style in enumerate(self.editor.slots, 1):
-            if selected_style: t.addItem(self.editor.nickname(j), j)
-        t.addItem('双体左 / 三体中', 8)
-        t.addItem('双体右 / 三体右', 9)
-        t.addItem('三体左', 7)
+        start = (self.team - 1) * 6
+        for local, selected_style in enumerate(self.editor.slots[start:start+6], 1):
+            j = start + local
+            if selected_style: t.addItem(f'{local} · {self.editor.nickname(j)}', j)
+        # 怪物在内部先使用107, 108, 109避免和二队冲突
+        t.addItem('双体左 / 三体中', 108)
+        t.addItem('双体右 / 三体右', 109)
+        t.addItem('三体左', 107)
         ix = t.findData(target); t.setCurrentIndex(max(0, ix))
         s.blockSignals(False); t.blockSignals(False)
         self._skill_changed(i)
@@ -627,7 +653,7 @@ class TurnRow(QGroupBox):
         if not enabled:
             self.check_od.setChecked(False)
 
-        self.check_od.setEnabled(enabled)
+        self.check_od.setEnabled(enabled and not getattr(self, '_team_frozen', False))  # 保证frozen时check_od不能触发
 
         set_checkbox_color(self.activate_od, has_od)
         set_checkbox_color(self.check_od, enabled)
@@ -644,13 +670,13 @@ class TurnRow(QGroupBox):
         match = re.search(r'^OD([123])', bonus)
         color = colors[int(match.group(1))] if match else 'white'
 
-        self.setStyleSheet(
-            f'QGroupBox#turnRow {{background-color: {color};}}'
-        )
+        # 冻结的边框为红色
+        border = 'border: 2px solid #dc2626;' if getattr(self, '_team_frozen', False) else ''
+        self.setStyleSheet(f'QGroupBox#turnRow {{background-color: {color}; {border}}}')
 
     # 保存状态
     def state(self):
-        return dict(turn=self.turn_no.currentIndex(), extra=self.extra.currentIndex(), bonus=self.bonus.currentIndex(), bonus_text=self.bonus.currentText(),
+        return dict(team=self.team, turn=self.turn_no.currentIndex(), extra=self.extra.currentIndex(), bonus=self.bonus.currentIndex(), bonus_text=self.bonus.currentText(),
         od=self.od.currentIndex(), activate_od=self.activate_od.isChecked(), check_od=self.check_od.isChecked(), label=self.custom_label.text(),
         moves=[(r.currentData(),s.currentData(),t.currentData()) for r,s,t in zip(self.roles,self.skills,self.targets)])
 
@@ -815,8 +841,9 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('HBRTool')
         self.resize(1120, 800)
         self.catalog = Catalog()
-        self.slots = [None] * 6  # list[Style]
-        self.nicknames = [''] * 6
+        self.slots = [None] * 12  # 全局slot 1-6属于队伍1，7-12属于队伍2
+        self.nicknames = [''] * 12
+        self.current_team = 1  # 记录现在选择的tab对应team
         self.rows = []
         self.other_actions = [] # Legacy actions not yet supported by the editor
         self.current_path = None
@@ -835,8 +862,15 @@ class MainWindow(QMainWindow):
         for title, callback in [('新建',self.new),('打开 HBRF',self.open_file),('打开 SAV',self.open_sav),('打开 jpg',self.open_jpg),('保存',self.save),('另存为',lambda: self.save(True))]:
             b = QPushButton(title); b.clicked.connect(callback); toolbar.addWidget(b)
         toolbar.addStretch(); root.addLayout(toolbar)
+        # 双队伍槽位 Tab。界面始终只显示当前队伍的6个槽位。
+        self.team_tabs = QTabBar()
+        self.team_tabs.addTab('队伍 1')
+        self.team_tabs.addTab('队伍 2')
+        self.team_tabs.currentChanged.connect(self.on_team_tab_changed)
+        root.addWidget(self.team_tabs)
         # 角色slot
-        slots_box = QGroupBox('队伍 · Slot 1–6（点击设置风格；右键清空；点击交换角色以调整位置）')
+        slots_box = QGroupBox('队伍1 · 选择6名角色（点击设置风格；右键清空；点击交换角色以调整位置）')
+        self.slots_box = slots_box
         slots_layout = QHBoxLayout(slots_box)
         self.slot_buttons = []
         self.slot_swap_source = None  # 储存第一次点击的角色
@@ -1045,6 +1079,29 @@ class MainWindow(QMainWindow):
         # 左侧没有重复次数和体力类型，按右侧实际内容高度补齐
         single_box.setMinimumHeight(repeat_box.sizeHint().height())
 
+    # 调整可使用的team角色
+    def on_team_tab_changed(self, index):
+        self.current_team = index + 1  # 修改current_team，1和2
+        self.slot_swap_source = None
+        self.slot_swap_mode.setChecked(False)
+        self.refresh_slots()  # 修改6个slot
+        self.refresh_row_team_states()  # 修改turn row，主要是冻结
+        self.slots_box.setTitle(f'队伍 {self.current_team} · 选择6名角色（点击设置风格；右键清空；点击交换角色以调整位置）')
+
+    def team_indices(self, team):  # 获得team对应slots的工具函数
+        start = (team - 1) * 6
+        return range(start, start + 6)
+
+    def row_team(self, row):  # 返回turn row的team值的工具函数
+        return getattr(row, 'team', self.current_team)
+
+    def refresh_row_team_states(self):  # 主要用于frozen的刷新
+        for row in self.rows:
+            if isinstance(row, TurnRow):
+                row.set_team_frozen(row.team != self.current_team)
+                if not row._team_frozen:
+                    row.refresh_roles()
+
     # 设置mod为swap，全部重置为可以交换角色的样式
     def set_slot_swap_mode(self, enabled):
         self.slot_swap_source = None
@@ -1073,16 +1130,16 @@ class MainWindow(QMainWindow):
 
     # 交换slot
     def swap_team_slots(self, first, second):
-        if not (0 <= first < 6 and 0 <= second < 6):
-            return
-        if first == second:
-            return
         # 先交换队伍数据，再同步重映射行动，确保技能按交换后的角色校验。
-        a, b = first + 1, second + 1
-        self.slots[first], self.slots[second] = self.slots[second], self.slots[first]
-        self.nicknames[first], self.nicknames[second] = self.nicknames[second], self.nicknames[first]
+        if not (0 <= first < 6 and 0 <= second < 6) or first == second:
+            return
+        # 保证交换的是当前tab
+        offset = (self.current_team - 1) * 6
+        a, b = offset + first + 1, offset + second + 1
+        self.slots[a-1], self.slots[b-1] = self.slots[b-1], self.slots[a-1]
+        self.nicknames[a-1], self.nicknames[b-1] = self.nicknames[b-1], self.nicknames[a-1]
         for row in self.rows:
-            if isinstance(row, TurnRow):
+            if isinstance(row, TurnRow) and row.team == self.current_team:
                 moves = row.state()['moves']
                 remapped = []
                 for role, skill, target in moves:
@@ -1097,37 +1154,29 @@ class MainWindow(QMainWindow):
         if self.slot_swap_mode.isChecked():
             self.set_slot_swap_mode(True)
 
-    # 选择风格、清除风格和新建的时候调用
+    # 选择风格、清除风格、换位置、切换tab、新建的时候调用
     def refresh_slots(self):
-        for i,(b,label) in enumerate(self.slot_buttons):
+        # 保证当前使用tab的6个风格
+        # 更新下面选技能的角色部分/重新判断特殊行动是否可用，不可用则弹出提示框删除
+        offset = (self.current_team - 1) * 6
+        for i, (b, label) in enumerate(self.slot_buttons):
+            global_index = offset + i
+            style = self.slots[global_index]
             # 有风格则存储风格图片
-            style = self.slots[i]
             if style:
                 b.setText(''); b.setIcon(QIcon(round_pixmap(style.image, 80)))
                 b.setIconSize(QSize(80,80))
                 label.setPlaceholderText(f'{style.label}（可改昵称）')
-                if label.text() != self.nicknames[i]: label.setText(self.nicknames[i])
+                if label.text() != self.nicknames[global_index]: label.setText(self.nicknames[global_index])
             # 没有风格就清空
             else:
                 b.setIcon(QIcon()); b.setText('＋'); label.setPlaceholderText(f'Slot {i+1}')
-                label.clear(); self.nicknames[i] = ''
-        # 更新下面选技能的角色部分/重新判断特殊行动是否可用，不可用则弹出提示框删除
-        available = self.available_global_buttons()
-        for row in list(self.rows):
-            if isinstance(row, TurnRow): 
+                label.clear(); self.nicknames[global_index] = ''
+        # 这里只处理turn row，special row放在refresh_special_rows函数中处理
+        for row in self.rows:
+            if isinstance(row, TurnRow) and row.team == self.current_team:
                 row.refresh_roles()
-            elif isinstance(row, EventRow) and row.kind == "special": 
-                valid = row.refresh_choices(available)
-                if not valid:
-                    box = QMessageBox(self)
-                    box.setWindowTitle('特殊行动不可用')
-                    box.setText(f'当前队伍不再支持任何特殊行动（魔界骑兵启动或总攻击）。')
-                    box.setInformativeText('是否删除该行动块？')
-                    delete = box.addButton('删除行动块', QMessageBox.ButtonRole.DestructiveRole)
-                    box.addButton('保留空行动块', QMessageBox.ButtonRole.RejectRole)
-                    box.exec()
-                    if box.clickedButton() == delete:
-                        self.remove_row(row)
+        self.refresh_special_rows()
 
     # 检测可用的global button
     def available_global_buttons(self):
@@ -1140,6 +1189,23 @@ class MainWindow(QMainWindow):
             allowed.add('attack')
         return allowed.intersection(tpl.GLOBAL_BUTTON_CONFIG)
 
+    # 更新特殊行动选项，保留原先不可用时询问是否删除的弹窗
+    def refresh_special_rows(self):
+        available = self.available_global_buttons()
+        for row in list(self.rows):
+            if isinstance(row, EventRow) and row.kind == 'special':
+                valid = row.refresh_choices(available)
+                if not valid:
+                    box = QMessageBox(self)
+                    box.setWindowTitle('特殊行动不可用')
+                    box.setText('当前队伍不再支持任何特殊行动（魔界骑兵启动或总攻击）。')
+                    box.setInformativeText('是否删除该行动块？')
+                    delete = box.addButton('删除行动块', QMessageBox.ButtonRole.DestructiveRole)
+                    box.addButton('保留空行动块', QMessageBox.ButtonRole.RejectRole)
+                    box.exec()
+                    if box.clickedButton() == delete:
+                        self.remove_row(row)
+
     # 获取目标slot的nickname，没有nickname就返回国服角色名
     def nickname(self, slot):
         style = self.slots[slot-1]
@@ -1147,25 +1213,31 @@ class MainWindow(QMainWindow):
 
     # 更新目标index的nickname，更新后把所有TurnRow的选项都更新了
     def change_nickname(self, index, name):
-        if not self.slots[index]: return
-        self.nicknames[index] = name.strip().replace(' ','').replace('　','')
+        global_index = (self.current_team - 1) * 6 + index + 1
+        if not self.slots[global_index-1]: return
+        self.nicknames[global_index-1] = name.strip().replace(' ','').replace('　','')
         for row in self.rows:
-            if isinstance(row, TurnRow): row.refresh_roles()
+            if isinstance(row, TurnRow) and row.team == self.current_team:
+                row.refresh_roles()
 
     # 点击6个槽位之一进入风格选择界面
     def choose_style(self, index):
         # 用角色名集合防止角色重复
-        taken = {s.name for i,s in enumerate(self.slots) if s and i != index}
-        dialog = StyleDialog(self.catalog, taken, self)
         # 选择了角色会accepted进而更改slots
+        global_index = (self.current_team - 1) * 6 + index
+        taken = {s.name for i, s in enumerate(self.slots) if s and i != global_index}
+        dialog = StyleDialog(self.catalog, taken, self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.slots[index] = dialog.chosen
-            self.nicknames[index] = ''
+            self.slots[global_index] = dialog.chosen
+            self.nicknames[global_index] = ''
             self.refresh_slots()
 
     # 右键槽位清除风格
     def clear_style(self, index):
-        self.slots[index] = None; self.nicknames[index] = ''; self.refresh_slots()
+        global_index = (self.current_team - 1) * 6 + index
+        self.slots[global_index] = None
+        self.nicknames[global_index] = ''
+        self.refresh_slots()
 
     # 新增一行，默认turn，连接删除复制移动行的功能，有index则可以在目标位置插入行
     def add_row(self, state=None, index=None, kind='turn', scroll=True):
@@ -1173,7 +1245,12 @@ class MainWindow(QMainWindow):
         if kind == 'special' and not available and state is None:
             QMessageBox.information(self, '无法添加特殊回合行动', '队伍中需要魔王山胁才能使用魔界骑兵，或需要 P5R 角色才能使用总攻击。')
             return None
-        row = TurnRow(self, state) if kind == 'turn' else EventRow(kind, state, available)
+        if kind == 'turn':
+            row = TurnRow(self, state)
+            row.team = (state or {}).get('team', self.current_team)
+            row.set_team_frozen(row.team != self.current_team)
+        else:
+            row = EventRow(kind, state, available)
         row.remove_requested.connect(self.remove_row)
         row.copy_requested.connect(self.copy_row)
         row.move_requested.connect(self.move_row)
@@ -1234,8 +1311,13 @@ class MainWindow(QMainWindow):
 
     # 新建页面，全部清除后加一行空turn row
     def new(self):
-        self.current_path = None; self.slots = [None]*6; self.nicknames=['']*6; self.other_actions=[]
+        self.current_path = None; self.slots = [None]*12; self.nicknames=['']*12; self.other_actions=[]
+        self.current_team = 1
+        self.team_tabs.blockSignals(True)
+        self.team_tabs.setCurrentIndex(0)
+        self.team_tabs.blockSignals(False)
         for row in list(self.rows): self.remove_row(row)
+        self.slots_box.setTitle(f'队伍 {self.current_team} · 选择6名角色（点击设置风格；右键清空；点击交换角色以调整位置）')
         self.refresh_slots(); self.add_row()
 
     # 刷新所有块右上角index编号
@@ -1249,7 +1331,7 @@ class MainWindow(QMainWindow):
         # Format: # HBRTOOL_STYLE 1 {"team":"31A","english":"...","id":"001"}
         result = {}
         for line in Path(path).read_text(encoding='utf-8').splitlines():
-            match = re.match(r'^\s*#\s*HBRTOOL_STYLE\s+([1-6])\s+(\{.*\})\s*$', line)
+            match = re.match(r'^\s*#\s*HBRTOOL_STYLE\s+(1[0-2]|[1-9])\s+(\{.*\})\s*$', line)
             if match:
                 result[int(match.group(1))] = json.loads(match.group(2))
         return result
@@ -1320,18 +1402,16 @@ class MainWindow(QMainWindow):
 
     # 打开 HBRF；指定 path 时复用原来的解析流程，不再弹出文件选择框
     def open_file(self, path=None):
-        if not isinstance(path, (str, Path)):
-            path, _ = QFileDialog.getOpenFileName(
-                self, '打开 HBRF', str(SCRIPTS), 'HBRF (*.hbrf);;All files (*)'
-            )
         # 用户取消选择时path为空
+        if not isinstance(path, (str, Path)):
+            path, _ = QFileDialog.getOpenFileName(self, '打开 HBRF', str(SCRIPTS), 'HBRF (*.hbrf);;All files (*)')
         if not path: return
         try:
             from hbrf import model as m
             script = m.load_hbrf(path)  # 调用model的load_hbrf生成BattleScript类
             notes = self._style_notes(path)  # 获得注释中的风格元数据
-            chosen = [None] * 6  # list[Style]
-            loaded_nicknames = [''] * 6
+            chosen = [None] * 12  # list[Style]
+            loaded_nicknames = [''] * 12
             occupied = set()
             # script.roles强制6名角色，有可能脚本保存成了空位
             for i, role in enumerate(script.roles):
@@ -1366,14 +1446,13 @@ class MainWindow(QMainWindow):
                 # 成功恢复style则添加occupied并储存可能的nickname
                 if style:
                     occupied.add(style.name)
-                    canonical = style.label.replace(' ', '').replace('　','')
+                    canonical = style.label.replace(' ', '').replace('　', '')
                     loaded_nicknames[i] = role.name if role.name != canonical else ''
 
             # 新建并从0开始恢复每一行行动
             self.new()
             self.current_path = Path(path)
-            self.slots = chosen
-            self.nicknames = loaded_nicknames
+            self.slots, self.nicknames = chosen, loaded_nicknames
             self.refresh_slots()
             for row in list(self.rows): self.remove_row(row)
             # active代表可切换技能目前启用的那一个
@@ -1383,8 +1462,12 @@ class MainWindow(QMainWindow):
                     if '/' in item:
                         active[(role.slot, index)] = item.split('/', 1)[0]
             # 还原每一行行动
+            current_team = 1
             check_next_turn = False  # CheckOD 对应下一条 BattleTurn
             for a in script.actions:
+                if isinstance(a, getattr(m, 'TeamEvent', ())):
+                    current_team = a.team
+                    continue
                 # 需要check下一个BattleTurn
                 if isinstance(a, m.CheckOD):
                     check_next_turn = True
@@ -1393,9 +1476,11 @@ class MainWindow(QMainWindow):
                 if isinstance(a, m.SkillSwitch):
                     pair = script.roles[a.role-1].skills[a.skill-1].split('/')
                     if len(pair) == 2:
-                        old = active.get((a.role,a.skill),pair[0])
+                        old = active.get((a.role,a.skill), pair[0])
                         active[(a.role,a.skill)] = pair[1] if old == pair[0] else pair[0]
                     continue
+                # 按照team获取队伍角色存储开始位置
+                base = (current_team - 1) * 6
                 if isinstance(a, m.SpecialRoleButton):
                     name = {'kelian': '切换姿态', 'siling': '鬼神化'}.get(a.button)
                     if not name or not chosen[a.role-1]:
@@ -1405,11 +1490,10 @@ class MainWindow(QMainWindow):
                     # HBRF 的 SpecialRoleButton 只保存操作角色和前排位置。
                     moves = [(0, '普通攻击', None) for _ in range(3)]
                     moves[a.position] = (a.role, '@special:' + name, None)
-
-                    # 尽量沿用之前回合的另外两名角色。
-                    previous = next((r for r in reversed(self.rows) if isinstance(r, TurnRow)), None)
+                    # 尽量沿用之前回合的另外两名角色
+                    previous = next((r for r in reversed(self.rows) if isinstance(r, TurnRow) and r.team == current_team), None)
                     candidates = [slot for slot, _, _ in previous.state()['moves']] if previous else []
-                    candidates += [i for i, style in enumerate(chosen, 1) if style]
+                    candidates += [base+i for i, style in enumerate(chosen[base:base+6], 1) if style]
 
                     for i in range(3):
                         if i == a.position: continue
@@ -1418,7 +1502,7 @@ class MainWindow(QMainWindow):
                         if slot:
                             moves[i] = (slot, self.catalog.default_action(chosen[slot-1]), None)
 
-                    self.add_row({'moves': moves}, scroll=False)
+                    self.add_row({'moves': moves, 'team': current_team}, scroll=False)
                     continue
                 if isinstance(a, (m.SkipEvent,m.ChangeTeamEvent)):
                     self.add_row({'action':'skip' if isinstance(a,m.SkipEvent) else 'change'},kind='yishi'); continue
@@ -1430,23 +1514,26 @@ class MainWindow(QMainWindow):
                 # 是BattleTurn
                 moves=[]
                 for mv in a.actions:
-                    old_role=script.roles[mv.role-1]
-                    if mv.skill==0: text=self.catalog.default_action(chosen[mv.role-1])
+                    role_index = mv.role - 1
+                    if mv.skill == 0: text = self.catalog.default_action(chosen[role_index])
                     else:
-                        value=old_role.skills[mv.skill-1]
-                        text=active.get((mv.role,mv.skill),value.split('/',1)[0])
-                    moves.append((mv.role if chosen[mv.role-1] else 0,text,
-                                  mv.target if mv.target in (7,8,9) or (mv.target is not None and chosen[mv.target-1]) else None))
+                        value = script.roles[role_index].skills[mv.skill-1]
+                        text = active.get((mv.role,mv.skill), value.split('/',1)[0])
+                    # model中的友方目标为局部编号；GUI中使用当前队伍的全局slot编号
+                    target = (base + mv.target) if mv.target in range(1,7) else (mv.target + 100 if mv.target in (7,8,9) else mv.target)
+                    moves.append((mv.role if chosen[role_index] else 0, text,
+                                  target if target in (7,8,9) or (target and chosen[target-1]) else None))
                 state = TurnRow.parse_label(a.label, a.od)
-                # 当od这个值不存在时添加默认值
-                state.setdefault('od', -a.od if a.od < 0 else (a.od + 3 if a.od > 0 else 0))
-                state.update(activate_od=a.od != 0, check_od=check_next_turn,moves=moves)
+                state.setdefault('od', -a.od if a.od < 0 else (a.od+3 if a.od > 0 else 0))  # 当od这个值不存在时添加默认值
+                state.update(activate_od=a.od != 0, check_od=check_next_turn, moves=moves, team=current_team)
                 self.add_row(state, scroll=False)
                 check_next_turn = False
+            self.team_tabs.setCurrentIndex(0)
+            self.refresh_slots(); self.refresh_row_team_states(); self.refresh_special_rows()
             self.run_path.setText(str(path))
             self.statusBar().showMessage(f'已打开：{path}')
         except Exception as e:
-            QMessageBox.critical(self,'读取失败',str(e))
+            QMessageBox.critical(self, '读取失败', str(e))
 
     def build_script(self):
         from hbrf import model as m
