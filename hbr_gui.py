@@ -18,7 +18,7 @@ from PySide6.QtGui import QIcon, QPixmap, QPainter, QPainterPath
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QGridLayout, QLabel, QPushButton, QComboBox, QSpinBox, QLineEdit, QScrollArea,
     QFileDialog, QMessageBox, QDialog, QCheckBox, QGroupBox,
-    QTabWidget, QTextEdit, QFormLayout, QInputDialog, QSizePolicy)
+    QTabWidget, QTabBar, QTextEdit, QFormLayout, QInputDialog, QSizePolicy)
 from config import settings
 
 from paths import ROOT_DIR, SCRIPTS_DIR
