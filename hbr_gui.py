@@ -686,7 +686,6 @@ class TurnRow(QGroupBox):
         self.extra.setCurrentIndex(state.get('extra',0))
         self.od.setCurrentIndex(state.get('od',0))
         self.activate_od.setChecked(state.get('activate_od', False))
-        self.refresh_check_od()
         self.check_od.setChecked(state.get('check_od', False) and self.check_od.isEnabled())
         self.refresh_bonus()
         bonus = state.get('bonus_text', '')
@@ -694,6 +693,7 @@ class TurnRow(QGroupBox):
         self.bonus.setCurrentIndex(index if 0 <= index < self.bonus.count() else 0)
         self.custom_label.setText(state.get('label',''))
         self.refresh_roles(state.get('moves',[(0,'普通攻击',None)]*3))
+        self.refresh_check_od()
 
 class EventRow(QGroupBox):
     remove_requested = Signal(object)
@@ -1537,17 +1537,31 @@ class MainWindow(QMainWindow):
 
     def build_script(self):
         from hbrf import model as m
+        # 先判断用到几个队伍
+        used_teams = set()
+        for row in self.rows:
+            if isinstance(row, TurnRow) and any(slot for slot, _, _ in row.state()['moves']):
+                used_teams.add(row.team)
+        # 单队模式下即使只使用Tab2，也压缩为HBRF的1-6
+        dual = len(used_teams) > 1
+        team_order = [1, 2] if dual else [next(iter(used_teams), 1)]  # 提取该set中的唯一team
+        compact_styles = []
+        slot_map = {}
+        roles = []
         # 把index映射为slot，同时处理中间角色空位问题
-        present = [i for i, style in enumerate(self.slots) if style is not None]
-        order = present + [i for i in range(6) if i not in present]  # 先排有的再排空位
-        slot_map = {old+1: new+1 for new, old in enumerate(order)}
-        compact_styles = [self.slots[i] for i in order]  # list[Style | None]
+        for output_team, source_team in enumerate(team_order, 1):
+            base = (source_team - 1) * 6
+            present = [base+i for i in range(6) if self.slots[base+i] is not None]
+            order = present + [base+i for i in range(6) if self.slots[base+i] is None]  # 先排有的再排空位
+            for local_new, old in enumerate(order, 1):
+                new = (output_team-1)*6 + local_new
+                slot_map[old+1] = new
+                compact_styles.append(self.slots[old])
+                roles.append(m.Role(new, (self.nicknames[old] or self.slots[old].label).replace(' ','').replace('　','') if self.slots[old] else f'空位{new}', []))
         # 加入昵称/国服名/空位，技能初始化为空
-        roles = [m.Role(i+1, (self.nicknames[old] or self.slots[old].label).replace(' ','').replace('　','') if self.slots[old] else f'空位{i+1}', [])
-                 for i, old in enumerate(order)]
-        if len({r.name for r in roles}) != 6: raise ValueError('角色昵称不能重复')
+        if len({r.name for r in roles}) != len(roles): raise ValueError('角色昵称不能重复')
         # 异常判断和使用的技能收集
-        used = [[] for _ in range(6)]  # 记录使用过的技能，方便hbrf技能部分写入
+        used = [[] for _ in roles]  # 记录使用过的技能，方便hbrf技能部分写入
         used_pairs = {}  # (compact slot, unordered pair) -> (selected names)  # 记录用过的可切换技能，方便提示框显示
         for row in self.rows:
             if not isinstance(row, TurnRow): continue
@@ -1555,6 +1569,8 @@ class MainWindow(QMainWindow):
             moves = row.state()['moves']
             special = [i for i, (_,sk,_) in enumerate(moves) if str(sk or '').startswith('@special:')]
             if len(special)>1: raise ValueError(f'{row.label_text()}：只能选择一个特殊前排行动')
+            if row.team not in team_order and any(slot for slot, _, _ in moves):
+                raise ValueError(f'{row.label_text()}：该回合使用的队伍未纳入导出')
             for position,(slot,skill,target) in enumerate(moves):
                 if not slot or not self.slots[slot-1]: raise ValueError(f'{row.label_text()}：有未选择的角色')
                 if slot in seen: raise ValueError(f'{row.label_text()}：角色重复')
@@ -1600,6 +1616,7 @@ class MainWindow(QMainWindow):
         # 开始遍历所有rows来构建BattleScript
         current = dict(defaults)
         actions=[]
+        current_output_team = 1  # 存储当前使用队伍
         for row in self.rows:
             # EventRow存储为action
             if isinstance(row, EventRow):
@@ -1608,9 +1625,13 @@ class MainWindow(QMainWindow):
                     raise ValueError('特殊回合行动与当前队伍不匹配，请重新选择角色或删除该行动')
                 if action == 'skip': actions.append(m.SkipEvent())
                 elif action == 'change': actions.append(m.ChangeTeamEvent())
-                else: actions.append(m.SpecialGlobalButton(action))
+                elif action is not None: actions.append(m.SpecialGlobalButton(action))
                 continue
             # TurnRow存储为action之前的处理
+            output_team = team_order.index(row.team) + 1 if row.team in team_order else 1
+            if dual and output_team != current_output_team:
+                actions.append(m.TeamEvent(output_team))
+                current_output_team = output_team
             moves=[]; special_action=None
             for position,(slot,skill,target) in enumerate(row.state()['moves']):
                 new_slot=slot_map[slot]; style=self.slots[slot-1]
@@ -1633,8 +1654,14 @@ class MainWindow(QMainWindow):
                             current[key]=skill
                     # 不是可切换的普通技能
                     else: skill_id=used[new_slot-1].index(skill)+1
-                moves.append(m.SkillAction(new_slot,skill_id,
-                            slot_map[target] if target and target <= 6 else target))
+                if target is None: target_id=None
+                elif target in (107,108,109): target_id=target-100
+                else:
+                    # GUI目标是全局slot；HBRF目标是当前队伍局部slot。
+                    if (target - 1) // 6 + 1 != row.team:
+                        raise ValueError(f'{row.label_text()}：不能指定其他队伍的目标')
+                    target_id = (slot_map[target] - 1) % 6 + 1
+                moves.append(m.SkillAction(new_slot,skill_id,target_id))
             # 是特殊行动则加入SpecialRoleButton进action
             if special_action:
                 if row.execution_od():
