@@ -10,6 +10,7 @@ from utils import match_template, detect_button, wait_and_click, wait_until, wai
 from hbrf import model as mod
 from paths import SCRIPTS_DIR
 import logging
+from dataclasses import replace
 
 log = logging.getLogger('hbr.fight')
 
@@ -285,11 +286,25 @@ def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mo
     return member_position_output
 
 def fight(game, script: mod.BattleScript, auto_close=False):
+    def local_role(role):  # 用于将7-12映射回1-6
+        return role - (current_team - 1) * 6
+    
+    # 每支队伍独立维护站位，编号均为1-6
+    team_positions = {
+        team: [1, 2, 3, 4, 5, 6]
+        for team in range(1, len(script.roles) // 6 + 1)
+    }
+    # 每支队伍独立维护技能数量，key也是局部编号1-6
+    team_skill_nums = {
+        team: {
+            role.slot - (team - 1) * 6: len(role.skills)
+            for role in script.roles[(team - 1) * 6:team * 6]
+        }
+        for team in team_positions
+    }
+    # 初始默认team为1
+    current_team = 1
 
-    # 初始化位置和角色技能数量
-    old_member_position = [1,2,3,4,5,6]  # 初始位置
-    # 角色slot到角色技能数量的映射
-    role_skill_num = {role.slot: len(role.skills) for role in script.roles}
     # 设置关闭自动战斗flag
     has_turn_off_auto = False
     # 设置检查od凹追击flag，理论上只有CheckOD紧接BattleTurn才会触发检查
@@ -307,7 +322,7 @@ def fight(game, script: mod.BattleScript, auto_close=False):
             log.info("本回合需要凹追击")
             continue
 
-        if isinstance(action, mod.SkipEvent):  # 表示需要点击skip按钮
+        elif isinstance(action, mod.SkipEvent):  # 表示需要点击skip按钮
             log.info("正在跳过剧情")
             pt = wait_until(lambda: detect_skip_button(game),
                        timeout=5*60,
@@ -316,6 +331,10 @@ def fight(game, script: mod.BattleScript, auto_close=False):
                 time.sleep(1)
                 click_in_game(game, pt)
                 time.sleep(3)
+
+        elif isinstance(action, mod.TeamEvent):  # 更改current_team
+            current_team = action.team
+            log.info("当前战斗队伍为：队伍%d", current_team)
 
         elif isinstance(action, mod.ChangeTeamEvent):  # 表示需要切换队伍
             log.info("正在切换队伍")
@@ -326,7 +345,7 @@ def fight(game, script: mod.BattleScript, auto_close=False):
 
         elif isinstance(action, mod.ResetPositions):
             log.info("正在重新设定角色位置")
-            old_member_position = action.positions.copy()
+            # old_member_position = action.positions.copy()
 
         elif isinstance(action, mod.SpecialRoleButton):
             log.info("正在启动 %s 按钮", action.button)
@@ -334,7 +353,7 @@ def fight(game, script: mod.BattleScript, auto_close=False):
                        timeout=5*60,
                        warning="未检测到回合结束按钮")
 
-            ensure_front(game, old_member_position, action.role, action.position)
+            ensure_front(game, team_positions[current_team], local_role(action.role), action.position)
             operate_role_button(game, action.button, action.position)
 
         elif isinstance(action, mod.SkillSwitch):
@@ -342,9 +361,10 @@ def fight(game, script: mod.BattleScript, auto_close=False):
             wait_until(lambda: detect_start_button(game),
                         timeout=5*60,
                         warning="未检测到回合结束按钮")
-            ensure_front(game, old_member_position, action.role, action.position)
+            local_slot = local_role(action.role)
+            ensure_front(game, team_positions[current_team], local_slot, action.position)
             # 如果角色本来就在前排
-            operate_skill_switch(game, action.position, action.role, action.skill, role_skill_num)
+            operate_skill_switch(game, action.position, local_slot, action.skill, team_skill_nums[current_team])
 
         elif isinstance(action, mod.SpecialGlobalButton):
             log.info("正在使用 %s 小按钮", action.button)
@@ -356,6 +376,14 @@ def fight(game, script: mod.BattleScript, auto_close=False):
         elif isinstance(action, mod.BattleTurn):  # 表示正常进行行动回合
             Turn = action.label
             log.info("正在进行 %s 回合行动", Turn)
+            # 把action的role编号都替换为1-6
+            local_action = replace(
+                action,
+                actions=[
+                    replace(move, role=local_role(move.role))
+                    for move in action.actions
+                ]
+            )
             # 到下一个回合了
             wait_until(lambda: detect_start_button(game),
                        timeout=5*60,
@@ -374,11 +402,11 @@ def fight(game, script: mod.BattleScript, auto_close=False):
                 else:
                     log.info("%s 回合凹 OD%d 成功，当前为 OD%d，继续战斗", action.label, od_check, current_od)
 
-            old_member_position = operate_one_turn(
+            team_positions[current_team] = operate_one_turn(
                 game=game, 
-                old_member_position=old_member_position.copy(), 
-                role_skill_num=role_skill_num,
-                action=action,
+                old_member_position=team_positions[current_team].copy(), 
+                role_skill_num=team_skill_nums[current_team],
+                action=local_action,
                 need_od_check=need_od_check)
             # 防止重复点击，可等待一段时间
             time.sleep(3)

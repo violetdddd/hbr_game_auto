@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 from config import templates as tpl
+import re
 
 """
 未来可以增加的内容：平A、选择怪物目标、技能切换、小按钮
@@ -68,8 +69,13 @@ class CheckOD:
 class ODRetryRequired(Exception):
     pass
 
+# 切换队伍信号，不点击换队按钮
+@dataclass
+class TeamEvent:
+    team: int  # 1 或 2
+
 # 整个战斗脚本
-BattleAction = BattleTurn | SkipEvent | ChangeTeamEvent | ResetPositions | SpecialGlobalButton | SkillSwitch | SpecialRoleButton | CheckOD
+BattleAction = BattleTurn | SkipEvent | ChangeTeamEvent | ResetPositions | SpecialGlobalButton | SkillSwitch | SpecialRoleButton | CheckOD | TeamEvent
 @dataclass
 class BattleScript:
     roles: list[Role]
@@ -77,21 +83,38 @@ class BattleScript:
 
 
 def validate_hbrf(script: BattleScript):
-    if len(script.roles) != 6:
-        raise ValueError("队伍必须有6名角色")
+    if len(script.roles) not in (6, 12):
+        raise ValueError("每支队伍必须有6名角色")
 
     role_ids = {role.slot for role in script.roles}
     role_by_id = {role.slot: role for role in script.roles}
     moster_ids = {7, 8, 9}
 
-    if role_ids != {1, 2, 3, 4, 5, 6}:
-        raise ValueError("角色编号必须为1-6")
+    if role_ids != set(range(1, len(script.roles) + 1)):
+        raise ValueError("一队角色编号为1-6，二队编号为7-12")
 
     for role in script.roles:
         if len(role.skills) > 6:
             raise ValueError("角色暂不支持超过6个技能")
 
+    # 区分2个team和1个team
+    current_team = 1
+    team_count = len(script.roles) // 6
+
     for i, action in enumerate(script.actions):
+
+        if isinstance(action, TeamEvent):
+            if team_count != 2:
+                raise ValueError(f"单队伍不应出现队伍切换信号")
+            if not 1 <= action.team <= 2:
+                raise ValueError(f"非法队伍编号: {action.team}")
+            current_team = action.team
+            continue
+
+        active_role_ids = set(range(
+            (current_team - 1) * 6 + 1,
+            current_team * 6 + 1
+        ))
 
         if isinstance(action, ResetPositions):
             if sorted(action.positions) != [1,2,3,4,5,6]:
@@ -116,9 +139,9 @@ def validate_hbrf(script: BattleScript):
                 raise ValueError(
                     f"非法前排角色特殊按钮: {action.button}"
                 )
-            if action.role not in (1,2,3,4,5,6):
+            if action.role not in active_role_ids:
                 raise ValueError(
-                    f"{action.button}的对应角色: {action.role}不存在"
+                    f"{action.button}的对应角色: {action.role}不属于队伍{current_team}"
                 )
             if action.position not in (0,1,2):
                 raise ValueError(
@@ -126,9 +149,9 @@ def validate_hbrf(script: BattleScript):
                 )
             
         elif isinstance(action, SkillSwitch):
-            if action.role not in (1,2,3,4,5,6):
+            if action.role not in active_role_ids:
                 raise ValueError(
-                    f"非法技能切换角色编号: {action.role}"
+                    f"切换技能的角色不属于队伍{current_team}: {action.role}"
                 )
             if not 1 <= action.skill <= len(role_by_id[action.role].skills):
                 raise ValueError(
@@ -169,12 +192,12 @@ def validate_hbrf(script: BattleScript):
 
             for move in action.actions:
 
-                if move.role not in role_ids:
+                if move.role not in active_role_ids:
                     raise ValueError(
-                        f"未知角色编号: {move.role}"
+                        f"{action.label}: 角色{move.role}不属于队伍{current_team}"
                     )
 
-                if move.target is not None and move.target not in (role_ids | moster_ids):
+                if move.target is not None and move.target not in range(1, 10):
                     raise ValueError(
                         f"非法技能目标: {move.target}"
                     )
@@ -204,10 +227,20 @@ def load_hbrf(filepath) -> BattleScript:
         raise ValueError("HBRF至少需要定义6名角色")
 
     # ---------- Roles ----------
+    role_lines = []
+
+    for line in lines:
+        if ":" not in line or "=" in line:
+            break
+        role_lines.append(line)
+
+    if len(role_lines) not in (6, 12):
+        raise ValueError("HBRF必须定义6名或12名角色")
+
     roles = []
 
-    # 前6行是角色定义区
-    for slot, line in enumerate(lines[:6], start=1):
+    # 前6行或12行是角色定义区
+    for slot, line in enumerate(role_lines, start=1):
         if ":" not in line:
             raise ValueError(f"角色定义格式错误: {line}")
 
@@ -240,13 +273,13 @@ def load_hbrf(filepath) -> BattleScript:
         for role in roles
     }
 
-    if len(role_by_name) != 6:
+    if len(role_by_name) != len(roles):
         raise ValueError("角色名称不能重复")
 
     # ---------- Actions ----------
     actions = []
 
-    for line in lines[6:]:
+    for line in lines[len(roles):]:
 
         if line == "skip":
             actions.append(SkipEvent())
@@ -254,6 +287,10 @@ def load_hbrf(filepath) -> BattleScript:
 
         if line == "change":
             actions.append(ChangeTeamEvent())
+            continue
+
+        if re.fullmatch(r"Team\s*=\s*[12]", line):
+            actions.append(TeamEvent(int(line.split("=", 1)[1].strip())))
             continue
 
         if line in tpl.GLOBAL_BUTTON_CONFIG:
@@ -421,9 +458,15 @@ def save_hbrf(script: BattleScript, filepath):
 
         f.write("# 配队和技能（用于初始化角色编号为1-6，目前支持技能数最多6个，角色最少需要装备3个技能）\n")
 
-        for role in sorted(script.roles, key=lambda r: r.slot):
+        role_num = len(script.roles)
+
+        for i, role in enumerate(sorted(script.roles, key=lambda r: r.slot),1):
+            if role_num == 12 and i == 1:
+                f.write("#队伍1\n")
             skills = ", ".join(role.skills)
             f.write(f"{role.name}: {skills}\n")
+            if role_num == 12 and i == 6:
+                f.write("\n#队伍2\n")
 
         f.write("\n")
         f.write(
@@ -442,6 +485,9 @@ def save_hbrf(script: BattleScript, filepath):
 
             elif isinstance(action, ChangeTeamEvent):
                 f.write("change\n")
+
+            elif isinstance(action, TeamEvent):
+                f.write(f"Team = {action.team}\n")
 
             elif isinstance(action, CheckOD):
                 f.write("check_od\n")

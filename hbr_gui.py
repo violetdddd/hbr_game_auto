@@ -402,6 +402,7 @@ class TurnRow(QGroupBox):
         self.custom_label.setEnabled(True)
         # 由原有背景方法统一设置边框，避免OD背景覆盖冻结状态
         self.update_background()
+        self.refresh_check_od()
         for button in self.findChildren(QPushButton):
             if button.text() in ('↑', '↓', '复制', '删除'):
                 button.setEnabled(True)
@@ -645,7 +646,8 @@ class TurnRow(QGroupBox):
         if not has_od:
             self.activate_od.setChecked(False)
 
-        self.activate_od.setEnabled(has_od)
+        frozen = getattr(self, '_team_frozen', False)
+        self.activate_od.setEnabled(has_od and not frozen)
 
         # 只有勾选发动后才能勾选凹追击
         enabled = has_od and self.activate_od.isChecked()
@@ -653,10 +655,10 @@ class TurnRow(QGroupBox):
         if not enabled:
             self.check_od.setChecked(False)
 
-        self.check_od.setEnabled(enabled and not getattr(self, '_team_frozen', False))  # 保证frozen时check_od不能触发
+        self.check_od.setEnabled(enabled and not frozen)  # 保证frozen时check_od不能触发
 
-        set_checkbox_color(self.activate_od, has_od)
-        set_checkbox_color(self.check_od, enabled)
+        set_checkbox_color(self.activate_od, has_od and not frozen)
+        set_checkbox_color(self.check_od, enabled and not frozen)
 
     # 改变背景颜色的函数，被bonus更改（和od更改）触发
     def update_background(self):
@@ -686,7 +688,7 @@ class TurnRow(QGroupBox):
         self.extra.setCurrentIndex(state.get('extra',0))
         self.od.setCurrentIndex(state.get('od',0))
         self.activate_od.setChecked(state.get('activate_od', False))
-        self.check_od.setChecked(state.get('check_od', False) and self.check_od.isEnabled())
+        self.check_od.setChecked(state.get('check_od', False))
         self.refresh_bonus()
         bonus = state.get('bonus_text', '')
         index = self.bonus.findText(bonus) if bonus else state.get('bonus', 0)
@@ -1522,7 +1524,7 @@ class MainWindow(QMainWindow):
                     # model中的友方目标为局部编号；GUI中使用当前队伍的全局slot编号
                     target = (base + mv.target) if mv.target in range(1,7) else (mv.target + 100 if mv.target in (7,8,9) else mv.target)
                     moves.append((mv.role if chosen[role_index] else 0, text,
-                                  target if target in (7,8,9) or (target and chosen[target-1]) else None))
+                                  target if target in (107,108,109) or (target and chosen[target-1]) else None))
                 state = TurnRow.parse_label(a.label, a.od)
                 state.setdefault('od', -a.od if a.od < 0 else (a.od+3 if a.od > 0 else 0))  # 当od这个值不存在时添加默认值
                 state.update(activate_od=a.od != 0, check_od=check_next_turn, moves=moves, team=current_team)
