@@ -168,9 +168,9 @@ def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mo
         pt = detect_button(game, load_template(tpl.od_figs_big[0]))
         if pt:
             time.sleep(0.1)
-            wait_and_click(game, load_template(tpl.od_figs_big[OD_mode-1], threshold=0.85), 
+            wait_and_click(game, load_template(tpl.od_figs_big[OD_mode-1]), 
                            timeout=60,
-                           warning=f"未匹配到目标OD{OD_mode}按钮")
+                           warning=f"未匹配到目标OD{OD_mode}按钮", threshold=0.85)
             return pt
         else:
             # time.sleep(0.1)
