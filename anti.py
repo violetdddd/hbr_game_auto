@@ -1,6 +1,6 @@
 import random
 
-def human_time(base=0.5, var=0.3):
+def human_time(base=0.6, var=0.2):
     """随机延时：base±var"""
     t = base + random.uniform(-var, var)
     return max(0.01, t)  # 避免负值

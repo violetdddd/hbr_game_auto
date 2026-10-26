@@ -32,7 +32,7 @@ def click_in_game(game, position, jitter = 10, sleep=True):
 
     # 先经过一定延迟再点击
     if sleep:
-        time.sleep(human_time(base=0.7))
+        time.sleep(human_time())
     pyautogui.click(abs_x, abs_y)
 
 def drag_in_game(game, trajectory, duration=0.3):
