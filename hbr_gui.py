@@ -336,7 +336,7 @@ class TurnRow(QGroupBox):
         # turnrow中单独保存属于哪一个team，来源于state或当前tab
         self.team = (state or {}).get('team', parent_editor.current_team)
         outer = QVBoxLayout(self)
-        # head包括turn，od，bonus，追加，发动od和定制label，以及信号控件
+        # head包括turn，od，bonus，追加，发动od和凹追击，以及信号控件
         head = QHBoxLayout()
         self.turn_no = NoWheelComboBox(); self.turn_no.addItems([f'T{i}' for i in range(1, 21)])
         self.extra = NoWheelComboBox(); self.extra.addItems(['普通回合', '追加回合'])
@@ -353,10 +353,9 @@ class TurnRow(QGroupBox):
         self.check_od = QCheckBox('须凹追击')
         self.check_od.setEnabled(False)
         
-        self.custom_label = QLineEdit(); self.custom_label.setPlaceholderText('自定义 label（非空时优先使用）')
         for w in (self.turn_no, self.extra, self.bonus, self.od, self.activate_od, self.check_od):
             head.addWidget(w)
-        head.addWidget(self.custom_label, 2)
+        head.addStretch(1)
         for label, callback in [('↑',lambda: self.move_requested.emit(self,-1)),('↓',lambda: self.move_requested.emit(self,1)),
                                 ('复制',lambda: self.copy_requested.emit(self)),('删除',lambda: self.remove_requested.emit(self))]:
             b = QPushButton(label); b.clicked.connect(callback); head.addWidget(b)
@@ -399,7 +398,6 @@ class TurnRow(QGroupBox):
         for widget in [*self.roles, *self.skills, *self.targets, *self.position_buttons,
                        self.od, self.activate_od, self.check_od, self.bonus, self.extra, self.turn_no]:
             widget.setEnabled(not frozen)
-        self.custom_label.setEnabled(True)
         # 由原有背景方法统一设置边框，避免OD背景覆盖冻结状态
         self.update_background()
         self.refresh_check_od()
@@ -568,7 +566,6 @@ class TurnRow(QGroupBox):
 
     # 根据head里的选项生成label
     def label_text(self):
-        if self.custom_label.text().strip(): return self.custom_label.text().strip()
         chunks = [self.turn_no.currentText()]
         
         if self.od_value() != 0: 
@@ -578,7 +575,7 @@ class TurnRow(QGroupBox):
         if self.extra.currentIndex(): chunks.append('追加')
         return '-'.join(chunks)
 
-    # 传入实际写入hbrf的内容，匹配为head中相应选项或写为custom label
+    # 传入实际写入hbrf的内容，匹配为head中相应选项
     @staticmethod
     def parse_label(label, execution_od=0):
         match = re.fullmatch(
@@ -586,23 +583,27 @@ class TurnRow(QGroupBox):
             label
         )
         if not match:
-            return dict(label=label)
+            QMessageBox.warning(None, 'hbrf识别失败', f'无法识别回合标签：{label}\n已默认设置为T1。')
+            return dict(turn=0, extra=0)
 
         turn, direction, bonus_text, level, bonus, post_level, extra = match.groups()
         level = int(level or post_level or 0)
 
         # bonus超出od范围
         if bonus and int(bonus) > level:
-            return dict(label=label)
+            QMessageBox.warning(None, 'hbrf识别失败', f'回合bonus超出OD范围：{label}\n已设置为默认bonus选项。')
+            return dict(turn=int(turn)-1, extra=int(bool(extra)))
 
         # 前置od出现“OD”前选项
         if direction == '前置' and post_level:
-            return dict(label=label)
+            QMessageBox.warning(None, 'hbrf识别失败', f'无法识别回合标签：{label}\n已默认设置为T1。')
+            return dict(turn=0, extra=0)
 
         # 把level还原为0-6的od
         if execution_od:
             if not direction or level != abs(execution_od) or (execution_od < 0) != (direction == '前置'):
-                return dict(label=label)
+                QMessageBox.warning(None, 'hbrf识别失败', f'无法识别回合标签：{label}\n已默认设置为T1。')
+                return dict(turn=0, extra=0)
             od = -execution_od if execution_od < 0 else execution_od + 3
         else:
             od = (level if direction == '前置' else level + 3) if direction else 0
@@ -612,7 +613,6 @@ class TurnRow(QGroupBox):
             extra=int(bool(extra)),
             od=od,
             bonus_text='OD前' if post_level else (bonus_text or '无 Bonus'),
-            label=''
         )
 
     # index 0到6 转换为hbrf的 -3到3
@@ -679,7 +679,7 @@ class TurnRow(QGroupBox):
     # 保存状态
     def state(self):
         return dict(team=self.team, turn=self.turn_no.currentIndex(), extra=self.extra.currentIndex(), bonus=self.bonus.currentIndex(), bonus_text=self.bonus.currentText(),
-        od=self.od.currentIndex(), activate_od=self.activate_od.isChecked(), check_od=self.check_od.isChecked(), label=self.custom_label.text(),
+        od=self.od.currentIndex(), activate_od=self.activate_od.isChecked(), check_od=self.check_od.isChecked(),
         moves=[(r.currentData(),s.currentData(),t.currentData()) for r,s,t in zip(self.roles,self.skills,self.targets)])
 
     # 重新load已经存在的状态
@@ -693,7 +693,6 @@ class TurnRow(QGroupBox):
         bonus = state.get('bonus_text', '')
         index = self.bonus.findText(bonus) if bonus else state.get('bonus', 0)
         self.bonus.setCurrentIndex(index if 0 <= index < self.bonus.count() else 0)
-        self.custom_label.setText(state.get('label',''))
         self.refresh_roles(state.get('moves',[(0,'普通攻击',None)]*3))
         self.refresh_check_od()
 
@@ -1094,9 +1093,6 @@ class MainWindow(QMainWindow):
         start = (team - 1) * 6
         return range(start, start + 6)
 
-    def row_team(self, row):  # 返回turn row的team值的工具函数
-        return getattr(row, 'team', self.current_team)
-
     def refresh_row_team_states(self):  # 主要用于frozen的刷新
         for row in self.rows:
             if isinstance(row, TurnRow):
@@ -1415,11 +1411,8 @@ class MainWindow(QMainWindow):
             chosen = [None] * 12  # list[Style]
             loaded_nicknames = [''] * 12
             occupied = set()
-            # script.roles强制6名角色，有可能脚本保存成了空位
+            # script.roles强制6/12名角色
             for i, role in enumerate(script.roles):
-                # 空位忽略即可
-                if role.name.startswith(('空位', '__EMPTY_SLOT_')) and not role.skills:
-                    continue
                 note = notes.get(i+1)
                 style = None
                 if note is not None:
@@ -1430,18 +1423,16 @@ class MainWindow(QMainWindow):
                     question = QMessageBox(self)
                     question.setWindowTitle('角色 / 风格未匹配')
                     question.setText(f'Slot {i+1}: {role.name}\n无法确定数据库中的对应风格。')
-                    question.setInformativeText('舍弃：保留空位（相关回合需手动修复）；选择风格：手动指定；取消：中止打开文件。')
-                    discard = question.addButton('舍弃角色', QMessageBox.ButtonRole.DestructiveRole)
+                    question.setInformativeText('请选择风格以继续导入，或取消导入。')
                     choose = question.addButton('选择风格', QMessageBox.ButtonRole.AcceptRole)
                     cancel = question.addButton('取消导入', QMessageBox.ButtonRole.RejectRole)
                     question.setDefaultButton(choose)
                     question.exec()
                     clicked = question.clickedButton()
-                    if clicked == cancel: return
-                    if clicked == choose:
-                        dialog = StyleDialog(self.catalog, occupied, self)
-                        if dialog.exec() != QDialog.DialogCode.Accepted: return
-                        style = dialog.chosen
+                    if clicked != choose: return
+                    dialog = StyleDialog(self.catalog, occupied, self)
+                    if dialog.exec() != QDialog.DialogCode.Accepted: return
+                    style = dialog.chosen
                 if style and style.name in occupied:
                     raise ValueError(f'同一角色重复上场：{style.name}')
                 chosen[i] = style
@@ -1547,19 +1538,19 @@ class MainWindow(QMainWindow):
         # 单队模式下即使只使用Tab2，也压缩为HBRF的1-6
         dual = len(used_teams) > 1
         team_order = [1, 2] if dual else [next(iter(used_teams), 1)]  # 提取该set中的唯一team
-        compact_styles = []
-        slot_map = {}
-        roles = []
-        # 把index映射为slot，同时处理中间角色空位问题
+        styles = []  # 储存用到的Style类
+        slot_map = {}  # 主要用于对tab2队伍但却只是单队轴时的映射
+        roles = []  # 储存用到的m.Role类
+        # 处理2队的slot编号问题
+        for source_team in team_order:
+            if any(self.slots[i] is None for i in self.team_indices(source_team)):
+                raise ValueError(f'队伍{source_team}未满6名角色，无法保存')
         for output_team, source_team in enumerate(team_order, 1):
-            base = (source_team - 1) * 6
-            present = [base+i for i in range(6) if self.slots[base+i] is not None]
-            order = present + [base+i for i in range(6) if self.slots[base+i] is None]  # 先排有的再排空位
-            for local_new, old in enumerate(order, 1):
+            for local_new, old in enumerate(self.team_indices(source_team), 1):
                 new = (output_team-1)*6 + local_new
                 slot_map[old+1] = new
-                compact_styles.append(self.slots[old])
-                roles.append(m.Role(new, (self.nicknames[old] or self.slots[old].label).replace(' ','').replace('　','') if self.slots[old] else f'空位{new}', []))
+                styles.append(self.slots[old])
+                roles.append(m.Role(new, (self.nicknames[old] or self.slots[old].label).replace(' ','').replace('　',''), []))
         # 加入昵称/国服名/空位，技能初始化为空
         if len({r.name for r in roles}) != len(roles): raise ValueError('角色昵称不能重复')
         # 异常判断和使用的技能收集
@@ -1688,11 +1679,11 @@ class MainWindow(QMainWindow):
         # 调用m.BattleScript将action储存为BattleScript
         script=m.BattleScript(roles,actions)
         m.validate_hbrf(script)
-        return script,compact_styles
+        return script,styles
 
     # 保存文件
     def save(self, save_as=False):
-        try: script, compact_styles=self.build_script()
+        try: script, styles=self.build_script()
         except Exception as e:
             QMessageBox.warning(self,'无法保存',str(e)); return False
         path = self.current_path
@@ -1706,7 +1697,7 @@ class MainWindow(QMainWindow):
             # 在文件尾部 Include style metadata as comments to retain compatibility with model.load_hbrf.
             with Path(path).open('a', encoding='utf-8') as f:
                 f.write('\n# HBRTool style metadata\n')
-                for slot, style in enumerate(compact_styles, 1):
+                for slot, style in enumerate(styles, 1):
                     if style:
                         meta = dict(team=style.team, english=style.english, id=style.sid)
                         f.write(f'# HBRTOOL_STYLE {slot} {json.dumps(meta, ensure_ascii=False)}\n')
