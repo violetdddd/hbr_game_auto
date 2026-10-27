@@ -37,11 +37,6 @@ class SkipEvent:
 class ChangeTeamEvent:
     pass
 
-# 重设置角色站位
-@dataclass
-class ResetPositions:
-    positions: list[int]
-
 # waki/总攻击的全局小按钮
 @dataclass
 class SpecialGlobalButton:
@@ -75,7 +70,7 @@ class TeamEvent:
     team: int  # 1 或 2
 
 # 整个战斗脚本
-BattleAction = BattleTurn | SkipEvent | ChangeTeamEvent | ResetPositions | SpecialGlobalButton | SkillSwitch | SpecialRoleButton | CheckOD | TeamEvent
+BattleAction = BattleTurn | SkipEvent | ChangeTeamEvent | SpecialGlobalButton | SkillSwitch | SpecialRoleButton | CheckOD | TeamEvent
 @dataclass
 class BattleScript:
     roles: list[Role]
@@ -115,12 +110,6 @@ def validate_hbrf(script: BattleScript):
             (current_team - 1) * 6 + 1,
             current_team * 6 + 1
         ))
-
-        if isinstance(action, ResetPositions):
-            if sorted(action.positions) != [1,2,3,4,5,6]:
-                raise ValueError(
-                    f"非法reset: {action.positions}"
-                )
 
         if isinstance(action, CheckOD):
             # od检测不能位于最后一个
@@ -348,25 +337,6 @@ def load_hbrf(filepath) -> BattleScript:
             else: 
                 raise ValueError(f"无效指令: {line}")
 
-        if line.startswith("reset"):
-            _, value = line.split("=", 1)
-
-            positions = [
-                int(x.strip())
-                for x in value.split(",")
-            ]
-
-            if len(positions) != 6:
-                raise ValueError(
-                    f"reset必须包含6个位置: {line}"
-                )
-
-            actions.append(
-                ResetPositions(positions)
-            )
-
-            continue
-
         #增加check_od，为fight提供凹追击的信号
         if line == "check_od":
             actions.append(CheckOD())
@@ -500,12 +470,6 @@ def save_hbrf(script: BattleScript, filepath):
 
             elif isinstance(action, SkillSwitch):
                 f.write(f"skill | {role_by_id[action.role].name} | {action.skill} | {action.position+1}\n")
-
-            elif isinstance(action, ResetPositions):
-                positions = ",".join(
-                    map(str, action.positions)
-                )
-                f.write(f"reset = {positions}\n")
 
             elif isinstance(action, BattleTurn):
 

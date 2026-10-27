@@ -343,10 +343,6 @@ def fight(game, script: mod.BattleScript, auto_close=False):
             wait_and_click(game, load_template(tpl.OK_electric_fig),
                            warning="未检测到切换队伍后的OK按钮")
 
-        elif isinstance(action, mod.ResetPositions):
-            log.info("正在重新设定角色位置")
-            # old_member_position = action.positions.copy()
-
         elif isinstance(action, mod.SpecialRoleButton):
             log.info("正在启动 %s 按钮", action.button)
             wait_until(lambda: detect_start_button(game),
