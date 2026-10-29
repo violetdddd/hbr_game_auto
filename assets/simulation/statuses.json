@@ -1,0 +1,613 @@
+{
+  "1": {"name": "attack_up", "category": "buff", "stack_group": "attack_up", "removable": true},
+  "2": {
+    "name": "attack_down",
+    "category": "debuff",
+    "stack_group": "attack_down",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "3": {
+    "name": "defense_down",
+    "category": "debuff",
+    "stack_group": "defense_down",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "4": {"name": "defense_up", "category": "buff", "stack_group": "defense_up", "removable": true},
+  "5": {
+    "name": "critical_rate_up",
+    "category": "buff",
+    "stack_group": "critical_rate_up",
+    "removable": true
+  },
+  "6": {
+    "name": "critical_rate_down",
+    "category": "debuff",
+    "stack_group": "critical_rate_down",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "7": {
+    "name": "critical_damage_up",
+    "category": "buff",
+    "stack_group": "critical_damage_up",
+    "removable": true
+  },
+  "8": {
+    "name": "critical_damage_down",
+    "category": "debuff",
+    "stack_group": "critical_damage_down",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "9": {"name": "replace_motion", "category": "none"},
+  "10": {"name": "stun", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true},
+  "11": {"name": "bind", "category": "debuff", "removable": true, "debuff_guard": true},
+  "12": {
+    "name": "provoke",
+    "category": "debuff",
+    "removable": true,
+    "debuff_guard": true,
+    "forced_one": true
+  },
+  "13": {"name": "funnel", "category": "buff", "stack_group": "funnel", "removable": true},
+  "14": {"name": "zone", "category": "none", "forced_one": true},
+  "15": {"name": "invincible", "category": "buff", "removable": true, "forced_one": true},
+  "16": {"name": "escape", "category": "none"},
+  "17": {"name": "resist_up", "category": "buff", "stack_group": "resist_up"},
+  "18": {
+    "name": "resist_down",
+    "category": "debuff",
+    "stack_group": "resist_down",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "19": {"name": "block_special_status", "category": "buff", "removable": true},
+  "20": {"name": "additional_turn", "category": "buff", "forced_one": true},
+  "21": {"name": "change_cut_in_category", "category": "none"},
+  "22": {
+    "name": "fragile",
+    "category": "debuff",
+    "stack_group": "fragile",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "23": {"name": "confusion", "category": "debuff", "removable": true, "debuff_guard": true},
+  "24": {"name": "imprison", "category": "debuff", "removable": true, "debuff_guard": true},
+  "25": {"name": "buff_charge", "category": "buff", "removable": true, "forced_one": true},
+  "26": {"name": "specify_sp", "category": "buff", "forced_one": true},
+  "27": {"name": "attack_up_per_token", "category": "buff", "stack_group": "attack_up", "removable": true},
+  "28": {
+    "name": "defense_up_per_token",
+    "category": "buff",
+    "stack_group": "defense_up",
+    "removable": true
+  },
+  "29": {"name": "super_illusion", "category": "debuff"},
+  "30": {"name": "virus", "category": "debuff", "removable": true, "debuff_guard": true},
+  "31": {"name": "illusion", "category": "debuff", "removable": true, "debuff_guard": true},
+  "32": {
+    "name": "attack_up_include_normal",
+    "category": "buff",
+    "stack_group": "attack_up",
+    "removable": true
+  },
+  "33": {"name": "recoil", "category": "debuff", "removable": true, "debuff_guard": true},
+  "34": {"name": "regeneration_dp", "category": "buff", "removable": true},
+  "35": {"name": "bad_status_resist_up", "category": "buff", "removable": true},
+  "36": {"name": "bad_status_resist_down", "category": "debuff", "removable": true, "debuff_guard": true},
+  "37": {"name": "super_avoidance", "category": "buff"},
+  "38": {
+    "name": "over_drive_point_per_hit_up",
+    "category": "buff",
+    "stack_group": "over_drive_point_per_hit_up",
+    "removable": true
+  },
+  "39": {"name": "damage_rate_up", "category": "buff", "stack_group": "damage_rate_up", "removable": true},
+  "40": {
+    "name": "defense_up_from_enemy_group",
+    "category": "buff",
+    "stack_group": "defense_up",
+    "removable": true
+  },
+  "41": {
+    "name": "damage_rate_resist_up",
+    "category": "buff",
+    "stack_group": "damage_rate_resist_up",
+    "removable": true
+  },
+  "42": {
+    "name": "heal_down",
+    "category": "debuff",
+    "stack_group": "heal_down",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "43": {
+    "name": "attack_up_only_normal",
+    "category": "buff",
+    "stack_group": "attack_up",
+    "removable": true
+  },
+  "44": {"name": "additional_element_only_normal", "category": "buff", "removable": true},
+  "45": {"name": "additional_element_include_normal", "category": "buff", "removable": true},
+  "46": {"name": "additional_element", "category": "buff", "removable": true},
+  "47": {"name": "hide_object", "category": "none"},
+  "48": {"name": "skill_limit_count_up", "category": "buff", "removable": true},
+  "49": {
+    "name": "over_drive_point_per_hit_up_include_normal",
+    "category": "buff",
+    "stack_group": "over_drive_point_per_hit_up"
+  },
+  "50": {
+    "name": "over_drive_point_per_hit_down_include_normal",
+    "category": "debuff",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "51": {"name": "aegis_chain_attack_down", "category": "debuff"},
+  "52": {"name": "give_heal_up", "category": "buff", "stack_group": "give_heal_up", "removable": true},
+  "53": {
+    "name": "give_heal_up_front",
+    "category": "buff",
+    "stack_group": "give_heal_up",
+    "removable": true
+  },
+  "54": {
+    "name": "give_attack_buff_up",
+    "category": "buff",
+    "stack_group": "give_attack_buff_up",
+    "removable": true
+  },
+  "55": {
+    "name": "give_attack_buff_up_front",
+    "category": "buff",
+    "stack_group": "give_attack_buff_up",
+    "removable": true
+  },
+  "56": {"name": "immortality", "category": "buff"},
+  "57": {
+    "name": "cover",
+    "category": "debuff",
+    "removable": true,
+    "debuff_guard": true,
+    "forced_one": true
+  },
+  "58": {
+    "name": "misfortune",
+    "category": "debuff",
+    "removable": true,
+    "debuff_guard": true,
+    "forced_one": true
+  },
+  "59": {
+    "name": "power_down_value",
+    "category": "debuff",
+    "stack_group": "power_down_value",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "60": {
+    "name": "power_down_rate",
+    "category": "debuff",
+    "stack_group": "power_down_rate",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "61": {
+    "name": "dexterity_down_value",
+    "category": "debuff",
+    "stack_group": "dexterity_down_value",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "62": {
+    "name": "dexterity_down_rate",
+    "category": "debuff",
+    "stack_group": "dexterity_down_rate",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "63": {
+    "name": "wisdom_down_value",
+    "category": "debuff",
+    "stack_group": "wisdom_down_value",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "64": {
+    "name": "wisdom_down_rate",
+    "category": "debuff",
+    "stack_group": "wisdom_down_rate",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "65": {
+    "name": "toughness_down_value",
+    "category": "debuff",
+    "stack_group": "toughness_down_value",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "66": {
+    "name": "toughness_down_rate",
+    "category": "debuff",
+    "stack_group": "toughness_down_rate",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "67": {
+    "name": "spirit_down_value",
+    "category": "debuff",
+    "stack_group": "spirit_down_value",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "68": {
+    "name": "spirit_down_rate",
+    "category": "debuff",
+    "stack_group": "spirit_down_rate",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "69": {
+    "name": "luck_down_value",
+    "category": "debuff",
+    "stack_group": "luck_down_value",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "70": {
+    "name": "luck_down_rate",
+    "category": "debuff",
+    "stack_group": "luck_down_rate",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "71": {"name": "immortality_dp", "category": "buff"},
+  "72": {"name": "damage_limit", "category": "buff", "forced_one": true},
+  "73": {"name": "continuous_hp_damage", "category": "debuff", "removable": true, "debuff_guard": true},
+  "74": {"name": "continuous_dp_damage", "category": "debuff", "removable": true, "debuff_guard": true},
+  "75": {"name": "continuous_damage", "category": "debuff", "removable": true, "debuff_guard": true},
+  "76": {"name": "fighting_spirit", "category": "buff", "removable": true, "forced_one": true},
+  "77": {
+    "name": "defense_up_from_provoke",
+    "category": "buff",
+    "stack_group": "defense_up",
+    "removable": true
+  },
+  "78": {"name": "mind_eye", "category": "buff", "stack_group": "mind_eye", "removable": true},
+  "79": {"name": "restraint", "category": "debuff", "removable": true, "debuff_guard": true},
+  "80": {"name": "sand_storm_zone", "category": "none", "forced_one": true},
+  "81": {"name": "power_up_value", "category": "buff", "stack_group": "power_up_value", "removable": true},
+  "82": {"name": "power_up_rate", "category": "buff", "stack_group": "power_up_rate", "removable": true},
+  "83": {
+    "name": "dexterity_up_value",
+    "category": "buff",
+    "stack_group": "dexterity_up_value",
+    "removable": true
+  },
+  "84": {
+    "name": "dexterity_up_rate",
+    "category": "buff",
+    "stack_group": "dexterity_up_rate",
+    "removable": true
+  },
+  "85": {
+    "name": "wisdom_up_value",
+    "category": "buff",
+    "stack_group": "wisdom_up_value",
+    "removable": true
+  },
+  "86": {"name": "wisdom_up_rate", "category": "buff", "stack_group": "wisdom_up_rate", "removable": true},
+  "87": {
+    "name": "toughness_up_value",
+    "category": "buff",
+    "stack_group": "toughness_up_value",
+    "removable": true
+  },
+  "88": {
+    "name": "toughness_up_rate",
+    "category": "buff",
+    "stack_group": "toughness_up_rate",
+    "removable": true
+  },
+  "89": {
+    "name": "spirit_up_value",
+    "category": "buff",
+    "stack_group": "spirit_up_value",
+    "removable": true
+  },
+  "90": {"name": "spirit_up_rate", "category": "buff", "stack_group": "spirit_up_rate", "removable": true},
+  "91": {"name": "luck_up_value", "category": "buff", "stack_group": "luck_up_value", "removable": true},
+  "92": {"name": "luck_up_rate", "category": "buff", "stack_group": "luck_up_rate", "removable": true},
+  "93": {"name": "token_set_by_attacked", "category": "buff"},
+  "94": {
+    "name": "give_defense_debuff_up",
+    "category": "buff",
+    "stack_group": "give_defense_debuff_up",
+    "removable": true
+  },
+  "95": {
+    "name": "all_status_up_value",
+    "category": "buff",
+    "stack_group": "all_status_up_value",
+    "removable": true
+  },
+  "96": {
+    "name": "all_status_up_rate",
+    "category": "buff",
+    "stack_group": "all_status_up_rate",
+    "removable": true
+  },
+  "97": {
+    "name": "all_status_down_value",
+    "category": "debuff",
+    "stack_group": "all_status_down_value",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "98": {
+    "name": "all_status_down_rate",
+    "category": "debuff",
+    "stack_group": "all_status_down_rate",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "99": {"name": "super_cover", "category": "debuff", "forced_one": true},
+  "100": {"name": "learning_nature_element", "category": "buff"},
+  "101": {"name": "apply_learning_nature_element_up", "category": "buff", "forced_one": true},
+  "102": {"name": "apply_learning_nature_element_down", "category": "debuff", "forced_one": true},
+  "103": {
+    "name": "damage_rate_resist_down",
+    "category": "debuff",
+    "stack_group": "damage_rate_resist_down",
+    "removable": true,
+    "debuff_guard": true
+  },
+  "104": {"name": "signal_buff", "category": "buff"},
+  "105": {"name": "super_break", "category": "debuff", "forced_one": true},
+  "106": {"name": "token_set_by_attacking", "category": "buff"},
+  "107": {"name": "token_set_by_healed_dp", "category": "buff"},
+  "108": {
+    "name": "resist_down_overwrite",
+    "category": "debuff",
+    "removable": true,
+    "debuff_guard": true,
+    "forced_one": true
+  },
+  "109": {
+    "name": "give_critical_damage_buff_up",
+    "category": "buff",
+    "stack_group": "give_critical_damage_buff_up",
+    "removable": true
+  },
+  "110": {"name": "debuff_guard", "category": "buff", "removable": true, "forced_one": true},
+  "111": {"name": "taken_damage_limit", "category": "buff", "forced_one": true},
+  "112": {"name": "show_object", "category": "none"},
+  "113": {"name": "break_guard", "category": "buff", "forced_one": true},
+  "114": {"name": "resist_down_gimmick", "category": "debuff"},
+  "115": {"name": "additional_hit_on_breaking", "category": "buff"},
+  "116": {"name": "additional_hit_on_removing_buff", "category": "buff"},
+  "117": {"name": "reduce_sp", "category": "buff", "forced_one": true},
+  "118": {"name": "give_debuff_up", "category": "buff", "stack_group": "give_debuff_up", "removable": true},
+  "119": {"name": "morale", "category": "buff", "forced_one": true},
+  "120": {
+    "name": "arrow_cherry_blossoms",
+    "category": "buff",
+    "stack_group": "give_debuff_up",
+    "removable": true,
+    "forced_one": true
+  },
+  "121": {"name": "dodge", "category": "buff", "removable": true, "forced_one": true},
+  "122": {"name": "phantasm_buff", "category": "buff"},
+  "123": {"name": "eternal_oath", "category": "buff", "forced_one": true},
+  "124": {"name": "shadow_clone", "category": "buff", "removable": true, "forced_one": true},
+  "125": {"name": "double_action_extra_skill", "category": "buff", "removable": true, "forced_one": true},
+  "126": {"name": "zone_up_eternal", "category": "buff"},
+  "127": {"name": "additional_hit_on_extra_skill", "category": "buff"},
+  "128": {"name": "storm_armor", "category": "buff", "removable": true, "forced_one": true},
+  "129": {"name": "additional_hit_on_attacked", "category": "buff"},
+  "130": {"name": "heal_sp_on_pre_turn", "category": "buff"},
+  "131": {
+    "name": "corrosion_dp",
+    "category": "debuff",
+    "removable": true,
+    "debuff_guard": true,
+    "forced_one": true
+  },
+  "132": {"name": "rice_field_zone", "category": "none", "forced_one": true},
+  "133": {"name": "babied", "category": "buff", "forced_one": true},
+  "134": {"name": "memory_spirit", "category": "buff"},
+  "135": {"name": "give_debuff_turn_up", "category": "buff"},
+  "136": {
+    "name": "hacking",
+    "category": "debuff",
+    "removable": true,
+    "debuff_guard": true,
+    "forced_one": true
+  },
+  "137": {"name": "additional_hit_on_kill", "category": "buff"},
+  "138": {"name": "additional_hit_on_kill_count", "category": "buff"},
+  "139": {"name": "break_down_turn_up", "category": "debuff", "forced_one": true},
+  "140": {"name": "sp_limit_overwrite", "category": "buff", "removable": true, "forced_one": true},
+  "141": {
+    "name": "growl_debuff",
+    "category": "debuff",
+    "removable": true,
+    "debuff_guard": true,
+    "forced_one": true
+  },
+  "142": {
+    "name": "turbidity",
+    "category": "debuff",
+    "removable": true,
+    "debuff_guard": true,
+    "forced_one": true
+  },
+  "143": {"name": "diva", "category": "buff", "stack_group": "diva", "removable": true},
+  "144": {"name": "shredding", "category": "buff", "removable": true},
+  "145": {
+    "name": "negative_mind",
+    "category": "debuff",
+    "removable": true,
+    "debuff_guard": true,
+    "forced_one": true
+  },
+  "146": {
+    "name": "praying_eel_form_horn_buff",
+    "category": "buff",
+    "stack_group": "attack_up",
+    "forced_one": true
+  },
+  "147": {"name": "gloomy_buff", "category": "buff", "removable": true, "forced_one": true},
+  "148": {
+    "name": "damage_rate_up_per_token",
+    "category": "buff",
+    "stack_group": "damage_rate_up",
+    "removable": true
+  },
+  "149": {"name": "wilding", "category": "debuff", "forced_one": true},
+  "150": {"name": "additional_hit_on_healed_sp_without_self_heal", "category": "buff"},
+  "151": {"name": "replace_normal_skill", "category": "buff", "forced_one": true},
+  "152": {"name": "m_tenne_potion_debuff", "category": "debuff", "removable": true},
+  "153": {
+    "name": "fatigue",
+    "category": "debuff",
+    "removable": true,
+    "debuff_guard": true,
+    "forced_one": true
+  },
+  "154": {"name": "b_i_yamawaki_servant", "category": "buff", "forced_one": true},
+  "155": {"name": "r_e_creature_white_buff", "category": "buff", "forced_one": true},
+  "156": {
+    "name": "super_stun",
+    "category": "debuff",
+    "removable": true,
+    "debuff_guard": true,
+    "forced_one": true
+  },
+  "157": {"name": "revive_territory", "category": "none", "forced_one": true},
+  "158": {"name": "replace_pursuit", "category": "buff", "forced_one": true},
+  "159": {"name": "additional_hit_on_pursuit", "category": "buff"},
+  "160": {"name": "high_boost", "category": "buff", "removable": true, "forced_one": true},
+  "161": {"name": "additional_hit_on_zone", "category": "buff"},
+  "162": {"name": "heal_up", "category": "buff", "stack_group": "heal_up", "removable": true},
+  "163": {"name": "makeup", "category": "buff", "removable": true, "forced_one": true},
+  "164": {"name": "additional_hit_on_specified_skill", "category": "buff"},
+  "165": {"name": "damage_up_by_over_drive", "category": "buff"},
+  "166": {"name": "fire_mark", "category": "buff", "removable": true, "forced_one": true},
+  "167": {"name": "ref_param_up_by_resonance", "category": "buff", "removable": true, "forced_one": true},
+  "168": {"name": "damage_rate_limit_up", "category": "debuff", "forced_one": true},
+  "169": {"name": "ignore_e_shield_element", "category": "buff", "forced_one": true},
+  "170": {"name": "super_break_down", "category": "debuff", "forced_one": true},
+  "171": {"name": "curry", "category": "buff", "removable": true, "forced_one": true},
+  "172": {"name": "shchi", "category": "buff", "removable": true, "forced_one": true},
+  "173": {
+    "name": "crazy_knocker_debuff",
+    "category": "debuff",
+    "removable": true,
+    "debuff_guard": true,
+    "forced_one": true
+  },
+  "174": {"name": "motivation", "category": "buff", "forced_one": true},
+  "175": {"name": "overwrite_sp", "category": "buff", "forced_one": true},
+  "176": {
+    "name": "continuous_sp_damage",
+    "category": "debuff",
+    "removable": true,
+    "debuff_guard": true,
+    "forced_one": true
+  },
+  "177": {"name": "talisman", "category": "debuff", "forced_one": true},
+  "178": {
+    "name": "suppress_sp",
+    "category": "debuff",
+    "removable": true,
+    "debuff_guard": true,
+    "forced_one": true
+  },
+  "179": {"name": "mocktail", "category": "buff", "removable": true, "forced_one": true},
+  "180": {"name": "additional_hit_on_over_drive_point_down_skill", "category": "buff"},
+  "181": {"name": "hyde_feeler_heal", "category": "buff"},
+  "182": {"name": "barrier", "category": "buff", "stack_group": "defense_up"},
+  "183": {
+    "name": "fear_of_devil",
+    "category": "debuff",
+    "removable": true,
+    "debuff_guard": true,
+    "forced_one": true
+  },
+  "184": {"name": "debuff_resist_overwrite_gimmick", "category": "buff", "forced_one": true},
+  "185": {"name": "ice_mark", "category": "buff", "removable": true, "forced_one": true},
+  "186": {
+    "name": "border_ref_p_down_by_admiral",
+    "category": "debuff",
+    "removable": true,
+    "debuff_guard": true,
+    "forced_one": true
+  },
+  "187": {"name": "ep_limit_overwrite", "category": "buff", "removable": true, "forced_one": true},
+  "188": {"name": "thunder_mark", "category": "buff", "removable": true, "forced_one": true},
+  "189": {"name": "execute_skill_on_pre_turn", "category": "buff", "removable": true, "forced_one": true},
+  "190": {"name": "steak", "category": "buff", "removable": true, "forced_one": true},
+  "191": {"name": "gelato", "category": "buff", "removable": true, "forced_one": true},
+  "192": {
+    "name": "b_i_yamawaki_enemy_servant",
+    "category": "debuff",
+    "removable": true,
+    "debuff_guard": true,
+    "forced_one": true
+  },
+  "193": {"name": "disaster", "category": "debuff", "debuff_guard": true, "forced_one": true},
+  "194": {"name": "sprightly", "category": "buff", "removable": true, "forced_one": true},
+  "195": {"name": "dark_mark", "category": "buff", "removable": true, "forced_one": true},
+  "196": {"name": "additional_hit_on_weak", "category": "buff"},
+  "197": {"name": "additional_hit_on_healed_dp_enemy", "category": "buff", "removable": true},
+  "198": {
+    "name": "byakko_double_action_attack_skill",
+    "category": "buff",
+    "removable": true,
+    "forced_one": true
+  },
+  "199": {"name": "additional_hit_on_removing_debuff", "category": "buff"},
+  "200": {"name": "additional_hit_on_attacking", "category": "buff"},
+  "201": {
+    "name": "undermine",
+    "category": "debuff",
+    "removable": true,
+    "debuff_guard": true,
+    "forced_one": true
+  },
+  "202": {"name": "dim_sum", "category": "buff", "removable": true, "forced_one": true},
+  "203": {"name": "additional_hit_on_extra_skill_all", "category": "buff"},
+  "204": {"name": "summers_end_territory", "category": "none", "forced_one": true},
+  "205": {
+    "name": "attack_up_range_by_all_damage_rate",
+    "category": "buff",
+    "removable": true,
+    "forced_one": true
+  },
+  "206": {"name": "light_mark", "category": "buff", "removable": true, "forced_one": true},
+  "207": {"name": "force_one_damage_by_hit", "category": "buff", "forced_one": true},
+  "208": {"name": "revenge", "category": "buff", "forced_one": true},
+  "209": {"name": "e_a_guard", "category": "buff", "removable": true, "forced_one": true},
+  "210": {"name": "toughness_up_value_per_revenge_level", "category": "buff", "forced_one": true},
+  "211": {"name": "damage_decay", "category": "buff", "removable": true, "forced_one": true},
+  "212": {"name": "attack_up_by_token", "category": "buff", "removable": true, "forced_one": true},
+  "213": {"name": "tea", "category": "buff", "removable": true, "forced_one": true},
+  "214": {"name": "infantilized", "category": "debuff", "forced_one": true},
+  "215": {"name": "additional_hit_on_consume_token_all", "category": "buff"},
+  "216": {"name": "additional_hit_on_token_set_all", "category": "buff"},
+  "217": {"name": "zone_up", "category": "buff"},
+  "218": {
+    "name": "venom",
+    "category": "debuff",
+    "removable": true,
+    "debuff_guard": true,
+    "forced_one": true
+  },
+  "219": {"name": "reduce_consume_over_drive", "category": "buff", "removable": true},
+  "220": {"name": "additional_hit_on_debuff", "category": "buff"}
+}
