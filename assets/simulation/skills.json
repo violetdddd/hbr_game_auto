@@ -18,7 +18,12 @@
     "kind": "system",
     "cost": {"sp": 0}
   },
-  "3": {"id": 3, "names": {"zh_cn": "追击", "zh_tw": "追擊", "jp": "追撃"}, "kind": "system", "cost": {"sp": 0}},
+  "3": {
+    "id": 3,
+    "names": {"zh_cn": "追击", "zh_tw": "追擊", "jp": "追撃"},
+    "kind": "system",
+    "cost": {"sp": 0}
+  },
   "4": {"id": 4, "names": {}, "kind": "reserved"},
   "5": {"id": 5, "names": {}, "kind": "reserved"},
   "6": {"id": 6, "names": {}, "kind": "reserved"},
