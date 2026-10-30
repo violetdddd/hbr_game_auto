@@ -201,62 +201,30 @@
   "20": {
     "id": 20,
     "names": {"zh_cn": "过热祈祷", "zh_tw": "過熱祈禱", "jp": "御祈祷オーバーヒート"},
+    "conditions":{
+      "cost": "CountBC(IsPlayer() == 1 && IsCharacter(ADate) == 1 && SpecialStatusCountByType(146) < 1) > 0",
+      "effects": "SpecialStatusCountByType(146) > 0"
+    },
     "kind": "active",
     "cost": {
-      "sp": 16,
-      "conditional_amount": 8,
-      "condition": "CountBC(IsPlayer() == 1 && IsCharacter(ADate) == 1 && SpecialStatusCountByType(146) < 1) > 0"
+      "no": {"sp": 16},
+      "yes": {"sp": 8}
     },
     "hit_count": 4,
     "target": "all",
     "attack_type": "strike",
     "elements": ["fire"],
     "use_count": [4, 5, 6],
-    "effects": [
-      {
-        "type": "skill_condition",
-        "target": "all",
-        "attack_type": "strike",
-        "elements": ["fire"],
-        "condition": "SpecialStatusCountByType(146) > 0"
-      }
-    ],
-    "variants": [
-      {"id": 200001, "selection": "skill_condition", "description_jp": "ネガティブ中"},
-      {"id": 200002, "selection": "skill_condition", "description_jp": "ネガティブじゃない"}
-    ]
-  },
-  "200001": {
-    "id": 200001,
-    "names": {"zh_cn": "过热祈祷", "zh_tw": "過熱祈禱", "jp": "御祈祷オーバーヒート"},
-    "kind": "active",
-    "parent_id": 20,
-    "cost": {"sp": 8},
-    "hit_count": 4,
-    "target": "all",
-    "attack_type": "strike",
-    "elements": ["fire"],
-    "use_count": [4, 5, 6],
-    "effects": [
-      {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"]},
-      {"type": "remove_buff", "target": "all"}
-    ]
-  },
-  "200002": {
-    "id": 200002,
-    "names": {"zh_cn": "过热祈祷", "zh_tw": "過熱祈禱", "jp": "御祈祷オーバーヒート"},
-    "kind": "active",
-    "parent_id": 20,
-    "cost": {"sp": 16},
-    "hit_count": 4,
-    "target": "all",
-    "attack_type": "strike",
-    "elements": ["fire"],
-    "use_count": [4, 5, 6],
-    "effects": [
-      {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"]},
-      {"type": "remove_buff", "target": "all"}
-    ]
+    "effects": {
+      "yes": [
+        {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"]},
+        {"type": "remove_buff", "target": "all"}
+      ],
+      "no": [
+        {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"]},
+        {"type": "remove_buff", "target": "all"}
+      ]
+    }
   },
   "21": {
     "id": 21,
@@ -6109,40 +6077,13 @@
       {"type": "token", "target": "self"}
     ]
   },
-  "250": {
-    "id": 250,
-    "names": {"zh_cn": "宇宙射线", "zh_tw": "宇宙射線", "jp": "コズミックレイ"},
-    "kind": "active",
-    "cost": {"sp": 8},
-    "hit_count": 1,
-    "target": "single",
-    "attack_type": "stab",
-    "elements": ["ice"],
-    "effects": [
-      {"type": "skill_switch", "target": "single", "attack_type": "stab", "elements": ["ice"]}
-    ],
-    "variants": [
-      {
-        "id": 2500001,
-        "selection": "skill_switch",
-        "description_jp": "敵に氷の銃撃 前衛の士気レベルを2上昇 自身のリベンジレベルを1上昇\nインビンシブル状態のとき 消費SP0 かつ追加ターン(追加ターン中を除く)"
-      },
-      {
-        "id": 2500002,
-        "selection": "skill_switch",
-        "description_jp": "敵に闇の銃撃 前衛の士気レベルを2上昇 自身のリベンジレベルを1上昇\nインビンシブル状態のとき 消費SP0 かつ追加ターン(追加ターン中を除く)"
-      }
-    ]
-  },
   "2500001": {
     "id": 2500001,
-    "names": {"zh_cn": "宇宙射线", "zh_tw": "宇宙射線", "jp": "コズミックレイ"},
+    "link": 2500002,
+    "names": {"zh_cn": "宇宙射线-冰", "zh_tw": "宇宙射線-冰", "jp": "コズミックレイ-氷"},
     "kind": "active",
-    "parent_id": 250,
-    "cost": {
-      "sp": 8,
-      "condition": "CountBC(IsPlayer() && IsCharacter(IMinase) && SpecialStatusCountByType(211)>0)>0"
-    },
+    "cost": {"sp": 8,
+    "condition": "CountBC(IsPlayer() && IsCharacter(IMinase) && SpecialStatusCountByType(211)>0)>0"},
     "hit_count": 1,
     "target": "single",
     "attack_type": "stab",
@@ -6161,13 +6102,12 @@
   },
   "2500002": {
     "id": 2500002,
-    "names": {"zh_cn": "宇宙射线", "zh_tw": "宇宙射線", "jp": "コズミックレイ"},
+    "link": 2500001,
+    "names": {"zh_cn": "宇宙射线-暗", "zh_tw": "宇宙射線-闇", "jp": "コズミックレイ-闇"},
     "kind": "active",
-    "parent_id": 250,
-    "cost": {
-      "sp": 8,
-      "condition": "CountBC(IsPlayer() && IsCharacter(IMinase) && SpecialStatusCountByType(211)>0)>0"
-    },
+    "cost": {"sp": 8,
+    "condition": "CountBC(IsPlayer() && IsCharacter(IMinase) && SpecialStatusCountByType(211)>0)>0"
+  },
     "hit_count": 1,
     "target": "single",
     "attack_type": "stab",
@@ -6336,113 +6276,81 @@
       }
     ]
   },
-  "257": {
-    "id": 257,
-    "names": {"zh_cn": "诸神黄昏·新星", "zh_tw": "諸神黃昏‧新星", "jp": "ラグナロク・ノヴァ"},
-    "kind": "active",
-    "cost": {"sp": 15},
-    "hit_count": 8,
-    "target": "single",
-    "attack_type": "stab",
-    "elements": ["ice"],
-    "use_count": [4, 5, 6],
-    "effects": [
-      {"type": "skill_switch", "target": "single", "attack_type": "stab", "elements": ["ice"]}
-    ],
-    "variants": [
-      {"id": 2570001, "selection": "skill_switch", "description_jp": "氷_リベンジレベル10"},
-      {"id": 2570002, "selection": "skill_switch", "description_jp": "氷_リベンジレベル9以下"},
-      {"id": 2570003, "selection": "skill_switch", "description_jp": "闇_リベンジレベル10"},
-      {"id": 2570004, "selection": "skill_switch", "description_jp": "闇_リベンジレベル9以下"}
-    ]
-  },
   "2570001": {
     "id": 2570001,
-    "names": {"zh_cn": "诸神黄昏·新星", "zh_tw": "諸神黃昏‧新星", "jp": "ラグナロク・ノヴァ"},
+    "link": 2570002,
+    "names": {"zh_cn": "诸神黄昏·新星-冰", "zh_tw": "諸神黃昏‧新星-冰", "jp": "ラグナロク・ノヴァ-氷"},
+    "conditions": {
+      "effects": "反击等级10"
+    },
     "kind": "active",
-    "parent_id": 257,
     "cost": {"sp": 15},
     "hit_count": 8,
     "target": "single",
     "attack_type": "stab",
     "elements": ["ice"],
-    "effects": [
-      {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["ice"]},
-      {
-        "type": "critical_damage_up",
-        "target": "self",
-        "elements": ["ice"],
-        "status_id": 7,
-        "duration": {"type": "ally_turn", "value": 3},
-        "solo": true
-      }
-    ]
+    "effects": {
+      "yes": [
+        {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["ice"]},
+        {
+          "type": "critical_damage_up",
+          "target": "self",
+          "elements": ["ice"],
+          "status_id": 7,
+          "duration": {"type": "ally_turn", "value": 3},
+          "solo": true
+        }
+      ],
+      "no": [
+        {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["ice"]},
+        {
+          "type": "critical_damage_up",
+          "target": "self",
+          "elements": ["ice"],
+          "status_id": 7,
+          "duration": {"type": "ally_turn", "value": 3},
+          "solo": true
+        }
+      ]
+    }
   },
   "2570002": {
     "id": 2570002,
-    "names": {"zh_cn": "诸神黄昏·新星", "zh_tw": "諸神黃昏‧新星", "jp": "ラグナロク・ノヴァ"},
+    "link": 2570001,
+    "names": {"zh_cn": "诸神黄昏·新星-暗", "zh_tw": "諸神黃昏‧新星-闇", "jp": "ラグナロク・ノヴァ-闇"},
+    "conditions": {
+      "effects": "反击等级10"
+    },
     "kind": "active",
-    "parent_id": 257,
-    "cost": {"sp": 15},
-    "hit_count": 8,
-    "target": "single",
-    "attack_type": "stab",
-    "elements": ["ice"],
-    "effects": [
-      {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["ice"]},
-      {
-        "type": "critical_damage_up",
-        "target": "self",
-        "elements": ["ice"],
-        "status_id": 7,
-        "duration": {"type": "ally_turn", "value": 3},
-        "solo": true
-      }
-    ]
-  },
-  "2570003": {
-    "id": 2570003,
-    "names": {"zh_cn": "诸神黄昏·新星", "zh_tw": "諸神黃昏‧新星", "jp": "ラグナロク・ノヴァ"},
-    "kind": "active",
-    "parent_id": 257,
     "cost": {"sp": 15},
     "hit_count": 8,
     "target": "single",
     "attack_type": "stab",
     "elements": ["dark"],
-    "effects": [
-      {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
-      {
-        "type": "critical_damage_up",
-        "target": "self",
-        "elements": ["dark"],
-        "status_id": 7,
-        "duration": {"type": "ally_turn", "value": 3},
-        "solo": true
-      }
-    ]
-  },
-  "2570004": {
-    "id": 2570004,
-    "names": {"zh_cn": "诸神黄昏·新星", "zh_tw": "諸神黃昏‧新星", "jp": "ラグナロク・ノヴァ"},
-    "kind": "active",
-    "parent_id": 257,
-    "cost": {"sp": 15},
-    "hit_count": 8,
-    "target": "single",
-    "attack_type": "stab",
-    "elements": ["dark"],
-    "effects": [
-      {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
-      {
-        "type": "critical_damage_up",
-        "target": "self",
-        "elements": ["dark"],
-        "status_id": 7,
-        "duration": {"type": "ally_turn", "value": 3},
-        "solo": true
-      }
-    ]
+    "effects": {
+      "yes": [
+        {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
+        {
+          "type": "critical_damage_up",
+          "target": "self",
+          "elements": ["dark"],
+          "status_id": 7,
+          "duration": {"type": "ally_turn", "value": 3},
+          "solo": true
+        }
+      ],
+      "no": [
+        {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
+        {
+          "type": "critical_damage_up",
+          "target": "self",
+          "elements": ["dark"],
+          "status_id": 7,
+          "duration": {"type": "ally_turn", "value": 3},
+          "solo": true
+        }
+      ]
+    }
   },
   "258": {
     "id": 258,
@@ -7682,36 +7590,11 @@
       }
     ]
   },
-  "318": {
-    "id": 318,
-    "names": {"zh_cn": "红尖晶石", "zh_tw": "紅色尖晶石", "jp": "レッドスピネル"},
-    "kind": "active",
-    "cost": {"sp": 9},
-    "hit_count": 3,
-    "target": "all",
-    "attack_type": "slash",
-    "elements": ["fire"],
-    "effects": [
-      {"type": "skill_switch", "target": "all", "attack_type": "slash", "elements": ["fire"]}
-    ],
-    "variants": [
-      {
-        "id": 3180001,
-        "selection": "skill_switch",
-        "description_jp": "敵全体の火属性防御力を下げ \n炎の力を宿した鎌で攻撃 [破壊率大] [スイッチで属性変化]"
-      },
-      {
-        "id": 3180002,
-        "selection": "skill_switch",
-        "description_jp": "敵全体の氷属性防御力を下げ \n氷の力を宿した鎌で攻撃 [破壊率大] [スイッチで属性変化]"
-      }
-    ]
-  },
   "3180001": {
     "id": 3180001,
+    "link": 3180002,
     "names": {"zh_cn": "红尖晶石", "zh_tw": "紅色尖晶石", "jp": "レッドスピネル"},
     "kind": "active",
-    "parent_id": 318,
     "cost": {"sp": 9},
     "hit_count": 3,
     "target": "all",
@@ -7730,9 +7613,9 @@
   },
   "3180002": {
     "id": 3180002,
+    "link": 3180001,
     "names": {"zh_cn": "堇青石", "zh_tw": "堇青石", "jp": "アイオライト"},
     "kind": "active",
-    "parent_id": 318,
     "cost": {"sp": 9},
     "hit_count": 3,
     "target": "all",
@@ -7867,37 +7750,11 @@
       }
     ]
   },
-  "325": {
-    "id": 325,
-    "names": {"zh_cn": "血腥燃烧", "zh_tw": "血腥之燃", "jp": "ブラッディ・バーン"},
-    "kind": "active",
-    "cost": {"sp": 13},
-    "hit_count": 10,
-    "target": "single",
-    "attack_type": "slash",
-    "elements": ["fire"],
-    "use_count": [4, 5, 6],
-    "effects": [
-      {"type": "skill_switch", "target": "single", "attack_type": "slash", "elements": ["fire"]}
-    ],
-    "variants": [
-      {
-        "id": 3250001,
-        "selection": "skill_switch",
-        "description_jp": "敵に火属性攻撃 [破壊率大] [対HP+30%] [スイッチで属性変化]\nダウンターン中の敵に攻撃したとき 威力上昇かつ [破壊率特大]"
-      },
-      {
-        "id": 3250002,
-        "selection": "skill_switch",
-        "description_jp": "敵に氷属性攻撃 [破壊率大] [対HP+30%] [スイッチで属性変化]\nダウンターン中の敵に攻撃したとき 威力上昇かつ [破壊率特大]"
-      }
-    ]
-  },
   "3250001": {
     "id": 3250001,
+    "link": 3250002,
     "names": {"zh_cn": "血腥燃烧", "zh_tw": "血腥之燃", "jp": "ブラッディ・バーン"},
     "kind": "active",
-    "parent_id": 325,
     "cost": {"sp": 13},
     "hit_count": 10,
     "target": "single",
@@ -7916,9 +7773,9 @@
   },
   "3250002": {
     "id": 3250002,
+    "link": 3250001,
     "names": {"zh_cn": "芬布尔之舞", "zh_tw": "芬布爾之舞", "jp": "フィンブル・ダンス"},
     "kind": "active",
-    "parent_id": 325,
     "cost": {"sp": 13},
     "hit_count": 10,
     "target": "single",
@@ -9151,36 +9008,11 @@
       }
     ]
   },
-  "383": {
-    "id": 383,
-    "names": {"zh_cn": "最高潮！青春登台", "zh_tw": "嗨到最高點！青春舞台", "jp": "最高潮！アオハルオンステージ"},
-    "kind": "active",
-    "cost": {"sp": 15},
-    "hit_count": 1,
-    "target": "all",
-    "elements": ["ice"],
-    "use_count": [4, 5, 6],
-    "effects": [
-      {"type": "skill_switch", "target": "all", "elements": ["ice"]}
-    ],
-    "variants": [
-      {
-        "id": 3830001,
-        "selection": "skill_switch",
-        "description_jp": "敵全体の氷属性防御力と氷弱点の敵の氷耐性を下げ(ターン永続)\n氷属性強化フィールド(大)を8ターン展開する"
-      },
-      {
-        "id": 3830002,
-        "selection": "skill_switch",
-        "description_jp": "敵全体の雷属性防御力と雷弱点の敵の雷耐性を下げ(ターン永続)\n雷属性強化フィールド(大)を8ターン展開する"
-      }
-    ]
-  },
   "3830001": {
     "id": 3830001,
-    "names": {"zh_cn": "最高潮！青春登台", "zh_tw": "嗨到最高點！青春舞台", "jp": "最高潮！アオハルオンステージ"},
+    "link": 3830002,
+    "names": {"zh_cn": "最高潮！青春登台-冰", "zh_tw": "嗨到最高點！青春舞台-冰", "jp": "最高潮！アオハルオンステージ-氷"},
     "kind": "active",
-    "parent_id": 383,
     "cost": {"sp": 15},
     "hit_count": 1,
     "target": "all",
@@ -9213,9 +9045,9 @@
   },
   "3830002": {
     "id": 3830002,
-    "names": {"zh_cn": "最高潮！青春登台", "zh_tw": "嗨到最高點！青春舞台", "jp": "最高潮！アオハルオンステージ"},
+    "link": 3830001,
+    "names": {"zh_cn": "最高潮！青春登台-雷", "zh_tw": "嗨到最高點！青春舞台-雷", "jp": "最高潮！アオハルオンステージ-雷"},
     "kind": "active",
-    "parent_id": 383,
     "cost": {"sp": 15},
     "hit_count": 1,
     "target": "all",
@@ -11782,7 +11614,7 @@
   },
   "487": {
     "id": 487,
-    "names": {"zh_cn": "大切なお届け物", "zh_tw": "重要的貨物", "jp": "大切なお届け物"},
+    "names": {"zh_cn": "重要的货物", "zh_tw": "重要的貨物", "jp": "大切なお届け物"},
     "kind": "active",
     "cost": {"sp": 0},
     "target": "ally_all",
@@ -11801,7 +11633,7 @@
   },
   "4870001": {
     "id": 4870001,
-    "names": {"zh_cn": "大切なお届け物", "zh_tw": "重要的貨物", "jp": "大切なお届け物"},
+    "names": {"zh_cn": "重要的货物", "zh_tw": "重要的貨物", "jp": "大切なお届け物"},
     "kind": "active",
     "parent_id": 487,
     "cost": {"sp": 0},
@@ -13142,37 +12974,11 @@
       }
     ]
   },
-  "549": {
-    "id": 549,
-    "names": {"zh_cn": "黑曜君王", "zh_tw": "黑曜君王", "jp": "黒曜のオーバーロード"},
-    "kind": "active",
-    "cost": {"sp": 14},
-    "hit_count": 10,
-    "target": "single",
-    "attack_type": "slash",
-    "elements": ["dark"],
-    "use_count": [4, 5, 6],
-    "effects": [
-      {"type": "skill_switch", "target": "single", "attack_type": "slash", "elements": ["dark"]}
-    ],
-    "variants": [
-      {
-        "id": 5490001,
-        "selection": "skill_switch",
-        "description_jp": "敵の闇属性防御力を下げ 暗黒の太陽で10連撃 [対HP+100%]\nさらに 敵の弱点をついたとき 威力上昇 [スイッチで属性変化]"
-      },
-      {
-        "id": 5490002,
-        "selection": "skill_switch",
-        "description_jp": "敵の火属性防御力を下げ 獄炎の太陽で10連撃 [対HP+100%]\nさらに 敵の弱点をついたとき 威力上昇 [スイッチで属性変化]"
-      }
-    ]
-  },
   "5490001": {
     "id": 5490001,
-    "names": {"zh_cn": "黑曜君王", "zh_tw": "黑曜君王", "jp": "黒曜のオーバーロード"},
+    "link": 5490002,
+    "names": {"zh_cn": "黑曜君王-暗", "zh_tw": "黑曜君王-闇", "jp": "黒曜のオーバーロード-闇"},
     "kind": "active",
-    "parent_id": 549,
     "cost": {"sp": 14},
     "hit_count": 10,
     "target": "single",
@@ -13198,9 +13004,9 @@
   },
   "5490002": {
     "id": 5490002,
-    "names": {"zh_cn": "黑曜君王", "zh_tw": "黑曜君王", "jp": "黒曜のオーバーロード"},
+    "link": 5490001,
+    "names": {"zh_cn": "黑曜君王-火", "zh_tw": "黑曜君王-火", "jp": "黒曜のオーバーロード-火"},
     "kind": "active",
-    "parent_id": 549,
     "cost": {"sp": 14},
     "hit_count": 10,
     "target": "single",
@@ -17060,37 +16866,11 @@
       {"type": "remove_buff", "target": "all"}
     ]
   },
-  "708": {
-    "id": 708,
-    "names": {"zh_cn": "暗夜代码", "zh_tw": "代碼暗影", "jp": "コードダクネス"},
-    "kind": "active",
-    "cost": {"sp": 15},
-    "hit_count": 6,
-    "target": "single",
-    "attack_type": "stab",
-    "elements": ["dark"],
-    "use_count": [4, 5, 6],
-    "effects": [
-      {"type": "skill_switch", "target": "single", "attack_type": "stab", "elements": ["dark"]}
-    ],
-    "variants": [
-      {
-        "id": 7080001,
-        "selection": "skill_switch",
-        "description_jp": "2ターンの間 敵をハッキング状態かつ脆弱状態にし\nさらに 獄炎の砲撃 [対DP+100%] [スイッチで属性変化]"
-      },
-      {
-        "id": 7080002,
-        "selection": "skill_switch",
-        "description_jp": "2ターンの間 敵をハッキング状態かつ脆弱状態にし\nさらに 灼熱の砲撃 [対DP+100%] [スイッチで属性変化]"
-      }
-    ]
-  },
   "7080001": {
     "id": 7080001,
-    "names": {"zh_cn": "暗夜代码", "zh_tw": "代碼暗影", "jp": "コードダクネス"},
+    "link": 7080002,
+    "names": {"zh_cn": "暗夜代码-暗", "zh_tw": "代碼暗影-闇", "jp": "コードダクネス-闇"},
     "kind": "active",
-    "parent_id": 708,
     "cost": {"sp": 15},
     "hit_count": 6,
     "target": "single",
@@ -17115,9 +16895,9 @@
   },
   "7080002": {
     "id": 7080002,
-    "names": {"zh_cn": "暗夜代码", "zh_tw": "代碼暗影", "jp": "コードダクネス"},
+    "link": 7080001,
+    "names": {"zh_cn": "暗夜代码-火", "zh_tw": "代碼暗影-火", "jp": "コードダクネス-火"},
     "kind": "active",
-    "parent_id": 708,
     "cost": {"sp": 15},
     "hit_count": 6,
     "target": "single",
@@ -17440,73 +17220,45 @@
       }
     ]
   },
-  "725": {
-    "id": 725,
-    "names": {"zh_cn": "苍焰迷宫", "zh_tw": "蒼焰迷宮", "jp": "蒼焔ノ迷宮"},
-    "kind": "active",
-    "cost": {"sp": 15},
-    "hit_count": 10,
-    "target": "all",
-    "attack_type": "slash",
-    "elements": ["ice"],
-    "use_count": [4, 5, 6],
-    "effects": [
-      {"type": "skill_switch", "target": "all", "attack_type": "slash", "elements": ["ice"]}
-    ],
-    "variants": [
-      {"id": 7250001, "selection": "skill_switch", "description_jp": "追加ターン中"},
-      {"id": 7250002, "selection": "skill_switch", "description_jp": "非追加ターン中"},
-      {
-        "id": 7250003,
-        "selection": "skill_switch",
-        "description_jp": "華麗なる氷撃で敵全体を10連撃 [破壊率特大]\n追加ターン中は消費SPが半減 [スイッチで性能変化]"
-      }
-    ]
-  },
   "7250001": {
     "id": 7250001,
+    "link": 7250002,
+    "conditions": {
+      "effects": "追加回合中"
+    },
     "names": {"zh_cn": "苍焰迷宫", "zh_tw": "蒼焰迷宮", "jp": "蒼焔ノ迷宮"},
     "kind": "active",
-    "parent_id": 725,
     "cost": {"sp": 15},
     "hit_count": 5,
     "target": "all",
     "attack_type": "slash",
     "elements": ["ice"],
-    "effects": [
-      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["ice"]},
-      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}}
-    ]
+    "effects": {
+      "yes":[
+        {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["ice"]},
+        {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}}
+      ],
+      "no": [
+        {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["ice"]}
+      ]
+    }
   },
   "7250002": {
     "id": 7250002,
-    "names": {"zh_cn": "苍焰迷宫", "zh_tw": "蒼焰迷宮", "jp": "蒼焔ノ迷宮"},
-    "kind": "active",
-    "parent_id": 725,
-    "cost": {"sp": 15},
-    "hit_count": 5,
-    "target": "all",
-    "attack_type": "slash",
-    "elements": ["ice"],
-    "effects": [
-      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["ice"]}
-    ]
-  },
-  "7250003": {
-    "id": 7250003,
+    "link": 7250001,
+    "conditions": {
+      "cost": "追加回合中"
+    },
     "names": {"zh_cn": "苍焰螺旋", "zh_tw": "蒼焰螺旋", "jp": "蒼焔ノ螺旋"},
     "kind": "active",
-    "parent_id": 725,
     "cost": {
-      "sp": 15,
-      "conditional_amount": 7,
-      "condition": "CountBC(IsPlayer() == 1 && SpecialStatusCountByType(20)>0)>0"
+      "yes": {"sp": 7},
+      "no": {"sp": 15}
     },
     "hit_count": 10,
     "target": "all",
     "attack_type": "slash",
     "elements": ["ice"],
-    "use_count": [4, 5, 6],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["ice"]}
     ]
