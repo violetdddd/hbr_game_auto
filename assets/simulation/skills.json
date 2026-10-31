@@ -3807,7 +3807,7 @@
     "names": {"zh_cn": "阳光扳机", "zh_tw": "陽光扳機", "jp": "サニートリガー"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_first_battle_start",
+    "trigger": "on_kill_enemy",
     "effects": [
       {"type": "morale", "target": "ally_front", "status_id": 119, "duration": {"type": "permanent"}, "level": 1}
     ]
@@ -4100,7 +4100,7 @@
     "names": {"zh_cn": "慈悲之剑", "zh_tw": "慈悲之劍", "jp": "慈悲の剣"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_first_battle_start",
+    "trigger": "on_kill_enemy",
     "effects": [
       {"type": "resource", "target": "self", "sp": 2}
     ]
@@ -9372,7 +9372,7 @@
     "names": {"zh_cn": "对半分", "zh_tw": "對半分", "jp": "はんぶんこ"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_first_battle_start",
+    "trigger": "on_kill_enemy",
     "effects": [
       {"type": "morale", "target": "ally_front", "status_id": 119, "duration": {"type": "permanent"}, "level": 1}
     ]
