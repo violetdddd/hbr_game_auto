@@ -2276,7 +2276,7 @@
   "167": {
     "id": 167,
     "names": {"zh_cn": "闪亮蜕变", "zh_tw": "閃亮蛻變", "jp": "きらめきメタモルフォーゼ"},
-    "conditions": {"cost": "ally.count(character('CSugahara')==1 and token()>=10) > 0", "effects": "ally.count(character('CSugahara')==1 and token()>=10) > 0"},
+    "conditions": {"cost": "token()>=10", "effects": "token()>=10"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 0},
@@ -2288,22 +2288,12 @@
     "elements": ["fire"],
     "effects": {
       "yes": [
-        {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"]},
-        {
-          "type": "funnel",
-          "target": "self",
-          "status_id": 13,
-          "duration": {"type": "use", "value": 1}
-        }
+        {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}},
+        {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"]}
       ],
       "no": [
-        {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"]},
-        {
-          "type": "funnel",
-          "target": "self",
-          "status_id": 13,
-          "duration": {"type": "use", "value": 1}
-        }
+        {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}},
+        {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"]}
       ]
     }
   },
@@ -2507,8 +2497,8 @@
     "target": "self",
     "effects": [
       {"type": "defense_up", "target": "self", "status_id": 4, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "token", "target": "self"},
-      {"type": "provoke", "target": "all", "status_id": 12}
+      {"type": "token", "target": "self", "level": 2},
+      {"type": "provoke", "target": "all", "status_id": 12, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "183": {
@@ -2580,8 +2570,7 @@
     "attack_type": "strike",
     "elements": ["thunder"],
     "effects": [
-      {"type": "token_attack", "target": "single", "attack_type": "strike", "elements": ["thunder"]},
-      {"type": "token_change_timeline", "target": "single"}
+      {"type": "token_attack", "target": "single", "attack_type": "strike", "elements": ["thunder"]}
     ]
   },
   "189": {
@@ -3256,7 +3245,7 @@
     "elements": ["fire"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["fire"]},
-      {"type": "token", "target": "ally_front"},
+      {"type": "token", "target": "ally_front", "level": 2},
       {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "not has(20)"}
     ]
   },
@@ -3349,7 +3338,7 @@
     "elements": ["fire"],
     "effects": [
       {"type": "attack_up", "target": "ally_all", "elements": ["fire"], "status_id": 1, "target_condition": "element('fire')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('fire')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true}
+      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('fire')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 50, "number": 3}}
     ]
   },
   "229": {
@@ -3880,7 +3869,7 @@
     "attack_type": "stab",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab"},
-      {"type": "token", "target": "self"}
+      {"type": "token", "target": "self", "level": 2}
     ]
   },
   "2500001": {
@@ -4006,8 +3995,7 @@
     "attack_type": "stab",
     "elements": ["light"],
     "effects": [
-      {"type": "token_attack", "target": "single", "attack_type": "stab", "elements": ["light"]},
-      {"type": "token_change_timeline", "target": "single"}
+      {"type": "token_attack", "target": "single", "attack_type": "stab", "elements": ["light"]}
     ]
   },
   "256": {
@@ -7126,7 +7114,7 @@
     "attack_type": "strike",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "strike"},
-      {"type": "token", "target": "self"}
+      {"type": "token", "target": "self", "level": 2}
     ]
   },
   "454": {
@@ -7137,7 +7125,7 @@
     "target": "self",
     "effects": [
       {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "token", "target": "self"},
+      {"type": "token", "target": "self", "level": 2},
       {"type": "additional_turn", "target": "self", "status_id": 20}
     ]
   },
@@ -7164,7 +7152,7 @@
     "elements": ["light"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-      {"type": "token", "target": "self"}
+      {"type": "token", "target": "self", "level": 2}
     ]
   },
   "457": {
@@ -7203,7 +7191,7 @@
     "attack_type": "strike",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "strike"},
-      {"type": "token", "target": "self"}
+      {"type": "token", "target": "self", "level": 3}
     ]
   },
   "460": {
@@ -7216,8 +7204,7 @@
     "attack_type": "strike",
     "elements": ["dark"],
     "effects": [
-      {"type": "token_attack", "target": "all", "attack_type": "strike", "elements": ["dark"]},
-      {"type": "token_change_timeline", "target": "all"}
+      {"type": "token_attack", "target": "all", "attack_type": "strike", "elements": ["dark"]}
     ]
   },
   "461": {
@@ -7232,12 +7219,10 @@
     "elements": ["light"],
     "effects": {
       "yes": [
-        {"type": "token_attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-        {"type": "token_change_timeline", "target": "all"}
+        {"type": "token_attack", "target": "all", "attack_type": "strike", "elements": ["light"]}
       ],
       "no": [
-        {"type": "token_attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-        {"type": "token_change_timeline", "target": "all"}
+        {"type": "token_attack", "target": "all", "attack_type": "strike", "elements": ["light"]}
       ]
     }
   },
@@ -7251,7 +7236,7 @@
     "target": "single",
     "attack_type": "strike",
     "elements": ["light"],
-    "use_condition": "ally.count(character('MTsukishiro') == 1 and has(20)) > 0",
+    "not_use_condition": "has(20)",
     "effects": {
       "yes": [{"type": "attack", "target": "single", "attack_type": "strike", "elements": ["light"]}],
       "no": [{"type": "attack", "target": "single", "attack_type": "strike", "elements": ["light"]}]
@@ -7420,7 +7405,7 @@
     "target": "ally_front",
     "effects": [
       {"type": "heal_dp", "target": "ally_front"},
-      {"type": "token", "target": "self"}
+      {"type": "token", "target": "self", "level": 2}
     ]
   },
   "478": {
@@ -7433,7 +7418,7 @@
     "attack_type": "strike",
     "effects": [
       {"type": "token_attack", "target": "single", "attack_type": "strike"},
-      {"type": "token", "target": "self"},
+      {"type": "token", "target": "self", "level": 2},
       {"type": "self_damage", "target": "self"}
     ]
   },
@@ -7454,9 +7439,9 @@
     "cost": {"sp": 8},
     "target": "ally_front",
     "effects": [
-      {"type": "regeneration_dp", "target": "ally_front", "status_id": 34, "duration": {"type": "enemy_turn", "value": 4}},
+      {"type": "regeneration_dp", "target": "ally_front", "status_id": 34, "duration": {"type": "enemy_turn", "value": 3}},
       {"type": "heal_dp", "target": "ally_front"},
-      {"type": "token", "target": "self"}
+      {"type": "token", "target": "self", "level": 2}
     ]
   },
   "481": {
@@ -7493,8 +7478,7 @@
     "attack_type": "strike",
     "elements": ["ice"],
     "effects": [
-      {"type": "token_attack", "target": "single", "attack_type": "strike", "elements": ["ice"]},
-      {"type": "token_change_timeline", "target": "single"}
+      {"type": "token_attack", "target": "single", "attack_type": "strike", "elements": ["ice"]}
     ]
   },
   "484": {
@@ -7508,8 +7492,7 @@
     "elements": ["thunder"],
     "effects": [
       {"type": "token_attack", "target": "all", "attack_type": "strike", "elements": ["thunder"]},
-      {"type": "remove_debuff", "target": "ally_all"},
-      {"type": "token_change_timeline", "target": "all"}
+      {"type": "remove_debuff", "target": "ally_all"}
     ]
   },
   "485": {
@@ -7533,7 +7516,7 @@
     "target": "ally_all",
     "effects": [
       {"type": "gelato", "target": "ally_all", "status_id": 191, "duration": {"type": "permanent"}},
-      {"type": "token", "target": "ally_all"},
+      {"type": "token", "target": "ally_all", "level": 2},
       {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('light')", "sp": 3}
     ]
   },
@@ -7650,16 +7633,14 @@
     "names": {"zh_cn": "调酒师精选", "zh_tw": "調酒師精選", "jp": "バーテンダーズ・チョイス"},
     "conditions": {"effects": "used(493)==0"},
     "kind": "active",
-    "cost": {"sp": 0},
+    "cost": {"resource": "od", "od": 15},
     "target": "ally_front",
-    "condition": "od_gauge() >= 0",
     "effects": {
       "yes": [
-        {"type": "token", "target": "ally_front"},
-        {"type": "resource", "target": "self", "sp": 3},
+        {"type": "token", "target": "ally_front", "level": 2},
         {"type": "resource", "target": "ally_all", "sp": 3}
       ],
-      "no": [{"type": "token", "target": "ally_front"}, {"type": "resource", "target": "od", "od": -15}]
+      "no": [{"type": "token", "target": "ally_front", "level": 2}]
     }
   },
   "494": {
@@ -7707,106 +7688,31 @@
   "497": {
     "id": 497,
     "names": {"zh_cn": "倾注夜色的星光调酒法", "zh_tw": "傾注夜色的星光調酒棒", "jp": "夜注ぐスターライト・ステア"},
-    "cases": ["effects"],
+    "cases": ["cost"],
     "kind": "active",
-    "cost": {"sp": 0},
+    "cost": {
+      "resource": "od",
+      "cases": [
+        {"when": "token()==10", "od": 50},
+        {"when": "token()==9", "od": 55},
+        {"when": "token()==8", "od": 60},
+        {"when": "token()==7", "od": 65},
+        {"when": "token()==6", "od": 70},
+        {"when": "token()==5", "od": 75},
+        {"when": "token()==4", "od": 80},
+        {"when": "token()==3", "od": 85},
+        {"when": "token()==2", "od": 90},
+        {"when": "token()==1", "od": 95},
+        {"when": "token()==0", "od": 100}
+      ]
+    },
     "hit_count": 8,
     "target": "all",
     "attack_type": "strike",
     "elements": ["light"],
-    "condition": "od_gauge() >= 0",
-    "effects": {
-      "cases": [
-        {
-          "when": "token()==10",
-          "effects": [
-            {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -50}
-          ],
-          "description": "トークン10"
-        },
-        {
-          "when": "token()==9",
-          "effects": [
-            {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -55}
-          ],
-          "description": "トークン9"
-        },
-        {
-          "when": "token()==8",
-          "effects": [
-            {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -60}
-          ],
-          "description": "トークン8"
-        },
-        {
-          "when": "token()==7",
-          "effects": [
-            {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -65}
-          ],
-          "description": "トークン7"
-        },
-        {
-          "when": "token()==6",
-          "effects": [
-            {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -70}
-          ],
-          "description": "トークン6"
-        },
-        {
-          "when": "token()==5",
-          "effects": [
-            {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -75}
-          ],
-          "description": "トークン5"
-        },
-        {
-          "when": "token()==4",
-          "effects": [
-            {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -80}
-          ],
-          "description": "トークン4"
-        },
-        {
-          "when": "token()==3",
-          "effects": [
-            {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -85}
-          ],
-          "description": "トークン3"
-        },
-        {
-          "when": "token()==2",
-          "effects": [
-            {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -90}
-          ],
-          "description": "トークン2"
-        },
-        {
-          "when": "token()==1",
-          "effects": [
-            {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -95}
-          ],
-          "description": "トークン1"
-        },
-        {
-          "when": "token()==0",
-          "effects": [
-            {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -100}
-          ],
-          "description": "トークン0"
-        }
-      ]
-    }
+    "effects": [
+      {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]}
+    ]
   },
   "498": {
     "id": 498,
@@ -7883,11 +7789,11 @@
     "kind": "active",
     "cost": {"sp": 4},
     "target": "self",
-    "condition": "in_od()==0",
+    "condition": "not in_od()",
     "effects": [
       {"type": "defense_up", "target": "self", "status_id": 4, "duration": {"type": "enemy_turn", "value": 2}},
-      {"type": "token", "target": "self"},
-      {"type": "provoke", "target": "all", "status_id": 12}
+      {"type": "token", "target": "self", "level": 2},
+      {"type": "provoke", "target": "all", "status_id": 12, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "505": {
@@ -7929,7 +7835,7 @@
     "elements": ["light"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["light"]},
-      {"type": "token", "target": "ally_all"}
+      {"type": "token", "target": "ally_all", "level": 2}
     ]
   },
   "508": {
@@ -7971,20 +7877,20 @@
     "id": 511,
     "names": {"zh_cn": "盛夏的冰凉冲击！", "zh_tw": "盛夏的冰涼刺激！", "jp": "真夏のひんやりショック！"},
     "kind": "active",
-    "cost": {"resource": "token", "token": -1, "mode": "variable"},
+    "cost": {"resource": "token", "token": -1, "mode": "ues_all"},
     "target": "self",
     "effects": [
-      {"type": "over_drive_point_up_by_token", "target": "self"}
+      {"type": "over_drive_point_up_by_token", "target": "self", "value": 10}
     ]
   },
   "512": {
     "id": 512,
     "names": {"zh_cn": "最后冲刺！全力混合泳", "zh_tw": "最後衝刺！全力混合泳", "jp": "追い込み！全力メドレー"},
     "kind": "active",
-    "cost": {"resource": "token", "token": -1, "mode": "variable"},
+    "cost": {"resource": "token", "token": -1, "mode": "ues_all"},
     "target": "ally_all",
     "effects": [
-      {"type": "heal_sp_by_token", "target": "ally_all"},
+      {"type": "heal_sp_by_token", "target": "ally_all", "sp": 1, "limit": 30},
       {"type": "attack_up_by_token", "target": "ally_all", "status_id": 212, "duration": {"type": "permanent"}}
     ]
   },
@@ -10462,7 +10368,7 @@
     "effects": [
       {"type": "luck_up_value", "target": "self", "status_id": 91, "duration": {"type": "enemy_turn", "value": 5}, "solo": true, "value": 30},
       {"type": "critical_damage_up", "target": "self", "elements": ["thunder"], "status_id": 7, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
-      {"type": "token", "target": "self"}
+      {"type": "token", "target": "self", "level": 10}
     ]
   },
   "685": {
@@ -10650,22 +10556,12 @@
     "elements": ["thunder"],
     "effects": {
       "yes": [
-        {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["thunder"]},
-        {
-          "type": "fragile",
-          "target": "single",
-          "status_id": 22,
-          "duration": {"type": "enemy_turn", "value": 2}
-        }
+        {"type": "fragile", "target": "single", "status_id": 22, "duration": {"type": "enemy_turn", "value": 2}},
+        {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["thunder"]}
       ],
       "no": [
-        {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["thunder"]},
-        {
-          "type": "fragile",
-          "target": "single",
-          "status_id": 22,
-          "duration": {"type": "enemy_turn", "value": 2}
-        }
+        {"type": "fragile", "target": "single", "status_id": 22, "duration": {"type": "enemy_turn", "value": 2}},
+        {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["thunder"]}
       ]
     }
   },
@@ -11063,7 +10959,7 @@
     "cost": {"sp": 5},
     "target": "ally_front",
     "effects": [
-      {"type": "token", "target": "ally_front"},
+      {"type": "token", "target": "ally_front", "level": 2},
       {"type": "additional_turn", "target": "self", "status_id": 20}
     ]
   },
@@ -11182,7 +11078,7 @@
   "726": {
     "id": 726,
     "names": {"zh_cn": "苍星虹彩", "zh_tw": "蒼星的虹彩", "jp": "蒼星のイリデッセンス"},
-    "conditions": {"cost": "ally.count(character('YShirakawa')==1 and token()>3) > 0"},
+    "conditions": {"cost": "token()>3"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 8},
@@ -11193,9 +11089,9 @@
     "attack_type": "slash",
     "elements": ["light"],
     "effects": [
-      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["light"]},
       {"type": "critical_rate_up", "target": "ally_all", "elements": ["light"], "status_id": 5, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
-      {"type": "critical_damage_up", "target": "ally_all", "elements": ["light"], "status_id": 7, "duration": {"type": "ally_turn", "value": 5}, "solo": true}
+      {"type": "critical_damage_up", "target": "ally_all", "elements": ["light"], "status_id": 7, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
+      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["light"]}
     ]
   },
   "727": {
