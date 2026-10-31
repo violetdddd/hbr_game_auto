@@ -7937,9 +7937,9 @@
     "attack_type": "stab",
     "elements": ["thunder"],
     "effects": [
-      {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["thunder"]},
       {"type": "critical_rate_up", "target": "ally_all", "elements": ["thunder"], "status_id": 5, "duration": {"type": "ally_turn", "value": 7}, "solo": true},
-      {"type": "critical_damage_up", "target": "ally_all", "elements": ["thunder"], "status_id": 7, "duration": {"type": "ally_turn", "value": 7}, "solo": true}
+      {"type": "critical_damage_up", "target": "ally_all", "elements": ["thunder"], "status_id": 7, "duration": {"type": "ally_turn", "value": 7}, "solo": true},
+      {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["thunder"]}
     ]
   },
   "519": {
