@@ -38,8 +38,8 @@
     "cost": {"sp": 6},
     "target": "self",
     "effects": [
-      {"type": "dodge", "target": "self", "status_id": 121, "duration": {"type": "use", "value": 2}},
-      {"type": "resource", "target": "self"}
+      {"type": "dodge", "target": "self", "status_id": 121, "duration": {"type": "on_attack", "value": 2}},
+      {"type": "resource", "target": "od", "od": 15}
     ]
   },
   "12": {
@@ -52,7 +52,7 @@
     "attack_type": "strike",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "strike"},
-      {"type": "resource", "target": "self"}
+      {"type": "resource", "target": "od", "od": 15}
     ]
   },
   "13": {
@@ -97,7 +97,7 @@
     "kind": "active",
     "cost": {"sp": 7},
     "target": "self",
-    "random_select": {
+    "user_select": {
       "1": {
         "effects": [
           {"type": "double_action_extra_skill", "target": "self", "status_id": 125, "duration": {"type": "use", "value": 1}}
@@ -115,7 +115,7 @@
   },
   "17": {
     "id": 17,
-    "names": {"zh_cn": "もつれトラップ", "zh_tw": "交纏陷阱", "jp": "もつれトラップ"},
+    "names": {"zh_cn": "交缠陷阱", "zh_tw": "交纏陷阱", "jp": "もつれトラップ"},
     "kind": "active",
     "cost": {"sp": 6},
     "hit_count": 1,
@@ -124,7 +124,7 @@
     "elements": ["light"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-      {"type": "disaster", "target": "all", "status_id": 193, "duration": {"type": "permanent"}}
+      {"type": "disaster", "target": "all", "status_id": 193, "duration": {"type": "permanent"}, "level": 2}
     ]
   },
   "18": {
@@ -137,9 +137,9 @@
     "attack_type": "strike",
     "elements": ["dark"],
     "effects": [
-      {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["dark"]},
-      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}},
-      {"type": "defense_down", "target": "self", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
+      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number":3}},
+      {"type": "defense_down", "target": "self", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
+      {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["dark"]}
     ]
   },
   "19": {
@@ -151,19 +151,30 @@
     "target": "single",
     "attack_type": "strike",
     "elements": ["ice"],
-    "effects": [
-      {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["ice"]},
-      {"type": "resource", "target": "self", "hit_condition": "BreakHitCount()>0"}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["ice"]},
+          {"type": "resource", "target": "od", "od": 150}
+        ],
+        "description_jp": "破盾"
+      },
+      "2": {
+        "effects": [
+          {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["ice"]}
+        ],
+        "description_jp": "不破盾"
+      }
+    }
   },
   "20": {
     "id": 20,
     "names": {"zh_cn": "过热祈祷", "zh_tw": "過熱祈禱", "jp": "御祈祷オーバーヒート"},
-    "conditions": {"cost": "CountBC(IsPlayer() == 1 && IsCharacter(ADate) == 1 && SpecialStatusCountByType(146) < 1) > 0", "effects": "SpecialStatusCountByType(146) > 0"},
+    "conditions": {"cost": "has(145)", "effects": "has(145)"},
     "kind": "active",
     "cost": {
-      "no": {"sp": 16},
-      "yes": {"sp": 8}
+      "no": {"sp": 8},
+      "yes": {"sp": 16}
     },
     "hit_count": 4,
     "target": "all",
@@ -182,7 +193,7 @@
   },
   "21": {
     "id": 21,
-    "names": {"zh_cn": "大玉パニック・スクランブル", "zh_tw": "大球恐慌亂烘烘", "jp": "大玉パニック・スクランブル"},
+    "names": {"zh_cn": "大球恐慌乱烘烘", "zh_tw": "大球恐慌亂烘烘", "jp": "大玉パニック・スクランブル"},
     "kind": "active",
     "cost": {"sp": 14},
     "hit_count": 1,
@@ -190,7 +201,7 @@
     "elements": ["light"],
     "effects": [
       {"type": "defense_down", "target": "all", "elements": ["light"], "status_id": 3, "duration": {"type": "permanent"}},
-      {"type": "resist_down", "target": "all", "elements": ["light"], "status_id": 18, "target_condition": "IsWeakElement(Light)==1", "duration": {"type": "permanent"}},
+      {"type": "resist_down", "target": "all", "elements": ["light"], "status_id": 18, "target_condition": "target.weak('light')==1", "duration": {"type": "permanent"}},
       {"type": "fragile", "target": "all", "status_id": 22, "duration": {"type": "enemy_turn", "value": 2}}
     ]
   },
@@ -200,7 +211,7 @@
     "kind": "passive",
     "cost": {"sp": 0},
     "trigger": "on_every_turn",
-    "trigger_condition": "IsFront() && SpecialStatusCountByType(125)>0",
+    "trigger_condition": "front() and has(124)",
     "effects": [
       {"type": "cover", "target": "all", "status_id": 57, "duration": {"type": "enemy_turn"}}
     ]
@@ -289,14 +300,14 @@
     "id": 30,
     "names": {"zh_cn": "狂野咆哮", "zh_tw": "狂野怒嚎 ", "jp": "ワイルドハウル"},
     "kind": "active",
-    "cost": {"sp": 12, "conditional_amount": 6, "condition": "IsOverDrive()"},
+    "cost": {"yes": {"sp": 6}, "no": {"sp": 12}}, "conditions": {"cost": "od()"},
     "hit_count": 3,
     "target": "all",
     "attack_type": "slash",
     "elements": ["dark"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]},
-      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "SpecialStatusCountByType(20) == 0"}
+      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "not has(20)"}
     ]
   },
   "31": {
@@ -336,7 +347,7 @@
     "attack_type": "slash",
     "elements": ["ice"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["ice"], "condition": "IsHitWeak()"},
+      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["ice"], "condition": "target.weak_to_hit()"},
       {"type": "imprison_random", "target": "single", "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
@@ -350,7 +361,7 @@
     "attack_type": "slash",
     "elements": ["dark"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["dark"], "condition": "IsHitWeak()"},
+      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["dark"], "condition": "target.weak_to_hit()"},
       {"type": "attack_up", "target": "self", "elements": ["dark"], "status_id": 1, "duration": {"type": "use", "value": 1}}
     ]
   },
@@ -378,7 +389,7 @@
         {"type": "critical_damage_up", "target": "ally_all", "elements": ["fire"], "status_id": 7, "duration": {"type": "use", "value": 1}}
       ]
     },
-    "conditions": {"cost": "CountBC(IsPlayer() == 1 && IsCharacter(AKanzaki) == 1 && SpecialStatusCountByType(125)>0)>0", "effects": "SpecialStatusCountByType(125) > 0"}
+    "conditions": {"cost": "ally.count(character('AKanzaki') == 1 and has(124)) > 0", "effects": "has(124)"}
   },
   "36": {
     "id": 36,
@@ -389,7 +400,7 @@
     "effects": {
       "cases": [
         {
-          "when": "PlayedSkillCount(AKanzakiSkill55) == 0",
+          "when": "used(36) == 0",
           "effects": [
             {"type": "critical_rate_up", "target": "ally_all", "status_id": 5, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
             {"type": "critical_damage_up", "target": "ally_all", "status_id": 7, "duration": {"type": "ally_turn", "value": 3}, "solo": true}
@@ -397,7 +408,7 @@
           "description_jp": "使用回数1回目"
         },
         {
-          "when": "PlayedSkillCount(AKanzakiSkill55) == 1",
+          "when": "used(36) == 1",
           "effects": [
             {"type": "critical_rate_up", "target": "ally_all", "status_id": 5, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
             {"type": "critical_damage_up", "target": "ally_all", "status_id": 7, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
@@ -406,7 +417,7 @@
           "description_jp": "使用回数2回目"
         },
         {
-          "when": "PlayedSkillCount(AKanzakiSkill55) >= 2",
+          "when": "used(36) >= 2",
           "effects": [
             {"type": "critical_rate_up", "target": "ally_all", "status_id": 5, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
             {"type": "critical_damage_up", "target": "ally_all", "status_id": 7, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
@@ -419,9 +430,9 @@
     },
     "elements": {
       "cases": [
-        {"when": "PlayedSkillCount(AKanzakiSkill55) == 0", "elements": null, "description_jp": "使用回数1回目"},
-        {"when": "PlayedSkillCount(AKanzakiSkill55) == 1", "elements": ["dark"], "description_jp": "使用回数2回目"},
-        {"when": "PlayedSkillCount(AKanzakiSkill55) >= 2", "elements": ["dark"], "description_jp": "使用回数3回目以降"}
+        {"when": "used(36) == 0", "elements": null, "description_jp": "使用回数1回目"},
+        {"when": "used(36) == 1", "elements": ["dark"], "description_jp": "使用回数2回目"},
+        {"when": "used(36) >= 2", "elements": ["dark"], "description_jp": "使用回数3回目以降"}
       ]
     }
   },
@@ -501,7 +512,7 @@
     "id": 43,
     "names": {"zh_cn": "神经痛", "zh_tw": "神經痛", "jp": "ヌラルジャ"},
     "kind": "active",
-    "cost": {"sp": 12, "conditional_amount": 6, "condition": "IsOverDrive()"},
+    "cost": {"yes": {"sp": 6}, "no": {"sp": 12}}, "conditions": {"cost": "od()"},
     "hit_count": 1,
     "target": "all",
     "attack_type": "strike",
@@ -517,7 +528,7 @@
     "kind": "active",
     "cost": {"sp": 7},
     "target": "ally_single",
-    "condition": "CountBC(IsPlayer()==1 && IsBroken() == 1)==0",
+    "condition": "ally.count(broken() == 1) == 0",
     "effects": {
       "yes": [
         {"type": "resource", "target": "ally_single"},
@@ -528,7 +539,7 @@
         {"type": "self_damage", "target": "ally_single"}
       ]
     },
-    "conditions": {"effects": "PlayedSkillCount(AMizuharaSkill06)==0"}
+    "conditions": {"effects": "used(44)==0"}
   },
   "45": {
     "id": 45,
@@ -569,7 +580,7 @@
     "effects": {
       "cases": [
         {
-          "when": "CountBC(IsPlayer()==0 && IsDead()==0)==3",
+          "when": "enemy.count() == 3",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["dark"]},
             {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
@@ -578,7 +589,7 @@
           "description_jp": "敵3体"
         },
         {
-          "when": "CountBC(IsPlayer()==0 && IsDead()==0)==2",
+          "when": "enemy.count() == 2",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["dark"]},
             {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
@@ -587,7 +598,7 @@
           "description_jp": "敵2体"
         },
         {
-          "when": "CountBC(IsPlayer()==0 && IsDead()==0)==1",
+          "when": "enemy.count() == 1",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["dark"]},
             {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
@@ -619,7 +630,7 @@
     "names": {"zh_cn": "彩虹奇迹滑行", "zh_tw": "彩虹奇蹟滑水道", "jp": "レインボーミラクルスライダー"},
     "kind": "active",
     "cost": {
-      "yes": {"sp": 16},
+      "yes": {"sp": 0},
       "no": {"sp": 16}
     },
     "hit_count": 8,
@@ -638,7 +649,7 @@
         {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}}
       ]
     },
-    "conditions": {"cost": "CountBC(IsPlayer()==0 && IsDead()==0 && BreakDownTurn()>0)>0", "effects": "CountBC(IsDead()==0&&IsPlayer()==0&&BreakDownTurn()>0)>0"}
+    "conditions": {"cost": "enemy.count(down_turns()>0) > 0", "effects": "enemy.count(down_turns()>0) > 0"}
   },
   "50": {
     "id": 50,
@@ -742,7 +753,7 @@
     "target": "single",
     "elements": ["dark"],
     "effects": [
-      {"type": "fixed_hp_damage_rate", "target": "single", "hit_condition": "IsTargetWeakNatureElement(Dark)==1"},
+      {"type": "fixed_hp_damage_rate", "target": "single", "hit_condition": "target.weak('dark')==1"},
       {"type": "defense_down", "target": "single", "elements": ["dark"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
@@ -755,7 +766,7 @@
     "target": "single",
     "elements": ["fire"],
     "effects": [
-      {"type": "fixed_hp_damage_rate", "target": "single", "hit_condition": "IsTargetWeakNatureElement(Fire)==1"},
+      {"type": "fixed_hp_damage_rate", "target": "single", "hit_condition": "target.weak('fire')==1"},
       {"type": "defense_down", "target": "single", "elements": ["fire"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
@@ -768,7 +779,7 @@
     "target": "single",
     "elements": ["ice"],
     "effects": [
-      {"type": "fixed_hp_damage_rate", "target": "single", "hit_condition": "IsTargetWeakNatureElement(Ice)==1"},
+      {"type": "fixed_hp_damage_rate", "target": "single", "hit_condition": "target.weak('ice')==1"},
       {"type": "defense_down", "target": "single", "elements": ["ice"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
@@ -781,7 +792,7 @@
     "target": "single",
     "elements": ["light"],
     "effects": [
-      {"type": "fixed_hp_damage_rate", "target": "single", "hit_condition": "IsTargetWeakNatureElement(Light)==1"},
+      {"type": "fixed_hp_damage_rate", "target": "single", "hit_condition": "target.weak('light')==1"},
       {"type": "defense_down", "target": "single", "elements": ["light"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
@@ -794,7 +805,7 @@
     "target": "single",
     "elements": ["thunder"],
     "effects": [
-      {"type": "fixed_hp_damage_rate", "target": "single", "hit_condition": "IsTargetWeakNatureElement(Thunder)==1"},
+      {"type": "fixed_hp_damage_rate", "target": "single", "hit_condition": "target.weak('thunder')==1"},
       {"type": "defense_down", "target": "single", "elements": ["thunder"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
@@ -906,7 +917,7 @@
     "attack_type": "slash",
     "elements": ["light"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["light"], "condition": "IsHitWeak()"},
+      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["light"], "condition": "target.weak_to_hit()"},
       {"type": "attack_up", "target": "self", "elements": ["light"], "status_id": 1, "duration": {"type": "ally_turn", "value": 3}, "solo": true}
     ]
   },
@@ -979,7 +990,7 @@
     "id": 79,
     "names": {"zh_cn": "灾难的业火", "zh_tw": "大災難", "jp": "カタストロフィー"},
     "kind": "active",
-    "cost": {"sp": 15, "conditional_amount": 8, "condition": "CountBC(PlayedSkillCount(AliceBSkill51)>0)==0"},
+    "cost": {"yes": {"sp": 8}, "no": {"sp": 15}}, "conditions": {"cost": "not (used(79)>0)"},
     "hit_count": 10,
     "target": "single",
     "attack_type": "stab",
@@ -999,9 +1010,9 @@
     "elements": ["ice"],
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["ice"]},
-      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "condition": "IsHitWeak()"},
+      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "condition": "target.weak_to_hit()"},
       {"type": "critical_damage_up", "target": "ally_front", "elements": ["ice"], "status_id": 7, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "condition": "IsHitWeak()"}
+      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "condition": "target.weak_to_hit()"}
     ]
   },
   "81": {
@@ -1057,10 +1068,10 @@
     "names": {"zh_cn": "佯攻·光辉波斯菊", "zh_tw": "佯動光輝波斯菊", "jp": "フェイント・ルミナスコスモス"},
     "kind": "active",
     "cost": {
-      "sp": 11,
-      "conditional_amount": 6,
-      "condition": "CountBC(IsPlayer()==0&&IsDead()==0&&SpecialStatusCountByType(12)>0)>0||CountBC(IsPlayer()==0&&IsDead()==0&&SpecialStatusCountByType(57)>0)>0"
-    },
+      "yes": {
+        "sp": 6},
+      "no": {"sp": 11}
+    }, "conditions": {"cost": "enemy.count(has(12)) > 0 or enemy.count(has(57)) > 0"},
     "target": "ally_all",
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
@@ -1073,11 +1084,11 @@
     "kind": "passive",
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
-    "trigger_condition": "CountBC(IsPlayer() &&IsTeam(31C))>=2",
+    "trigger_condition": "team.member('31C') >= 2",
     "effects": {
       "cases": [
         {
-          "when": "CountBC(IsPlayer() && IsTeam(31C))==2",
+          "when": "team.member('31C') == 2",
           "effects": [
             {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}},
             {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}}
@@ -1085,7 +1096,7 @@
           "description_jp": "メンバー2人"
         },
         {
-          "when": "CountBC(IsPlayer() && IsTeam(31C))==3",
+          "when": "team.member('31C') == 3",
           "effects": [
             {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}},
             {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}}
@@ -1093,7 +1104,7 @@
           "description_jp": "メンバー3人"
         },
         {
-          "when": "CountBC(IsPlayer() && IsTeam(31C))==4",
+          "when": "team.member('31C') == 4",
           "effects": [
             {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}},
             {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}}
@@ -1101,7 +1112,7 @@
           "description_jp": "メンバー4人"
         },
         {
-          "when": "CountBC(IsPlayer() && IsTeam(31C))==5",
+          "when": "team.member('31C') == 5",
           "effects": [
             {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}},
             {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}}
@@ -1109,7 +1120,7 @@
           "description_jp": "メンバー5人"
         },
         {
-          "when": "CountBC(IsPlayer() && IsTeam(31C))==6",
+          "when": "team.member('31C') == 6",
           "effects": [
             {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}},
             {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}}
@@ -1185,7 +1196,7 @@
     "kind": "active",
     "cost": {"sp": 6},
     "target": "ally_single_without_self",
-    "condition": "CountBC(IsPlayer())>1",
+    "condition": "ally.count() > 1",
     "effects": [
       {"type": "resource", "target": "ally_single_without_self"}
     ]
@@ -1196,7 +1207,7 @@
     "kind": "active",
     "cost": {"sp": 6},
     "target": "ally_front_without_self",
-    "condition": "CountBC(IsPlayer())>1",
+    "condition": "ally.count() > 1",
     "effects": [
       {"type": "resource", "target": "ally_front_without_self"}
     ]
@@ -1207,11 +1218,11 @@
     "kind": "active",
     "cost": {"sp": 6},
     "target": "ally_single_without_self",
-    "condition": "CountBC(IsPlayer())>1",
+    "condition": "ally.count() > 1",
     "effects": [
       {"type": "b_i_yamawaki_servant", "target": "ally_single_without_self", "status_id": 154, "duration": {"type": "permanent"}},
       {"type": "resource", "target": "ally_single_without_self"},
-      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "SpecialStatusCountByType(20) == 0"}
+      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "not has(20)"}
     ]
   },
   "95": {
@@ -1256,7 +1267,7 @@
         {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "use", "value": 1}}
       ]
     },
-    "conditions": {"effects": "CountBC(IsPlayer() &&IsTeam(31C)==1)>=3"}
+    "conditions": {"effects": "team.member('31C') >= 3"}
   },
   "98": {
     "id": 98,
@@ -1290,22 +1301,22 @@
         {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["thunder"]}
       ]
     },
-    "conditions": {"effects": "PlayedSkillCount(BIYamawakiSkill53)==0"}
+    "conditions": {"effects": "used(99)==0"}
   },
   "100": {
     "id": 100,
     "names": {"zh_cn": "意志之镰", "zh_tw": "信念之鐮", "jp": "ヴォリション・サイス"},
     "kind": "active",
-    "cost": {"sp": 17, "condition": "CountBC(IsPlayer()==0 && IsDead()==0 && BreakDownTurn()>0)>0"},
+    "cost": {"yes": {"sp": 0}, "no": {"sp": 17}}, "conditions": {"cost": "enemy.count(down_turns()>0) > 0"},
     "hit_count": 8,
     "target": "single",
     "attack_type": "slash",
     "elements": ["ice"],
-    "use_condition": "CountBC(IsPlayer()==0&&IsDead()==0&&BreakDownTurn()>0)>0",
+    "use_condition": "enemy.count(down_turns()>0) > 0",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["ice"]},
-      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "condition": "IsHitWeak()"},
-      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "condition": "IsHitWeak()"}
+      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "condition": "target.weak_to_hit()"},
+      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "condition": "target.weak_to_hit()"}
     ]
   },
   "101": {
@@ -1317,7 +1328,7 @@
     "target": "all",
     "attack_type": "slash",
     "elements": ["dark"],
-    "condition": "CountBC(IsPlayer() && SpecialStatusCountByType(155) >= 1)>=6",
+    "condition": "ally.count(has(154)) >= 6",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]},
       {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}}
@@ -1485,7 +1496,7 @@
     "attack_type": "stab",
     "elements": ["thunder"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "stab", "elements": ["thunder"], "condition": "IsHitWeak()"},
+      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "stab", "elements": ["thunder"], "condition": "target.weak_to_hit()"},
       {"type": "defense_down", "target": "single", "elements": ["thunder"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}}
     ]
   },
@@ -1504,7 +1515,7 @@
         "type": "funnel",
         "target": "ally_all",
         "status_id": 13,
-        "target_condition": "IsNatureElement(Dark)==1",
+        "target_condition": "element('dark')==1",
         "duration": {"type": "ally_turn", "value": 3},
         "solo": true
       }
@@ -1552,7 +1563,7 @@
     "id": 119,
     "names": {"zh_cn": "微风轻拂", "zh_tw": "微風吹拂", "jp": "そよ風に吹かれて"},
     "kind": "active",
-    "cost": {"sp": 12, "conditional_amount": 6, "condition": "CountBC(PlayedSkillCount(CMatsuokaSkill04)>0)==0"},
+    "cost": {"yes": {"sp": 6}, "no": {"sp": 12}}, "conditions": {"cost": "not (used(119)>0)"},
     "hit_count": 3,
     "target": "single",
     "attack_type": "strike",
@@ -1566,7 +1577,7 @@
     "id": 120,
     "names": {"zh_cn": "明星之路", "zh_tw": "星路", "jp": "スターダムロード"},
     "kind": "active",
-    "cost": {"sp": 7, "condition": "CountBC(IsPlayer() == 1 && IsCharacter(CMatsuoka) == 1 && IsCharging()==1) > 0"},
+    "cost": {"yes": {"sp": 0}, "no": {"sp": 7}}, "conditions": {"cost": "ally.count(character('CMatsuoka') == 1 and charging()==1) > 0"},
     "target": "ally_front",
     "effects": [
       {"type": "defense_up", "target": "ally_front", "status_id": 4, "duration": {"type": "enemy_turn", "value": 1}},
@@ -1588,7 +1599,7 @@
         {"type": "remove_debuff", "target": "ally_all"}
       ]
     },
-    "conditions": {"effects": "IsCharging()"}
+    "conditions": {"effects": "charging()"}
   },
   "122": {
     "id": 122,
@@ -1607,7 +1618,7 @@
     "id": 123,
     "names": {"zh_cn": "必杀！旋翼飞踢+", "zh_tw": "滅！徒然飛踢+", "jp": "必滅！ヴェインキック+"},
     "kind": "active",
-    "cost": {"sp": 14, "conditional_amount": 7, "condition": "CountBC(PlayedSkillCount(CMatsuokaSkill51Ev1)>0)==0"},
+    "cost": {"yes": {"sp": 7}, "no": {"sp": 14}}, "conditions": {"cost": "not (used(123)>0)"},
     "hit_count": 10,
     "target": "all",
     "attack_type": "strike",
@@ -1620,12 +1631,12 @@
     "id": 124,
     "names": {"zh_cn": "提神·干杯！", "zh_tw": "煥然一新聲援！", "jp": "リフレッシング・チアーズ！"},
     "kind": "active",
-    "cost": {"sp": 12, "conditional_amount": 6, "condition": "CountBC(PlayedSkillCount(CMatsuokaSkill52)>0)==0"},
+    "cost": {"yes": {"sp": 6}, "no": {"sp": 12}}, "conditions": {"cost": "not (used(124)>0)"},
     "target": "ally_all",
     "effects": [
       {"type": "buff_charge", "target": "ally_all", "status_id": 25, "duration": {"type": "use", "value": 1}},
-      {"type": "defense_up", "target": "ally_all", "status_id": 4, "target_condition": "IsNatureElement(Light)==1", "duration": {"type": "enemy_turn", "value": 3}},
-      {"type": "regeneration_dp", "target": "ally_all", "status_id": 34, "target_condition": "IsNatureElement(Light)==1", "duration": {"type": "enemy_turn", "value": 4}}
+      {"type": "defense_up", "target": "ally_all", "status_id": 4, "target_condition": "element('light')==1", "duration": {"type": "enemy_turn", "value": 3}},
+      {"type": "regeneration_dp", "target": "ally_all", "status_id": 34, "target_condition": "element('light')==1", "duration": {"type": "enemy_turn", "value": 4}}
     ]
   },
   "125": {
@@ -1648,7 +1659,7 @@
         {"type": "attack_up", "target": "ally_front", "elements": ["thunder"], "status_id": 1, "duration": {"type": "ally_turn", "value": 5}, "solo": true}
       ]
     },
-    "conditions": {"effects": "IsCharging()"}
+    "conditions": {"effects": "charging()"}
   },
   "126": {
     "id": 126,
@@ -1656,7 +1667,7 @@
     "kind": "active",
     "cost": {"sp": 0},
     "target": "self",
-    "condition": "CountBC(IsCharacter(CReaper)==1 && IsBroken()==1)>=1",
+    "condition": "ally.count(character('CReaper')==1 and broken()==1) >= 1",
     "effects": [
       {"type": "revive_dp", "target": "self"},
       {"type": "resource", "target": "self"},
@@ -1670,7 +1681,7 @@
     "cost": {"sp": 0},
     "trigger": "on_battle_win",
     "effects": [
-      {"type": "heal_skill_used_count", "target": "ally_all", "target_condition": "IsNatureElement(Thunder)"}
+      {"type": "heal_skill_used_count", "target": "ally_all", "target_condition": "element('thunder')"}
     ]
   },
   "128": {
@@ -1767,8 +1778,8 @@
     "target": "ally_all",
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
-      {"type": "attack_up", "target": "ally_front", "status_id": 1, "target_condition": "IsNatureElement(Fire)==1", "duration": {"type": "use", "value": 1}},
-      {"type": "funnel", "target": "ally_front", "status_id": 13, "target_condition": "IsNatureElement(Fire)==1", "duration": {"type": "use", "value": 1}}
+      {"type": "attack_up", "target": "ally_front", "status_id": 1, "target_condition": "element('fire')==1", "duration": {"type": "use", "value": 1}},
+      {"type": "funnel", "target": "ally_front", "status_id": 13, "target_condition": "element('fire')==1", "duration": {"type": "use", "value": 1}}
     ]
   },
   "136": {
@@ -1781,7 +1792,7 @@
     "attack_type": "slash",
     "elements": ["thunder"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["thunder"], "condition": "TargetBreakDownTurn()>0"}
+      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["thunder"], "condition": "target.down_turns()>0"}
     ]
   },
   "137": {
@@ -1793,7 +1804,7 @@
     "effects": [
       {"type": "steak", "target": "ally_all", "status_id": 190, "duration": {"type": "permanent"}},
       {"type": "resource", "target": "self"},
-      {"type": "resource", "target": "ally_all_without_self", "target_condition": "IsNatureElement(Thunder)"}
+      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('thunder')"}
     ]
   },
   "138": {
@@ -1803,7 +1814,7 @@
     "cost": {"sp": 0},
     "trigger": "on_battle_start",
     "effects": [
-      {"type": "resource", "target": "ally_all", "target_condition": "IsCharacter(RKayamori)==1 || IsCharacter(CSkopovskaya)==1"}
+      {"type": "resource", "target": "ally_all", "target_condition": "character('RKayamori')==1 or character('CSkopovskaya')==1"}
     ]
   },
   "139": {
@@ -1813,7 +1824,7 @@
     "cost": {"sp": 0},
     "trigger": "on_battle_win",
     "effects": [
-      {"type": "heal_skill_used_count", "target": "ally_all", "target_condition": "IsNatureElement(Fire)"}
+      {"type": "heal_skill_used_count", "target": "ally_all", "target_condition": "element('fire')"}
     ]
   },
   "140": {
@@ -1959,7 +1970,7 @@
     "kind": "active",
     "cost": {"sp": 10},
     "target": "ally_single_without_self",
-    "condition": "CountBC(IsPlayer())>1",
+    "condition": "ally.count() > 1",
     "effects": [
       {"type": "eternal_oath", "target": "ally_single_without_self", "status_id": 123, "duration": {"type": "permanent"}},
       {"type": "resource", "target": "ally_single_without_self"},
@@ -1976,7 +1987,7 @@
     "elements": ["fire"],
     "effects": [
       {"type": "shchi", "target": "ally_all", "status_id": 172, "duration": {"type": "permanent"}},
-      {"type": "resource", "target": "ally_all_without_self", "target_condition": "IsNatureElement(Fire)"},
+      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('fire')"},
       {"type": "zone", "target": "field", "elements": ["fire"], "status_id": 14, "duration": {"type": "permanent"}}
     ]
   },
@@ -1989,10 +2000,10 @@
     "target": "single",
     "attack_type": "stab",
     "elements": ["fire"],
-    "condition": "Sp()<0",
+    "condition": "sp()<0",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["fire"]},
-      {"type": "resist_down", "target": "single", "elements": ["fire"], "status_id": 18, "target_condition": "IsWeakElement(Fire)", "duration": {"type": "permanent"}},
+      {"type": "resist_down", "target": "single", "elements": ["fire"], "status_id": 18, "target_condition": "target.weak('fire')", "duration": {"type": "permanent"}},
       {"type": "fragile", "target": "single", "status_id": 22, "duration": {"type": "permanent"}}
     ]
   },
@@ -2080,7 +2091,7 @@
     "kind": "active",
     "cost": {"sp": 13},
     "target": "ally_all_without_self",
-    "condition": "CountBC(IsPlayer())>1",
+    "condition": "ally.count() > 1",
     "effects": [
       {"type": "resource", "target": "ally_all_without_self"}
     ]
@@ -2115,10 +2126,10 @@
     "names": {"zh_cn": "纯真狂野+", "zh_tw": "純真狂野+", "jp": "イノセントワイルド+"},
     "kind": "active",
     "cost": {
-      "sp": 10,
-      "conditional_amount": 5,
-      "condition": "CountBC(IsPlayer() == 1 && IsCharacter(CSugahara) == 1 && DpRate() >= 1.0) > 0"
-    },
+      "yes": {
+        "sp": 5},
+      "no": {"sp": 10}
+    }, "conditions": {"cost": "ally.count(character('CSugahara') == 1 and dp_rate() >= 1.0) > 0"},
     "hit_count": 3,
     "target": "all",
     "attack_type": "strike",
@@ -2148,13 +2159,13 @@
         {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["dark"]}
       ]
     },
-    "conditions": {"cost": "CountBC(IsPlayer()==0&&IsDead()==0&&SpecialStatusCountByType(12)>0)>0||CountBC(IsPlayer()==0&&IsDead()==0&&SpecialStatusCountByType(57)>0)>0", "effects": "CountBC(IsPlayer()==0&&SpecialStatusCountByType(12)>0)>0||CountBC(IsPlayer()==0&&SpecialStatusCountByType(57)>0)>0"}
+    "conditions": {"cost": "enemy.count(has(12)) > 0 or enemy.count(has(57)) > 0", "effects": "enemy.count(has(12)) > 0 or enemy.count(has(57)) > 0"}
   },
   "165": {
     "id": 165,
     "names": {"zh_cn": "洛丽塔全力爆裂", "zh_tw": "蘿莉塔火力全開", "jp": "ロリータフルバースト"},
     "kind": "active",
-    "cost": {"sp": 14, "conditional_amount": 7, "condition": "CountBC(IsPlayer() == 1 && SpecialStatusCountByType(20)>0)>0"},
+    "cost": {"yes": {"sp": 7}, "no": {"sp": 14}}, "conditions": {"cost": "ally.count(has(20)) > 0"},
     "hit_count": 6,
     "target": "all",
     "attack_type": "strike",
@@ -2185,7 +2196,7 @@
     "names": {"zh_cn": "きらめきメタモルフォーゼ", "zh_tw": "閃亮蛻變", "jp": "きらめきメタモルフォーゼ"},
     "kind": "active",
     "cost": {
-      "yes": {"sp": 18},
+      "yes": {"sp": 0},
       "no": {"sp": 18}
     },
     "hit_count": 5,
@@ -2202,7 +2213,7 @@
         {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}}
       ]
     },
-    "conditions": {"cost": "CountBC(IsPlayer()==1&&IsCharacter(CSugahara)==1&&Token()>=10)>0", "effects": "CountBC(IsPlayer()==1&&IsCharacter(CSugahara)==1&&Token()>=10)>0"}
+    "conditions": {"cost": "ally.count(character('CSugahara')==1 and token()>=10) > 0", "effects": "ally.count(character('CSugahara')==1 and token()>=10) > 0"}
   },
   "168": {
     "id": 168,
@@ -2263,7 +2274,7 @@
     "id": 173,
     "names": {"zh_cn": "琶音", "zh_tw": "琶音", "jp": "アルペジオ"},
     "kind": "active",
-    "cost": {"sp": 12, "condition": "CountBC(IsDead()==0&&IsPlayer()==0&&BreakDownTurn()>0)>0"},
+    "cost": {"yes": {"sp": 0}, "no": {"sp": 12}}, "conditions": {"cost": "enemy.count(down_turns()>0) > 0"},
     "hit_count": 3,
     "target": "all",
     "attack_type": "stab",
@@ -2294,28 +2305,28 @@
     "effects": {
       "cases": [
         {
-          "when": "PlayedSkillCount(CathyCSkill51) == 0",
+          "when": "used(175) == 0",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["ice"]}
           ],
           "description_jp": "使用回数1回目"
         },
         {
-          "when": "PlayedSkillCount(CathyCSkill51) == 1",
+          "when": "used(175) == 1",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["ice"]}
           ],
           "description_jp": "使用回数2回目"
         },
         {
-          "when": "PlayedSkillCount(CathyCSkill51) == 2",
+          "when": "used(175) == 2",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["ice"]}
           ],
           "description_jp": "使用回数3回目"
         },
         {
-          "when": "PlayedSkillCount(CathyCSkill51) >= 3",
+          "when": "used(175) >= 3",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["ice"]}
           ],
@@ -2413,7 +2424,7 @@
     "attack_type": "strike",
     "elements": ["fire"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "all", "attack_type": "strike", "elements": ["fire"], "condition": "IsHitWeak()"}
+      {"type": "damage_rate_change_attack_skill", "target": "all", "attack_type": "strike", "elements": ["fire"], "condition": "target.weak_to_hit()"}
     ]
   },
   "184": {
@@ -2422,7 +2433,7 @@
     "kind": "active",
     "cost": {"sp": 9},
     "target": "ally_single_without_self",
-    "condition": "CountBC(IsPlayer())>1",
+    "condition": "ally.count() > 1",
     "effects": [
       {"type": "attack_up", "target": "ally_single_without_self", "status_id": 1, "duration": {"type": "use", "value": 1}},
       {"type": "critical_damage_up", "target": "ally_single_without_self", "status_id": 7, "duration": {"type": "use", "value": 1}}
@@ -2483,7 +2494,7 @@
     "target": "ally_all",
     "effects": [
       {"type": "debuff_guard", "target": "ally_all", "status_id": 110, "duration": {"type": "use", "value": 1}},
-      {"type": "resource", "target": "ally_all_without_self", "target_condition": "IsNatureElement(Fire)==1"}
+      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('fire')==1"}
     ]
   },
   "190": {
@@ -2510,11 +2521,11 @@
     "target": "all",
     "attack_type": "strike",
     "elements": ["dark"],
-    "use_condition": "MoraleLevel()>=10",
+    "use_condition": "level(119)>=10",
     "effects": {
       "cases": [
         {
-          "when": "0<=MoraleLevel() && MoraleLevel()<=1",
+          "when": "0<=level(119) and level(119)<=1",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["dark"]},
             {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}},
@@ -2523,7 +2534,7 @@
           "description_jp": "士気0〜1"
         },
         {
-          "when": "2<=MoraleLevel() && MoraleLevel()<=3",
+          "when": "2<=level(119) and level(119)<=3",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["dark"]},
             {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}},
@@ -2533,7 +2544,7 @@
           "description_jp": "士気2〜3"
         },
         {
-          "when": "4<=MoraleLevel() && MoraleLevel()<=5",
+          "when": "4<=level(119) and level(119)<=5",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["dark"]},
             {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}},
@@ -2544,7 +2555,7 @@
           "description_jp": "士気4〜5"
         },
         {
-          "when": "6<=MoraleLevel() && MoraleLevel()<=7",
+          "when": "6<=level(119) and level(119)<=7",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["dark"]},
             {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}},
@@ -2555,7 +2566,7 @@
           "description_jp": "士気6〜7"
         },
         {
-          "when": "8<=MoraleLevel() && MoraleLevel()<=9",
+          "when": "8<=level(119) and level(119)<=9",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["dark"]},
             {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}},
@@ -2567,7 +2578,7 @@
           "description_jp": "士気8〜9"
         },
         {
-          "when": "MoraleLevel()==10",
+          "when": "level(119)==10",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["dark"]},
             {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}},
@@ -2580,7 +2591,7 @@
         }
       ]
     },
-    "conditions": {"cost": "CountBC(IsPlayer() == 1 && IsCharacter(EAoi) == 1 && MoraleLevel() >= 6)>0"}
+    "conditions": {"cost": "ally.count(character('EAoi') == 1 and level(119) >= 6) > 0"}
   },
   "192": {
     "id": 192,
@@ -2590,7 +2601,7 @@
     "target": "self",
     "effects": [
       {"type": "resource", "target": "self"},
-      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "IsNatureElement(Ice)==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true}
+      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('ice')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true}
     ]
   },
   "193": {
@@ -2601,15 +2612,15 @@
     "target": "ally_single",
     "effects": [
       {"type": "heal_dp", "target": "ally_single"},
-      {"type": "remove_debuff", "target": "ally_single", "target_condition": "IsNatureElement(Dark)==0"},
-      {"type": "remove_debuff", "target": "ally_single", "target_condition": "IsNatureElement(Dark)==1"}
+      {"type": "remove_debuff", "target": "ally_single", "target_condition": "element('dark')==0"},
+      {"type": "remove_debuff", "target": "ally_single", "target_condition": "element('dark')==1"}
     ]
   },
   "194": {
     "id": 194,
     "names": {"zh_cn": "加尔达因", "zh_tw": "加爾達因", "jp": "ガルダイン"},
     "kind": "active",
-    "cost": {"sp": 9, "conditional_amount": 4, "condition": "CountBC(IsDead()==0&&IsPlayer()==0&&BreakDownTurn()>0)>0"},
+    "cost": {"yes": {"sp": 4}, "no": {"sp": 9}}, "conditions": {"cost": "enemy.count(down_turns()>0) > 0"},
     "hit_count": 5,
     "target": "single",
     "attack_type": "slash",
@@ -2637,7 +2648,7 @@
         {"type": "critical_damage_up", "target": "ally_all", "status_id": 7, "duration": {"type": "ally_turn", "value": 3}, "solo": true}
       ]
     },
-    "conditions": {"effects": "PlayedSkillCount(EmaCSkill01)==0"}
+    "conditions": {"effects": "used(195)==0"}
   },
   "196": {
     "id": 196,
@@ -2653,14 +2664,14 @@
     "id": 197,
     "names": {"zh_cn": "原子火焰", "zh_tw": "原子火焰", "jp": "アトミックフレア"},
     "kind": "active",
-    "cost": {"sp": 16, "condition": "CountBC(IsPlayer() == 1 && SpecialStatusCountByType(20)>0)>0"},
+    "cost": {"yes": {"sp": 0}, "no": {"sp": 16}}, "conditions": {"cost": "ally.count(has(20)) > 0"},
     "hit_count": 5,
     "target": "single",
     "attack_type": "strike",
     "effects": [
       {"type": "penetration_critical_attack", "target": "single", "attack_type": "strike"},
       {"type": "ignore_e_shield_element", "target": "self", "status_id": 169, "duration": {"type": "ally_turn", "value": 1}},
-      {"type": "resource", "target": "self", "hit_condition": "BreakHitCount()>0"}
+      {"type": "resource", "target": "self", "hit_condition": "break_hits()>0"}
     ]
   },
   "198": {
@@ -2681,7 +2692,7 @@
     "id": 199,
     "names": {"zh_cn": "勇气步伐", "zh_tw": "勇氣步伐", "jp": "ブレイブステップ"},
     "kind": "active",
-    "cost": {"sp": 12, "conditional_amount": 6, "condition": "CountBC(PlayedSkillCount(EmaDSkill02)>0)==0"},
+    "cost": {"yes": {"sp": 6}, "no": {"sp": 12}}, "conditions": {"cost": "not (used(199)>0)"},
     "target": "ally_front",
     "effects": [
       {"type": "critical_rate_up", "target": "ally_front", "status_id": 5, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
@@ -2711,7 +2722,7 @@
         {"type": "attack_up", "target": "self", "elements": ["light"], "status_id": 1, "duration": {"type": "ally_turn", "value": 5}, "solo": true}
       ]
     },
-    "conditions": {"cost": "CountBC(IsPlayer() == 1 && SpecialStatusCountByType(20)>0)>0", "effects": "SpecialStatusCountByType(20) > 0"}
+    "conditions": {"cost": "ally.count(has(20)) > 0", "effects": "has(20)"}
   },
   "201": {
     "id": 201,
@@ -2759,7 +2770,7 @@
     "kind": "active",
     "cost": {"sp": 5},
     "target": "self",
-    "condition": "0.0<DpRate()",
+    "condition": "0.0<dp_rate()",
     "effects": {
       "yes": [
         {"type": "resource", "target": "self"},
@@ -2770,20 +2781,20 @@
         {"type": "self_damage", "target": "self"}
       ]
     },
-    "conditions": {"effects": "PlayedSkillCount(FMikotoSkill04)==0"}
+    "conditions": {"effects": "used(204)==0"}
   },
   "205": {
     "id": 205,
     "names": {"zh_cn": "ロンリーブレード", "zh_tw": "孤獨之刃", "jp": "ロンリーブレード"},
     "kind": "active",
-    "cost": {"sp": 10, "conditional_amount": 5, "condition": "CountBC(IsPlayer() && IsCharacter(FMikoto) && DpRate()<=0.5)>0"},
+    "cost": {"yes": {"sp": 5}, "no": {"sp": 10}}, "conditions": {"cost": "ally.count(character('FMikoto') and dp_rate()<=0.5) > 0"},
     "hit_count": 3,
     "target": "all",
     "attack_type": "slash",
     "elements": ["fire"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["fire"]},
-      {"type": "resist_down", "target": "all", "elements": ["fire"], "status_id": 18, "target_condition": "IsWeakElement(Fire)==1", "duration": {"type": "permanent"}}
+      {"type": "resist_down", "target": "all", "elements": ["fire"], "status_id": 18, "target_condition": "target.weak('fire')==1", "duration": {"type": "permanent"}}
     ]
   },
   "206": {
@@ -2805,7 +2816,7 @@
         {"type": "fragile", "target": "single", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}}
       ]
     },
-    "conditions": {"effects": "IsOverDrive()"}
+    "conditions": {"effects": "od()"}
   },
   "207": {
     "id": 207,
@@ -2828,7 +2839,7 @@
         {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}}
       ]
     },
-    "conditions": {"effects": "IsOverDrive()"}
+    "conditions": {"effects": "od()"}
   },
   "208": {
     "id": 208,
@@ -2853,7 +2864,7 @@
     "target": "all",
     "attack_type": "slash",
     "elements": ["fire"],
-    "condition": "0.0<DpRate()",
+    "condition": "0.0<dp_rate()",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["fire"]},
       {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "permanent"}},
@@ -2868,7 +2879,7 @@
     "kind": "passive",
     "cost": {"sp": 0},
     "trigger": "on_every_turn",
-    "trigger_condition": "Sp()>=20",
+    "trigger_condition": "sp()>=20",
     "effects": [
       {"type": "resource", "target": "self"},
       {"type": "resource", "target": "ally_all_without_self"}
@@ -2909,7 +2920,7 @@
         {"type": "additional_turn", "target": "self", "status_id": 20}
       ]
     },
-    "conditions": {"effects": "IsReinforcedMode()"}
+    "conditions": {"effects": "reinforced()"}
   },
   "213": {
     "id": 213,
@@ -3022,8 +3033,8 @@
     "target": "ally_all",
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
-      {"type": "remove_debuff", "target": "ally_all", "target_condition": "IsNatureElement(Light)==0"},
-      {"type": "remove_debuff", "target": "ally_all", "target_condition": "IsNatureElement(Light)==1"}
+      {"type": "remove_debuff", "target": "ally_all", "target_condition": "element('light')==0"},
+      {"type": "remove_debuff", "target": "ally_all", "target_condition": "element('light')==1"}
     ]
   },
   "222": {
@@ -3038,7 +3049,7 @@
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["fire"]},
       {"type": "token", "target": "ally_front"},
-      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "SpecialStatusCountByType(20) == 0"}
+      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "not has(20)"}
     ]
   },
   "223": {
@@ -3089,7 +3100,7 @@
         {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["dark"]}
       ]
     },
-    "conditions": {"cost": "CountBC(IsPlayer() == 1 && SpecialStatusCountByType(20)>0)>0", "effects": "IsCharging()"}
+    "conditions": {"cost": "ally.count(has(20)) > 0", "effects": "charging()"}
   },
   "226": {
     "id": 226,
@@ -3102,14 +3113,14 @@
     "elements": ["thunder"],
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["thunder"]},
-      {"type": "resource", "target": "ally_all", "hit_condition": "BreakHitCount()>0"}
+      {"type": "resource", "target": "ally_all", "hit_condition": "break_hits()>0"}
     ]
   },
   "227": {
     "id": 227,
     "names": {"zh_cn": "放学后的小小刺激", "zh_tw": "放學後的小小刺激", "jp": "放課後の淡いスリル"},
     "kind": "active",
-    "cost": {"sp": 14, "conditional_amount": 7, "condition": "CountBC(IsPlayer() == 1 && SpecialStatusCountByType(20)>0)>0"},
+    "cost": {"yes": {"sp": 7}, "no": {"sp": 14}}, "conditions": {"cost": "ally.count(has(20)) > 0"},
     "hit_count": 3,
     "target": "all",
     "attack_type": "stab",
@@ -3134,7 +3145,7 @@
         "target": "ally_all",
         "elements": ["fire"],
         "status_id": 1,
-        "target_condition": "IsNatureElement(Fire)==1",
+        "target_condition": "element('fire')==1",
         "duration": {"type": "ally_turn", "value": 3},
         "solo": true
       },
@@ -3142,7 +3153,7 @@
         "type": "funnel",
         "target": "ally_all",
         "status_id": 13,
-        "target_condition": "IsNatureElement(Fire)==1",
+        "target_condition": "element('fire')==1",
         "duration": {"type": "ally_turn", "value": 3},
         "solo": true
       }
@@ -3154,7 +3165,7 @@
     "kind": "passive",
     "cost": {"sp": 0},
     "trigger": "on_every_turn",
-    "trigger_condition": "IsZone(Fire)==1 || IsZone(Ice)==1 || IsZone(Thunder)==1 || IsZone(Light)==1 || IsZone(Dark)==1",
+    "trigger_condition": "zone('fire')==1 or zone('ice')==1 or zone('thunder')==1 or zone('light')==1 or zone('dark')==1",
     "effects": [
       {"type": "resource", "target": "self"}
     ]
@@ -3214,7 +3225,7 @@
     "effects": {
       "cases": [
         {
-          "when": "IsZone(Fire)==1",
+          "when": "zone('fire')==1",
           "effects": [
             {"type": "critical_rate_up", "target": "ally_single", "elements": ["fire"], "status_id": 5, "duration": {"type": "use", "value": 1}},
             {"type": "critical_damage_up", "target": "ally_single", "elements": ["fire"], "status_id": 7, "duration": {"type": "use", "value": 1}}
@@ -3222,7 +3233,7 @@
           "description_jp": "火属性"
         },
         {
-          "when": "IsZone(Ice)==1",
+          "when": "zone('ice')==1",
           "effects": [
             {"type": "critical_rate_up", "target": "ally_single", "elements": ["ice"], "status_id": 5, "duration": {"type": "use", "value": 1}},
             {"type": "critical_damage_up", "target": "ally_single", "elements": ["ice"], "status_id": 7, "duration": {"type": "use", "value": 1}}
@@ -3230,7 +3241,7 @@
           "description_jp": "氷属性"
         },
         {
-          "when": "IsZone(Thunder)==1",
+          "when": "zone('thunder')==1",
           "effects": [
             {"type": "critical_rate_up", "target": "ally_single", "elements": ["thunder"], "status_id": 5, "duration": {"type": "use", "value": 1}},
             {"type": "critical_damage_up", "target": "ally_single", "elements": ["thunder"], "status_id": 7, "duration": {"type": "use", "value": 1}}
@@ -3238,7 +3249,7 @@
           "description_jp": "雷属性"
         },
         {
-          "when": "IsZone(Light)==1",
+          "when": "zone('light')==1",
           "effects": [
             {"type": "critical_rate_up", "target": "ally_single", "elements": ["light"], "status_id": 5, "duration": {"type": "use", "value": 1}},
             {"type": "critical_damage_up", "target": "ally_single", "elements": ["light"], "status_id": 7, "duration": {"type": "use", "value": 1}}
@@ -3246,7 +3257,7 @@
           "description_jp": "光属性"
         },
         {
-          "when": "IsZone(Dark)==1",
+          "when": "zone('dark')==1",
           "effects": [
             {"type": "critical_rate_up", "target": "ally_single", "elements": ["dark"], "status_id": 5, "duration": {"type": "use", "value": 1}},
             {"type": "critical_damage_up", "target": "ally_single", "elements": ["dark"], "status_id": 7, "duration": {"type": "use", "value": 1}}
@@ -3254,7 +3265,7 @@
           "description_jp": "闇属性"
         },
         {
-          "when": "無属性フィールド",
+          "when": "zone('none')",
           "effects": [
             {"type": "critical_rate_up", "target": "ally_single", "status_id": 5, "duration": {"type": "use", "value": 1}},
             {"type": "critical_damage_up", "target": "ally_single", "status_id": 7, "duration": {"type": "use", "value": 1}}
@@ -3265,12 +3276,12 @@
     },
     "elements": {
       "cases": [
-        {"when": "IsZone(Fire)==1", "elements": ["fire"], "description_jp": "火属性"},
-        {"when": "IsZone(Ice)==1", "elements": ["ice"], "description_jp": "氷属性"},
-        {"when": "IsZone(Thunder)==1", "elements": ["thunder"], "description_jp": "雷属性"},
-        {"when": "IsZone(Light)==1", "elements": ["light"], "description_jp": "光属性"},
-        {"when": "IsZone(Dark)==1", "elements": ["dark"], "description_jp": "闇属性"},
-        {"when": "無属性フィールド", "elements": null, "description_jp": "無属性"}
+        {"when": "zone('fire')==1", "elements": ["fire"], "description_jp": "火属性"},
+        {"when": "zone('ice')==1", "elements": ["ice"], "description_jp": "氷属性"},
+        {"when": "zone('thunder')==1", "elements": ["thunder"], "description_jp": "雷属性"},
+        {"when": "zone('light')==1", "elements": ["light"], "description_jp": "光属性"},
+        {"when": "zone('dark')==1", "elements": ["dark"], "description_jp": "闇属性"},
+        {"when": "zone('none')", "elements": null, "description_jp": "無属性"}
       ]
     }
   },
@@ -3290,7 +3301,7 @@
         {"type": "zone", "target": "field", "elements": ["thunder"], "status_id": 14, "duration": {"type": "permanent"}}
       ]
     },
-    "conditions": {"effects": "IsZone(Thunder)==1"}
+    "conditions": {"effects": "zone('thunder')==1"}
   },
   "236": {
     "id": 236,
@@ -3301,14 +3312,14 @@
     "effects": {
       "cases": [
         {
-          "when": "IsZone(Fire)==1",
+          "when": "zone('fire')==1",
           "effects": [
             {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
             {
               "type": "funnel",
               "target": "ally_all_without_self",
               "status_id": 13,
-              "target_condition": "IsNatureElement(Fire)",
+              "target_condition": "element('fire')",
               "duration": {"type": "ally_turn", "value": 3},
               "solo": true
             }
@@ -3316,14 +3327,14 @@
           "description_jp": "火属性"
         },
         {
-          "when": "IsZone(Ice)==1",
+          "when": "zone('ice')==1",
           "effects": [
             {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
             {
               "type": "funnel",
               "target": "ally_all_without_self",
               "status_id": 13,
-              "target_condition": "IsNatureElement(Ice)",
+              "target_condition": "element('ice')",
               "duration": {"type": "ally_turn", "value": 3},
               "solo": true
             }
@@ -3331,14 +3342,14 @@
           "description_jp": "氷属性"
         },
         {
-          "when": "IsZone(Thunder)==1",
+          "when": "zone('thunder')==1",
           "effects": [
             {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
             {
               "type": "funnel",
               "target": "ally_all_without_self",
               "status_id": 13,
-              "target_condition": "IsNatureElement(Thunder)",
+              "target_condition": "element('thunder')",
               "duration": {"type": "ally_turn", "value": 3},
               "solo": true
             }
@@ -3346,14 +3357,14 @@
           "description_jp": "雷属性"
         },
         {
-          "when": "IsZone(Light)==1",
+          "when": "zone('light')==1",
           "effects": [
             {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
             {
               "type": "funnel",
               "target": "ally_all_without_self",
               "status_id": 13,
-              "target_condition": "IsNatureElement(Light)",
+              "target_condition": "element('light')",
               "duration": {"type": "ally_turn", "value": 3},
               "solo": true
             }
@@ -3361,14 +3372,14 @@
           "description_jp": "光属性"
         },
         {
-          "when": "IsZone(Dark)==1",
+          "when": "zone('dark')==1",
           "effects": [
             {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
             {
               "type": "funnel",
               "target": "ally_all_without_self",
               "status_id": 13,
-              "target_condition": "IsNatureElement(Dark)",
+              "target_condition": "element('dark')",
               "duration": {"type": "ally_turn", "value": 3},
               "solo": true
             }
@@ -3376,14 +3387,14 @@
           "description_jp": "闇属性"
         },
         {
-          "when": "無属性フィールド",
+          "when": "zone('none')",
           "effects": [
             {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
             {
               "type": "funnel",
               "target": "ally_all_without_self",
               "status_id": 13,
-              "target_condition": "IsNatureElement(Nonelement)",
+              "target_condition": "element('none')",
               "duration": {"type": "ally_turn", "value": 3},
               "solo": true
             }
@@ -3391,14 +3402,14 @@
           "description_jp": "無属性"
         },
         {
-          "when": "!IsZone(Fire) && !IsZone(Ice) && !IsZone(Thunder) && !IsZone(Light) && !IsZone(Dark)",
+          "when": "not zone('fire') and not zone('ice') and not zone('thunder') and not zone('light') and not zone('dark')",
           "effects": [
             {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
             {
               "type": "funnel",
               "target": "ally_all_without_self",
               "status_id": 13,
-              "target_condition": "IsNatureElement(Nonelement)",
+              "target_condition": "element('none')",
               "duration": {"type": "ally_turn", "value": 3},
               "solo": true
             }
@@ -3445,13 +3456,13 @@
         {"type": "zone", "target": "field", "elements": ["dark"], "status_id": 14, "duration": {"type": "permanent"}}
       ]
     },
-    "conditions": {"cost": "CountBC(PlayedSkillCount(IIshiiSkill51Ev1)>0)==0", "effects": "PlayedSkillCount(IIshiiSkill51Ev1)==0"}
+    "conditions": {"cost": "not (used(238)>0)", "effects": "used(238)==0"}
   },
   "239": {
     "id": 239,
     "names": {"zh_cn": "奇观艺术", "zh_tw": "奇觀藝術", "jp": "スペクタクルアート"},
     "kind": "active",
-    "cost": {"sp": 14, "condition": "CountBC(IsZone(Fire)==0&&IsZone(None)==0)>0"},
+    "cost": {"yes": {"sp": 0}, "no": {"sp": 14}}, "conditions": {"cost": "not zone('fire') and not zone('none')"},
     "target": "ally_all",
     "elements": ["fire"],
     "effects": [
@@ -3470,7 +3481,7 @@
     "effects": {
       "cases": [
         {
-          "when": "IsZone(Fire)==1",
+          "when": "zone('fire')==1",
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["fire"]},
             {"type": "critical_rate_up", "target": "ally_front", "elements": ["fire"], "status_id": 5, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
@@ -3479,7 +3490,7 @@
           "description_jp": "火属性"
         },
         {
-          "when": "IsZone(Ice)==1",
+          "when": "zone('ice')==1",
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["ice"]},
             {"type": "critical_rate_up", "target": "ally_front", "elements": ["ice"], "status_id": 5, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
@@ -3488,7 +3499,7 @@
           "description_jp": "氷属性"
         },
         {
-          "when": "IsZone(Thunder)==1",
+          "when": "zone('thunder')==1",
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["thunder"]},
             {"type": "critical_rate_up", "target": "ally_front", "elements": ["thunder"], "status_id": 5, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
@@ -3497,7 +3508,7 @@
           "description_jp": "雷属性"
         },
         {
-          "when": "IsZone(Light)==1",
+          "when": "zone('light')==1",
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["light"]},
             {"type": "critical_rate_up", "target": "ally_front", "elements": ["light"], "status_id": 5, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
@@ -3506,7 +3517,7 @@
           "description_jp": "光属性"
         },
         {
-          "when": "IsZone(Dark)==1",
+          "when": "zone('dark')==1",
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
             {"type": "critical_rate_up", "target": "ally_front", "elements": ["dark"], "status_id": 5, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
@@ -3515,7 +3526,7 @@
           "description_jp": "闇属性"
         },
         {
-          "when": "無属性フィールド",
+          "when": "zone('none')",
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "stab"},
             {"type": "critical_rate_up", "target": "ally_front", "status_id": 5, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
@@ -3527,12 +3538,12 @@
     },
     "elements": {
       "cases": [
-        {"when": "IsZone(Fire)==1", "elements": ["fire"], "description_jp": "火属性"},
-        {"when": "IsZone(Ice)==1", "elements": ["ice"], "description_jp": "氷属性"},
-        {"when": "IsZone(Thunder)==1", "elements": ["thunder"], "description_jp": "雷属性"},
-        {"when": "IsZone(Light)==1", "elements": ["light"], "description_jp": "光属性"},
-        {"when": "IsZone(Dark)==1", "elements": ["dark"], "description_jp": "闇属性"},
-        {"when": "無属性フィールド", "elements": null, "description_jp": "無属性"}
+        {"when": "zone('fire')==1", "elements": ["fire"], "description_jp": "火属性"},
+        {"when": "zone('ice')==1", "elements": ["ice"], "description_jp": "氷属性"},
+        {"when": "zone('thunder')==1", "elements": ["thunder"], "description_jp": "雷属性"},
+        {"when": "zone('light')==1", "elements": ["light"], "description_jp": "光属性"},
+        {"when": "zone('dark')==1", "elements": ["dark"], "description_jp": "闇属性"},
+        {"when": "zone('none')", "elements": null, "description_jp": "無属性"}
       ]
     }
   },
@@ -3554,7 +3565,7 @@
     "kind": "passive",
     "cost": {"sp": 0},
     "trigger": "on_every_turn",
-    "trigger_condition": "DpRate()==0.0 && IsFront()",
+    "trigger_condition": "dp_rate()==0.0 and front()",
     "activation_limit": 1,
     "effects": [
       {"type": "revive_dp_rate", "target": "self"}
@@ -3647,7 +3658,7 @@
     "link": 2500002,
     "names": {"zh_cn": "宇宙射线-冰", "zh_tw": "宇宙射線-冰", "jp": "コズミックレイ-氷"},
     "kind": "active",
-    "cost": {"sp": 8, "condition": "CountBC(IsPlayer() && IsCharacter(IMinase) && SpecialStatusCountByType(211)>0)>0"},
+    "cost": {"yes": {"sp": 0}, "no": {"sp": 8}}, "conditions": {"cost": "has(15)"},
     "hit_count": 1,
     "target": "single",
     "attack_type": "stab",
@@ -3656,7 +3667,7 @@
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["ice"]},
       {"type": "morale", "target": "ally_front", "status_id": 119, "duration": {"type": "permanent"}},
       {"type": "revenge", "target": "self", "status_id": 208, "duration": {"type": "permanent"}},
-      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "SpecialStatusCountByType(211) && SpecialStatusCountByType(20) == 0"}
+      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "stacks(15) and not has(20)"}
     ]
   },
   "2500002": {
@@ -3664,7 +3675,7 @@
     "link": 2500001,
     "names": {"zh_cn": "宇宙射线-暗", "zh_tw": "宇宙射線-闇", "jp": "コズミックレイ-闇"},
     "kind": "active",
-    "cost": {"sp": 8, "condition": "CountBC(IsPlayer() && IsCharacter(IMinase) && SpecialStatusCountByType(211)>0)>0"},
+    "cost": {"yes": {"sp": 0}, "no": {"sp": 8}}, "conditions": {"cost": "has(15)"},
     "hit_count": 1,
     "target": "single",
     "attack_type": "stab",
@@ -3673,7 +3684,7 @@
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
       {"type": "morale", "target": "ally_front", "status_id": 119, "duration": {"type": "permanent"}},
       {"type": "revenge", "target": "self", "status_id": 208, "duration": {"type": "permanent"}},
-      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "SpecialStatusCountByType(211) && SpecialStatusCountByType(20) == 0"}
+      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "stacks(15) and not has(20)"}
     ]
   },
   "251": {
@@ -3682,7 +3693,7 @@
     "kind": "active",
     "cost": {"sp": 0},
     "target": "self",
-    "condition": "0.0<DpRate()",
+    "condition": "0.0<dp_rate()",
     "effects": [
       {"type": "e_a_guard", "target": "self", "status_id": 209, "duration": {"type": "use", "value": 2}}
     ]
@@ -3719,7 +3730,7 @@
         {"type": "attack_up", "target": "self", "elements": ["thunder"], "status_id": 1, "duration": {"type": "use", "value": 1}}
       ]
     },
-    "conditions": {"effects": "CountBC(IsPlayer()==0&&SpecialStatusCountByType(12)>0)>0||CountBC(IsPlayer()==0&&SpecialStatusCountByType(57)>0)>0"}
+    "conditions": {"effects": "enemy.count(has(12)) > 0 or enemy.count(has(57)) > 0"}
   },
   "254": {
     "id": 254,
@@ -3764,7 +3775,7 @@
         "type": "funnel",
         "target": "ally_all",
         "status_id": 13,
-        "target_condition": "IsNatureElement(Light)==1",
+        "target_condition": "element('light')==1",
         "duration": {"type": "ally_turn", "value": 3},
         "solo": true
       }
@@ -3774,7 +3785,7 @@
     "id": 2570001,
     "link": 2570002,
     "names": {"zh_cn": "诸神黄昏·新星-冰", "zh_tw": "諸神黃昏‧新星-冰", "jp": "ラグナロク・ノヴァ-氷"},
-    "conditions": {"effects": "反击等级10"},
+    "conditions": {"effects": "level(208) >= 10"},
     "kind": "active",
     "cost": {"sp": 15},
     "hit_count": 8,
@@ -3796,7 +3807,7 @@
     "id": 2570002,
     "link": 2570001,
     "names": {"zh_cn": "诸神黄昏·新星-暗", "zh_tw": "諸神黃昏‧新星-闇", "jp": "ラグナロク・ノヴァ-闇"},
-    "conditions": {"effects": "反击等级10"},
+    "conditions": {"effects": "level(208) >= 10"},
     "kind": "active",
     "cost": {"sp": 15},
     "hit_count": 8,
@@ -3878,7 +3889,7 @@
     "kind": "active",
     "cost": {"sp": 0},
     "target": "self",
-    "condition": "Sp()>19",
+    "condition": "sp()>19",
     "effects": [
       {"type": "buff_charge", "target": "self", "status_id": 25, "duration": {"type": "use", "value": 1}},
       {"type": "resource", "target": "self"}
@@ -3913,7 +3924,7 @@
         {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["dark"]}
       ]
     },
-    "conditions": {"effects": "IsCharging()"}
+    "conditions": {"effects": "charging()"}
   },
   "266": {
     "id": 266,
@@ -3937,7 +3948,7 @@
         {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "permanent"}}
       ]
     },
-    "conditions": {"cost": "CountBC(PlayedSkillCount(INatsumeSkill51Ev1)>0)==0", "effects": "IsCharging()"}
+    "conditions": {"cost": "not (used(266)>0)", "effects": "charging()"}
   },
   "267": {
     "id": 267,
@@ -3956,7 +3967,7 @@
         {"type": "attack", "target": "all", "attack_type": "slash"}
       ]
     },
-    "conditions": {"effects": "IsCharging()"}
+    "conditions": {"effects": "charging()"}
   },
   "268": {
     "id": 268,
@@ -3967,7 +3978,7 @@
     "target": "single",
     "attack_type": "slash",
     "elements": ["thunder"],
-    "condition": "Sp()>0",
+    "condition": "sp()>0",
     "effects": {
       "yes": [
         {"type": "attack_by_sp", "target": "single", "attack_type": "slash", "elements": ["thunder"]}
@@ -3976,7 +3987,7 @@
         {"type": "attack_by_sp", "target": "single", "attack_type": "slash", "elements": ["thunder"]}
       ]
     },
-    "conditions": {"effects": "IsCharging()"}
+    "conditions": {"effects": "charging()"}
   },
   "269": {
     "id": 269,
@@ -4137,7 +4148,7 @@
     "id": 282,
     "names": {"zh_cn": "梦幻花园", "zh_tw": "夢想花田", "jp": "ドリーミー・ガーデン"},
     "kind": "active",
-    "cost": {"sp": 10, "condition": "CountBC(IsPlayer()&&Sp()<=0)>0"},
+    "cost": {"yes": {"sp": 0}, "no": {"sp": 10}}, "conditions": {"cost": "ally.count(sp()<=0) > 0"},
     "target": "ally_all",
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
@@ -4162,7 +4173,7 @@
         {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "permanent"}}
       ]
     },
-    "conditions": {"effects": "IsOverDrive()"}
+    "conditions": {"effects": "od()"}
   },
   "284": {
     "id": 284,
@@ -4194,8 +4205,8 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "all_status_up_value", "target": "ally_all", "status_id": 95, "target_condition": "IsTeam(31E)==1", "duration": {"type": "permanent"}},
-      {"type": "resource", "target": "ally_all", "target_condition": "IsTeam(31E)==1", "duration": {"type": "permanent"}}
+      {"type": "all_status_up_value", "target": "ally_all", "status_id": 95, "target_condition": "team.is_member('31E')==1", "duration": {"type": "permanent"}},
+      {"type": "resource", "target": "ally_all", "target_condition": "team.is_member('31E')==1", "duration": {"type": "permanent"}}
     ]
   },
   "287": {
@@ -4205,7 +4216,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "attack_up", "target": "ally_all", "status_id": 1, "target_condition": "IsTeam(31E)==1", "duration": {"type": "permanent"}}
+      {"type": "attack_up", "target": "ally_all", "status_id": 1, "target_condition": "team.is_member('31E')==1", "duration": {"type": "permanent"}}
     ]
   },
   "288": {
@@ -4263,7 +4274,7 @@
     "kind": "active",
     "cost": {"sp": 0},
     "target": "ally_front",
-    "condition": "OverDriveGauge() >= 0",
+    "condition": "od_gauge() >= 0",
     "effects": [
       {"type": "resource", "target": "ally_front"},
       {"type": "resource", "target": "self"}
@@ -4275,10 +4286,10 @@
     "kind": "active",
     "cost": {"sp": 9},
     "target": "ally_all_without_self",
-    "condition": "CountBC(IsPlayer())>1",
+    "condition": "ally.count() > 1",
     "effects": [
       {"type": "resource", "target": "ally_all_without_self"},
-      {"type": "additional_turn", "target": "ally_front", "status_id": 20, "hit_condition": "SpecialStatusCountByType(20) == 0"}
+      {"type": "additional_turn", "target": "ally_front", "status_id": 20, "hit_condition": "not has(20)"}
     ]
   },
   "294": {
@@ -4315,7 +4326,7 @@
         {"type": "fragile", "target": "single", "status_id": 22, "duration": {"type": "enemy_turn", "value": 2}}
       ]
     },
-    "conditions": {"cost": "CountBC(IsPlayer()==0&&IsDead()==0&&SpecialStatusCountByType(12)>0)>0||CountBC(IsPlayer()==0&&IsDead()==0&&SpecialStatusCountByType(57)>0)>0", "effects": "CountBC(IsPlayer()==0&&SpecialStatusCountByType(12)>0)>0||CountBC(IsPlayer()==0&&SpecialStatusCountByType(57)>0)>0"}
+    "conditions": {"cost": "enemy.count(has(12)) > 0 or enemy.count(has(57)) > 0", "effects": "enemy.count(has(12)) > 0 or enemy.count(has(57)) > 0"}
   },
   "296": {
     "id": 296,
@@ -4353,7 +4364,7 @@
     "kind": "active",
     "cost": {"sp": 5},
     "target": "ally_single_without_self",
-    "condition": "CountBC(IsPlayer())>1",
+    "condition": "ally.count() > 1",
     "effects": [
       {"type": "heal_dp", "target": "ally_single_without_self"},
       {"type": "resource", "target": "ally_single_without_self"}
@@ -4455,7 +4466,7 @@
     "id": 306,
     "names": {"zh_cn": "魔炎闪狱门+", "zh_tw": "魔炎閃獄門+", "jp": "魔炎閃獄門+"},
     "kind": "active",
-    "cost": {"sp": 14, "conditional_amount": 7, "condition": "CountBC(IsPlayer() &&IsTeam(31E)==1)>=3"},
+    "cost": {"yes": {"sp": 7}, "no": {"sp": 14}}, "conditions": {"cost": "team.member('31E') >= 3"},
     "hit_count": 6,
     "target": "single",
     "attack_type": "slash",
@@ -4512,7 +4523,7 @@
     "kind": "passive",
     "cost": {"sp": 0},
     "trigger": "on_player_turn_start",
-    "trigger_condition": "CountBC(IsDead()==0 && IsPlayer()==0&&BreakDownTurn()>0)>0",
+    "trigger_condition": "enemy.count(down_turns()>0) > 0",
     "effects": [
       {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "ally_turn", "value": 1}}
     ]
@@ -4662,7 +4673,7 @@
     "id": 321,
     "names": {"zh_cn": "血腥之舞+", "zh_tw": "血腥之舞+", "jp": "ブラッディ・ダンス+"},
     "kind": "active",
-    "cost": {"sp": 11, "conditional_amount": 6, "condition": "CountBC(PlayedSkillCount(KAsakuraSkill51Ev1)>0)==0"},
+    "cost": {"yes": {"sp": 6}, "no": {"sp": 11}}, "conditions": {"cost": "not (used(321)>0)"},
     "hit_count": 10,
     "target": "single",
     "attack_type": "slash",
@@ -4693,7 +4704,7 @@
     "attack_type": "slash",
     "elements": ["light"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "all", "attack_type": "slash", "elements": ["light"], "condition": "IsHitWeak()"},
+      {"type": "damage_rate_change_attack_skill", "target": "all", "attack_type": "slash", "elements": ["light"], "condition": "target.weak_to_hit()"},
       {"type": "funnel", "target": "ally_front", "status_id": 13, "duration": {"type": "use", "value": 1}}
     ]
   },
@@ -4707,7 +4718,7 @@
     "attack_type": "slash",
     "elements": ["dark"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "all", "attack_type": "slash", "elements": ["dark"], "condition": "IsHitWeak()"},
+      {"type": "damage_rate_change_attack_skill", "target": "all", "attack_type": "slash", "elements": ["dark"], "condition": "target.weak_to_hit()"},
       {"type": "critical_rate_up", "target": "ally_all", "status_id": 5, "duration": {"type": "use", "value": 1}},
       {"type": "critical_damage_up", "target": "ally_all", "elements": ["dark"], "status_id": 7, "duration": {"type": "use", "value": 1}}
     ]
@@ -4723,7 +4734,7 @@
     "attack_type": "slash",
     "elements": ["fire"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["fire"], "condition": "TargetBreakDownTurn()>0"}
+      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["fire"], "condition": "target.down_turns()>0"}
     ]
   },
   "3250002": {
@@ -4737,7 +4748,7 @@
     "attack_type": "slash",
     "elements": ["ice"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["ice"], "condition": "TargetBreakDownTurn()>0"}
+      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["ice"], "condition": "target.down_turns()>0"}
     ]
   },
   "326": {
@@ -4745,7 +4756,7 @@
     "names": {"zh_cn": "对称·启示", "zh_tw": "對稱釋能", "jp": "シンメトリー・リベレーション"},
     "kind": "active",
     "cost": {
-      "yes": {"sp": 16},
+      "yes": {"sp": 0},
       "no": {"sp": 16}
     },
     "hit_count": 10,
@@ -4759,7 +4770,7 @@
         {"type": "penetration_critical_attack", "target": "single", "attack_type": "slash"}
       ]
     },
-    "conditions": {"cost": "CountBC(IsDead()==0 && IsPlayer()==0&&SpecialStatusCountByType(172)>0)>0", "effects": "CountBC(IsDead()==0 && IsPlayer()==0&&SpecialStatusCountByType(172)>0)>0"}
+    "conditions": {"cost": "enemy.count(has(170)) > 0", "effects": "enemy.count(has(170)) > 0"}
   },
   "327": {
     "id": 327,
@@ -4841,7 +4852,7 @@
     "kind": "active",
     "cost": {"sp": 7},
     "target": "ally_single",
-    "condition": "MoraleLevel() >= 6",
+    "condition": "level(119) >= 6",
     "effects": [
       {"type": "funnel", "target": "ally_single", "status_id": 13, "duration": {"type": "ally_turn", "value": 5}, "solo": true}
     ]
@@ -4863,7 +4874,7 @@
     "kind": "active",
     "cost": {"sp": 13},
     "target": "ally_all_without_self",
-    "condition": "CountBC(IsPlayer())>1",
+    "condition": "ally.count() > 1",
     "effects": [
       {"type": "resource", "target": "ally_all_without_self"}
     ]
@@ -4874,7 +4885,7 @@
     "kind": "active",
     "cost": {"sp": 13},
     "target": "ally_all_without_self",
-    "condition": "CountBC(IsPlayer())>1",
+    "condition": "ally.count() > 1",
     "effects": [
       {"type": "attack_up", "target": "ally_all_without_self", "status_id": 1, "duration": {"type": "use", "value": 1}},
       {"type": "resource", "target": "ally_all_without_self"},
@@ -4885,7 +4896,7 @@
     "id": 337,
     "names": {"zh_cn": "冻结之咒", "zh_tw": "急凍咒語", "jp": "フリージング・スペル"},
     "kind": "active",
-    "cost": {"sp": 12, "conditional_amount": 6, "condition": "CountBC(IsPlayer()==0&&IsDead()==0&&SpecialStatusCountByType(58))>0"},
+    "cost": {"yes": {"sp": 6}, "no": {"sp": 12}}, "conditions": {"cost": "enemy.count(stacks(58)) > 0"},
     "hit_count": 6,
     "target": "single",
     "attack_type": "slash",
@@ -4919,7 +4930,7 @@
     "target": "all",
     "attack_type": "slash",
     "elements": ["dark"],
-    "use_condition": "MoraleLevel() >= 6",
+    "use_condition": "level(119) >= 6",
     "effects": {
       "yes": [
         {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]}
@@ -4928,7 +4939,7 @@
         {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]}
       ]
     },
-    "conditions": {"cost": "CountBC(IsPlayer() == 1 && IsCharacter(KHiiragi) == 1 && MoraleLevel() >= 6)>0", "effects": "CountBC(IsPlayer() == 1 && IsCharacter(KHiiragi) == 1 && MoraleLevel()>=6)>0"}
+    "conditions": {"cost": "ally.count(character('KHiiragi') == 1 and level(119) >= 6) > 0", "effects": "ally.count(character('KHiiragi') == 1 and level(119)>=6) > 0"}
   },
   "340": {
     "id": 340,
@@ -4941,13 +4952,13 @@
         "type": "all_status_up_value",
         "target": "ally_all",
         "status_id": 95,
-        "target_condition": "IsCharacter(KMaruyama)==1 || IsCharacter(MTenne)==1 || IsCharacter(YBungo)==1 || IsCharacter(HOgasawara)==1 || IsCharacter(YoOhshima)==1 || IsCharacter(VBalakrishnan)==1 ",
+        "target_condition": "character('KMaruyama')==1 or character('MTenne')==1 or character('YBungo')==1 or character('HOgasawara')==1 or character('YoOhshima')==1 or character('VBalakrishnan')==1",
         "duration": {"type": "permanent"}
       },
       {
         "type": "resource",
         "target": "ally_all",
-        "target_condition": "IsCharacter(KMaruyama)==1 || IsCharacter(MTenne)==1 || IsCharacter(YBungo)==1 || IsCharacter(HOgasawara)==1 || IsCharacter(YoOhshima)==1 || IsCharacter(VBalakrishnan)==1 ",
+        "target_condition": "character('KMaruyama')==1 or character('MTenne')==1 or character('YBungo')==1 or character('HOgasawara')==1 or character('YoOhshima')==1 or character('VBalakrishnan')==1",
         "duration": {"type": "permanent"}
       }
     ]
@@ -5057,7 +5068,7 @@
         {"type": "resource", "target": "ally_all"}
       ]
     },
-    "conditions": {"effects": "IsCharging()"}
+    "conditions": {"effects": "charging()"}
   },
   "349": {
     "id": 349,
@@ -5076,7 +5087,7 @@
         {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]}
       ]
     },
-    "conditions": {"effects": "IsCharging()"}
+    "conditions": {"effects": "charging()"}
   },
   "350": {
     "id": 350,
@@ -5099,7 +5110,7 @@
         {"type": "remove_buff", "target": "single"}
       ]
     },
-    "conditions": {"effects": "IsCharging()"}
+    "conditions": {"effects": "charging()"}
   },
   "351": {
     "id": 351,
@@ -5129,7 +5140,7 @@
         "type": "funnel",
         "target": "ally_all",
         "status_id": 13,
-        "target_condition": "IsNatureElement(Thunder)==0",
+        "target_condition": "element('thunder')==0",
         "duration": {"type": "ally_turn", "value": 3},
         "solo": true
       },
@@ -5137,7 +5148,7 @@
         "type": "funnel",
         "target": "ally_all",
         "status_id": 13,
-        "target_condition": "IsNatureElement(Thunder)==1",
+        "target_condition": "element('thunder')==1",
         "duration": {"type": "ally_turn", "value": 3},
         "solo": true
       }
@@ -5150,7 +5161,7 @@
     "cost": {"sp": 0},
     "trigger": "on_battle_win",
     "effects": [
-      {"type": "heal_skill_used_count", "target": "ally_all", "target_condition": "IsNatureElement(Dark)"}
+      {"type": "heal_skill_used_count", "target": "ally_all", "target_condition": "element('dark')"}
     ]
   },
   "354": {
@@ -5282,7 +5293,7 @@
     "cost": {"sp": 0},
     "hit_count": 1,
     "target": "single",
-    "condition": "Sp()<0",
+    "condition": "sp()<0",
     "effects": [
       {"type": "fixed_hp_damage_rate_attack", "target": "single"},
       {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}}
@@ -5305,7 +5316,7 @@
         {"type": "revive_territory", "target": "field", "status_id": 157}
       ]
     },
-    "conditions": {"effects": "PlayedSkillCount(LShanhuaSkill54)==0"}
+    "conditions": {"effects": "used(365)==0"}
   },
   "366": {
     "id": 366,
@@ -5316,7 +5327,7 @@
     "effects": [
       {"type": "dim_sum", "target": "ally_all", "status_id": 202, "duration": {"type": "permanent"}},
       {"type": "sprightly", "target": "ally_all", "status_id": 194, "duration": {"type": "use", "value": 1}},
-      {"type": "resource", "target": "ally_all_without_self", "target_condition": "IsNatureElement(Dark)"}
+      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('dark')"}
     ]
   },
   "367": {
@@ -5327,7 +5338,7 @@
     "target": "ally_single",
     "effects": [
       {"type": "resource", "target": "ally_single"},
-      {"type": "resource", "target": "ally_single", "target_condition": "IsTeam(31A)==1"}
+      {"type": "resource", "target": "ally_single", "target_condition": "team.is_member('31A')==1"}
     ]
   },
   "368": {
@@ -5424,7 +5435,7 @@
     "hit_count": 1,
     "target": "all",
     "attack_type": "strike",
-    "condition": "0.0<DpRate()",
+    "condition": "0.0<dp_rate()",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "strike"},
       {"type": "self_damage", "target": "self"},
@@ -5462,7 +5473,7 @@
     "id": 378,
     "names": {"zh_cn": "极限冲击+", "zh_tw": "極限衝擊+", "jp": "リミット・インパクト+"},
     "kind": "active",
-    "cost": {"sp": 10, "conditional_amount": 5, "condition": "CountBC(IsPlayer() &&IsTeam(31A)==1)>=3"},
+    "cost": {"yes": {"sp": 5}, "no": {"sp": 10}}, "conditions": {"cost": "team.member('31A') >= 3"},
     "hit_count": 1,
     "target": "single",
     "attack_type": "strike",
@@ -5545,7 +5556,7 @@
     "effects": [
       {"type": "defense_down", "target": "all", "elements": ["ice"], "status_id": 3, "duration": {"type": "permanent"}},
       {"type": "zone", "target": "field", "elements": ["ice"], "status_id": 14, "duration": {"type": "ally_turn", "value": 8}},
-      {"type": "resist_down", "target": "all", "elements": ["ice"], "status_id": 18, "target_condition": "IsWeakElement(Ice)==1", "duration": {"type": "permanent"}}
+      {"type": "resist_down", "target": "all", "elements": ["ice"], "status_id": 18, "target_condition": "target.weak('ice')==1", "duration": {"type": "permanent"}}
     ]
   },
   "3830002": {
@@ -5565,7 +5576,7 @@
         "target": "all",
         "elements": ["thunder"],
         "status_id": 18,
-        "target_condition": "IsWeakElement(Thunder)==1",
+        "target_condition": "target.weak('thunder')==1",
         "duration": {"type": "permanent"}
       }
     ]
@@ -5588,7 +5599,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "fire_mark", "target": "ally_all", "status_id": 166, "target_condition": "IsNatureElement(Fire)==1", "duration": {"type": "permanent"}}
+      {"type": "fire_mark", "target": "ally_all", "status_id": 166, "target_condition": "element('fire')==1", "duration": {"type": "permanent"}}
     ]
   },
   "386": {
@@ -5702,7 +5713,7 @@
     "id": 394,
     "names": {"zh_cn": "御稻荷神话", "zh_tw": "御稻荷神話", "jp": "御稲荷神話"},
     "kind": "active",
-    "cost": {"sp": 14, "conditional_amount": 7, "condition": "CountBC(IsPlayer()==0&&IsDead()==0&&SpecialStatusCountByType(22)>0)>0"},
+    "cost": {"yes": {"sp": 7}, "no": {"sp": 14}}, "conditions": {"cost": "enemy.count(has(22)) > 0"},
     "hit_count": 3,
     "target": "single",
     "attack_type": "stab",
@@ -5734,10 +5745,10 @@
     "names": {"zh_cn": "暮色中升腾绽放的幻影", "zh_tw": "騰空綻放的夜幕幻影", "jp": "咲き昇る宵の幻"},
     "kind": "active",
     "cost": {
-      "sp": 16,
-      "conditional_amount": 8,
-      "condition": "CountBC(IsPlayer() == 1 && IsCharacter(MKiryu) == 1 && FireMarkLevel()>=4)>=1"
-    },
+      "yes": {
+        "sp": 8},
+      "no": {"sp": 16}
+    }, "conditions": {"cost": "ally.count(character('MKiryu') == 1 and level(166)>=4) >= 1"},
     "hit_count": 8,
     "target": "single",
     "attack_type": "stab",
@@ -5748,7 +5759,7 @@
         "type": "mind_eye",
         "target": "ally_all",
         "status_id": 78,
-        "target_condition": "IsNatureElement(Fire)==1",
+        "target_condition": "element('fire')==1",
         "duration": {"type": "ally_turn", "value": 5},
         "solo": true
       }
@@ -5823,14 +5834,14 @@
     "attack_type": "strike",
     "elements": ["thunder"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "all", "attack_type": "strike", "elements": ["thunder"], "condition": "IsHitWeak()"}
+      {"type": "damage_rate_change_attack_skill", "target": "all", "attack_type": "strike", "elements": ["thunder"], "condition": "target.weak_to_hit()"}
     ]
   },
   "403": {
     "id": 403,
     "names": {"zh_cn": "配牌上々", "zh_tw": "優勢開局", "jp": "配牌上々"},
     "kind": "active",
-    "cost": {"sp": 11, "conditional_amount": 6, "condition": "CountBC(PlayedSkillCount(MKurosawaSkill06)>0)==0"},
+    "cost": {"yes": {"sp": 6}, "no": {"sp": 11}}, "conditions": {"cost": "not (used(403)>0)"},
     "hit_count": 1,
     "target": "all",
     "attack_type": "strike",
@@ -5858,7 +5869,7 @@
         {"type": "fragile", "target": "single", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}}
       ]
     },
-    "conditions": {"effects": "IsCharging()"}
+    "conditions": {"effects": "charging()"}
   },
   "405": {
     "id": 405,
@@ -5880,7 +5891,7 @@
         {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}}
       ]
     },
-    "conditions": {"effects": "IsCharging()"}
+    "conditions": {"effects": "charging()"}
   },
   "406": {
     "id": 406,
@@ -5903,10 +5914,10 @@
     "names": {"zh_cn": "黒蝶霹靂制裁", "zh_tw": "黑蝶霹靂制裁", "jp": "黒蝶霹靂制裁"},
     "kind": "active",
     "cost": {
-      "sp": 16,
-      "conditional_amount": 8,
-      "condition": "CountBC(IsPlayer() == 1 && IsCharacter(MKurosawa) == 1 && IsCharging()==1) > 0"
-    },
+      "yes": {
+        "sp": 8},
+      "no": {"sp": 16}
+    }, "conditions": {"cost": "ally.count(character('MKurosawa') == 1 and charging()==1) > 0"},
     "hit_count": 4,
     "target": "all",
     "attack_type": "strike",
@@ -5983,7 +5994,7 @@
     "hit_count": 3,
     "target": "single",
     "attack_type": "strike",
-    "condition": "Turn()==1",
+    "condition": "turn()==1",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "strike"},
       {"type": "resource", "target": "self"}
@@ -5993,7 +6004,7 @@
     "id": 414,
     "names": {"zh_cn": "顺风", "zh_tw": "優勢", "jp": "追風"},
     "kind": "active",
-    "cost": {"sp": 12, "conditional_amount": 6, "condition": "IsOverDrive()"},
+    "cost": {"yes": {"sp": 6}, "no": {"sp": 12}}, "conditions": {"cost": "od()"},
     "hit_count": 3,
     "target": "all",
     "attack_type": "strike",
@@ -6011,7 +6022,7 @@
     "target": "ally_front",
     "effects": [
       {"type": "attack_up", "target": "ally_front", "status_id": 1, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-      {"type": "additional_turn", "target": "ally_front", "status_id": 20, "hit_condition": "SpecialStatusCountByType(20)==0"}
+      {"type": "additional_turn", "target": "ally_front", "status_id": 20, "hit_condition": "not has(20)"}
     ]
   },
   "416": {
@@ -6045,7 +6056,7 @@
         {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["dark"]}
       ]
     },
-    "conditions": {"effects": "IsOverDrive()"}
+    "conditions": {"effects": "od()"}
   },
   "418": {
     "id": 418,
@@ -6067,7 +6078,7 @@
         {"type": "attack_up", "target": "self", "elements": ["dark"], "status_id": 1, "duration": {"type": "use", "value": 1}}
       ]
     },
-    "conditions": {"effects": "IsOverDrive()"}
+    "conditions": {"effects": "od()"}
   },
   "419": {
     "id": 419,
@@ -6087,7 +6098,7 @@
         {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["ice"]}
       ]
     },
-    "conditions": {"effects": "IsOverDrive()"}
+    "conditions": {"effects": "od()"}
   },
   "420": {
     "id": 420,
@@ -6113,7 +6124,7 @@
         {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
       ]
     },
-    "conditions": {"effects": "IsOverDrive()"}
+    "conditions": {"effects": "od()"}
   },
   "421": {
     "id": 421,
@@ -6137,7 +6148,7 @@
     "cost": {"sp": 0},
     "trigger": "on_battle_start",
     "effects": [
-      {"type": "resource", "target": "ally_all", "target_condition": "IsTeam(31C)==1"}
+      {"type": "resource", "target": "ally_all", "target_condition": "team.is_member('31C')==1"}
     ]
   },
   "423": {
@@ -6224,9 +6235,9 @@
     "kind": "active",
     "cost": {"sp": 6},
     "target": "ally_single_without_self",
-    "condition": "SpecialStatusCountByType(20)==0 && CountBC(IsPlayer())>1",
+    "condition": "not has(20) and ally.count() > 1",
     "effects": [
-      {"type": "additional_turn", "target": "ally_single_without_self", "status_id": 20, "target_condition": "IsFront()==1"},
+      {"type": "additional_turn", "target": "ally_single_without_self", "status_id": 20, "target_condition": "front()==1"},
       {"type": "additional_turn", "target": "self", "status_id": 20}
     ]
   },
@@ -6280,7 +6291,7 @@
         {"type": "zone", "target": "field", "elements": ["ice"], "status_id": 14, "duration": {"type": "permanent"}}
       ]
     },
-    "conditions": {"effects": "CountBC(IsPlayer() &&IsTeam(31C)==1)>=3"}
+    "conditions": {"effects": "team.member('31C') >= 3"}
   },
   "434": {
     "id": 434,
@@ -6300,7 +6311,7 @@
         {"type": "critical_rate_up", "target": "ally_front", "status_id": 5, "duration": {"type": "use", "value": 1}}
       ]
     },
-    "conditions": {"effects": "PlayedSkillCount(MSatsukiSkill52)==0"}
+    "conditions": {"effects": "used(434)==0"}
   },
   "435": {
     "id": 435,
@@ -6320,7 +6331,7 @@
         {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["ice"]}
       ]
     },
-    "conditions": {"effects": "CountBC(IsPlayer()==0&&IsDead()==0&&IsBroken()==1&&DamageRate()>=200.0)>0"}
+    "conditions": {"effects": "enemy.count(broken()==1 and damage_rate()>=200.0) > 0"}
   },
   "436": {
     "id": 436,
@@ -6342,7 +6353,7 @@
         {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["fire"]}
       ]
     },
-    "conditions": {"effects": "SpecialStatusCountByType(125) > 0"}
+    "conditions": {"effects": "has(124)"}
   },
   "437": {
     "id": 437,
@@ -6357,7 +6368,7 @@
     "effects": {
       "cases": [
         {
-          "when": "PlayedSkillCount(MSatsukiSkill55) == 0",
+          "when": "used(437) == 0",
           "effects": [
             {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "permanent"}},
             {"type": "fragile", "target": "single", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}}
@@ -6365,7 +6376,7 @@
           "description_jp": "使用回数1回目"
         },
         {
-          "when": "PlayedSkillCount(MSatsukiSkill55) == 1",
+          "when": "used(437) == 1",
           "effects": [
             {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "permanent"}},
             {"type": "fragile", "target": "single", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}},
@@ -6374,7 +6385,7 @@
           "description_jp": "使用回数2回目"
         },
         {
-          "when": "PlayedSkillCount(MSatsukiSkill55) == 2",
+          "when": "used(437) == 2",
           "effects": [
             {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "permanent"}},
             {"type": "fragile", "target": "single", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}},
@@ -6383,7 +6394,7 @@
           "description_jp": "使用回数3回目"
         },
         {
-          "when": "PlayedSkillCount(MSatsukiSkill55) >= 3",
+          "when": "used(437) >= 3",
           "effects": [
             {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "permanent"}},
             {"type": "fragile", "target": "single", "status_id": 22, "duration": {"type": "enemy_turn", "value": 2}},
@@ -6393,7 +6404,7 @@
         }
       ]
     },
-    "conditions": {"cost": "CountBC(PlayedSkillCount(MSatsukiSkill55)>1)>0"}
+    "conditions": {"cost": "ally.count(used(437)>1) > 0"}
   },
   "438": {
     "id": 438,
@@ -6406,8 +6417,8 @@
     "elements": ["light"],
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["light"]},
-      {"type": "disaster", "target": "single", "status_id": 193, "target_condition": "IsWeakElement(Light)", "duration": {"type": "permanent"}},
-      {"type": "venom", "target": "single", "status_id": 218, "target_condition": "IsWeakElement(Light)", "duration": {"type": "enemy_turn", "value": 10}}
+      {"type": "disaster", "target": "single", "status_id": 193, "target_condition": "target.weak('light')", "duration": {"type": "permanent"}},
+      {"type": "venom", "target": "single", "status_id": 218, "target_condition": "target.weak('light')", "duration": {"type": "enemy_turn", "value": 10}}
     ]
   },
   "439": {
@@ -6416,7 +6427,7 @@
     "kind": "active",
     "cost": {"sp": 0},
     "target": "ally_all",
-    "condition": "OverDriveGauge() >= 0",
+    "condition": "od_gauge() >= 0",
     "effects": [
       {"type": "remove_debuff", "target": "ally_all"},
       {"type": "resource", "target": "self"}
@@ -6524,7 +6535,7 @@
     "id": 448,
     "names": {"zh_cn": "破坏+", "zh_tw": "毀滅+", "jp": "デストロイ+"},
     "kind": "active",
-    "cost": {"sp": 14, "conditional_amount": 7, "condition": "CountBC(PlayedSkillCount(MTenneSkill51Ev1)>0)==0"},
+    "cost": {"yes": {"sp": 7}, "no": {"sp": 14}}, "conditions": {"cost": "not (used(448)>0)"},
     "hit_count": 6,
     "target": "all",
     "attack_type": "stab",
@@ -6537,7 +6548,7 @@
     "id": 449,
     "names": {"zh_cn": "猫咪大魔法", "zh_tw": "貓咪大魔法", "jp": "にゃんこ大魔法"},
     "kind": "active",
-    "cost": {"sp": 14, "conditional_amount": 7, "condition": "CountBC(IsPlayer()==0&&IsDead()==0&&SpecialStatusCountByType(3)>0)>0"},
+    "cost": {"yes": {"sp": 7}, "no": {"sp": 14}}, "conditions": {"cost": "enemy.count(has(3)) > 0"},
     "hit_count": 3,
     "target": "single",
     "attack_type": "stab",
@@ -6573,7 +6584,7 @@
     "effects": {
       "cases": [
         {
-          "when": "PlayedSkillCount(MTenneSkill54) == 0",
+          "when": "used(451) == 0",
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
             {"type": "heal_dp", "target": "ally_all"},
@@ -6582,7 +6593,7 @@
           "description_jp": "使用回数1回目"
         },
         {
-          "when": "PlayedSkillCount(MTenneSkill54) == 1",
+          "when": "used(451) == 1",
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
             {"type": "heal_dp", "target": "ally_all"},
@@ -6591,7 +6602,7 @@
           "description_jp": "使用回数2回目"
         },
         {
-          "when": "PlayedSkillCount(MTenneSkill54) == 2",
+          "when": "used(451) == 2",
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
             {"type": "heal_dp", "target": "ally_all"},
@@ -6600,7 +6611,7 @@
           "description_jp": "使用回数3回目"
         },
         {
-          "when": "PlayedSkillCount(MTenneSkill54) >= 3",
+          "when": "used(451) >= 3",
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
             {"type": "heal_dp", "target": "ally_all"},
@@ -6763,7 +6774,7 @@
         {"type": "token_change_timeline", "target": "all"}
       ]
     },
-    "conditions": {"effects": "SpecialStatusCountByType(20) > 0"}
+    "conditions": {"effects": "has(20)"}
   },
   "462": {
     "id": 462,
@@ -6774,7 +6785,7 @@
     "target": "single",
     "attack_type": "strike",
     "elements": ["light"],
-    "use_condition": "CountBC(IsPlayer() == 1 && IsCharacter(MTsukishiro) == 1 && SpecialStatusCountByType(20)>0) > 0",
+    "use_condition": "ally.count(character('MTsukishiro') == 1 and has(20)) > 0",
     "effects": {
       "yes": [
         {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["light"]}
@@ -6783,7 +6794,7 @@
         {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["light"]}
       ]
     },
-    "conditions": {"effects": "SpecialStatusCountByType(20) > 0"}
+    "conditions": {"effects": "has(20)"}
   },
   "463": {
     "id": 463,
@@ -6801,10 +6812,10 @@
     "kind": "active",
     "cost": {"sp": 0},
     "target": "ally_single_without_self",
-    "condition": "CountBC(IsPlayer())>1",
+    "condition": "ally.count() > 1",
     "effects": [
       {"type": "heal_dp", "target": "ally_single_without_self"},
-      {"type": "resource", "target": "ally_single_without_self", "target_condition": "IsCharacter(KMaruyama)==1"},
+      {"type": "resource", "target": "ally_single_without_self", "target_condition": "character('KMaruyama')==1"},
       {"type": "additional_turn", "target": "self", "status_id": 20}
     ]
   },
@@ -6871,7 +6882,7 @@
     "kind": "active",
     "cost": {"sp": 6},
     "target": "ally_single_without_self",
-    "condition": "CountBC(IsPlayer())>1",
+    "condition": "ally.count() > 1",
     "effects": [
       {"type": "resource", "target": "ally_single_without_self"}
     ]
@@ -6927,7 +6938,7 @@
     "kind": "passive",
     "cost": {"sp": 0},
     "trigger": "on_player_turn_start",
-    "trigger_condition": "IsFront()",
+    "trigger_condition": "front()",
     "effects": [
       {"type": "attack_up_per_token", "target": "self", "status_id": 27, "duration": {"type": "ally_turn", "value": 1}}
     ]
@@ -6939,7 +6950,7 @@
     "cost": {"sp": 0},
     "trigger": "on_battle_win",
     "effects": [
-      {"type": "heal_skill_used_count", "target": "ally_all", "target_condition": "IsNatureElement(Light)"}
+      {"type": "heal_skill_used_count", "target": "ally_all", "target_condition": "element('light')"}
     ]
   },
   "477": {
@@ -7064,7 +7075,7 @@
     "effects": [
       {"type": "gelato", "target": "ally_all", "status_id": 191, "duration": {"type": "permanent"}},
       {"type": "token", "target": "ally_all"},
-      {"type": "resource", "target": "ally_all_without_self", "target_condition": "IsNatureElement(Light)"}
+      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('light')"}
     ]
   },
   "487": {
@@ -7073,8 +7084,8 @@
     "kind": "active",
     "cost": {"sp": 0},
     "target": "ally_all",
-    "condition": "OverDriveGauge() < 0",
-    "random_select": {
+    "condition": "od_gauge() < 0",
+    "user_select": {
       "1": {
         "effects": [
           {"type": "resource", "target": "self"},
@@ -7123,7 +7134,7 @@
     "kind": "passive",
     "cost": {"sp": 0},
     "trigger": "on_battle_start",
-    "trigger_condition": "IsFront()",
+    "trigger_condition": "front()",
     "effects": [
       {"type": "resource", "target": "self"}
     ]
@@ -7171,7 +7182,7 @@
     "kind": "active",
     "cost": {"sp": 6},
     "target": "ally_single_without_self",
-    "condition": "CountBC(IsPlayer())>1",
+    "condition": "ally.count() > 1",
     "effects": [
       {"type": "resource", "target": "ally_single_without_self"}
     ]
@@ -7182,7 +7193,7 @@
     "kind": "active",
     "cost": {"sp": 0},
     "target": "ally_front",
-    "condition": "OverDriveGauge() >= 0",
+    "condition": "od_gauge() >= 0",
     "effects": {
       "yes": [
         {"type": "token", "target": "ally_front"},
@@ -7194,7 +7205,7 @@
         {"type": "resource", "target": "self"}
       ]
     },
-    "conditions": {"effects": "PlayedSkillCount(MiOhshimaSkill05)==0"}
+    "conditions": {"effects": "used(493)==0"}
   },
   "494": {
     "id": 494,
@@ -7231,7 +7242,7 @@
     "kind": "active",
     "cost": {"sp": 0},
     "target": "ally_all",
-    "condition": "OverDriveGauge() >= 0",
+    "condition": "od_gauge() >= 0",
     "effects": [
       {"type": "critical_rate_up", "target": "ally_all", "status_id": 5, "duration": {"type": "use", "value": 1}},
       {"type": "critical_damage_up", "target": "ally_all", "status_id": 7, "duration": {"type": "use", "value": 1}},
@@ -7247,11 +7258,11 @@
     "target": "all",
     "attack_type": "strike",
     "elements": ["light"],
-    "condition": "OverDriveGauge() >= 0",
+    "condition": "od_gauge() >= 0",
     "effects": {
       "cases": [
         {
-          "when": "Token()==10",
+          "when": "token()==10",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
             {"type": "resource", "target": "self"}
@@ -7259,7 +7270,7 @@
           "description_jp": "トークン10"
         },
         {
-          "when": "Token()==9",
+          "when": "token()==9",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
             {"type": "resource", "target": "self"}
@@ -7267,7 +7278,7 @@
           "description_jp": "トークン9"
         },
         {
-          "when": "Token()==8",
+          "when": "token()==8",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
             {"type": "resource", "target": "self"}
@@ -7275,7 +7286,7 @@
           "description_jp": "トークン8"
         },
         {
-          "when": "Token()==7",
+          "when": "token()==7",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
             {"type": "resource", "target": "self"}
@@ -7283,7 +7294,7 @@
           "description_jp": "トークン7"
         },
         {
-          "when": "Token()==6",
+          "when": "token()==6",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
             {"type": "resource", "target": "self"}
@@ -7291,7 +7302,7 @@
           "description_jp": "トークン6"
         },
         {
-          "when": "Token()==5",
+          "when": "token()==5",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
             {"type": "resource", "target": "self"}
@@ -7299,7 +7310,7 @@
           "description_jp": "トークン5"
         },
         {
-          "when": "Token()==4",
+          "when": "token()==4",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
             {"type": "resource", "target": "self"}
@@ -7307,7 +7318,7 @@
           "description_jp": "トークン4"
         },
         {
-          "when": "Token()==3",
+          "when": "token()==3",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
             {"type": "resource", "target": "self"}
@@ -7315,7 +7326,7 @@
           "description_jp": "トークン3"
         },
         {
-          "when": "Token()==2",
+          "when": "token()==2",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
             {"type": "resource", "target": "self"}
@@ -7323,7 +7334,7 @@
           "description_jp": "トークン2"
         },
         {
-          "when": "Token()==1",
+          "when": "token()==1",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
             {"type": "resource", "target": "self"}
@@ -7331,7 +7342,7 @@
           "description_jp": "トークン1"
         },
         {
-          "when": "Token()==0",
+          "when": "token()==0",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
             {"type": "resource", "target": "self"}
@@ -7416,7 +7427,7 @@
     "kind": "active",
     "cost": {"sp": 4},
     "target": "self",
-    "condition": "IsOverDrive()==0",
+    "condition": "od()==0",
     "effects": [
       {"type": "defense_up", "target": "self", "status_id": 4, "duration": {"type": "enemy_turn", "value": 2}},
       {"type": "token", "target": "self"},
@@ -7429,7 +7440,7 @@
     "kind": "active",
     "cost": {"sp": 8},
     "target": "ally_single",
-    "condition": "IsOverDrive()",
+    "condition": "od()",
     "effects": [
       {"type": "attack_up", "target": "ally_single", "status_id": 1, "duration": {"type": "use", "value": 1}},
       {"type": "critical_damage_up", "target": "ally_single", "status_id": 7, "duration": {"type": "use", "value": 1}},
@@ -7451,10 +7462,10 @@
     "id": 507,
     "names": {"zh_cn": "ドルフィンキック", "zh_tw": "海豚踢", "jp": "ドルフィンキック"},
     "kind": "active",
-    "cost": {
-      "sp": 8,
-      "condition": "CountBC(IsPlayer()==0&&IsDead()==0&&SpecialStatusCountByType(12)>0)>0||CountBC(IsPlayer()==0&&IsDead()==0&&SpecialStatusCountByType(57)>0)>0"
-    },
+    "cost": {"yes": {"sp": 0}, "no": {"sp": 8}}, "conditions": {"cost": "enemy.count(has(12)) > 0 or enemy.count(has(57)) > 0"}
+
+
+,
     "hit_count": 3,
     "target": "all",
     "attack_type": "stab",
@@ -7484,7 +7495,7 @@
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
       {"type": "mind_eye", "target": "ally_sub", "status_id": 78, "duration": {"type": "use", "value": 1}},
-      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "IsOverDrive()"}
+      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "od()"}
     ]
   },
   "510": {
@@ -7568,11 +7579,11 @@
     "id": 517,
     "names": {"zh_cn": "深藏的心意", "zh_tw": "深藏的心意", "jp": "宿る想い"},
     "kind": "active",
-    "cost": {"sp": 8, "conditional_amount": 4, "condition": "CountBC(IsPlayer() == 1 && SpecialStatusCountByType(20)>0)>0"},
+    "cost": {"yes": {"sp": 4}, "no": {"sp": 8}}, "conditions": {"cost": "ally.count(has(20)) > 0"},
     "target": "self",
     "effects": [
       {"type": "heal_ep", "target": "self"},
-      {"type": "additional_turn", "target": "ally_front", "status_id": 20, "hit_condition": "SpecialStatusCountByType(20)==0"}
+      {"type": "additional_turn", "target": "ally_front", "status_id": 20, "hit_condition": "not has(20)"}
     ]
   },
   "518": {
@@ -7673,10 +7684,10 @@
     "names": {"zh_cn": "柑橘化妆品", "zh_tw": "柑橘潤色", "jp": "シトラスティント"},
     "kind": "active",
     "cost": {
-      "sp": 10,
-      "conditional_amount": 5,
-      "condition": "CountBC(IsPlayer()==1&&IsCharacter(NiOhshima)==1&&SpecialStatusCountByType(164)>0)>0"
-    },
+      "yes": {
+        "sp": 5},
+      "no": {"sp": 10}
+    }, "conditions": {"cost": "ally.count(character('NiOhshima')==1 and has(163)) > 0"},
     "target": "self",
     "elements": ["dark"],
     "effects": [
@@ -7701,7 +7712,7 @@
     "id": 527,
     "names": {"zh_cn": "纯爱热忱+", "zh_tw": "純愛野心+", "jp": "純愛アンビシャス+"},
     "kind": "active",
-    "cost": {"sp": 14, "conditional_amount": 7, "condition": "CountBC(IsPlayer() &&IsTeam(31E)==1)>=3"},
+    "cost": {"yes": {"sp": 7}, "no": {"sp": 14}}, "conditions": {"cost": "team.member('31E') >= 3"},
     "hit_count": 8,
     "target": "single",
     "attack_type": "slash",
@@ -7715,12 +7726,12 @@
     "id": 528,
     "names": {"zh_cn": "仁慈曼舞金风中", "zh_tw": "仁慈曼舞金風中", "jp": "爽籟に舞う仁慈"},
     "kind": "active",
-    "cost": {"sp": 14, "conditional_amount": 7, "condition": "CountBC(IsPlayer()==0&&IsDead()==0&&IsBroken()==1&&DamageRate()>=200.0)>0"},
+    "cost": {"yes": {"sp": 7}, "no": {"sp": 14}}, "conditions": {"cost": "enemy.count(broken()==1 and damage_rate()>=200.0) > 0"},
     "hit_count": 8,
     "target": "all",
     "attack_type": "slash",
     "elements": ["light"],
-    "use_condition": "CountBC(IsPlayer()==0&&IsDead()==0&&IsBroken()==1&&DamageRate()>=200.0)>0",
+    "use_condition": "enemy.count(broken()==1 and damage_rate()>=200.0) > 0",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["light"]},
       {"type": "critical_damage_up", "target": "self", "elements": ["light"], "status_id": 7, "duration": {"type": "use", "value": 1}}
@@ -7731,15 +7742,15 @@
     "names": {"zh_cn": "恋上夏天的淡香水", "zh_tw": "戀上夏天的淡香水", "jp": "夏に恋するオードトワレ"},
     "kind": "active",
     "cost": {
-      "sp": 16,
-      "conditional_amount": 8,
-      "condition": "CountBC(IsPlayer()==1&&IsCharacter(NiOhshima)==1&&SpecialStatusCountByType(164)>0)>0"
-    },
+      "yes": {
+        "sp": 8},
+      "no": {"sp": 16}
+    }, "conditions": {"cost": "ally.count(character('NiOhshima')==1 and has(163)) > 0"},
     "hit_count": 4,
     "target": "all",
     "attack_type": "slash",
     "elements": ["dark"],
-    "use_condition": "SpecialStatusCountByType(164)>0",
+    "use_condition": "has(163)",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]}
     ]
@@ -7770,7 +7781,7 @@
     "kind": "passive",
     "cost": {"sp": 0},
     "trigger": "on_player_turn_start",
-    "trigger_condition": "IsFront()",
+    "trigger_condition": "front()",
     "effects": [
       {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "ally_turn", "value": 1}}
     ]
@@ -7883,7 +7894,7 @@
         {"type": "funnel", "target": "ally_single", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true}
       ]
     },
-    "conditions": {"effects": "SpecialStatusCountByType(144) > 0"}
+    "conditions": {"effects": "has(143)"}
   },
   "542": {
     "id": 542,
@@ -7893,7 +7904,7 @@
     "target": "ally_front",
     "effects": [
       {"type": "resource", "target": "ally_front"},
-      {"type": "additional_turn", "target": "ally_front", "status_id": 20, "hit_condition": "SpecialStatusCountByType(20)==0"}
+      {"type": "additional_turn", "target": "ally_front", "status_id": 20, "hit_condition": "not has(20)"}
     ]
   },
   "543": {
@@ -7912,7 +7923,7 @@
         {"type": "resource", "target": "ally_all"}
       ]
     },
-    "conditions": {"effects": "SpecialStatusCountByType(20) > 0"}
+    "conditions": {"effects": "has(20)"}
   },
   "544": {
     "id": 544,
@@ -7958,7 +7969,7 @@
         {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "use", "value": 1}}
       ]
     },
-    "conditions": {"effects": "CountBC(IsPlayer() &&IsTeam(31A)==1)>=3"}
+    "conditions": {"effects": "team.member('31A') >= 3"}
   },
   "547": {
     "id": 547,
@@ -7998,7 +8009,7 @@
     "attack_type": "slash",
     "elements": ["dark"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["dark"], "condition": "IsHitWeak()"},
+      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["dark"], "condition": "target.weak_to_hit()"},
       {"type": "defense_down", "target": "single", "elements": ["dark"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
@@ -8013,7 +8024,7 @@
     "attack_type": "slash",
     "elements": ["fire"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["fire"], "condition": "IsHitWeak()"},
+      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["fire"], "condition": "target.weak_to_hit()"},
       {"type": "defense_down", "target": "single", "elements": ["fire"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
@@ -8044,7 +8055,7 @@
     "effects": {
       "cases": [
         {
-          "when": "絶好調",
+          "when": "level(174) == 5",
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["light"]},
             {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
@@ -8056,7 +8067,7 @@
           "description_jp": "絶好調"
         },
         {
-          "when": "好調",
+          "when": "level(174) == 4",
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["light"]},
             {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
@@ -8068,7 +8079,7 @@
           "description_jp": "好調"
         },
         {
-          "when": "普通",
+          "when": "level(174) == 3",
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["light"]},
             {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
@@ -8078,7 +8089,7 @@
           "description_jp": "普通"
         },
         {
-          "when": "不調",
+          "when": "level(174) == 2",
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["light"]},
             {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
@@ -8087,7 +8098,7 @@
           "description_jp": "不調"
         },
         {
-          "when": "絶不調",
+          "when": "level(174) == 1",
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["light"]},
             {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "ally_turn", "value": 3}, "solo": true}
@@ -8096,7 +8107,7 @@
         }
       ]
     },
-    "conditions": {"cost": "CountBC(IsPlayer() == 1 && IsCharacter(RKayamori) == 1 && MotivationLevel() == 5)>0"}
+    "conditions": {"cost": "ally.count(character('RKayamori') == 1 and level(174) == 5) > 0"}
   },
   "552": {
     "id": 552,
@@ -8119,7 +8130,7 @@
         {"type": "mind_eye", "target": "ally_all", "status_id": 78, "duration": {"type": "ally_turn", "value": 5}, "solo": true}
       ]
     },
-    "conditions": {"effects": "IsOverDrive()"}
+    "conditions": {"effects": "od()"}
   },
   "553": {
     "id": 553,
@@ -8133,7 +8144,7 @@
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]},
       {"type": "defense_down", "target": "all", "elements": ["dark"], "status_id": 3, "duration": {"type": "permanent"}},
-      {"type": "resist_down", "target": "all", "elements": ["dark"], "status_id": 18, "target_condition": "IsWeakElement(Dark)==1", "duration": {"type": "permanent"}}
+      {"type": "resist_down", "target": "all", "elements": ["dark"], "status_id": 18, "target_condition": "target.weak('dark')==1", "duration": {"type": "permanent"}}
     ]
   },
   "554": {
@@ -8228,7 +8239,7 @@
     "kind": "active",
     "cost": {"sp": 4},
     "target": "ally_single",
-    "random_select": {
+    "user_select": {
       "1": {
         "effects": [
           {"type": "regeneration_dp", "target": "ally_single", "status_id": 34, "duration": {"type": "enemy_turn", "value": 6}},
@@ -8276,7 +8287,7 @@
     "id": 564,
     "names": {"zh_cn": "爱心爆破+", "zh_tw": "暖心轟炸機+", "jp": "ハートフル・ボマー+"},
     "kind": "active",
-    "cost": {"sp": 14, "conditional_amount": 7, "condition": "CountBC(IsPlayer() &&IsTeam(31D)==1)>=3"},
+    "cost": {"yes": {"sp": 7}, "no": {"sp": 14}}, "conditions": {"cost": "team.member('31D') >= 3"},
     "hit_count": 3,
     "target": "single",
     "attack_type": "stab",
@@ -8304,15 +8315,15 @@
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
       {"type": "remove_debuff", "target": "ally_all"},
-      {"type": "mind_eye", "target": "ally_all", "status_id": 78, "hit_condition": "RemoveDebuffCount()>0", "duration": {"type": "use", "value": 1}},
-      {"type": "attack_up", "target": "ally_all", "status_id": 1, "hit_condition": "RemoveDebuffCount()>0", "duration": {"type": "use", "value": 1}}
+      {"type": "mind_eye", "target": "ally_all", "status_id": 78, "hit_condition": "removed_debuffs()>0", "duration": {"type": "use", "value": 1}},
+      {"type": "attack_up", "target": "ally_all", "status_id": 1, "hit_condition": "removed_debuffs()>0", "duration": {"type": "use", "value": 1}}
     ]
   },
   "567": {
     "id": 567,
     "names": {"zh_cn": "よいこのみんな、あつまれ！", "zh_tw": "好孩子們，集合囉！", "jp": "よいこのみんな、あつまれ！"},
     "kind": "active",
-    "cost": {"sp": 10, "condition": "CountBC(IsPlayer() &&IsNatureElement(Thunder))>=4"},
+    "cost": {"yes": {"sp": 0}, "no": {"sp": 10}}, "conditions": {"cost": "team.element('thunder') >= 4"},
     "target": "ally_all",
     "elements": ["thunder"],
     "effects": [
@@ -8395,7 +8406,7 @@
     "id": 574,
     "names": {"zh_cn": "フレッダメンテ", "zh_tw": "冷奏", "jp": "フレッダメンテ"},
     "kind": "active",
-    "cost": {"sp": 11, "conditional_amount": 8, "condition": "IsTerritory(SummersEndTerritory)==1"},
+    "cost": {"yes": {"sp": 8}, "no": {"sp": 11}}, "conditions": {"cost": "has(204)==1"},
     "hit_count": 3,
     "target": "all",
     "attack_type": "slash",
@@ -8452,7 +8463,7 @@
         {"type": "funnel", "target": "ally_single", "status_id": 13, "duration": {"type": "use", "value": 1}}
       ]
     },
-    "conditions": {"effects": "IsCharging()"}
+    "conditions": {"effects": "charging()"}
   },
   "578": {
     "id": 578,
@@ -8545,7 +8556,7 @@
         "type": "attack_up",
         "target": "ally_front",
         "status_id": 1,
-        "target_condition": "IsNatureElement(Fire)==0",
+        "target_condition": "element('fire')==0",
         "duration": {"type": "ally_turn", "value": 3},
         "solo": true
       },
@@ -8553,7 +8564,7 @@
         "type": "attack_up",
         "target": "ally_front",
         "status_id": 1,
-        "target_condition": "IsNatureElement(Fire)==1",
+        "target_condition": "element('fire')==1",
         "duration": {"type": "ally_turn", "value": 5},
         "solo": true
       }
@@ -8568,7 +8579,7 @@
     "target": "single",
     "attack_type": "stab",
     "elements": ["thunder"],
-    "random_select": {
+    "user_select": {
       "1": {
         "effects": [
           {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["thunder"]},
@@ -8630,10 +8641,10 @@
         "target": "ally_all",
         "elements": ["dark"],
         "status_id": 1,
-        "target_condition": "IsNatureElement(Dark)==1",
+        "target_condition": "element('dark')==1",
         "duration": {"type": "use", "value": 1}
       },
-      {"type": "mind_eye", "target": "ally_all", "status_id": 78, "target_condition": "IsNatureElement(Dark)==1", "duration": {"type": "use", "value": 1}}
+      {"type": "mind_eye", "target": "ally_all", "status_id": 78, "target_condition": "element('dark')==1", "duration": {"type": "use", "value": 1}}
     ]
   },
   "590": {
@@ -8655,7 +8666,7 @@
     "kind": "passive",
     "cost": {"sp": 0},
     "trigger": "on_battle_start",
-    "trigger_condition": "IsFront()",
+    "trigger_condition": "front()",
     "effects": [
       {"type": "rice_field_zone", "target": "field", "status_id": 132, "duration": {"type": "permanent"}}
     ]
@@ -8784,14 +8795,14 @@
     "attack_type": "slash",
     "elements": ["dark"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "all", "attack_type": "slash", "elements": ["dark"], "condition": "IsHitWeak()"}
+      {"type": "damage_rate_change_attack_skill", "target": "all", "attack_type": "slash", "elements": ["dark"], "condition": "target.weak_to_hit()"}
     ]
   },
   "602": {
     "id": 602,
     "names": {"zh_cn": "水花晶莹，浅蓝一抹", "zh_tw": "飛沫閃耀的水淺蔥色", "jp": "飛沫きらめく水浅葱"},
     "kind": "active",
-    "cost": {"sp": 14, "conditional_amount": 7, "condition": "CountBC(PlayedSkillCount(SKuraSkill53)>0)==0"},
+    "cost": {"yes": {"sp": 7}, "no": {"sp": 14}}, "conditions": {"cost": "not (used(602)>0)"},
     "hit_count": 6,
     "target": "all",
     "attack_type": "slash",
@@ -8806,7 +8817,7 @@
     "kind": "active",
     "cost": {"sp": 5},
     "target": "ally_single_without_self",
-    "condition": "CountBC(IsPlayer())>1",
+    "condition": "ally.count() > 1",
     "effects": [
       {"type": "attack_up", "target": "ally_single_without_self", "status_id": 1, "duration": {"type": "use", "value": 1}},
       {"type": "heal_dp_rate", "target": "ally_single_without_self"},
@@ -8865,7 +8876,7 @@
         {"type": "attack", "target": "all", "attack_type": "slash"}
       ]
     },
-    "conditions": {"effects": "PlayedSkillCount(SMinaseSkill02)==0"}
+    "conditions": {"effects": "used(607)==0"}
   },
   "608": {
     "id": 608,
@@ -8909,7 +8920,7 @@
     "id": 611,
     "names": {"zh_cn": "猫眼", "zh_tw": "貓眼", "jp": "キャッツアイ"},
     "kind": "active",
-    "cost": {"sp": 10, "conditional_amount": 5, "condition": "CountBC(PlayedSkillCount(SMinaseSkill06)>0)==0"},
+    "cost": {"yes": {"sp": 5}, "no": {"sp": 10}}, "conditions": {"cost": "not (used(611)>0)"},
     "target": "self",
     "effects": [
       {"type": "mind_eye", "target": "self", "status_id": 78, "duration": {"type": "ally_turn", "value": 3}, "solo": true}
@@ -8950,17 +8961,17 @@
         {"type": "attack_up", "target": "self", "elements": ["thunder"], "status_id": 1, "duration": {"type": "use", "value": 1}}
       ]
     },
-    "conditions": {"cost": "CountBC(IsPlayer()==0&&IsDead()==0&&SpecialStatusCountByType(12)>0)>0||CountBC(IsPlayer()==0&&IsDead()==0&&SpecialStatusCountByType(57)>0)>0", "effects": "CountBC(IsPlayer()==0&&SpecialStatusCountByType(12)>0)>0||CountBC(IsPlayer()==0&&SpecialStatusCountByType(57)>0)>0"}
+    "conditions": {"cost": "enemy.count(has(12)) > 0 or enemy.count(has(57)) > 0", "effects": "enemy.count(has(12)) > 0 or enemy.count(has(57)) > 0"}
   },
   "614": {
     "id": 614,
     "names": {"zh_cn": "冰霜风暴", "zh_tw": "冰雹風暴", "jp": "ヘイルストーム"},
     "kind": "active",
     "cost": {
-      "sp": 14,
-      "conditional_amount": 7,
-      "condition": "CountBC(IsPlayer() == 1 && IsCharacter(SMinase) == 1 && SpecialStatusCountByType(122)>0)>0"
-    },
+      "yes": {
+        "sp": 7},
+      "no": {"sp": 14}
+    }, "conditions": {"cost": "ally.count(character('SMinase') == 1 and has(121)) > 0"},
     "hit_count": 4,
     "target": "all",
     "attack_type": "slash",
@@ -8973,7 +8984,7 @@
     "id": 615,
     "names": {"zh_cn": "洛可可式破坏", "zh_tw": "洛可可式破壞", "jp": "ロココ・デストラクション"},
     "kind": "active",
-    "cost": {"sp": 14, "conditional_amount": 7, "condition": "CountBC(PlayedSkillCount(SMinaseSkill53)>0)==0"},
+    "cost": {"yes": {"sp": 7}, "no": {"sp": 14}}, "conditions": {"cost": "not (used(615)>0)"},
     "hit_count": 5,
     "target": "single",
     "attack_type": "slash",
@@ -9118,10 +9129,10 @@
     "names": {"zh_cn": "如花般飞舞，灵动的火焰", "zh_tw": "漫天飛舞的動人火花", "jp": "花舞う、可憐のフレア"},
     "kind": "active",
     "cost": {
-      "sp": 14,
-      "conditional_amount": 7,
-      "condition": "CountBC(IsPlayer()==0&&IsDead()==0&&SpecialStatusCountByType(12)>0)>0||CountBC(IsPlayer()==0&&IsDead()==0&&SpecialStatusCountByType(57)>0)>0"
-    },
+      "yes": {
+        "sp": 7},
+      "no": {"sp": 14}
+    }, "conditions": {"cost": "enemy.count(has(12)) > 0 or enemy.count(has(57)) > 0"},
     "hit_count": 6,
     "target": "single",
     "attack_type": "strike",
@@ -9140,14 +9151,14 @@
     "effects": {
       "cases": [
         {
-          "when": "PlayedSkillCount(SSakurabaSkill54) == 0",
+          "when": "used(628) == 0",
           "effects": [
             {"type": "defense_up", "target": "ally_front", "status_id": 4, "duration": {"type": "enemy_turn", "value": 3}}
           ],
           "description_jp": "使用回数1回目"
         },
         {
-          "when": "PlayedSkillCount(SSakurabaSkill54) == 1",
+          "when": "used(628) == 1",
           "effects": [
             {"type": "defense_up", "target": "ally_front", "status_id": 4, "duration": {"type": "enemy_turn", "value": 3}},
             {"type": "remove_debuff", "target": "ally_front"}
@@ -9155,7 +9166,7 @@
           "description_jp": "使用回数2回目"
         },
         {
-          "when": "PlayedSkillCount(SSakurabaSkill54) == 2",
+          "when": "used(628) == 2",
           "effects": [
             {"type": "defense_up", "target": "ally_front", "status_id": 4, "duration": {"type": "enemy_turn", "value": 3}},
             {"type": "remove_debuff", "target": "ally_front"},
@@ -9164,7 +9175,7 @@
           "description_jp": "使用回数3回目"
         },
         {
-          "when": "PlayedSkillCount(SSakurabaSkill54) >= 3",
+          "when": "used(628) >= 3",
           "effects": [
             {"type": "defense_up", "target": "ally_front", "status_id": 4, "duration": {"type": "enemy_turn", "value": 3}},
             {"type": "remove_debuff", "target": "ally_front"},
@@ -9203,7 +9214,7 @@
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["thunder"]},
       {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "IsReinforcedMode()"}
+      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "reinforced()"}
     ]
   },
   "631": {
@@ -9215,7 +9226,7 @@
     "target": "all",
     "attack_type": "stab",
     "elements": ["thunder"],
-    "condition": "Sp()>0",
+    "condition": "sp()>0",
     "effects": [
       {"type": "attack_by_sp", "target": "all", "attack_type": "stab", "elements": ["thunder"]}
     ]
@@ -9317,7 +9328,7 @@
     "kind": "active",
     "cost": {"sp": 7},
     "target": "ally_sub",
-    "condition": "CountBC(IsFront()==0&&IsPlayer())>0",
+    "condition": "ally.count(front()==0) > 0",
     "effects": [
       {"type": "attack_up", "target": "ally_sub", "status_id": 1, "duration": {"type": "use", "value": 1}},
       {"type": "attack_down", "target": "self", "status_id": 2, "duration": {"type": "enemy_turn", "value": 3}}
@@ -9363,7 +9374,7 @@
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
       {"type": "attack_up", "target": "ally_all", "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "resource", "target": "ally_all_without_self", "target_condition": "IsNatureElement(Fire)==1"}
+      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('fire')==1"}
     ]
   },
   "645": {
@@ -9389,7 +9400,7 @@
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
       {"type": "regeneration_dp", "target": "ally_all", "status_id": 34, "duration": {"type": "enemy_turn", "value": 4}},
-      {"type": "resource", "target": "ally_all_without_self", "target_condition": "IsNatureElement(Light)==1"}
+      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('light')==1"}
     ]
   },
   "647": {
@@ -9408,12 +9419,12 @@
     "id": 648,
     "names": {"zh_cn": "秘技！灵符龙卷风", "zh_tw": "秘技！靈符龍捲風", "jp": "秘技！霊符トルネード"},
     "kind": "active",
-    "cost": {"sp": 13, "condition": "CountBC(IsPlayer()==0 && IsDead()==0 && BreakDownTurn()>0)>0"},
+    "cost": {"yes": {"sp": 0}, "no": {"sp": 13}}, "conditions": {"cost": "enemy.count(down_turns()>0) > 0"},
     "hit_count": 5,
     "target": "all",
     "attack_type": "slash",
     "elements": ["ice"],
-    "use_condition": "CountBC(IsPlayer()==0&&IsDead()==0&&BreakDownTurn()>0)>0",
+    "use_condition": "enemy.count(down_turns()>0) > 0",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["ice"]},
       {"type": "defense_down", "target": "all", "elements": ["ice"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
@@ -9426,7 +9437,7 @@
     "kind": "passive",
     "cost": {"sp": 0},
     "trigger": "on_battle_start",
-    "trigger_condition": "IsFront()",
+    "trigger_condition": "front()",
     "effects": [
       {"type": "resource", "target": "self"}
     ]
@@ -9515,7 +9526,7 @@
     "id": 657,
     "names": {"zh_cn": "魅惑之眸", "zh_tw": "魅惑的眼神", "jp": "魅惑のまなざし"},
     "kind": "active",
-    "cost": {"sp": 10, "conditional_amount": 5, "condition": "CountBC(IsPlayer() == 1 && SpecialStatusCountByType(20)>0)>0"},
+    "cost": {"yes": {"sp": 5}, "no": {"sp": 10}}, "conditions": {"cost": "ally.count(has(20)) > 0"},
     "hit_count": 1,
     "target": "single",
     "attack_type": "stab",
@@ -9598,7 +9609,7 @@
         "type": "funnel",
         "target": "ally_front",
         "status_id": 13,
-        "target_condition": "IsNatureElement(Dark)==1",
+        "target_condition": "element('dark')==1",
         "duration": {"type": "ally_turn", "value": 3},
         "solo": true
       },
@@ -9622,7 +9633,7 @@
     "id": 664,
     "names": {"zh_cn": "舞动吧！我心如火！", "zh_tw": "舞動吧！我心熾火！", "jp": "踊れ！マ・パシオン！"},
     "kind": "active",
-    "cost": {"sp": 16, "conditional_amount": 8, "condition": "CountBC(IsPlayer() == 1 && SpecialStatusCountByType(20)>0)>0"},
+    "cost": {"yes": {"sp": 8}, "no": {"sp": 16}}, "conditions": {"cost": "ally.count(has(20)) > 0"},
     "hit_count": 6,
     "target": "all",
     "attack_type": "stab",
@@ -9641,7 +9652,7 @@
     "cost": {"sp": 0},
     "trigger": "on_battle_win",
     "effects": [
-      {"type": "heal_skill_used_count", "target": "ally_all", "target_condition": "IsNatureElement(Ice)"}
+      {"type": "heal_skill_used_count", "target": "ally_all", "target_condition": "element('ice')"}
     ]
   },
   "666": {
@@ -9737,10 +9748,10 @@
     "names": {"zh_cn": "狂舞乱炸的迦梨+", "zh_tw": "瘋狂亂舞的迦梨+", "jp": "狂気乱舞のカーリー+"},
     "kind": "active",
     "cost": {
-      "sp": 14,
-      "conditional_amount": 7,
-      "condition": "CountBC(IsPlayer() == 1 && IsCharacter(VBalakrishnan) == 1 && DpRate() >= 1.0) > 0"
-    },
+      "yes": {
+        "sp": 7},
+      "no": {"sp": 14}
+    }, "conditions": {"cost": "ally.count(character('VBalakrishnan') == 1 and dp_rate() >= 1.0) > 0"},
     "hit_count": 10,
     "target": "single",
     "attack_type": "strike",
@@ -9771,7 +9782,7 @@
     "effects": [
       {"type": "curry", "target": "ally_all", "status_id": 171, "duration": {"type": "permanent"}},
       {"type": "defense_up", "target": "ally_all", "status_id": 4, "duration": {"type": "ally_turn", "value": 3}},
-      {"type": "resource", "target": "ally_all_without_self", "target_condition": "IsNatureElement(Ice)"}
+      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('ice')"}
     ]
   },
   "676": {
@@ -9782,7 +9793,7 @@
     "hit_count": 4,
     "target": "single",
     "attack_type": "stab",
-    "condition": "DpRate()<=0.5 && IsFront()",
+    "condition": "dp_rate()<=0.5 and front()",
     "effects": [
       {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"}
     ]
@@ -9846,7 +9857,7 @@
     "hit_count": 1,
     "target": "single",
     "attack_type": "stab",
-    "random_select": {
+    "user_select": {
       "1": {
         "effects": [
           {"type": "attack", "target": "single", "attack_type": "stab"},
@@ -9870,7 +9881,7 @@
     "kind": "active",
     "cost": {"sp": 6},
     "target": "ally_sub",
-    "condition": "CountBC(IsFront()==0&&IsPlayer())>0",
+    "condition": "ally.count(front()==0) > 0",
     "effects": [
       {"type": "b_i_yamawaki_servant", "target": "ally_sub", "status_id": 154, "duration": {"type": "permanent"}}
     ]
@@ -9883,7 +9894,7 @@
     "hit_count": 2,
     "target": "all",
     "attack_type": "stab",
-    "random_select": {
+    "user_select": {
       "1": {
         "effects": [
           {"type": "attack", "target": "all", "attack_type": "stab"},
@@ -9921,7 +9932,7 @@
     "cost": {"sp": 11},
     "target": "single",
     "attack_type": "stab",
-    "random_select": {
+    "user_select": {
       "1": {
         "hit_count": 2,
         "elements": ["ice"],
@@ -9947,7 +9958,7 @@
     "target": "single",
     "attack_type": "stab",
     "elements": ["ice"],
-    "random_select": {
+    "user_select": {
       "1": {
         "hit_count": 2,
         "effects": [
@@ -9986,7 +9997,7 @@
         {"type": "defense_down", "target": "self", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
       ]
     },
-    "conditions": {"effects": "PlayedSkillCount(YBungoSkill52)==0"}
+    "conditions": {"effects": "used(687)==0"}
   },
   "688": {
     "id": 688,
@@ -10007,7 +10018,7 @@
         {"type": "remove_buff", "target": "all"}
       ]
     },
-    "conditions": {"effects": "PlayedSkillCount(YBungoSkill53)==0"}
+    "conditions": {"effects": "used(688)==0"}
   },
   "689": {
     "id": 689,
@@ -10023,35 +10034,35 @@
     "effects": {
       "cases": [
         {
-          "when": "CountBC(IsPlayer() && SpecialStatusCountByType(155)>=1)==1",
+          "when": "ally.count(has(154)) == 1",
           "effects": [
             {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"}
           ],
           "description_jp": "下僕1人"
         },
         {
-          "when": "CountBC(IsPlayer() && SpecialStatusCountByType(155)>=1)==2",
+          "when": "ally.count(has(154)) == 2",
           "effects": [
             {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"}
           ],
           "description_jp": "下僕2人"
         },
         {
-          "when": "CountBC(IsPlayer() && SpecialStatusCountByType(155)>=1)==3",
+          "when": "ally.count(has(154)) == 3",
           "effects": [
             {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"}
           ],
           "description_jp": "下僕3人"
         },
         {
-          "when": "CountBC(IsPlayer() && SpecialStatusCountByType(155)>=1)==4",
+          "when": "ally.count(has(154)) == 4",
           "effects": [
             {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"}
           ],
           "description_jp": "下僕4人"
         },
         {
-          "when": "CountBC(IsPlayer() && SpecialStatusCountByType(155)>=1)==5",
+          "when": "ally.count(has(154)) == 5",
           "effects": [
             {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"},
             {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}}
@@ -10059,7 +10070,7 @@
           "description_jp": "下僕5人"
         },
         {
-          "when": "CountBC(IsPlayer() && SpecialStatusCountByType(155)>=1)==6",
+          "when": "ally.count(has(154)) == 6",
           "effects": [
             {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"},
             {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}},
@@ -10069,7 +10080,7 @@
         }
       ]
     },
-    "conditions": {"cost": "CountBC(IsPlayer() == 1 && SpecialStatusCountByType(155) >= 1)>=3"}
+    "conditions": {"cost": "ally.count(has(154)) >= 3"}
   },
   "690": {
     "id": 690,
@@ -10090,7 +10101,7 @@
         {"type": "fragile", "target": "single", "status_id": 22, "duration": {"type": "enemy_turn", "value": 2}}
       ]
     },
-    "conditions": {"effects": "CountBC(IsPlayer()==0 && IsDead()==0&& SpecialStatusCountByType(22)>0)>0"}
+    "conditions": {"effects": "enemy.count(has(22)) > 0"}
   },
   "691": {
     "id": 691,
@@ -10211,7 +10222,7 @@
     "elements": ["dark"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["dark"]},
-      {"type": "heal_skill_used_count", "target": "self", "hit_condition": "BreakHitCount()>0"}
+      {"type": "heal_skill_used_count", "target": "self", "hit_condition": "break_hits()>0"}
     ]
   },
   "701": {
@@ -10239,7 +10250,7 @@
     "attack_type": "stab",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab"},
-      {"type": "resource", "target": "ally_front", "hit_condition": "BreakHitCount()>0"}
+      {"type": "resource", "target": "ally_front", "hit_condition": "break_hits()>0"}
     ]
   },
   "703": {
@@ -10253,7 +10264,7 @@
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab"},
       {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}},
-      {"type": "resource", "target": "ally_front", "hit_condition": "BreakHitCount()>0"}
+      {"type": "resource", "target": "ally_front", "hit_condition": "break_hits()>0"}
     ]
   },
   "704": {
@@ -10296,8 +10307,8 @@
     "elements": ["light"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["light"]},
-      {"type": "super_break", "target": "all", "elements": ["light"], "status_id": 105, "condition": "IsHitWeak()"},
-      {"type": "super_break", "target": "all", "elements": ["light"], "status_id": 105, "condition": "IsHitWeak()"},
+      {"type": "super_break", "target": "all", "elements": ["light"], "status_id": 105, "condition": "target.weak_to_hit()"},
+      {"type": "super_break", "target": "all", "elements": ["light"], "status_id": 105, "condition": "target.weak_to_hit()"},
       {"type": "attack_down", "target": "self", "status_id": 2, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
@@ -10359,13 +10370,13 @@
     "elements": ["ice"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["ice"]},
-      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "IsNatureElement(Ice)==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true},
+      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('ice')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true},
       {
         "type": "resist_down",
         "target": "all",
         "elements": ["ice"],
         "status_id": 18,
-        "target_condition": "IsWeakElement(Ice)==1",
+        "target_condition": "target.weak('ice')==1",
         "duration": {"type": "enemy_turn", "value": 2}
       }
     ]
@@ -10481,7 +10492,7 @@
     "kind": "active",
     "cost": {"sp": 7},
     "target": "ally_front",
-    "condition": "SpecialStatusCountByType(20)==0",
+    "condition": "not has(20)",
     "effects": [
       {"type": "additional_turn", "target": "ally_front", "status_id": 20}
     ]
@@ -10508,11 +10519,11 @@
         "type": "funnel",
         "target": "ally_all",
         "status_id": 13,
-        "target_condition": "IsNatureElement(Fire)==1",
+        "target_condition": "element('fire')==1",
         "duration": {"type": "ally_turn", "value": 3},
         "solo": true
       },
-      {"type": "additional_turn", "target": "ally_front", "status_id": 20, "hit_condition": "SpecialStatusCountByType(20) == 0"}
+      {"type": "additional_turn", "target": "ally_front", "status_id": 20, "hit_condition": "not has(20)"}
     ]
   },
   "722": {
@@ -10560,12 +10571,12 @@
         {"type": "critical_damage_up", "target": "self", "elements": ["dark"], "status_id": 7, "duration": {"type": "use", "value": 1}}
       ]
     },
-    "conditions": {"effects": "SpecialStatusCountByType(20) > 0"}
+    "conditions": {"effects": "has(20)"}
   },
   "7250001": {
     "id": 7250001,
     "link": 7250002,
-    "conditions": {"effects": "追加回合中"},
+    "conditions": {"effects": "extra_turn()"},
     "names": {"zh_cn": "苍焰迷宫", "zh_tw": "蒼焰迷宮", "jp": "蒼焔ノ迷宮"},
     "kind": "active",
     "cost": {"sp": 15},
@@ -10586,7 +10597,7 @@
   "7250002": {
     "id": 7250002,
     "link": 7250001,
-    "conditions": {"cost": "追加回合中"},
+    "conditions": {"cost": "extra_turn()"},
     "names": {"zh_cn": "苍焰螺旋", "zh_tw": "蒼焰螺旋", "jp": "蒼焔ノ螺旋"},
     "kind": "active",
     "cost": {
@@ -10605,7 +10616,7 @@
     "id": 726,
     "names": {"zh_cn": "苍星虹彩", "zh_tw": "蒼星的虹彩", "jp": "蒼星のイリデッセンス"},
     "kind": "active",
-    "cost": {"sp": 16, "conditional_amount": 8, "condition": "CountBC(IsPlayer()==1&&IsCharacter(YShirakawa)==1&&Token()>3)>0"},
+    "cost": {"yes": {"sp": 8}, "no": {"sp": 16}}, "conditions": {"cost": "ally.count(character('YShirakawa')==1 and token()>3) > 0"},
     "hit_count": 8,
     "target": "all",
     "attack_type": "slash",
@@ -10620,7 +10631,7 @@
     "id": 727,
     "names": {"zh_cn": "为神献身的胜旗圣女", "zh_tw": "為神獻身的勝旗聖女", "jp": "神に捧ぐ、勝旗のラ・ピュセル"},
     "kind": "active",
-    "cost": {"sp": 16, "conditional_amount": 8, "condition": "CountBC(IsPlayer() == 1 && SpecialStatusCountByType(20)>0)>0"},
+    "cost": {"yes": {"sp": 8}, "no": {"sp": 16}}, "conditions": {"cost": "ally.count(has(20)) > 0"},
     "hit_count": 8,
     "target": "all",
     "attack_type": "slash",
@@ -10638,10 +10649,10 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "replace_pursuit", "target": "self", "status_id": 158, "condition": "HasSkill(YoOhshimaSkill53)==1", "duration": {"type": "permanent"}}
+      {"type": "replace_pursuit", "target": "self", "status_id": 158, "condition": "has_skill(737)==1", "duration": {"type": "permanent"}}
     ],
     "variants": [
-      {"id": 7280001, "selection": "replace_pursuit", "condition": "IsFront()==0", "description_jp": "3ターン 前衛の闇属性スキル攻撃力と闇属性CRT率&ダメージを\n大きく上げ [単独発動] 敵に闇属性攻撃[追撃でのみ発動可能]"}
+      {"id": 7280001, "selection": "replace_pursuit", "condition": "front()==0", "description_jp": "3ターン 前衛の闇属性スキル攻撃力と闇属性CRT率&ダメージを\n大きく上げ [単独発動] 敵に闇属性攻撃[追撃でのみ発動可能]"}
     ]
   },
   "7280001": {
@@ -10654,7 +10665,7 @@
     "target": "single",
     "attack_type": "stab",
     "elements": ["dark"],
-    "condition": "IsFront()==0",
+    "condition": "front()==0",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
       {"type": "attack_up", "target": "ally_front", "elements": ["dark"], "status_id": 1, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
@@ -10691,7 +10702,7 @@
     "kind": "active",
     "cost": {"sp": 7},
     "target": "ally_sub",
-    "condition": "CountBC(IsFront()==0&&IsPlayer())>0",
+    "condition": "ally.count(front()==0) > 0",
     "effects": [
       {"type": "attack_up", "target": "ally_sub", "status_id": 1, "duration": {"type": "use", "value": 1}},
       {"type": "recoil_random", "target": "self", "duration": {"type": "ally_turn", "value": 2}}
@@ -10716,7 +10727,7 @@
     "kind": "active",
     "cost": {"sp": 12},
     "target": "ally_sub",
-    "condition": "CountBC(IsFront()==0&&IsPlayer())>0",
+    "condition": "ally.count(front()==0) > 0",
     "effects": [
       {"type": "attack_up", "target": "ally_sub", "status_id": 1, "duration": {"type": "use", "value": 1}},
       {"type": "resource", "target": "self"}
@@ -10726,14 +10737,14 @@
     "id": 734,
     "names": {"zh_cn": "サンシャインリフレクション", "zh_tw": "夏陽反射", "jp": "サンシャインリフレクション"},
     "kind": "active",
-    "cost": {"sp": 12, "conditional_amount": 6, "condition": "IsOverDrive()"},
+    "cost": {"yes": {"sp": 6}, "no": {"sp": 12}}, "conditions": {"cost": "od()"},
     "hit_count": 2,
     "target": "all",
     "attack_type": "stab",
     "elements": ["light"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["light"]},
-      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "SpecialStatusCountByType(20) == 0"}
+      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "not has(20)"}
     ]
   },
   "735": {
@@ -10743,7 +10754,7 @@
     "cost": {"sp": 12},
     "target": "ally_sub",
     "elements": ["fire"],
-    "condition": "CountBC(IsFront()==0&&IsPlayer())>0",
+    "condition": "ally.count(front()==0) > 0",
     "effects": [
       {"type": "attack_up", "target": "ally_sub", "elements": ["fire"], "status_id": 1, "duration": {"type": "use", "value": 1}},
       {"type": "critical_rate_up", "target": "ally_sub", "elements": ["fire"], "status_id": 5, "duration": {"type": "use", "value": 1}},
@@ -10757,11 +10768,11 @@
     "cost": {"sp": 11},
     "target": "ally_sub",
     "elements": ["light"],
-    "condition": "CountBC(IsFront()==0&&IsPlayer())>0",
+    "condition": "ally.count(front()==0) > 0",
     "effects": [
       {"type": "attack_up", "target": "ally_sub", "elements": ["light"], "status_id": 1, "duration": {"type": "use", "value": 1}},
       {"type": "critical_damage_up", "target": "ally_sub", "elements": ["light"], "status_id": 7, "duration": {"type": "use", "value": 1}},
-      {"type": "funnel", "target": "ally_sub", "status_id": 13, "target_condition": "IsNatureElement(Light)==1", "duration": {"type": "use", "value": 1}}
+      {"type": "funnel", "target": "ally_sub", "status_id": 13, "target_condition": "element('light')==1", "duration": {"type": "use", "value": 1}}
     ]
   },
   "737": {
@@ -10773,7 +10784,7 @@
     "target": "single",
     "attack_type": "stab",
     "elements": ["dark"],
-    "condition": "IsFront()==0",
+    "condition": "front()==0",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
       {"type": "attack_up", "target": "ally_front", "elements": ["dark"], "status_id": 1, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
@@ -10797,7 +10808,7 @@
         "target": "ally_all",
         "elements": ["light"],
         "status_id": 5,
-        "target_condition": "IsNatureElement(Light)==1",
+        "target_condition": "element('light')==1",
         "duration": {"type": "ally_turn", "value": 3},
         "solo": true
       },
@@ -10806,7 +10817,7 @@
         "target": "ally_all",
         "elements": ["light"],
         "status_id": 7,
-        "target_condition": "IsNatureElement(Light)==1",
+        "target_condition": "element('light')==1",
         "duration": {"type": "ally_turn", "value": 3},
         "solo": true
       },
@@ -10814,7 +10825,7 @@
         "type": "funnel",
         "target": "ally_all",
         "status_id": 13,
-        "target_condition": "IsNatureElement(Light)==1",
+        "target_condition": "element('light')==1",
         "duration": {"type": "ally_turn", "value": 3},
         "solo": true
       }
