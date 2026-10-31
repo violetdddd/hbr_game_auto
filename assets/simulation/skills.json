@@ -1631,7 +1631,7 @@
   "120": {
     "id": 120,
     "names": {"zh_cn": "明星之路", "zh_tw": "星路", "jp": "スターダムロード"},
-    "conditions": {"cost": "ally.count(character('CMatsuoka') == 1 and charging()==1) > 0"},
+    "conditions": {"cost": "charging()==1"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 0},
@@ -2207,7 +2207,7 @@
   "163": {
     "id": 163,
     "names": {"zh_cn": "纯真狂野+", "zh_tw": "純真狂野+", "jp": "イノセントワイルド+"},
-    "conditions": {"cost": "ally.count(character('CSugahara') == 1 and dp_rate() >= 1) > 0"},
+    "conditions": {"cost": "dp_rate() >= 1"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 5},
@@ -2599,7 +2599,7 @@
   "191": {
     "id": 191,
     "names": {"zh_cn": "目不转睛·可爱光线", "zh_tw": "獨佔目光♡可愛光線", "jp": "くぎづけ♡ラブリービーム"},
-    "conditions": {"cost": "ally.count(character('EAoi') == 1 and level(119) >= 6) > 0"},
+    "conditions": {"cost": "level(119) >= 6"},
     "cases": ["effects"],
     "kind": "active",
     "cost": {
@@ -2915,7 +2915,7 @@
   "205": {
     "id": 205,
     "names": {"zh_cn": "孤独之刃", "zh_tw": "孤獨之刃", "jp": "ロンリーブレード"},
-    "conditions": {"cost": "ally.count(character('FMikoto') and dp_rate()<=0.5) > 0"},
+    "conditions": {"cost": "dp_rate()<=0.5"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 5},
@@ -5242,7 +5242,7 @@
   "339": {
     "id": 339,
     "names": {"zh_cn": "邪眼·海浪斩击", "zh_tw": "邪眼海潮斬", "jp": "邪眼・マリンスラッシュ"},
-    "conditions": {"cost": "ally.count(character('KHiiragi') == 1 and level(119) >= 6) > 0", "effects": "ally.count(character('KHiiragi') == 1 and level(119)>=6) > 0"},
+    "conditions": {"cost": "level(119) >= 6", "effects": "level(119)>=6"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 8},
@@ -6048,7 +6048,7 @@
   "396": {
     "id": 396,
     "names": {"zh_cn": "暮色中升腾绽放的幻影", "zh_tw": "騰空綻放的夜幕幻影", "jp": "咲き昇る宵の幻"},
-    "conditions": {"cost": "ally.count(character('MKiryu') == 1 and level(166)>=4) >= 1"},
+    "conditions": {"cost": "level(166)>=4"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 8},
@@ -6246,7 +6246,7 @@
   "407": {
     "id": 407,
     "names": {"zh_cn": "黑蝶霹雳制裁", "zh_tw": "黑蝶霹靂制裁", "jp": "黒蝶霹靂制裁"},
-    "conditions": {"cost": "ally.count(character('MKurosawa') == 1 and charging()==1) > 0"},
+    "conditions": {"cost": "charging()==1"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 8},
@@ -8049,7 +8049,7 @@
   "525": {
     "id": 525,
     "names": {"zh_cn": "柑橘化妆品", "zh_tw": "柑橘潤色", "jp": "シトラスティント"},
-    "conditions": {"cost": "ally.count(character('NiOhshima')==1 and has(163)) > 0"},
+    "conditions": {"cost": "has(163)"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 5},
@@ -8114,7 +8114,7 @@
   "529": {
     "id": 529,
     "names": {"zh_cn": "恋上夏天的淡香水", "zh_tw": "戀上夏天的淡香水", "jp": "夏に恋するオードトワレ"},
-    "conditions": {"cost": "ally.count(character('NiOhshima')==1 and has(163)) > 0"},
+    "conditions": {"cost": "has(163)"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 8},
@@ -8426,7 +8426,7 @@
   "551": {
     "id": 551,
     "names": {"zh_cn": "燃烧吧青春！海洋球！", "zh_tw": "燃燒青春！海洋球！", "jp": "燃やせ青春！マリンボール！"},
-    "conditions": {"cost": "ally.count(character('RKayamori') == 1 and level(174) == 5) > 0"},
+    "conditions": {"cost": "level(174) == 5"},
     "cases": ["effects"],
     "kind": "active",
     "cost": {
@@ -9403,7 +9403,7 @@
   "614": {
     "id": 614,
     "names": {"zh_cn": "冰霜风暴", "zh_tw": "冰雹風暴", "jp": "ヘイルストーム"},
-    "conditions": {"cost": "ally.count(character('SMinase') == 1 and has(121)) > 0"},
+    "conditions": {"cost": "has(121)"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 7},
@@ -10193,7 +10193,7 @@
   "673": {
     "id": 673,
     "names": {"zh_cn": "狂舞乱炸的迦梨+", "zh_tw": "瘋狂亂舞的迦梨+", "jp": "狂気乱舞のカーリー+"},
-    "conditions": {"cost": "ally.count(character('VBalakrishnan') == 1 and dp_rate() >= 1) > 0"},
+    "conditions": {"cost": "dp_rate() >= 1"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 7},
