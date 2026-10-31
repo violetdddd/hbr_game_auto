@@ -3795,7 +3795,6 @@
     "cost": {"sp": 0},
     "trigger": "on_new_turn_start",
     "trigger_condition": "dp_rate()==0 and front()",
-    "activation_limit": 1,
     "effects": [
       {"type": "revive_dp_rate", "target": "self"}
     ]
