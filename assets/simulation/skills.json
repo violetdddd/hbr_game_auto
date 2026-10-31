@@ -3036,9 +3036,9 @@
     "attack_type": "slash",
     "elements": ["fire"],
     "effects": [
-      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["fire"]},
       {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "permanent"}},
       {"type": "defense_down", "target": "all", "elements": ["fire"], "status_id": 3, "duration": {"type": "permanent"}},
+      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["fire"]},
       {"type": "self_damage", "target": "self"},
       {"type": "resource", "target": "ally_all", "sp": 2}
     ]
@@ -3919,7 +3919,7 @@
     "cost": {"sp": 0},
     "target": "self",
     "effects": [
-      {"type": "e_a_guard", "target": "self", "status_id": 209, "duration": {"type": "use", "value": 2}}
+      {"type": "e_a_guard", "target": "self", "status_id": 209, "duration": {"type": "on_attack", "value": 2}}
     ]
   },
   "252": {
@@ -5359,22 +5359,12 @@
     "interval_turn": 3,
     "effects": {
       "yes": [
-        {
-          "type": "buff_charge",
-          "target": "ally_all",
-          "status_id": 25,
-          "duration": {"type": "use", "value": 1}
-        },
+        {"type": "buff_charge", "target": "ally_all", "status_id": 25, "duration": {"type": "use", "value": 1}},
         {"type": "resource", "target": "ally_all", "sp": 3},
         {"type": "heal_dp", "target": "ally_all"}
       ],
       "no": [
-        {
-          "type": "buff_charge",
-          "target": "ally_all",
-          "status_id": 25,
-          "duration": {"type": "use", "value": 1}
-        },
+        {"type": "buff_charge", "target": "ally_all", "status_id": 25, "duration": {"type": "use", "value": 1}},
         {"type": "resource", "target": "ally_all", "sp": 3}
       ]
     }
@@ -5451,8 +5441,8 @@
     "interval_turn": 3,
     "effects": [
       {"type": "mind_eye", "target": "ally_all", "status_id": 78, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('thunder')==0", "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('thunder')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true}
+      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('thunder')==0", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": { "value": 12, "number": 5}},
+      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('thunder')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": { "value": 50, "number": 3}}
     ]
   },
   "353": {
@@ -5592,7 +5582,7 @@
     "names": {"zh_cn": "恰似春宵之尘", "zh_tw": "恰似春宵塵土", "jp": "春の宵の塵に同じ"},
     "kind": "active",
     "cost": {"sp": 0},
-    "hit_count": 1,
+    "hit_count": 0,
     "target": "single",
     "effects": [
       {"type": "fixed_hp_damage_rate_attack", "target": "single"},
@@ -5733,9 +5723,9 @@
     "target": "all",
     "attack_type": "strike",
     "effects": [
-      {"type": "attack", "target": "all", "attack_type": "strike"},
       {"type": "self_damage", "target": "self"},
-      {"type": "fragile", "target": "all", "status_id": 22, "duration": {"type": "permanent"}}
+      {"type": "fragile", "target": "all", "status_id": 22, "duration": {"type": "permanent"}},
+      {"type": "attack", "target": "all", "attack_type": "strike"}
     ]
   },
   "376": {
@@ -8276,7 +8266,7 @@
           "type": "give_debuff_up",
           "target": "ally_all",
           "status_id": 118,
-          "duration": {"type": "use", "value": 1}
+          "duration": {"type": "use_debuff", "value": 1}
         }
       ],
       "no": [{"type": "resource", "target": "ally_all", "sp": 2}]
@@ -8905,14 +8895,19 @@
   "578": {
     "id": 578,
     "names": {"zh_cn": "泡幻柔情", "zh_tw": "泡幻柔情", "jp": "泡沫アフェトゥオーソ"},
+    "conditions": {"effects": "territory.has(204)"},
     "kind": "active",
     "cost": {"sp": 0},
     "hit_count": 1,
-    "target": "field",
-    "effects": [
-      {"type": "summers_end_territory", "target": "field", "status_id": 204},
-      {"type": "attack_up_range_by_all_damage_rate", "target": "ally_all", "status_id": 205}
-    ]
+    "target": "territory",
+    "effects": {
+      "yes": [
+        {"type": "launch_summers_end_territory", "target": "ally_all", "status_id": 205}
+      ],
+      "no": [
+        {"type": "summers_end_territory", "target": "territory", "status_id": 204}
+      ]
+    }
   },
   "579": {
     "id": 579,
