@@ -1,0 +1,75 @@
+Official source: skills.json (728 original skill records)
+Input: skills(9).json (749 entries)
+Output: skills_completed.json (749 entries)
+Safety: IDs 0-50 unchanged except description_jp -> description.
+Protected official damage / break-rate branch distinctions; unresolved details logged.
+
+COUNTS:
+  description_renamed: 111
+  sp_filled: 85
+  zh_cn_replaced: 57
+  distinct_branches_kept: 49
+  od_filled: 34
+  unneeded_use_conditions_removed: 22
+  fixed_values_filled: 21
+  converted_damage_attack: 16
+  cases_detected: 12
+  conditional_attack_branches_created: 8
+  verified_branches_merged: 3
+
+REVIEW LOG:
+[HIDDEN_DAMAGE] ID 73: 条件攻击存在官方伤害/破坏率差异；已保留 yes/no 分支，倍率暂未编码
+[HIDDEN_DIFFERENCE] ID 97: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[HIDDEN_DAMAGE] ID 114: 条件攻击存在官方伤害/破坏率差异；已保留 yes/no 分支，倍率暂未编码
+[HIDDEN_DAMAGE] ID 136: 条件攻击存在官方伤害/破坏率差异；已保留 yes/no 分支，倍率暂未编码
+[NAME_DISAGREEMENT] ID 138: 官方:ルカとふたりきりですね…; 当前:ルカとふたりきりですね・・・
+[HIDDEN_DIFFERENCE] ID 167: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[HIDDEN_DAMAGE] ID 183: 条件攻击存在官方伤害/破坏率差异；已保留 yes/no 分支，倍率暂未编码
+[HIDDEN_DIFFERENCE] ID 200: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[HIDDEN_DIFFERENCE] ID 204: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[HIDDEN_DIFFERENCE] ID 225: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[HIDDEN_DIFFERENCE] ID 253: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[HIDDEN_DIFFERENCE] ID 265: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[HIDDEN_DIFFERENCE] ID 266: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[HIDDEN_DIFFERENCE] ID 268: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[HIDDEN_DIFFERENCE] ID 283: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[RESOURCE_UNKNOWN] ID 286: resource 效果无法可靠判定 SP / OD 或数值
+[HIDDEN_DAMAGE] ID 323: 条件攻击存在官方伤害/破坏率差异；已保留 yes/no 分支，倍率暂未编码
+[HIDDEN_DAMAGE] ID 324: 条件攻击存在官方伤害/破坏率差异；已保留 yes/no 分支，倍率暂未编码
+[HIDDEN_DIFFERENCE] ID 326: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[HIDDEN_DIFFERENCE] ID 339: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[NAME_DISAGREEMENT] ID 340: 官方:行くぞ！　丸山部隊！; 当前:行くぞ！丸山部隊
+[RESOURCE_UNKNOWN] ID 340: resource 效果无法可靠判定 SP / OD 或数值
+[HIDDEN_DIFFERENCE] ID 349: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[HIDDEN_DAMAGE] ID 402: 条件攻击存在官方伤害/破坏率差异；已保留 yes/no 分支，倍率暂未编码
+[HIDDEN_DIFFERENCE] ID 404: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[HIDDEN_DIFFERENCE] ID 405: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[HIDDEN_DIFFERENCE] ID 417: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[HIDDEN_DIFFERENCE] ID 461: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[HIDDEN_DIFFERENCE] ID 462: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[HIDDEN_DIFFERENCE] ID 541: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[HIDDEN_DIFFERENCE] ID 546: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[HIDDEN_DIFFERENCE] ID 552: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[HIDDEN_DAMAGE] ID 601: 条件攻击存在官方伤害/破坏率差异；已保留 yes/no 分支，倍率暂未编码
+[HIDDEN_DIFFERENCE] ID 688: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[HIDDEN_DIFFERENCE] ID 690: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[NAME_DISAGREEMENT] ID 691: 官方:BeatDown();; 当前:BeatDown()
+[HIDDEN_DIFFERENCE] ID 724: JSON 两分支相同，但官方两分支原始数据不同（可能为伤害、破坏率或其他参数）；按要求保留
+[MISSING_OFFICIAL] ID 2500001: 无法按 ID -> 官方 label 精确关联，保留源数据
+[MISSING_OFFICIAL] ID 2500002: 无法按 ID -> 官方 label 精确关联，保留源数据
+[MISSING_OFFICIAL] ID 2570001: 无法按 ID -> 官方 label 精确关联，保留源数据
+[MISSING_OFFICIAL] ID 2570002: 无法按 ID -> 官方 label 精确关联，保留源数据
+[MISSING_OFFICIAL] ID 3180001: 无法按 ID -> 官方 label 精确关联，保留源数据
+[MISSING_OFFICIAL] ID 3180002: 无法按 ID -> 官方 label 精确关联，保留源数据
+[MISSING_OFFICIAL] ID 3250001: 无法按 ID -> 官方 label 精确关联，保留源数据
+[MISSING_OFFICIAL] ID 3250002: 无法按 ID -> 官方 label 精确关联，保留源数据
+[MISSING_OFFICIAL] ID 3830001: 无法按 ID -> 官方 label 精确关联，保留源数据
+[MISSING_OFFICIAL] ID 3830002: 无法按 ID -> 官方 label 精确关联，保留源数据
+[MISSING_OFFICIAL] ID 4520001: 无法按 ID -> 官方 label 精确关联，保留源数据
+[MISSING_OFFICIAL] ID 5490001: 无法按 ID -> 官方 label 精确关联，保留源数据
+[MISSING_OFFICIAL] ID 5490002: 无法按 ID -> 官方 label 精确关联，保留源数据
+[MISSING_OFFICIAL] ID 7080001: 无法按 ID -> 官方 label 精确关联，保留源数据
+[MISSING_OFFICIAL] ID 7080002: 无法按 ID -> 官方 label 精确关联，保留源数据
+[MISSING_OFFICIAL] ID 7250001: 无法按 ID -> 官方 label 精确关联，保留源数据
+[MISSING_OFFICIAL] ID 7250002: 无法按 ID -> 官方 label 精确关联，保留源数据
+[MISSING_OFFICIAL] ID 7280001: 无法按 ID -> 官方 label 精确关联，保留源数据
