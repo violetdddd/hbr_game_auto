@@ -73,3 +73,194 @@ REVIEW LOG:
 [MISSING_OFFICIAL] ID 7250001: 无法按 ID -> 官方 label 精确关联，保留源数据
 [MISSING_OFFICIAL] ID 7250002: 无法按 ID -> 官方 label 精确关联，保留源数据
 [MISSING_OFFICIAL] ID 7280001: 无法按 ID -> 官方 label 精确关联，保留源数据
+
+
+我按照目前最新的 skills_names_synced.json 和 simulation/statuses.json 做了统计。下面以排轴模拟器需要实现什么为核心整理，而不是单纯按照游戏中的 Attacker、Buffer、Debuffer 等角色定位分类。
+一、当前数据库的整体情况
+技能记录
+967
+含 228 条子技能
+状态类型
+220
+Buff / Debuff / 其他
+单独发动效果
+147
+solo: true
+
+技能记录的分布为：
+kind	数量	说明
+active	881	主动技能及条件子技能
+passive	58	被动技能
+accessory	17	装备技能
+system	4	无动作、普通攻击、指挥、追击
+reserved	7	预留编号 4–10
+
+需要注意：881 条主动技能中包含条件分支，所以不能直接理解为 881 个独立可选技能。
+二、当前有哪些主要技能效果
+下面统计的是 effects[].type 的出现次数，同一个技能可以产生多个效果，条件子技能也会被计入，因此不是独立技能数量。
+分类	主要类型	出现次数	排轴重要性
+攻击	attack	454	高
+攻击 Buff	attack_up	141	高
+防御 Debuff	defense_down	169	高
+暴击 Buff	critical_rate_up、critical_damage_up	51、63	高
+连击 Buff	funnel	58	很高
+脆弱	fragile	38	中
+心眼	mind_eye	26	高
+充能	buff_charge	18	高
+SP/OD 等资源效果	resource	128	很高
+Token	token	19	很高
+追加回合	additional_turn	37	很高
+属性领域	zone	35	高
+DP 治疗	heal_dp	62	中
+条件分支	skill_condition	70	很高
+其他特殊技能	skill_switch、skill_random	8、8	很高
+
+对于暂时不计算伤害数值的模拟器，最先需要实现的是资源变化、行动时序、状态条件、Buff 持续、技能变体和 OD 相关效果。单纯增加伤害倍率的效果可以先保存状态、不实际计算数值。
+三、Buff 和 Debuff 的类型
+statuses.json 中 220 种状态的分类如下：
+状态类型分布
+
+
+04080120160BuffDebuff其他
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+这 220 种状态不全是普通的可叠加 Buff。有些是角色专属标记、永久效果、领域或改变行动规则的状态。
+1. 攻击与辅助 Buff
+状态 ID	类型	作用
+1	attack_up	攻击力提升
+5	critical_rate_up	暴击率提升
+7	critical_damage_up	暴击伤害提升
+13	funnel	连击
+25	buff_charge	充能
+39	damage_rate_up	伤害倍率提升
+78	mind_eye	心眼
+119	morale	士气
+
+还有带条件的派生类型，例如 attack_up_per_token、attack_up_only_normal、attack_up_include_normal。它们可能共享 attack_up 的叠加组，但适用对象和触发条件并不完全相同。
+2. 防御、恢复及控制 Buff
+状态 ID	类型	作用
+4	defense_up	防御提升
+15	invincible	无敌
+34	regeneration_dp	DP 持续恢复
+110	debuff_guard	Debuff 防护
+121	dodge	回避
+20	additional_turn	追加回合
+125	double_action_extra_skill	特殊追加行动
+140	sp_limit_overwrite	修改 SP 上限
+151	replace_normal_skill	替换普通攻击
+158	replace_pursuit	替换追击
+
+其中后六类不能只做成普通 Buff 数组，还需要让它们影响行动安排或资源限制。
+3. Debuff
+状态 ID	类型	作用
+2	attack_down	攻击下降
+3	defense_down	防御下降
+10	stun	眩晕
+11	bind	束缚
+12	provoke	挑衅
+18	resist_down	抗性下降
+22	fragile	脆弱
+23	confusion	混乱
+24	imprison	禁锢
+42	heal_down	治疗效果下降
+58	misfortune	厄运
+105	super_break	特殊破盾效果
+108	resist_down_overwrite	抗性覆盖
+
+数据库另外保留了属性值下降、持续伤害、SP 抑制、击破相关 Debuff，以及多个角色专属状态。
+四、最需要注意的特殊机制
+1. Buff 持续时间及发动消耗
+这是我们之前已经确定的核心规则。
+持续方式	当前效果数	应如何处理
+use	229	符合条件的行动消耗次数
+ally_turn	188	己方回合结算
+enemy_turn	275	敌方回合结算
+permanent	158	无普通倒计时
+od_end	3	OD 结束时移除
+one_shot	2	需要单独定义一次性触发事件
+
+这些数量是效果记录数，不是 Buff 层数。
+
+按照你已指定的规则，同一个 stack_group：
+- 有回合型状态时，优先发动回合型，不允许次数型补足第二层。
+- 没有回合型时，才使用次数型。
+- 普通情况下最多发动两层；solo: true 则单独发动。
+- 回合型不会因为攻击而减少剩余回合数。
+这里还有一个需要注意的数据库结构问题：目前只有 66 种状态显式定义了 stack_group。因此无分组的状态不能直接按照普通两层 Buff 处理，需要根据状态性质确定它们是否允许叠加。
+2. 条件技能、切换技能与随机技能
+这三种需要分开实现。
+类型	代表技能	特殊点
+skill_condition	ID 125 超新星演员	根据充能等条件选择分支
+skill_switch	ID 250 宇宙射线	根据游戏条件切换实际技能效果
+skill_random	ID 16 幸运机会	随机选择效果分支
+
+目前有 88 个主技能带 variants，每个子技能使用 parent_id 指向主技能。
+
+特别是 skill_switch：有时子技能的日文名称本来就与父技能不同，例如 ID 725 苍焰迷宫的一个子分支是「蒼焔ノ螺旋」。这种不能单纯根据名称合并成同一种技能。
+3. SP 和 Token 特殊消耗
+普通技能只需要 cost.sp，但数据库中已经存在其他形式。
+ID 141：猫型坦克
+"cost": {"sp": -1, "mode": "variable"}
+
+
+ID 166：觉醒本能
+"cost": {"resource": "token", "token": 5}
+
+
+ID 511：盛夏的冰凉冲击！
+"cost": {
+  "resource": "token",
+  "token": -1,
+  "mode": "variable"
+}
+
+
+
+这里的负数不能简单当作实际扣除负 SP 或负 Token；必须结合 mode: "variable" 和技能机制解释。排轴模拟器需要支持动态消耗。
+
+此外还存在条件减费（如 OD 中 SP 减半）、改变 SP 上限、SP 指定值、Token 的获取与消耗，以及根据 Token 数量改变 OD 获得量等情况。
+4. OD 与追加行动
+需要分别追踪：
+- OD 槽的增加、OD 发动、OD 结束。
+- additional_turn 生成的追加回合。
+- double_action_extra_skill 这种额外行动效果。
+- additional_hit_on_breaking 等满足条件的额外攻击。
+- OD 发动时触发的被动技能。
+例如 ID 23 兽牙粉碎在 on_overdrive_start 发动，生成持续至 od_end 的效果。若只实现普通回合结束的 Buff 递减，就无法正确清除这类状态。
+5. 被动技能的触发点
+目前被动技能共有 58 条，触发方式如下：
+trigger	数量
+on_first_battle_start	31
+on_battle_start	10
+on_every_turn	5
+on_player_turn_start	5
+on_battle_win	5
+on_overdrive_start	2
+
+on_kill_enemy
+
+on_first_battle_start 和 on_battle_start 是两种不同的字段值，不能在未确认语义前直接合并。
+
+on_battle_win 例如恢复技能使用次数，通常不影响当前单场排轴，却会影响连续战斗模拟。
+6. 其他不适合按普通 Buff 实现的机制
+机制	示例	模拟器需要额外保存什么
+领域	zone、rice_field_zone	当前场地状态、属性
+技能替换	ID 452 曙光	被替换动作及替换后的技能
+追击替换	ID 728 温泉通行木牌	追击动作映射
+技能历史	使用次数决定分支	技能累计使用次数
+队伍条件	ID 86 的不同人数分支	编队人数、所属队伍
+随机控制	stun_random、confusion_random	是否触发、控制持续时间
+持续恢复	regeneration_dp	每次结算的触发时机
+角色专属状态	eternal_oath、shadow_clone 等	特殊状态、技能依赖关系

@@ -825,7 +825,7 @@
     "cost": {"sp": 1},
     "target": "self",
     "effects": [
-      {"type": "resource", "target": "self", "sp": 3.0}
+      {"type": "resource", "target": "self", "sp": 3}
     ]
   },
   "66": {
@@ -845,7 +845,7 @@
     "cost": {"sp": 6},
     "target": "self",
     "effects": [
-      {"type": "resource", "target": "od", "od": 15.0}
+      {"type": "resource", "target": "od", "od": 15}
     ]
   },
   "68": {
@@ -868,7 +868,7 @@
     "attack_type": "slash",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash"},
-      {"type": "resource", "target": "self", "sp": 3.0}
+      {"type": "resource", "target": "self", "sp": 3}
     ]
   },
   "70": {
@@ -1114,40 +1114,40 @@
         {
           "when": "team.member('31C') == 2",
           "effects": [
-            {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}, "value": 5.0},
-            {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}, "value": 5.0}
+            {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}, "value": 5},
+            {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}, "value": 5}
           ],
           "description": "2名队员"
         },
         {
           "when": "team.member('31C') == 3",
           "effects": [
-            {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}, "value": 10.0},
-            {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}, "value": 10.0}
+            {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}, "value": 10},
+            {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}, "value": 10}
           ],
           "description": "3名队员"
         },
         {
           "when": "team.member('31C') == 4",
           "effects": [
-            {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}, "value": 15.0},
-            {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}, "value": 15.0}
+            {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}, "value": 15},
+            {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}, "value": 15}
           ],
           "description": "4名队员"
         },
         {
           "when": "team.member('31C') == 5",
           "effects": [
-            {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}, "value": 20.0},
-            {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}, "value": 20.0}
+            {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}, "value": 20},
+            {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}, "value": 20}
           ],
           "description": "5名队员"
         },
         {
           "when": "team.member('31C') == 6",
           "effects": [
-            {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}, "value": 25.0},
-            {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}, "value": 25.0}
+            {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}, "value": 25},
+            {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}, "value": 25}
           ],
           "description": "6名队员"
         }
@@ -1221,7 +1221,7 @@
     "cost": {"sp": 6},
     "target": "ally_single_without_self",
     "effects": [
-      {"type": "resource", "target": "ally_single_without_self", "sp": 6.0}
+      {"type": "resource", "target": "ally_single_without_self", "sp": 6}
     ]
   },
   "93": {
@@ -1231,7 +1231,7 @@
     "cost": {"sp": 6},
     "target": "ally_front_without_self",
     "effects": [
-      {"type": "resource", "target": "ally_front_without_self", "sp": 3.0}
+      {"type": "resource", "target": "ally_front_without_self", "sp": 3}
     ]
   },
   "94": {
@@ -1242,7 +1242,7 @@
     "target": "ally_single_without_self",
     "effects": [
       {"type": "b_i_yamawaki_servant", "target": "ally_single_without_self", "status_id": 154, "duration": {"type": "permanent"}},
-      {"type": "resource", "target": "ally_single_without_self", "sp": 4.0},
+      {"type": "resource", "target": "ally_single_without_self", "sp": 4},
       {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "not has(20)"}
     ]
   },
@@ -1730,7 +1730,7 @@
           "duration": {"type": "ally_turn", "value": 5},
           "solo": true
         },
-        {"type": "resource", "target": "ally_all", "sp": 5.0}
+        {"type": "resource", "target": "ally_all", "sp": 5}
       ],
       "no": [
         {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["thunder"]},
@@ -1753,7 +1753,7 @@
     "target": "self",
     "effects": [
       {"type": "revive_dp", "target": "self"},
-      {"type": "resource", "target": "self", "sp": 15.0},
+      {"type": "resource", "target": "self", "sp": 15},
       {"type": "additional_turn", "target": "self", "status_id": 20}
     ]
   },
@@ -1888,8 +1888,8 @@
     "target": "ally_all",
     "effects": [
       {"type": "steak", "target": "ally_all", "status_id": 190, "duration": {"type": "permanent"}},
-      {"type": "resource", "target": "self", "sp": 3.0},
-      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('thunder')", "sp": 3.0}
+      {"type": "resource", "target": "self", "sp": 3},
+      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('thunder')", "sp": 3}
     ]
   },
   "138": {
@@ -1899,7 +1899,7 @@
     "cost": {"sp": 0},
     "trigger": "on_battle_start",
     "effects": [
-      {"type": "resource", "target": "ally_all", "target_condition": "character('RKayamori')==1 or character('CSkopovskaya')==1", "sp": 2.0}
+      {"type": "resource", "target": "ally_all", "target_condition": "character('RKayamori')==1 or character('CSkopovskaya')==1", "sp": 2}
     ]
   },
   "139": {
@@ -2057,9 +2057,9 @@
     "target": "ally_single_without_self",
     "effects": [
       {"type": "eternal_oath", "target": "ally_single_without_self", "status_id": 123, "duration": {"type": "permanent"}},
-      {"type": "resource", "target": "ally_single_without_self", "sp": 5.0},
+      {"type": "resource", "target": "ally_single_without_self", "sp": 5},
       {"type": "eternal_oath", "target": "self", "status_id": 123, "duration": {"type": "permanent"}},
-      {"type": "resource", "target": "self", "sp": 5.0}
+      {"type": "resource", "target": "self", "sp": 5}
     ]
   },
   "151": {
@@ -2071,7 +2071,7 @@
     "elements": ["fire"],
     "effects": [
       {"type": "shchi", "target": "ally_all", "status_id": 172, "duration": {"type": "permanent"}},
-      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('fire')", "sp": 3.0},
+      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('fire')", "sp": 3},
       {"type": "zone", "target": "field", "elements": ["fire"], "status_id": 14, "duration": {"type": "permanent"}}
     ]
   },
@@ -2098,8 +2098,8 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "critical_rate_up", "target": "self", "status_id": 5, "duration": {"type": "permanent"}, "value": 100.0},
-      {"type": "critical_damage_up", "target": "self", "status_id": 7, "duration": {"type": "permanent"}, "value": 50.0},
+      {"type": "critical_rate_up", "target": "self", "status_id": 5, "duration": {"type": "permanent"}, "value": 100},
+      {"type": "critical_damage_up", "target": "self", "status_id": 7, "duration": {"type": "permanent"}, "value": 50},
       {"type": "defense_down", "target": "self", "status_id": 3, "duration": {"type": "permanent"}}
     ]
   },
@@ -2110,7 +2110,7 @@
     "cost": {"sp": 3},
     "target": "self",
     "effects": [
-      {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "enemy_turn", "value": 2}, "value": 15.0},
+      {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "enemy_turn", "value": 2}, "value": 15},
       {"type": "provoke", "target": "all", "status_id": 12}
     ]
   },
@@ -2176,7 +2176,7 @@
     "cost": {"sp": 13},
     "target": "ally_all_without_self",
     "effects": [
-      {"type": "resource", "target": "ally_all_without_self", "sp": 3.0}
+      {"type": "resource", "target": "ally_all_without_self", "sp": 3}
     ]
   },
   "161": {
@@ -2207,7 +2207,7 @@
   "163": {
     "id": 163,
     "names": {"zh_cn": "纯真狂野+", "zh_tw": "純真狂野+", "jp": "イノセントワイルド+"},
-    "conditions": {"cost": "ally.count(character('CSugahara') == 1 and dp_rate() >= 1.0) > 0"},
+    "conditions": {"cost": "ally.count(character('CSugahara') == 1 and dp_rate() >= 1) > 0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 5},
@@ -2270,7 +2270,7 @@
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["light"]},
       {"type": "heal_dp_by_damage", "target": "ally_all"},
-      {"type": "resource", "target": "ally_all", "sp": 3.0}
+      {"type": "resource", "target": "ally_all", "sp": 3}
     ]
   },
   "167": {
@@ -2449,7 +2449,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "defense_up", "target": "self", "status_id": 4, "duration": {"type": "permanent"}, "value": 15.0}
+      {"type": "defense_up", "target": "self", "status_id": 4, "duration": {"type": "permanent"}, "value": 15}
     ]
   },
   "178": {
@@ -2459,7 +2459,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "critical_rate_up", "target": "ally_all", "status_id": 5, "duration": {"type": "permanent"}, "value": 100.0}
+      {"type": "critical_rate_up", "target": "ally_all", "status_id": 5, "duration": {"type": "permanent"}, "value": 100}
     ]
   },
   "179": {
@@ -2592,7 +2592,7 @@
     "target": "ally_all",
     "effects": [
       {"type": "debuff_guard", "target": "ally_all", "status_id": 110, "duration": {"type": "use", "value": 1}},
-      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('fire')==1", "sp": 5.0}
+      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('fire')==1", "sp": 5}
     ]
   },
   "190": {
@@ -2603,7 +2603,7 @@
     "target": "ally_all",
     "effects": [
       {"type": "revive_dp", "target": "ally_all"},
-      {"type": "resource", "target": "od", "od": 100.0},
+      {"type": "resource", "target": "od", "od": 100},
       {"type": "mind_eye", "target": "ally_all", "status_id": 78, "duration": {"type": "ally_turn", "value": 5}, "solo": true}
     ]
   },
@@ -2699,7 +2699,7 @@
     "cost": {"sp": 14},
     "target": "self",
     "effects": [
-      {"type": "resource", "target": "od", "od": 50.0},
+      {"type": "resource", "target": "od", "od": 50},
       {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('ice')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true}
     ]
   },
@@ -2800,7 +2800,7 @@
     "effects": [
       {"type": "penetration_critical_attack", "target": "single", "attack_type": "strike"},
       {"type": "ignore_e_shield_element", "target": "self", "status_id": 169, "duration": {"type": "ally_turn", "value": 1}},
-      {"type": "resource", "target": "od", "hit_condition": "break_hits()>0", "od": 100.0}
+      {"type": "resource", "target": "od", "hit_condition": "break_hits()>0", "od": 100}
     ]
   },
   "198": {
@@ -2919,8 +2919,8 @@
     "cost": {"sp": 5},
     "target": "self",
     "effects": {
-      "yes": [{"type": "resource", "target": "od", "od": 75.0}, {"type": "self_damage", "target": "self"}],
-      "no": [{"type": "resource", "target": "od", "od": 25.0}, {"type": "self_damage", "target": "self"}]
+      "yes": [{"type": "resource", "target": "od", "od": 75}, {"type": "self_damage", "target": "self"}],
+      "no": [{"type": "resource", "target": "od", "od": 25}, {"type": "self_damage", "target": "self"}]
     }
   },
   "205": {
@@ -3053,7 +3053,7 @@
       {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "permanent"}},
       {"type": "defense_down", "target": "all", "elements": ["fire"], "status_id": 3, "duration": {"type": "permanent"}},
       {"type": "self_damage", "target": "self"},
-      {"type": "resource", "target": "ally_all", "sp": 2.0}
+      {"type": "resource", "target": "ally_all", "sp": 2}
     ]
   },
   "210": {
@@ -3064,8 +3064,8 @@
     "trigger": "on_new_turn_start",
     "trigger_condition": "sp()>=20",
     "effects": [
-      {"type": "resource", "target": "self", "sp": 1.0},
-      {"type": "resource", "target": "ally_all_without_self", "sp": 1.0}
+      {"type": "resource", "target": "self", "sp": 1},
+      {"type": "resource", "target": "ally_all_without_self", "sp": 1}
     ]
   },
   "211": {
@@ -3138,7 +3138,7 @@
     "trigger": "on_first_battle_start",
     "effects": [
       {"type": "additional_hit_on_breaking", "target": "self", "status_id": 115, "duration": {"type": "permanent"}},
-      {"type": "resource", "target": "ally_all", "sp": 1.0}
+      {"type": "resource", "target": "ally_all", "sp": 1}
     ]
   },
   "214": {
@@ -3174,7 +3174,7 @@
     "attack_type": "stab",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab"},
-      {"type": "resource", "target": "od", "od": 10.0}
+      {"type": "resource", "target": "od", "od": 10}
     ]
   },
   "217": {
@@ -3317,7 +3317,7 @@
     "elements": ["thunder"],
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["thunder"]},
-      {"type": "resource", "target": "ally_all", "hit_condition": "break_hits()>0", "sp": 8.0}
+      {"type": "resource", "target": "ally_all", "hit_condition": "break_hits()>0", "sp": 8}
     ]
   },
   "227": {
@@ -3360,7 +3360,7 @@
     "trigger": "on_new_turn_start",
     "trigger_condition": "zone('fire')==1 or zone('ice')==1 or zone('thunder')==1 or zone('light')==1 or zone('dark')==1",
     "effects": [
-      {"type": "resource", "target": "self", "sp": 1.0}
+      {"type": "resource", "target": "self", "sp": 1}
     ]
   },
   "230": {
@@ -3383,7 +3383,7 @@
     "attack_type": "stab",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab"},
-      {"type": "resource", "target": "self", "sp": 2.0}
+      {"type": "resource", "target": "self", "sp": 2}
     ]
   },
   "232": {
@@ -3646,7 +3646,7 @@
           "status_id": 14,
           "duration": {"type": "permanent"}
         },
-        {"type": "resource", "target": "od", "od": 30.0}
+        {"type": "resource", "target": "od", "od": 30}
       ],
       "no": [
         {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["dark"]},
@@ -3672,7 +3672,7 @@
     "target": "ally_all",
     "elements": ["fire"],
     "effects": [
-      {"type": "resource", "target": "ally_all", "sp": 5.0},
+      {"type": "resource", "target": "ally_all", "sp": 5},
       {"type": "zone", "target": "field", "elements": ["fire"], "status_id": 14, "duration": {"type": "ally_turn", "value": 8}}
     ]
   },
@@ -3796,7 +3796,7 @@
     "kind": "passive",
     "cost": {"sp": 0},
     "trigger": "on_new_turn_start",
-    "trigger_condition": "dp_rate()==0.0 and front()",
+    "trigger_condition": "dp_rate()==0 and front()",
     "activation_limit": 1,
     "effects": [
       {"type": "revive_dp_rate", "target": "self"}
@@ -4163,7 +4163,7 @@
     "condition": "sp()>19",
     "effects": [
       {"type": "buff_charge", "target": "self", "status_id": 25, "duration": {"type": "use", "value": 1}},
-      {"type": "resource", "target": "self", "sp": 5.0}
+      {"type": "resource", "target": "self", "sp": 5}
     ]
   },
   "264": {
@@ -4287,7 +4287,7 @@
     "trigger": "on_first_battle_start",
     "effects": [
       {"type": "additional_hit_on_removing_buff", "target": "self", "status_id": 116, "duration": {"type": "permanent"}},
-      {"type": "resource", "target": "od", "od": 30.0}
+      {"type": "resource", "target": "od", "od": 30}
     ]
   },
   "271": {
@@ -4473,7 +4473,7 @@
     "target": "ally_all",
     "effects": [
       {"type": "tea", "target": "ally_all", "status_id": 213, "duration": {"type": "permanent"}},
-      {"type": "resource", "target": "ally_all_without_self", "sp": 2.0},
+      {"type": "resource", "target": "ally_all_without_self", "sp": 2},
       {"type": "remove_debuff", "target": "ally_all"},
       {"type": "remove_buff", "target": "all"}
     ]
@@ -4495,7 +4495,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "all_status_up_value", "target": "ally_all", "status_id": 95, "target_condition": "team.is_member('31E')==1", "duration": {"type": "permanent"}, "value": 10.0},
+      {"type": "all_status_up_value", "target": "ally_all", "status_id": 95, "target_condition": "team.is_member('31E')==1", "duration": {"type": "permanent"}, "value": 10},
       {"type": "resource", "target": "ally_all", "target_condition": "team.is_member('31E')==1", "duration": {"type": "permanent"}}
     ]
   },
@@ -4540,7 +4540,7 @@
     "cost": {"sp": 3},
     "target": "self",
     "effects": [
-      {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "enemy_turn", "value": 2}, "value": 15.0},
+      {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "enemy_turn", "value": 2}, "value": 15},
       {"type": "provoke", "target": "all", "status_id": 12}
     ]
   },
@@ -4566,8 +4566,8 @@
     "target": "ally_front",
     "condition": "od_gauge() >= 0",
     "effects": [
-      {"type": "resource", "target": "ally_front", "sp": 6.0},
-      {"type": "resource", "target": "self", "sp": 6.0}
+      {"type": "resource", "target": "ally_front", "sp": 6},
+      {"type": "resource", "target": "self", "sp": 6}
     ]
   },
   "293": {
@@ -4577,7 +4577,7 @@
     "cost": {"sp": 9},
     "target": "ally_all_without_self",
     "effects": [
-      {"type": "resource", "target": "ally_all_without_self", "sp": 2.0},
+      {"type": "resource", "target": "ally_all_without_self", "sp": 2},
       {"type": "additional_turn", "target": "ally_front", "status_id": 20, "hit_condition": "not has(20)"}
     ]
   },
@@ -4625,7 +4625,7 @@
       {"type": "resist_down_overwrite", "target": "all", "elements": ["light"], "status_id": 108, "duration": {"type": "permanent"}},
       {"type": "resist_down", "target": "all", "elements": ["light"], "status_id": 18, "duration": {"type": "permanent"}},
       {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "permanent"}},
-      {"type": "resource", "target": "od", "od": 50.0}
+      {"type": "resource", "target": "od", "od": 50}
     ]
   },
   "297": {
@@ -4649,7 +4649,7 @@
     "target": "ally_single_without_self",
     "effects": [
       {"type": "heal_dp", "target": "ally_single_without_self"},
-      {"type": "resource", "target": "ally_single_without_self", "sp": 5.0}
+      {"type": "resource", "target": "ally_single_without_self", "sp": 5}
     ]
   },
   "299": {
@@ -5197,7 +5197,7 @@
     "cost": {"sp": 5},
     "target": "ally_single",
     "effects": [
-      {"type": "resource", "target": "ally_single", "sp": 3.0},
+      {"type": "resource", "target": "ally_single", "sp": 3},
       {"type": "remove_debuff", "target": "ally_single"}
     ]
   },
@@ -5208,7 +5208,7 @@
     "cost": {"sp": 13},
     "target": "ally_all_without_self",
     "effects": [
-      {"type": "resource", "target": "ally_all_without_self", "sp": 5.0}
+      {"type": "resource", "target": "ally_all_without_self", "sp": 5}
     ]
   },
   "336": {
@@ -5219,7 +5219,7 @@
     "target": "ally_all_without_self",
     "effects": [
       {"type": "attack_up", "target": "ally_all_without_self", "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "resource", "target": "ally_all_without_self", "sp": 5.0},
+      {"type": "resource", "target": "ally_all_without_self", "sp": 5},
       {"type": "give_debuff_up", "target": "ally_all", "status_id": 118, "duration": {"type": "use", "value": 1}}
     ]
   },
@@ -5279,7 +5279,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "all_status_up_value", "target": "ally_all", "status_id": 95, "target_condition": "character('KMaruyama')==1 or character('MTenne')==1 or character('YBungo')==1 or character('HOgasawara')==1 or character('YoOhshima')==1 or character('VBalakrishnan')==1", "duration": {"type": "permanent"}, "value": 10.0},
+      {"type": "all_status_up_value", "target": "ally_all", "status_id": 95, "target_condition": "character('KMaruyama')==1 or character('MTenne')==1 or character('YBungo')==1 or character('HOgasawara')==1 or character('YoOhshima')==1 or character('VBalakrishnan')==1", "duration": {"type": "permanent"}, "value": 10},
       {"type": "resource", "target": "ally_all", "target_condition": "character('KMaruyama')==1 or character('MTenne')==1 or character('YBungo')==1 or character('HOgasawara')==1 or character('YoOhshima')==1 or character('VBalakrishnan')==1", "duration": {"type": "permanent"}}
     ]
   },
@@ -5386,7 +5386,7 @@
           "status_id": 25,
           "duration": {"type": "use", "value": 1}
         },
-        {"type": "resource", "target": "ally_all", "sp": 3.0},
+        {"type": "resource", "target": "ally_all", "sp": 3},
         {"type": "heal_dp", "target": "ally_all"}
       ],
       "no": [
@@ -5396,7 +5396,7 @@
           "status_id": 25,
           "duration": {"type": "use", "value": 1}
         },
-        {"type": "resource", "target": "ally_all", "sp": 3.0}
+        {"type": "resource", "target": "ally_all", "sp": 3}
       ]
     }
   },
@@ -5531,7 +5531,7 @@
     "elements": ["thunder"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["thunder"]},
-      {"type": "resource", "target": "self", "sp": 3.0}
+      {"type": "resource", "target": "self", "sp": 3}
     ]
   },
   "358": {
@@ -5558,7 +5558,7 @@
     "elements": ["fire"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["fire"]},
-      {"type": "resource", "target": "self", "sp": 3.0}
+      {"type": "resource", "target": "self", "sp": 3}
     ]
   },
   "360": {
@@ -5631,7 +5631,7 @@
     "effects": {
       "yes": [
         {"type": "heal_dp", "target": "ally_all"},
-        {"type": "resource", "target": "ally_all", "sp": 5.0},
+        {"type": "resource", "target": "ally_all", "sp": 5},
         {"type": "revive_territory", "target": "field", "status_id": 157}
       ],
       "no": [{"type": "heal_dp", "target": "ally_all"}, {"type": "revive_territory", "target": "field", "status_id": 157}]
@@ -5646,7 +5646,7 @@
     "effects": [
       {"type": "dim_sum", "target": "ally_all", "status_id": 202, "duration": {"type": "permanent"}},
       {"type": "sprightly", "target": "ally_all", "status_id": 194, "duration": {"type": "use", "value": 1}},
-      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('dark')", "sp": 3.0}
+      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('dark')", "sp": 3}
     ]
   },
   "367": {
@@ -5656,8 +5656,8 @@
     "cost": {"sp": 0},
     "target": "ally_single",
     "effects": [
-      {"type": "resource", "target": "ally_single", "sp": 3.0},
-      {"type": "resource", "target": "ally_single", "target_condition": "team.is_member('31A')==1", "sp": 3.0}
+      {"type": "resource", "target": "ally_single", "sp": 3},
+      {"type": "resource", "target": "ally_single", "target_condition": "team.is_member('31A')==1", "sp": 3}
     ]
   },
   "368": {
@@ -5904,7 +5904,7 @@
     "trigger": "on_first_battle_start",
     "effects": [
       {"type": "additional_hit_on_extra_skill", "target": "self", "status_id": 127, "duration": {"type": "permanent"}},
-      {"type": "resource", "target": "ally_all", "sp": 2.0}
+      {"type": "resource", "target": "ally_all", "sp": 2}
     ]
   },
   "385": {
@@ -6345,7 +6345,7 @@
     "condition": "turn()==1",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "strike"},
-      {"type": "resource", "target": "self", "sp": 7.0}
+      {"type": "resource", "target": "self", "sp": 7}
     ]
   },
   "414": {
@@ -6426,7 +6426,7 @@
           "status_id": 1,
           "duration": {"type": "use", "value": 1}
         },
-        {"type": "resource", "target": "ally_all_without_self", "sp": 5.0}
+        {"type": "resource", "target": "ally_all_without_self", "sp": 5}
       ],
       "no": [
         {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["dark"]},
@@ -6545,7 +6545,7 @@
     "cost": {"sp": 0},
     "trigger": "on_battle_start",
     "effects": [
-      {"type": "resource", "target": "ally_all", "target_condition": "team.is_member('31C')==1", "sp": 1.0}
+      {"type": "resource", "target": "ally_all", "target_condition": "team.is_member('31C')==1", "sp": 1}
     ]
   },
   "423": {
@@ -6555,7 +6555,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "damage_rate_up", "target": "ally_all", "status_id": 39, "duration": {"type": "permanent"}, "value": 7.0}
+      {"type": "damage_rate_up", "target": "ally_all", "status_id": 39, "duration": {"type": "permanent"}, "value": 7}
     ]
   },
   "424": {
@@ -6578,7 +6578,7 @@
     "attack_type": "stab",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab"},
-      {"type": "resource", "target": "self", "sp": 3.0}
+      {"type": "resource", "target": "self", "sp": 3}
     ]
   },
   "426": {
@@ -6692,7 +6692,7 @@
           "status_id": 78,
           "duration": {"type": "use", "value": 1}
         },
-        {"type": "resource", "target": "ally_all_without_self", "sp": 3.0}
+        {"type": "resource", "target": "ally_all_without_self", "sp": 3}
       ],
       "no": [
         {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["ice"]},
@@ -6759,7 +6759,7 @@
   "435": {
     "id": 435,
     "names": {"zh_cn": "下次的主角就是你", "zh_tw": "下一個主角就是你", "jp": "次の主役はあなた"},
-    "conditions": {"effects": "enemy.count(broken()==1 and damage_rate()>=200.0) > 0"},
+    "conditions": {"effects": "enemy.count(broken()==1 and damage_rate()>=200) > 0"},
     "kind": "active",
     "cost": {"sp": 14},
     "hit_count": 4,
@@ -6890,7 +6890,7 @@
     "condition": "od_gauge() >= 0",
     "effects": [
       {"type": "remove_debuff", "target": "ally_all"},
-      {"type": "resource", "target": "od", "od": -100.0}
+      {"type": "resource", "target": "od", "od": -100}
     ]
   },
   "440": {
@@ -7057,7 +7057,7 @@
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
             {"type": "heal_dp", "target": "ally_all"},
-            {"type": "resource", "target": "ally_all_without_self", "sp": 1.0}
+            {"type": "resource", "target": "ally_all_without_self", "sp": 1}
           ],
           "description": "第1次使用"
         },
@@ -7066,7 +7066,7 @@
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
             {"type": "heal_dp", "target": "ally_all"},
-            {"type": "resource", "target": "ally_all_without_self", "sp": 2.0}
+            {"type": "resource", "target": "ally_all_without_self", "sp": 2}
           ],
           "description": "第2次使用"
         },
@@ -7075,7 +7075,7 @@
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
             {"type": "heal_dp", "target": "ally_all"},
-            {"type": "resource", "target": "ally_all_without_self", "sp": 3.0}
+            {"type": "resource", "target": "ally_all_without_self", "sp": 3}
           ],
           "description": "第3次使用"
         },
@@ -7084,7 +7084,7 @@
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
             {"type": "heal_dp", "target": "ally_all"},
-            {"type": "resource", "target": "ally_all_without_self", "sp": 4.0}
+            {"type": "resource", "target": "ally_all_without_self", "sp": 4}
           ],
           "description": "第4次及以后使用"
         }
@@ -7277,7 +7277,7 @@
     "target": "ally_single_without_self",
     "effects": [
       {"type": "heal_dp", "target": "ally_single_without_self"},
-      {"type": "resource", "target": "ally_single_without_self", "target_condition": "character('KMaruyama')==1", "sp": 5.0},
+      {"type": "resource", "target": "ally_single_without_self", "target_condition": "character('KMaruyama')==1", "sp": 5},
       {"type": "additional_turn", "target": "self", "status_id": 20}
     ]
   },
@@ -7335,7 +7335,7 @@
     "attack_type": "stab",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab"},
-      {"type": "resource", "target": "self", "sp": 3.0}
+      {"type": "resource", "target": "self", "sp": 3}
     ]
   },
   "470": {
@@ -7345,7 +7345,7 @@
     "cost": {"sp": 6},
     "target": "ally_single_without_self",
     "effects": [
-      {"type": "resource", "target": "ally_single_without_self", "sp": 6.0}
+      {"type": "resource", "target": "ally_single_without_self", "sp": 6}
     ]
   },
   "471": {
@@ -7482,7 +7482,7 @@
     "elements": ["fire"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"]},
-      {"type": "resource", "target": "self", "sp": 3.0}
+      {"type": "resource", "target": "self", "sp": 3}
     ]
   },
   "483": {
@@ -7536,7 +7536,7 @@
     "effects": [
       {"type": "gelato", "target": "ally_all", "status_id": 191, "duration": {"type": "permanent"}},
       {"type": "token", "target": "ally_all"},
-      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('light')", "sp": 3.0}
+      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('light')", "sp": 3}
     ]
   },
   "487": {
@@ -7549,7 +7549,7 @@
     "user_select": {
       "1": {
         "effects": [
-          {"type": "resource", "target": "od", "od": 50.0},
+          {"type": "resource", "target": "od", "od": 50},
           {"type": "mocktail", "target": "ally_all", "status_id": 179},
           {"type": "steak", "target": "ally_all", "status_id": 190, "duration": {"type": "permanent"}}
         ],
@@ -7557,7 +7557,7 @@
       },
       "2": {
         "effects": [
-          {"type": "resource", "target": "od", "od": 50.0},
+          {"type": "resource", "target": "od", "od": 50},
           {"type": "mocktail", "target": "ally_all", "status_id": 179},
           {"type": "dim_sum", "target": "ally_all", "status_id": 202, "duration": {"type": "permanent"}}
         ],
@@ -7565,7 +7565,7 @@
       },
       "3": {
         "effects": [
-          {"type": "resource", "target": "od", "od": 50.0},
+          {"type": "resource", "target": "od", "od": 50},
           {"type": "mocktail", "target": "ally_all", "status_id": 179},
           {"type": "curry", "target": "ally_all", "status_id": 171, "duration": {"type": "permanent"}}
         ],
@@ -7573,7 +7573,7 @@
       },
       "4": {
         "effects": [
-          {"type": "resource", "target": "od", "od": 50.0},
+          {"type": "resource", "target": "od", "od": 50},
           {"type": "mocktail", "target": "ally_all", "status_id": 179},
           {"type": "gelato", "target": "ally_all", "status_id": 191, "duration": {"type": "permanent"}}
         ],
@@ -7581,7 +7581,7 @@
       },
       "5": {
         "effects": [
-          {"type": "resource", "target": "od", "od": 50.0},
+          {"type": "resource", "target": "od", "od": 50},
           {"type": "mocktail", "target": "ally_all", "status_id": 179},
           {"type": "shchi", "target": "ally_all", "status_id": 172, "duration": {"type": "permanent"}}
         ],
@@ -7597,7 +7597,7 @@
     "trigger": "on_battle_start",
     "trigger_condition": "front()",
     "effects": [
-      {"type": "resource", "target": "od", "od": 10.0}
+      {"type": "resource", "target": "od", "od": 10}
     ]
   },
   "489": {
@@ -7644,7 +7644,7 @@
     "cost": {"sp": 6},
     "target": "ally_single_without_self",
     "effects": [
-      {"type": "resource", "target": "ally_single_without_self", "sp": 6.0}
+      {"type": "resource", "target": "ally_single_without_self", "sp": 6}
     ]
   },
   "493": {
@@ -7658,10 +7658,10 @@
     "effects": {
       "yes": [
         {"type": "token", "target": "ally_front"},
-        {"type": "resource", "target": "self", "sp": 3.0},
-        {"type": "resource", "target": "ally_all", "sp": 3.0}
+        {"type": "resource", "target": "self", "sp": 3},
+        {"type": "resource", "target": "ally_all", "sp": 3}
       ],
-      "no": [{"type": "token", "target": "ally_front"}, {"type": "resource", "target": "od", "od": -15.0}]
+      "no": [{"type": "token", "target": "ally_front"}, {"type": "resource", "target": "od", "od": -15}]
     }
   },
   "494": {
@@ -7703,7 +7703,7 @@
     "effects": [
       {"type": "critical_rate_up", "target": "ally_all", "status_id": 5, "duration": {"type": "use", "value": 1}},
       {"type": "critical_damage_up", "target": "ally_all", "status_id": 7, "duration": {"type": "use", "value": 1}},
-      {"type": "resource", "target": "od", "od": -50.0}
+      {"type": "resource", "target": "od", "od": -50}
     ]
   },
   "497": {
@@ -7723,7 +7723,7 @@
           "when": "token()==10",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -50.0}
+            {"type": "resource", "target": "od", "od": -50}
           ],
           "description": "トークン10"
         },
@@ -7731,7 +7731,7 @@
           "when": "token()==9",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -55.0}
+            {"type": "resource", "target": "od", "od": -55}
           ],
           "description": "トークン9"
         },
@@ -7739,7 +7739,7 @@
           "when": "token()==8",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -60.0}
+            {"type": "resource", "target": "od", "od": -60}
           ],
           "description": "トークン8"
         },
@@ -7747,7 +7747,7 @@
           "when": "token()==7",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -65.0}
+            {"type": "resource", "target": "od", "od": -65}
           ],
           "description": "トークン7"
         },
@@ -7755,7 +7755,7 @@
           "when": "token()==6",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -70.0}
+            {"type": "resource", "target": "od", "od": -70}
           ],
           "description": "トークン6"
         },
@@ -7763,7 +7763,7 @@
           "when": "token()==5",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -75.0}
+            {"type": "resource", "target": "od", "od": -75}
           ],
           "description": "トークン5"
         },
@@ -7771,7 +7771,7 @@
           "when": "token()==4",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -80.0}
+            {"type": "resource", "target": "od", "od": -80}
           ],
           "description": "トークン4"
         },
@@ -7779,7 +7779,7 @@
           "when": "token()==3",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -85.0}
+            {"type": "resource", "target": "od", "od": -85}
           ],
           "description": "トークン3"
         },
@@ -7787,7 +7787,7 @@
           "when": "token()==2",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -90.0}
+            {"type": "resource", "target": "od", "od": -90}
           ],
           "description": "トークン2"
         },
@@ -7795,7 +7795,7 @@
           "when": "token()==1",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -95.0}
+            {"type": "resource", "target": "od", "od": -95}
           ],
           "description": "トークン1"
         },
@@ -7803,7 +7803,7 @@
           "when": "token()==0",
           "effects": [
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
-            {"type": "resource", "target": "od", "od": -100.0}
+            {"type": "resource", "target": "od", "od": -100}
           ],
           "description": "トークン0"
         }
@@ -7852,7 +7852,7 @@
     "attack_type": "stab",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab"},
-      {"type": "resource", "target": "self", "sp": 3.0}
+      {"type": "resource", "target": "self", "sp": 3}
     ]
   },
   "502": {
@@ -7966,7 +7966,7 @@
     "effects": [
       {"type": "heal_dp", "target": "ally_single"},
       {"type": "heal_skill_used_count", "target": "ally_single"},
-      {"type": "resource", "target": "ally_single", "sp": 3.0}
+      {"type": "resource", "target": "ally_single", "sp": 3}
     ]
   },
   "511": {
@@ -8074,7 +8074,7 @@
     "effects": [
       {"type": "attack_up", "target": "ally_all", "status_id": 1, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
       {"type": "attack_up", "target": "ally_all", "elements": ["thunder"], "status_id": 1, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
-      {"type": "resource", "target": "ally_all_without_self", "sp": 3.0}
+      {"type": "resource", "target": "ally_all_without_self", "sp": 3}
     ]
   },
   "520": {
@@ -8087,7 +8087,7 @@
     "attack_type": "slash",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "slash"},
-      {"type": "resource", "target": "self", "sp": 2.0}
+      {"type": "resource", "target": "self", "sp": 2}
     ]
   },
   "521": {
@@ -8192,7 +8192,7 @@
   "528": {
     "id": 528,
     "names": {"zh_cn": "仁慈曼舞金风中", "zh_tw": "仁慈曼舞金風中", "jp": "爽籟に舞う仁慈"},
-    "conditions": {"cost": "enemy.count(broken()==1 and damage_rate()>=200.0) > 0"},
+    "conditions": {"cost": "enemy.count(broken()==1 and damage_rate()>=200) > 0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 7},
@@ -8369,7 +8369,7 @@
     "cost": {"sp": 9},
     "target": "ally_front",
     "effects": [
-      {"type": "resource", "target": "ally_front", "sp": 3.0},
+      {"type": "resource", "target": "ally_front", "sp": 3},
       {"type": "additional_turn", "target": "ally_front", "status_id": 20, "hit_condition": "not has(20)"}
     ]
   },
@@ -8383,7 +8383,7 @@
     "interval_turn": 3,
     "effects": {
       "yes": [
-        {"type": "resource", "target": "ally_all", "sp": 2.0},
+        {"type": "resource", "target": "ally_all", "sp": 2},
         {
           "type": "give_debuff_up",
           "target": "ally_all",
@@ -8391,7 +8391,7 @@
           "duration": {"type": "use", "value": 1}
         }
       ],
-      "no": [{"type": "resource", "target": "ally_all", "sp": 2.0}]
+      "no": [{"type": "resource", "target": "ally_all", "sp": 2}]
     }
   },
   "544": {
@@ -8702,7 +8702,7 @@
     "attack_type": "stab",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab"},
-      {"type": "resource", "target": "self", "sp": 2.0}
+      {"type": "resource", "target": "self", "sp": 2}
     ]
   },
   "559": {
@@ -8874,7 +8874,7 @@
     "attack_type": "slash",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash"},
-      {"type": "resource", "target": "self", "sp": 3.0}
+      {"type": "resource", "target": "self", "sp": 3}
     ]
   },
   "571": {
@@ -9081,7 +9081,7 @@
     "elements": ["fire"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["fire"]},
-      {"type": "resource", "target": "self", "sp": 3.0}
+      {"type": "resource", "target": "self", "sp": 3}
     ]
   },
   "584": {
@@ -9310,7 +9310,7 @@
     "elements": ["light"],
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["light"]},
-      {"type": "resource", "target": "ally_all_without_self", "sp": 5.0}
+      {"type": "resource", "target": "ally_all_without_self", "sp": 5}
     ]
   },
   "601": {
@@ -9543,7 +9543,7 @@
     "elements": ["ice"],
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["ice"]},
-      {"type": "resource", "target": "ally_all_without_self", "sp": 3.0}
+      {"type": "resource", "target": "ally_all_without_self", "sp": 3}
     ]
   },
   "617": {
@@ -9554,7 +9554,7 @@
     "trigger": "on_first_battle_start",
     "effects": [
       {"type": "additional_hit_on_extra_skill", "target": "self", "status_id": 127, "duration": {"type": "permanent"}},
-      {"type": "resource", "target": "od", "od": 10.0}
+      {"type": "resource", "target": "od", "od": 10}
     ]
   },
   "618": {
@@ -9810,7 +9810,7 @@
     "attack_type": "slash",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash"},
-      {"type": "resource", "target": "self", "sp": 3.0}
+      {"type": "resource", "target": "self", "sp": 3}
     ]
   },
   "636": {
@@ -9913,7 +9913,7 @@
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
       {"type": "attack_up", "target": "ally_all", "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('fire')==1", "sp": 3.0}
+      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('fire')==1", "sp": 3}
     ]
   },
   "645": {
@@ -9939,7 +9939,7 @@
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
       {"type": "regeneration_dp", "target": "ally_all", "status_id": 34, "duration": {"type": "enemy_turn", "value": 4}},
-      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('light')==1", "sp": 3.0}
+      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('light')==1", "sp": 3}
     ]
   },
   "647": {
@@ -9982,7 +9982,7 @@
     "trigger": "on_battle_start",
     "trigger_condition": "front()",
     "effects": [
-      {"type": "resource", "target": "od", "od": 10.0}
+      {"type": "resource", "target": "od", "od": 10}
     ]
   },
   "650": {
@@ -10005,7 +10005,7 @@
     "attack_type": "stab",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab"},
-      {"type": "resource", "target": "self", "sp": 3.0}
+      {"type": "resource", "target": "self", "sp": 3}
     ]
   },
   "652": {
@@ -10206,7 +10206,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "defense_up", "target": "ally_all", "status_id": 4, "duration": {"type": "permanent"}, "value": 7.0}
+      {"type": "defense_up", "target": "ally_all", "status_id": 4, "duration": {"type": "permanent"}, "value": 7}
     ]
   },
   "667": {
@@ -10290,7 +10290,7 @@
   "673": {
     "id": 673,
     "names": {"zh_cn": "狂舞乱炸的迦梨+", "zh_tw": "瘋狂亂舞的迦梨+", "jp": "狂気乱舞のカーリー+"},
-    "conditions": {"cost": "ally.count(character('VBalakrishnan') == 1 and dp_rate() >= 1.0) > 0"},
+    "conditions": {"cost": "ally.count(character('VBalakrishnan') == 1 and dp_rate() >= 1) > 0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 7},
@@ -10326,7 +10326,7 @@
     "effects": [
       {"type": "curry", "target": "ally_all", "status_id": 171, "duration": {"type": "permanent"}},
       {"type": "defense_up", "target": "ally_all", "status_id": 4, "duration": {"type": "ally_turn", "value": 3}},
-      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('ice')", "sp": 3.0}
+      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('ice')", "sp": 3}
     ]
   },
   "676": {
@@ -10404,14 +10404,14 @@
       "1": {
         "effects": [
           {"type": "attack", "target": "single", "attack_type": "stab"},
-          {"type": "resource", "target": "self", "sp": 10.0}
+          {"type": "resource", "target": "self", "sp": 10}
         ],
         "description": "成功"
       },
       "2": {
         "effects": [
           {"type": "attack", "target": "single", "attack_type": "stab"},
-          {"type": "resource", "target": "self", "sp": 10.0},
+          {"type": "resource", "target": "self", "sp": 10},
           {"type": "defense_up", "target": "single", "status_id": 4, "duration": {"type": "enemy_turn", "value": 3}}
         ],
         "description": "失败"
@@ -10463,7 +10463,7 @@
     "target": "self",
     "elements": ["thunder"],
     "effects": [
-      {"type": "luck_up_value", "target": "self", "status_id": 91, "duration": {"type": "enemy_turn", "value": 5}, "solo": true, "value": 30.0},
+      {"type": "luck_up_value", "target": "self", "status_id": 91, "duration": {"type": "enemy_turn", "value": 5}, "solo": true, "value": 30},
       {"type": "critical_damage_up", "target": "self", "elements": ["thunder"], "status_id": 7, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
       {"type": "token", "target": "self"}
     ]
@@ -10680,7 +10680,7 @@
     "trigger": "on_first_battle_start",
     "effects": [
       {"type": "additional_hit_on_breaking", "target": "self", "status_id": 115, "duration": {"type": "permanent"}},
-      {"type": "resource", "target": "ally_front", "sp": 2.0}
+      {"type": "resource", "target": "ally_front", "sp": 2}
     ]
   },
   "692": {
@@ -10819,7 +10819,7 @@
     "attack_type": "stab",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab"},
-      {"type": "resource", "target": "ally_front", "hit_condition": "break_hits()>0", "sp": 5.0}
+      {"type": "resource", "target": "ally_front", "hit_condition": "break_hits()>0", "sp": 5}
     ]
   },
   "703": {
@@ -10833,7 +10833,7 @@
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab"},
       {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}},
-      {"type": "resource", "target": "ally_front", "hit_condition": "break_hits()>0", "sp": 5.0}
+      {"type": "resource", "target": "ally_front", "hit_condition": "break_hits()>0", "sp": 5}
     ]
   },
   "704": {
@@ -10961,7 +10961,7 @@
     "target": "self",
     "effects": [
       {"type": "additional_turn", "target": "self", "status_id": 20},
-      {"type": "resource", "target": "self", "sp": 2.0}
+      {"type": "resource", "target": "self", "sp": 2}
     ]
   },
   "712": {
@@ -11009,7 +11009,7 @@
     "attack_type": "slash",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash"},
-      {"type": "resource", "target": "self", "sp": 3.0}
+      {"type": "resource", "target": "self", "sp": 3}
     ]
   },
   "716": {
@@ -11276,7 +11276,7 @@
     "attack_type": "stab",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab"},
-      {"type": "resource", "target": "self", "sp": 3.0}
+      {"type": "resource", "target": "self", "sp": 3}
     ]
   },
   "731": {
@@ -11313,7 +11313,7 @@
     "condition": "ally.count(front()==0) > 0",
     "effects": [
       {"type": "attack_up", "target": "ally_sub", "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "resource", "target": "od", "od": 25.0}
+      {"type": "resource", "target": "od", "od": 25}
     ]
   },
   "734": {
