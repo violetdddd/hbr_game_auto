@@ -2240,7 +2240,7 @@
   "165": {
     "id": 165,
     "names": {"zh_cn": "洛丽塔全力爆裂", "zh_tw": "蘿莉塔火力全開", "jp": "ロリータフルバースト"},
-    "conditions": {"cost": "ally.count(has(20)) > 0"},
+    "conditions": {"cost": "has(20)"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 7},
@@ -2835,7 +2835,7 @@
   "200": {
     "id": 200,
     "names": {"zh_cn": "剑之舞", "zh_tw": "劍之舞", "jp": "剣の舞"},
-    "conditions": {"cost": "ally.count(has(20)) > 0", "effects": "has(20)"},
+    "conditions": {"cost": "has(20)", "effects": "has(20)"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 8},
@@ -3290,7 +3290,7 @@
   "225": {
     "id": 225,
     "names": {"zh_cn": "女仆剑刺", "zh_tw": "劍擊女僕", "jp": "メイド・イン・パンクチュア"},
-    "conditions": {"cost": "ally.count(has(20)) > 0", "effects": "charging()"},
+    "conditions": {"cost": "has(20)", "effects": "charging()"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 7},
@@ -3322,7 +3322,7 @@
   "227": {
     "id": 227,
     "names": {"zh_cn": "放学后的小小刺激", "zh_tw": "放學後的小小刺激", "jp": "放課後の淡いスリル"},
-    "conditions": {"cost": "ally.count(has(20)) > 0"},
+    "conditions": {"cost": "has(20)"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 7},
@@ -3900,7 +3900,7 @@
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["ice"]},
       {"type": "morale", "target": "ally_front", "status_id": 119, "duration": {"type": "permanent"}, "level": 2},
       {"type": "revenge", "target": "self", "status_id": 208, "duration": {"type": "permanent"}, "level": 1},
-      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "stacks(15) and not has(20)"}
+      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "has(15) and not has(20)"}
     ]
   },
   "2500002": {
@@ -3921,7 +3921,7 @@
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
       {"type": "morale", "target": "ally_front", "status_id": 119, "duration": {"type": "permanent"}, "level": 2},
       {"type": "revenge", "target": "self", "status_id": 208, "duration": {"type": "permanent"}, "level": 1},
-      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "stacks(15) and not has(20)"}
+      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "has(15) and not has(20)"}
     ]
   },
   "251": {
@@ -7922,7 +7922,7 @@
   "517": {
     "id": 517,
     "names": {"zh_cn": "深藏的心意", "zh_tw": "深藏的心意", "jp": "宿る想い"},
-    "conditions": {"cost": "ally.count(has(20)) > 0"},
+    "conditions": {"cost": "has(20)"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 4},
@@ -9955,7 +9955,7 @@
   "657": {
     "id": 657,
     "names": {"zh_cn": "魅惑之眸", "zh_tw": "魅惑的眼神", "jp": "魅惑のまなざし"},
-    "conditions": {"cost": "ally.count(has(20)) > 0"},
+    "conditions": {"cost": "has(20)"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 5},
@@ -10059,7 +10059,7 @@
   "664": {
     "id": 664,
     "names": {"zh_cn": "舞动吧！我心如火！", "zh_tw": "舞動吧！我心熾火！", "jp": "踊れ！マ・パシオン！"},
-    "conditions": {"cost": "ally.count(has(20)) > 0"},
+    "conditions": {"cost": "has(20)"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 8},
@@ -11079,7 +11079,7 @@
   "727": {
     "id": 727,
     "names": {"zh_cn": "为神献身的胜旗圣女", "zh_tw": "為神獻身的勝旗聖女", "jp": "神に捧ぐ、勝旗のラ・ピュセル"},
-    "conditions": {"cost": "ally.count(has(20)) > 0"},
+    "conditions": {"cost": "has(20)"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 8},
