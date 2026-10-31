@@ -2539,7 +2539,7 @@
     "id": 186,
     "names": {"zh_cn": "映照出过去的眼泪", "zh_tw": "映照過去的淚水", "jp": "過去を映す涙"},
     "kind": "active",
-    "cost": {"sp": 0},
+    "cost": {"resource": "ct", "ct": 3},
     "target": "ally_front",
     "interval_turn": 3,
     "effects": [
@@ -5342,7 +5342,7 @@
     "id": 347,
     "names": {"zh_cn": "勇气之灯火", "zh_tw": "勇氣燈火", "jp": "勇気の灯火"},
     "kind": "active",
-    "cost": {"sp": 0},
+    "cost": {"resource": "ct", "ct": 3},
     "target": "ally_front",
     "interval_turn": 3,
     "effects": [
@@ -5354,7 +5354,7 @@
     "names": {"zh_cn": "王之激励", "zh_tw": "王之激勵", "jp": "王の激励"},
     "conditions": {"effects": "charging()"},
     "kind": "active",
-    "cost": {"sp": 0},
+    "cost": {"resource": "ct", "ct": 3},
     "target": "ally_all",
     "interval_turn": 3,
     "effects": {
@@ -5436,7 +5436,7 @@
     "id": 352,
     "names": {"zh_cn": "照耀进军的霸光", "zh_tw": "照耀行軍的霸光", "jp": "進軍を照らす覇光"},
     "kind": "active",
-    "cost": {"sp": 0},
+    "cost": {"resource": "ct", "ct": 3},
     "target": "ally_all",
     "interval_turn": 3,
     "effects": [
@@ -8256,7 +8256,7 @@
     "names": {"zh_cn": "不羁卡牌", "zh_tw": "不羈卡牌", "jp": "ワイルドカード"},
     "conditions": {"effects": "has(20)"},
     "kind": "active",
-    "cost": {"sp": 0},
+    "cost": {"resource": "ct", "ct": 3},
     "target": "ally_all",
     "interval_turn": 3,
     "effects": {
