@@ -1406,7 +1406,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "permanent"}, "solo": true}
+      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "permanent"}, "solo": true, "mode": {"value": 12, "number": 2}}
     ]
   },
   "105": {
@@ -3063,7 +3063,7 @@
     "trigger": "on_new_turn_start",
     "trigger_condition": "sp()>=20",
     "effects": [
-      {"type": "resource", "target": "self", "sp": 1},
+      {"type": "resource", "target": "self", "sp": -3},
       {"type": "resource", "target": "ally_all_without_self", "sp": 1}
     ]
   },
@@ -3134,9 +3134,8 @@
     "names": {"zh_cn": "友缘之剑", "zh_tw": "有緣之劍", "jp": "友縁の剣"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_first_battle_start",
+    "trigger": "on_break_enemy",
     "effects": [
-      {"type": "additional_hit_on_breaking", "target": "self", "status_id": 115, "duration": {"type": "permanent"}},
       {"type": "resource", "target": "ally_all", "sp": 1}
     ]
   },
@@ -3818,7 +3817,7 @@
     "cost": {"sp": 0},
     "trigger": "on_battle_start",
     "effects": [
-      {"type": "overwrite_sp", "target": "self", "status_id": 175, "duration": {"type": "enemy_turn", "value": 2}}
+      {"type": "overwrite_sp", "target": "self", "status_id": 175, "duration": {"type": "enemy_turn", "value": 2}, "sp": 8}
     ]
   },
   "245": {
@@ -4273,9 +4272,8 @@
     "names": {"zh_cn": "名侦探将照亮一切", "zh_tw": "名偵探會照破一切", "jp": "名探偵は明るく照らす"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_first_battle_start",
+    "trigger": "on_relieve_enemy_buff",
     "effects": [
-      {"type": "additional_hit_on_removing_buff", "target": "self", "status_id": 116, "duration": {"type": "permanent"}},
       {"type": "resource", "target": "od", "od": 30}
     ]
   },
@@ -5642,7 +5640,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "zone_up_eternal", "target": "field", "status_id": 126, "duration": {"type": "permanent"}}
+      {"type": "zone_up_eternal_plus_15", "target": "self", "status_id": 126, "duration": {"type": "permanent"}}
     ]
   },
   "369": {
@@ -5876,9 +5874,8 @@
     "names": {"zh_cn": "开辟希望的一箭", "zh_tw": "開拓希望的一箭", "jp": "希望を拓く一矢"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_first_battle_start",
+    "trigger": "after_ex_use",
     "effects": [
-      {"type": "additional_hit_on_extra_skill", "target": "self", "status_id": 127, "duration": {"type": "permanent"}},
       {"type": "resource", "target": "ally_all", "sp": 2}
     ]
   },
@@ -6059,7 +6056,7 @@
     "cost": {"sp": 0},
     "trigger": "on_battle_start",
     "effects": [
-      {"type": "double_action_extra_skill", "target": "self", "status_id": 125, "duration": {"type": "use", "value": 1}}
+      {"type": "double_action_extra_skill", "target": "self", "status_id": 125, "duration": {"type": "use_ex", "value": 1}}
     ]
   },
   "398": {
@@ -7258,7 +7255,7 @@
     "trigger": "on_first_battle_start",
     "effects": [
       {"type": "high_boost", "target": "ally_all", "status_id": 160, "duration": {"type": "permanent"}},
-      {"type": "sp_limit_overwrite", "target": "ally_all", "status_id": 140, "duration": {"type": "permanent"}}
+      {"type": "sp_limit_overwrite", "target": "ally_all", "status_id": 140, "duration": {"type": "permanent"}, "limit": 30}
     ]
   },
   "466": {
@@ -7702,9 +7699,8 @@
     "names": {"zh_cn": "痛并快乐着～！", "zh_tw": "又痛又爽~!", "jp": "痛気持ちいぃ〜！"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_first_battle_start",
+    "trigger": "on_attacked",
     "effects": [
-      {"type": "additional_hit_on_attacked", "target": "self", "status_id": 129, "duration": {"type": "permanent"}},
       {"type": "heal_sp_on_pre_turn", "status_id": 130}
     ]
   },
@@ -7892,7 +7888,7 @@
     "cost": {"sp": 0},
     "trigger": "on_new_turn_start",
     "effects": [
-      {"type": "heal_ep", "target": "self"}
+      {"type": "resource", "target": "self", "ep": 1}
     ]
   },
   "515": {
@@ -8564,7 +8560,7 @@
     "cost": {"sp": 0},
     "trigger": "on_battle_start",
     "effects": [
-      {"type": "infantilized", "target": "all", "status_id": 214, "duration": {"type": "permanent"}}
+      {"type": "infantilized", "target": "all", "status_id": 214, "duration": {"type": "permanent"}, "level": 2}
     ]
   },
   "557": {
@@ -9094,9 +9090,8 @@
     "names": {"zh_cn": "神级接球", "zh_tw": "神之接球", "jp": "神業レシーブ"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_first_battle_start",
+    "trigger": "on_kill_enemy",
     "effects": [
-      {"type": "additional_hit_on_kill", "target": "self", "status_id": 137, "duration": {"type": "permanent"}},
       {"type": "heal_skill_used_count", "target": "self"}
     ]
   },
@@ -9253,9 +9248,8 @@
     "names": {"zh_cn": "玫瑰花瓣", "zh_tw": "玫瑰花瓣", "jp": "ローズペタル"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_first_battle_start",
+    "trigger": "on_kill_enemy",
     "effects": [
-      {"type": "additional_hit_on_kill", "target": "self", "status_id": 137, "duration": {"type": "permanent"}},
       {"type": "heal_skill_used_count", "target": "self"}
     ]
   },
@@ -9440,9 +9434,8 @@
     "names": {"zh_cn": "千里眼", "zh_tw": "千里眼", "jp": "千里眼"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_first_battle_start",
+    "trigger": "after_ex_use",
     "effects": [
-      {"type": "additional_hit_on_extra_skill", "target": "self", "status_id": 127, "duration": {"type": "permanent"}},
       {"type": "resource", "target": "od", "od": 10}
     ]
   },
@@ -9665,7 +9658,7 @@
     "cost": {"sp": 0},
     "trigger": "on_battle_start",
     "effects": [
-      {"type": "talisman", "target": "all", "status_id": 177, "duration": {"type": "permanent"}}
+      {"type": "talisman", "target": "all", "status_id": 177, "duration": {"type": "permanent"}, "level": 0}
     ]
   },
   "633": {
@@ -10553,9 +10546,8 @@
     "names": {"zh_cn": "BeatDown()", "zh_tw": "BeatDown()", "jp": "BeatDown()"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_first_battle_start",
+    "trigger": "on_break_enemy",
     "effects": [
-      {"type": "additional_hit_on_breaking", "target": "self", "status_id": 115, "duration": {"type": "permanent"}},
       {"type": "resource", "target": "ally_front", "sp": 2}
     ]
   },
@@ -10564,10 +10556,9 @@
     "names": {"zh_cn": "遥拜之人", "zh_tw": "遙拜之人", "jp": "遥拝の君"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_first_battle_start",
+    "trigger": "on_break_enemy",
     "effects": [
-      {"type": "additional_hit_on_breaking", "target": "ally_all", "status_id": 115, "duration": {"type": "permanent"}},
-      {"type": "break_down_turn_up", "status_id": 139, "duration": {"type": "use"}}
+      {"type": "break_down_turn_up", "status_id": 139, "duration": {"type": "use"}, "value": 1}
     ]
   },
   "693": {

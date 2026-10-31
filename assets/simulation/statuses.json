@@ -405,7 +405,7 @@
   "123": {"name": "eternal_oath", "category": "buff", "forced_one": true},
   "124": {"name": "shadow_clone", "category": "buff", "removable": true, "forced_one": true},
   "125": {"name": "double_action_extra_skill", "category": "buff", "removable": true, "forced_one": true},
-  "126": {"name": "zone_up_eternal", "category": "buff"},
+  "126": {"name": "zone_up_eternal_plus_15", "category": "buff"},
   "127": {"name": "additional_hit_on_extra_skill", "category": "buff"},
   "128": {"name": "storm_armor", "category": "buff", "removable": true, "forced_one": true},
   "129": {"name": "additional_hit_on_attacked", "category": "buff"},
