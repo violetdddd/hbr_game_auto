@@ -11118,7 +11118,7 @@
     "names": {"zh_cn": "猫咪喷射打靶", "zh_tw": "噴射貓咪打靶趣", "jp": "ネコジェット・シャテキ"},
     "kind": "active",
     "parent_id": 728,
-    "cost": {"sp": 0},
+    "cost": {"sp": 10},
     "hit_count": 5,
     "target": "single",
     "attack_type": "stab",
