@@ -1351,7 +1351,7 @@
     "target": "single",
     "attack_type": "slash",
     "elements": ["ice"],
-    "use_condition": "enemy.count(down_turns()>0) > 0",
+    "not_use_condition": "enemy.count(down_turns()>0) > 0",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["ice"]},
       {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "condition": "target.weak_to_hit()"},
@@ -2610,7 +2610,7 @@
     "target": "all",
     "attack_type": "strike",
     "elements": ["dark"],
-    "use_condition": "level(119)>=10",
+    "not_use_condition": "level(119)>=10",
     "effects": {
       "cases": [
         {
@@ -5252,7 +5252,7 @@
     "target": "all",
     "attack_type": "slash",
     "elements": ["dark"],
-    "use_condition": "level(119) >= 6",
+    "not_use_condition": "level(119) >= 6",
     "effects": {
       "yes": [{"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]}],
       "no": [{"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]}]
@@ -7877,7 +7877,7 @@
     "id": 511,
     "names": {"zh_cn": "盛夏的冰凉冲击！", "zh_tw": "盛夏的冰涼刺激！", "jp": "真夏のひんやりショック！"},
     "kind": "active",
-    "cost": {"resource": "token", "token": -1, "mode": "ues_all"},
+    "cost": {"resource": "token", "token": -1, "mode": "use_all"},
     "target": "self",
     "effects": [
       {"type": "over_drive_point_up_by_token", "target": "self", "value": 10}
@@ -7887,7 +7887,7 @@
     "id": 512,
     "names": {"zh_cn": "最后冲刺！全力混合泳", "zh_tw": "最後衝刺！全力混合泳", "jp": "追い込み！全力メドレー"},
     "kind": "active",
-    "cost": {"resource": "token", "token": -1, "mode": "ues_all"},
+    "cost": {"resource": "token", "token": -1, "mode": "use_all"},
     "target": "ally_all",
     "effects": [
       {"type": "heal_sp_by_token", "target": "ally_all", "sp": 1, "limit": 30},
@@ -8124,7 +8124,7 @@
     "target": "all",
     "attack_type": "slash",
     "elements": ["dark"],
-    "use_condition": "has(163)",
+    "not_use_condition": "has(163)",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]}
     ]
@@ -9870,7 +9870,7 @@
     "target": "all",
     "attack_type": "slash",
     "elements": ["ice"],
-    "use_condition": "enemy.count(down_turns()>0) > 0",
+    "not_use_condition": "enemy.count(down_turns()>0) > 0",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["ice"]},
       {"type": "defense_down", "target": "all", "elements": ["ice"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
