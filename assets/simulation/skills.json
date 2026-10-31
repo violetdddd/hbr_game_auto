@@ -7900,7 +7900,7 @@
     "effects": [
       {"type": "attack_up", "target": "ally_all", "status_id": 1, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
       {"type": "self_damage", "target": "ally_all_without_self"},
-      {"type": "heal_ep", "target": "self"}
+      {"type": "resource", "target": "self", "ep": 2}
     ]
   },
   "516": {
@@ -7926,7 +7926,7 @@
     },
     "target": "self",
     "effects": [
-      {"type": "heal_ep", "target": "self"},
+      {"type": "resource", "target": "self", "ep": 3},
       {"type": "additional_turn", "target": "ally_front", "status_id": 20, "target_condition": "not has(20)"}
     ]
   },
