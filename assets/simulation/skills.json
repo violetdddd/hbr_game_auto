@@ -835,7 +835,7 @@
     "cost": {"sp": 6},
     "target": "self",
     "effects": [
-      {"type": "morale", "target": "self", "status_id": 119, "duration": {"type": "permanent"}}
+      {"type": "morale", "target": "self", "status_id": 119, "duration": {"type": "permanent"}, "level": 2}
     ]
   },
   "67": {
@@ -1468,7 +1468,7 @@
     "cost": {"sp": 3},
     "target": "ally_single",
     "effects": [
-      {"type": "morale", "target": "ally_single", "status_id": 119, "duration": {"type": "permanent"}}
+      {"type": "morale", "target": "ally_single", "status_id": 119, "duration": {"type": "permanent"}, "level": 2}
     ]
   },
   "110": {
@@ -2186,8 +2186,8 @@
     "cost": {"sp": 5},
     "target": "self",
     "effects": [
-      {"type": "morale", "target": "self", "status_id": 119, "duration": {"type": "permanent"}},
-      {"type": "token", "target": "self"},
+      {"type": "morale", "target": "self", "status_id": 119, "duration": {"type": "permanent"}, "level": 2},
+      {"type": "token", "target": "self", "level": 2},
       {"type": "additional_turn", "target": "self", "status_id": 20}
     ]
   },
@@ -2544,7 +2544,7 @@
     "cost": {"sp": 6},
     "target": "ally_all",
     "effects": [
-      {"type": "morale", "target": "ally_all", "status_id": 119, "duration": {"type": "permanent"}}
+      {"type": "morale", "target": "ally_all", "status_id": 119, "duration": {"type": "permanent"}, "level": 2}
     ]
   },
   "186": {
@@ -3809,8 +3809,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "additional_hit_on_kill_count", "target": "self", "status_id": 138, "duration": {"type": "permanent"}},
-      {"type": "morale", "target": "ally_front", "status_id": 119, "duration": {"type": "permanent"}}
+      {"type": "morale", "target": "ally_front", "status_id": 119, "duration": {"type": "permanent"}, "level": 1}
     ]
   },
   "244": {
@@ -3900,8 +3899,8 @@
     "elements": ["ice"],
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["ice"]},
-      {"type": "morale", "target": "ally_front", "status_id": 119, "duration": {"type": "permanent"}},
-      {"type": "revenge", "target": "self", "status_id": 208, "duration": {"type": "permanent"}},
+      {"type": "morale", "target": "ally_front", "status_id": 119, "duration": {"type": "permanent"}, "level": 2},
+      {"type": "revenge", "target": "self", "status_id": 208, "duration": {"type": "permanent"}, "level": 1},
       {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "stacks(15) and not has(20)"}
     ]
   },
@@ -3921,8 +3920,8 @@
     "elements": ["dark"],
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
-      {"type": "morale", "target": "ally_front", "status_id": 119, "duration": {"type": "permanent"}},
-      {"type": "revenge", "target": "self", "status_id": 208, "duration": {"type": "permanent"}},
+      {"type": "morale", "target": "ally_front", "status_id": 119, "duration": {"type": "permanent"}, "level": 2},
+      {"type": "revenge", "target": "self", "status_id": 208, "duration": {"type": "permanent"}, "level": 1},
       {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "stacks(15) and not has(20)"}
     ]
   },
@@ -4103,8 +4102,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "additional_hit_on_kill_count", "target": "self", "status_id": 138, "duration": {"type": "permanent"}},
-      {"type": "resource", "target": "self", "sp": 2.0}
+      {"type": "resource", "target": "self", "sp": 2}
     ]
   },
   "259": {
@@ -4365,7 +4363,7 @@
     "cost": {"sp": 10},
     "target": "ally_front",
     "effects": [
-      {"type": "morale", "target": "ally_front", "status_id": 119, "duration": {"type": "permanent"}},
+      {"type": "morale", "target": "ally_front", "status_id": 119, "duration": {"type": "permanent"}, "level": 5},
       {"type": "attack_up", "target": "all", "status_id": 1, "duration": {"type": "permanent"}}
     ]
   },
@@ -4799,8 +4797,8 @@
     "elements": ["dark"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]},
-      {"type": "token", "target": "ally_all"},
-      {"type": "morale", "target": "ally_all", "status_id": 119, "duration": {"type": "permanent"}}
+      {"type": "token", "target": "ally_all", "level": 3},
+      {"type": "morale", "target": "ally_all", "status_id": 119, "duration": {"type": "permanent"}, "level": 3}
     ]
   },
   "310": {
@@ -5112,7 +5110,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "morale", "target": "ally_all", "status_id": 119, "duration": {"type": "permanent"}}
+      {"type": "morale", "target": "ally_all", "status_id": 119, "duration": {"type": "permanent"}, "level": 2}
     ]
   },
   "328": {
@@ -5249,8 +5247,8 @@
     "cost": {"sp": 6},
     "target": "ally_all",
     "effects": [
-      {"type": "morale", "target": "ally_all", "status_id": 119, "duration": {"type": "permanent"}},
-      {"type": "resource", "target": "od", "od": 15.0}
+      {"type": "morale", "target": "ally_all", "status_id": 119, "duration": {"type": "permanent"}, "level": 2},
+      {"type": "resource", "target": "od", "od": 15}
     ]
   },
   "339": {
@@ -8801,7 +8799,7 @@
     "attack_type": "stab",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab"},
-      {"type": "morale", "target": "ally_all", "status_id": 119, "duration": {"type": "permanent"}}
+      {"type": "morale", "target": "ally_all", "status_id": 119, "duration": {"type": "permanent"}, "level": 4}
     ]
   },
   "565": {
@@ -9376,8 +9374,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "additional_hit_on_kill_count", "target": "self", "status_id": 138, "duration": {"type": "permanent"}},
-      {"type": "morale", "target": "ally_front", "status_id": 119, "duration": {"type": "permanent"}}
+      {"type": "morale", "target": "ally_front", "status_id": 119, "duration": {"type": "permanent"}, "level": 1}
     ]
   },
   "606": {
