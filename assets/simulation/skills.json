@@ -4563,7 +4563,7 @@
     "target": "ally_all_without_self",
     "effects": [
       {"type": "resource", "target": "ally_all_without_self", "sp": 2},
-      {"type": "additional_turn", "target": "ally_front", "status_id": 20, "hit_condition": "not has(20)"}
+      {"type": "additional_turn", "target": "ally_front", "status_id": 20, "target_condition": "not has(20)"}
     ]
   },
   "294": {
@@ -6345,7 +6345,7 @@
     "target": "ally_front",
     "effects": [
       {"type": "attack_up", "target": "ally_front", "status_id": 1, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-      {"type": "additional_turn", "target": "ally_front", "status_id": 20, "hit_condition": "not has(20)"}
+      {"type": "additional_turn", "target": "ally_front", "status_id": 20, "target_condition": "not has(20)"}
     ]
   },
   "416": {
@@ -7927,7 +7927,7 @@
     "target": "self",
     "effects": [
       {"type": "heal_ep", "target": "self"},
-      {"type": "additional_turn", "target": "ally_front", "status_id": 20, "hit_condition": "not has(20)"}
+      {"type": "additional_turn", "target": "ally_front", "status_id": 20, "target_condition": "not has(20)"}
     ]
   },
   "518": {
@@ -8251,7 +8251,7 @@
     "target": "ally_front",
     "effects": [
       {"type": "resource", "target": "ally_front", "sp": 3},
-      {"type": "additional_turn", "target": "ally_front", "status_id": 20, "hit_condition": "not has(20)"}
+      {"type": "additional_turn", "target": "ally_front", "status_id": 20, "target_condition": "not has(20)"}
     ]
   },
   "543": {
@@ -10944,7 +10944,7 @@
     "target": "ally_all",
     "effects": [
       {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('fire')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-      {"type": "additional_turn", "target": "ally_front", "status_id": 20, "hit_condition": "not has(20)"}
+      {"type": "additional_turn", "target": "ally_front", "status_id": 20, "target_condition": "not has(20)"}
     ]
   },
   "722": {
