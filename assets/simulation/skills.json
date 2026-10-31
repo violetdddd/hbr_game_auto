@@ -4409,7 +4409,7 @@
   "282": {
     "id": 282,
     "names": {"zh_cn": "梦幻花园", "zh_tw": "夢想花田", "jp": "ドリーミー・ガーデン"},
-    "conditions": {"cost": "ally.count(sp()<=0) > 0"},
+    "conditions": {"cost": "team.count(sp()<=0) > 0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 0},
@@ -5629,7 +5629,7 @@
     "target": "ally_single",
     "effects": [
       {"type": "resource", "target": "ally_single", "sp": 3},
-      {"type": "resource", "target": "ally_single", "target_condition": "team.is_member('31A')==1", "sp": 3}
+      {"type": "resource", "target": "ally_single", "target_condition": "target.is_member('31A')==1", "sp": 3}
     ]
   },
   "368": {
@@ -6787,7 +6787,7 @@
   "437": {
     "id": 437,
     "names": {"zh_cn": "支配重力", "zh_tw": "重力主宰", "jp": "ドミネーション・グラビティ"},
-    "conditions": {"cost": "ally.count(used(437)>1) > 0"},
+    "conditions": {"cost": "used(437)>1"},
     "cases": ["effects"],
     "kind": "active",
     "cost": {
@@ -7700,7 +7700,7 @@
     "cost": {"sp": 0},
     "trigger": "on_attacked",
     "effects": [
-      {"type": "heal_sp_on_pre_turn", "status_id": 130}
+      {"type": "resource", "target": "self", "sp": 1}
     ]
   },
   "499": {
@@ -8719,7 +8719,7 @@
     "target": "ally_all",
     "elements": ["thunder"],
     "effects": [
-      {"type": "infantilized", "target": "all", "status_id": 214, "duration": {"type": "permanent"}},
+      {"type": "infantilized", "target": "all", "status_id": 214, "duration": {"type": "permanent"}, "level": 2},
       {"type": "heal_dp", "target": "ally_all"},
       {"type": "defense_down", "target": "all", "elements": ["thunder"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}}
     ]
@@ -10459,7 +10459,7 @@
   "689": {
     "id": 689,
     "names": {"zh_cn": "超强破坏者", "zh_tw": "巨大炸裂者", "jp": "メガデストロイヤー"},
-    "conditions": {"cost": "ally.count(has(154)) >= 3"},
+    "conditions": {"cost": "team.count(has(154)) >= 3"},
     "cases": ["effects"],
     "kind": "active",
     "cost": {
@@ -10472,35 +10472,35 @@
     "effects": {
       "cases": [
         {
-          "when": "ally.count(has(154)) == 1",
+          "when": "team.count(has(154)) == 1",
           "effects": [
             {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"}
           ],
           "description": "下僕1人"
         },
         {
-          "when": "ally.count(has(154)) == 2",
+          "when": "team.count(has(154)) == 2",
           "effects": [
             {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"}
           ],
           "description": "下僕2人"
         },
         {
-          "when": "ally.count(has(154)) == 3",
+          "when": "team.count(has(154)) == 3",
           "effects": [
             {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"}
           ],
           "description": "下僕3人"
         },
         {
-          "when": "ally.count(has(154)) == 4",
+          "when": "team.count(has(154)) == 4",
           "effects": [
             {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"}
           ],
           "description": "下僕4人"
         },
         {
-          "when": "ally.count(has(154)) == 5",
+          "when": "team.count(has(154)) == 5",
           "effects": [
             {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}},
             {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"}
@@ -10508,7 +10508,7 @@
           "description": "下僕5人"
         },
         {
-          "when": "ally.count(has(154)) == 6",
+          "when": "team.count(has(154)) == 6",
           "effects": [
             {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}},
             {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}},
@@ -10557,7 +10557,7 @@
     "cost": {"sp": 0},
     "trigger": "on_break_enemy",
     "effects": [
-      {"type": "break_down_turn_up", "status_id": 139, "duration": {"type": "use"}, "value": 1}
+      {"type": "break_down_turn_up", "status_id": 139, "duration": {"type": "one_shot"}, "value": 1}
     ]
   },
   "693": {
