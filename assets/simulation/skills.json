@@ -137,7 +137,7 @@
     "attack_type": "strike",
     "elements": ["dark"],
     "effects": [
-      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number":3}},
+      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}},
       {"type": "defense_down", "target": "self", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
       {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["dark"]}
     ]
@@ -210,7 +210,7 @@
     "names": {"zh_cn": "一忍再忍忍无可忍", "zh_tw": "該忍不忍一鳴驚忍", "jp": "忍び忍ばれ忍ばない"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_every_turn",
+    "trigger": "on_new_turn_start",
     "trigger_condition": "front() and has(124)",
     "effects": [
       {"type": "cover", "target": "all", "status_id": 57, "duration": {"type": "enemy_turn"}}
@@ -259,7 +259,7 @@
     "cost": {"sp": 5},
     "target": "self",
     "effects": [
-      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}}
+      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}}
     ]
   },
   "27": {
@@ -293,14 +293,15 @@
     "cost": {"sp": 8},
     "target": "self",
     "effects": [
-      {"type": "shadow_clone", "target": "self", "status_id": 124, "duration": {"type": "use", "value": 2}}
+      {"type": "shadow_clone", "target": "self", "status_id": 124, "duration": {"type": "on_attack", "value": 2}}
     ]
   },
   "30": {
     "id": 30,
     "names": {"zh_cn": "狂野咆哮", "zh_tw": "狂野怒嚎 ", "jp": "ワイルドハウル"},
+    "conditions": {"cost": "in_od()"},
     "kind": "active",
-    "cost": {"yes": {"sp": 6}, "no": {"sp": 12}}, "conditions": {"cost": "od()"},
+    "cost": {"yes": {"sp": 6}, "no": {"sp": 12}}, 
     "hit_count": 3,
     "target": "all",
     "attack_type": "slash",
@@ -340,34 +341,49 @@
   "33": {
     "id": 33,
     "names": {"zh_cn": "神崎流忍术·冰晶", "zh_tw": "神崎流忍術‧冰塵", "jp": "神崎流忍術・氷塵"},
+    "conditions": {"effects": "target.weak('ice')==1"},
     "kind": "active",
     "cost": {"sp": 14},
     "hit_count": 6,
     "target": "single",
     "attack_type": "slash",
     "elements": ["ice"],
-    "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["ice"], "condition": "target.weak_to_hit()"},
-      {"type": "imprison_random", "target": "single", "duration": {"type": "enemy_turn", "value": 1}}
-    ]
+    "effects": {
+      "yes": [
+        {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["ice"]},
+        {"type": "imprison_random", "target": "single", "duration": {"type": "enemy_turn", "value": 1}}
+      ],
+      "no": [
+        {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["ice"]},
+        {"type": "imprison_random", "target": "single", "duration": {"type": "enemy_turn", "value": 1}}
+      ]
+    }
   },
   "34": {
     "id": 34,
     "names": {"zh_cn": "神崎流忍术·散华", "zh_tw": "神崎流忍術‧散華", "jp": "神崎流忍術・散華"},
+    "conditions": {"effects": "target.weak('dark')==1"},
     "kind": "active",
     "cost": {"sp": 15},
     "hit_count": 4,
     "target": "single",
     "attack_type": "slash",
     "elements": ["dark"],
-    "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["dark"], "condition": "target.weak_to_hit()"},
-      {"type": "attack_up", "target": "self", "elements": ["dark"], "status_id": 1, "duration": {"type": "use", "value": 1}}
-    ]
+    "effects": {
+      "yes": [
+        {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["dark"]},
+        {"type": "attack_up", "target": "self", "elements": ["dark"], "status_id": 1, "duration": {"type": "use", "value": 1}}
+      ],
+      "no": [
+        {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["dark"]},
+        {"type": "attack_up", "target": "self", "elements": ["dark"], "status_id": 1, "duration": {"type": "use", "value": 1}}
+      ]
+    }
   },
   "35": {
     "id": 35,
     "names": {"zh_cn": "赤色回旋幻象", "zh_tw": "紅球迴旋幻象", "jp": "レッドラウンドイリュージョン"},
+    "conditions": {"cost": "has(124)"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 7},
@@ -377,23 +393,16 @@
     "target": "single",
     "attack_type": "slash",
     "elements": ["fire"],
-    "effects": {
-      "yes": [
-        {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["fire"]},
-        {"type": "attack_up", "target": "ally_all", "elements": ["fire"], "status_id": 1, "duration": {"type": "use", "value": 1}},
-        {"type": "critical_damage_up", "target": "ally_all", "elements": ["fire"], "status_id": 7, "duration": {"type": "use", "value": 1}}
-      ],
-      "no": [
-        {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["fire"]},
-        {"type": "attack_up", "target": "ally_all", "elements": ["fire"], "status_id": 1, "duration": {"type": "use", "value": 1}},
-        {"type": "critical_damage_up", "target": "ally_all", "elements": ["fire"], "status_id": 7, "duration": {"type": "use", "value": 1}}
-      ]
-    },
-    "conditions": {"cost": "ally.count(character('AKanzaki') == 1 and has(124)) > 0", "effects": "has(124)"}
+    "effects": [
+      {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["fire"]},
+      {"type": "attack_up", "target": "ally_all", "elements": ["fire"], "status_id": 1, "duration": {"type": "use", "value": 1}},
+      {"type": "critical_damage_up", "target": "ally_all", "elements": ["fire"], "status_id": 7, "duration": {"type": "use", "value": 1}}
+    ]
   },
   "36": {
     "id": 36,
     "names": {"zh_cn": "灾厄之焰", "zh_tw": "災厄閃焰", "jp": "フレア・オブ・ディザスター"},
+    "cases": ["effects"],
     "kind": "active",
     "cost": {"sp": 7},
     "target": "ally_all",
@@ -424,26 +433,19 @@
             {"type": "attack_up", "target": "ally_all", "elements": ["dark"], "status_id": 1, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
             {"type": "critical_damage_up", "target": "ally_all", "elements": ["dark"], "status_id": 7, "duration": {"type": "ally_turn", "value": 3}, "solo": true}
           ],
-          "description_jp": "使用回数3回目以降"
+          "description_jp": "使用回数3回目以上"
         }
-      ]
-    },
-    "elements": {
-      "cases": [
-        {"when": "used(36) == 0", "elements": null, "description_jp": "使用回数1回目"},
-        {"when": "used(36) == 1", "elements": ["dark"], "description_jp": "使用回数2回目"},
-        {"when": "used(36) >= 2", "elements": ["dark"], "description_jp": "使用回数3回目以降"}
       ]
     }
   },
   "37": {
     "id": 37,
-    "names": {"zh_cn": "母の灯を継いで", "zh_tw": "繼承母親的燈火", "jp": "母の灯を継いで"},
+    "names": {"zh_cn": "继承母亲的灯火", "zh_tw": "繼承母親的燈火", "jp": "母の灯を継いで"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_player_turn_start",
+    "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "over_drive_rate_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}}
+      {"type": "over_drive_rate_up", "target": "self", "duration": {"type": "permanent"}, "value": 5}
     ]
   },
   "38": {
@@ -453,7 +455,7 @@
     "cost": {"sp": 0},
     "trigger": "on_overdrive_start",
     "effects": [
-      {"type": "give_defense_debuff_up", "target": "self", "status_id": 94, "duration": {"type": "od_end"}}
+      {"type": "give_defense_debuff_up", "target": "self", "status_id": 94, "duration": {"type": "od_end"}, "value": 10}
     ]
   },
   "39": {
@@ -511,8 +513,9 @@
   "43": {
     "id": 43,
     "names": {"zh_cn": "神经痛", "zh_tw": "神經痛", "jp": "ヌラルジャ"},
+    "conditions": {"cost": "in_od()"},
     "kind": "active",
-    "cost": {"yes": {"sp": 6}, "no": {"sp": 12}}, "conditions": {"cost": "od()"},
+    "cost": {"yes": {"sp": 6}, "no": {"sp": 12}}, 
     "hit_count": 1,
     "target": "all",
     "attack_type": "strike",
@@ -525,21 +528,20 @@
   "44": {
     "id": 44,
     "names": {"zh_cn": "夏日狂热", "zh_tw": "夏色嗨心", "jp": "夏色ハイテンション"},
+    "conditions": {"effects": "used(44)==0"},
     "kind": "active",
     "cost": {"sp": 7},
     "target": "ally_single",
-    "condition": "ally.count(broken() == 1) == 0",
     "effects": {
       "yes": [
-        {"type": "resource", "target": "ally_single"},
+        {"type": "resource", "target": "od", "od": 50},
         {"type": "self_damage", "target": "ally_single"}
       ],
       "no": [
-        {"type": "resource", "target": "ally_single"},
+        {"type": "resource", "target": "od", "od": 25},
         {"type": "self_damage", "target": "ally_single"}
       ]
-    },
-    "conditions": {"effects": "used(44)==0"}
+    }
   },
   "45": {
     "id": 45,
@@ -551,26 +553,27 @@
     "attack_type": "strike",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "strike"},
-      {"type": "resource", "target": "single"}
+      {"type": "resource", "target": "od", "od": 50}
     ]
   },
   "46": {
     "id": 46,
-    "names": {"zh_cn": "海のギャング+", "zh_tw": "大海不良分子+", "jp": "海のギャング+"},
+    "names": {"zh_cn": "海之双煞+", "zh_tw": "大海不良分子+", "jp": "海のギャング+"},
     "kind": "active",
     "cost": {"sp": 15},
     "hit_count": 6,
     "target": "single",
     "attack_type": "strike",
     "effects": [
-      {"type": "attack", "target": "single", "attack_type": "strike"},
       {"type": "fragile", "target": "single", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "resource", "target": "self"}
+      {"type": "attack", "target": "single", "attack_type": "strike"},
+      {"type": "resource", "target": "od", "od": 50}
     ]
   },
   "47": {
     "id": 47,
     "names": {"zh_cn": "豪迈！海盗加农炮", "zh_tw": "豪邁！海盜加農炮", "jp": "豪快！パイレーツキャノン"},
+    "cases": ["effects"],
     "kind": "active",
     "cost": {"sp": 7},
     "hit_count": 5,
@@ -582,27 +585,27 @@
         {
           "when": "enemy.count() == 3",
           "effects": [
-            {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["dark"]},
+            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 6, "number": 1}},
             {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}}
+            {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["dark"]}
           ],
           "description_jp": "敵3体"
         },
         {
           "when": "enemy.count() == 2",
           "effects": [
-            {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["dark"]},
+            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 6, "number": 3}},
             {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}}
+            {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["dark"]}
           ],
           "description_jp": "敵2体"
         },
         {
           "when": "enemy.count() == 1",
           "effects": [
-            {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["dark"]},
+            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 6, "number": 10}},
             {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}}
+            {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["dark"]}
           ],
           "description_jp": "敵1体"
         }
@@ -628,6 +631,7 @@
   "49": {
     "id": 49,
     "names": {"zh_cn": "彩虹奇迹滑行", "zh_tw": "彩虹奇蹟滑水道", "jp": "レインボーミラクルスライダー"},
+    "conditions": {"cost": "enemy.count(down_turns()>0) > 0", "effects": "enemy.count(down_turns()>0) > 0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 0},
@@ -648,8 +652,7 @@
         {"type": "defense_down", "target": "single", "elements": ["thunder"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}},
         {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}}
       ]
-    },
-    "conditions": {"cost": "enemy.count(down_turns()>0) > 0", "effects": "enemy.count(down_turns()>0) > 0"}
+    }
   },
   "50": {
     "id": 50,
@@ -658,7 +661,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "defense_up", "target": "self", "status_id": 4, "duration": {"type": "permanent"}}
+      {"type": "defense_up", "target": "self", "status_id": 4, "duration": {"type": "permanent"}, "value": 10}
     ]
   },
   "51": {
@@ -2816,7 +2819,7 @@
         {"type": "fragile", "target": "single", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}}
       ]
     },
-    "conditions": {"effects": "od()"}
+    "conditions": {"effects": "in_od()"}
   },
   "207": {
     "id": 207,
@@ -2839,7 +2842,7 @@
         {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}}
       ]
     },
-    "conditions": {"effects": "od()"}
+    "conditions": {"effects": "in_od()"}
   },
   "208": {
     "id": 208,
@@ -2878,7 +2881,7 @@
     "names": {"zh_cn": "サバイブストラテジー", "zh_tw": "求生戰略", "jp": "サバイブストラテジー"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_every_turn",
+    "trigger": "on_new_turn_start",
     "trigger_condition": "sp()>=20",
     "effects": [
       {"type": "resource", "target": "self"},
@@ -3164,7 +3167,7 @@
     "names": {"zh_cn": "光怪陆离的光谱", "zh_tw": "光彩絢爛的光譜", "jp": "光彩陸離のスペクトル"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_every_turn",
+    "trigger": "on_new_turn_start",
     "trigger_condition": "zone('fire')==1 or zone('ice')==1 or zone('thunder')==1 or zone('light')==1 or zone('dark')==1",
     "effects": [
       {"type": "resource", "target": "self"}
@@ -3564,7 +3567,7 @@
     "names": {"zh_cn": "新的决心", "zh_tw": "嶄新的決心", "jp": "新たな決心"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_every_turn",
+    "trigger": "on_new_turn_start",
     "trigger_condition": "dp_rate()==0.0 and front()",
     "activation_limit": 1,
     "effects": [
@@ -4173,7 +4176,7 @@
         {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "permanent"}}
       ]
     },
-    "conditions": {"effects": "od()"}
+    "conditions": {"effects": "in_od()"}
   },
   "284": {
     "id": 284,
@@ -4522,7 +4525,7 @@
     "names": {"zh_cn": "下定决心要变强的那一天", "zh_tw": "下定決心要變強的那一天", "jp": "強くなると決めた日"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_player_turn_start",
+    "trigger": "on_action_start",
     "trigger_condition": "enemy.count(down_turns()>0) > 0",
     "effects": [
       {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "ally_turn", "value": 1}}
@@ -6004,7 +6007,7 @@
     "id": 414,
     "names": {"zh_cn": "顺风", "zh_tw": "優勢", "jp": "追風"},
     "kind": "active",
-    "cost": {"yes": {"sp": 6}, "no": {"sp": 12}}, "conditions": {"cost": "od()"},
+    "cost": {"yes": {"sp": 6}, "no": {"sp": 12}}, "conditions": {"cost": "in_od()"},
     "hit_count": 3,
     "target": "all",
     "attack_type": "strike",
@@ -6056,7 +6059,7 @@
         {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["dark"]}
       ]
     },
-    "conditions": {"effects": "od()"}
+    "conditions": {"effects": "in_od()"}
   },
   "418": {
     "id": 418,
@@ -6078,7 +6081,7 @@
         {"type": "attack_up", "target": "self", "elements": ["dark"], "status_id": 1, "duration": {"type": "use", "value": 1}}
       ]
     },
-    "conditions": {"effects": "od()"}
+    "conditions": {"effects": "in_od()"}
   },
   "419": {
     "id": 419,
@@ -6098,7 +6101,7 @@
         {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["ice"]}
       ]
     },
-    "conditions": {"effects": "od()"}
+    "conditions": {"effects": "in_od()"}
   },
   "420": {
     "id": 420,
@@ -6124,7 +6127,7 @@
         {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
       ]
     },
-    "conditions": {"effects": "od()"}
+    "conditions": {"effects": "in_od()"}
   },
   "421": {
     "id": 421,
@@ -6937,7 +6940,7 @@
     "names": {"zh_cn": "背負い進む覚悟", "zh_tw": "背負著前進的覺悟", "jp": "背負い進む覚悟"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_player_turn_start",
+    "trigger": "on_action_start",
     "trigger_condition": "front()",
     "effects": [
       {"type": "attack_up_per_token", "target": "self", "status_id": 27, "duration": {"type": "ally_turn", "value": 1}}
@@ -7427,7 +7430,7 @@
     "kind": "active",
     "cost": {"sp": 4},
     "target": "self",
-    "condition": "od()==0",
+    "condition": "in_od()==0",
     "effects": [
       {"type": "defense_up", "target": "self", "status_id": 4, "duration": {"type": "enemy_turn", "value": 2}},
       {"type": "token", "target": "self"},
@@ -7440,7 +7443,7 @@
     "kind": "active",
     "cost": {"sp": 8},
     "target": "ally_single",
-    "condition": "od()",
+    "condition": "in_od()",
     "effects": [
       {"type": "attack_up", "target": "ally_single", "status_id": 1, "duration": {"type": "use", "value": 1}},
       {"type": "critical_damage_up", "target": "ally_single", "status_id": 7, "duration": {"type": "use", "value": 1}},
@@ -7495,7 +7498,7 @@
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
       {"type": "mind_eye", "target": "ally_sub", "status_id": 78, "duration": {"type": "use", "value": 1}},
-      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "od()"}
+      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "in_od()"}
     ]
   },
   "510": {
@@ -7546,7 +7549,7 @@
     "names": {"zh_cn": "盛开的鲜花", "zh_tw": "盛放的花朵", "jp": "咲き誇る花"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_every_turn",
+    "trigger": "on_new_turn_start",
     "effects": [
       {"type": "heal_ep", "target": "self"}
     ]
@@ -7780,7 +7783,7 @@
     "names": {"zh_cn": "怪物般的球威", "zh_tw": "怪物球威", "jp": "怪物球威"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_player_turn_start",
+    "trigger": "on_action_start",
     "trigger_condition": "front()",
     "effects": [
       {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "ally_turn", "value": 1}}
@@ -8130,7 +8133,7 @@
         {"type": "mind_eye", "target": "ally_all", "status_id": 78, "duration": {"type": "ally_turn", "value": 5}, "solo": true}
       ]
     },
-    "conditions": {"effects": "od()"}
+    "conditions": {"effects": "in_od()"}
   },
   "553": {
     "id": 553,
@@ -10407,7 +10410,7 @@
     "names": {"zh_cn": "微笑的秘诀", "zh_tw": "微笑的秘訣", "jp": "微笑の秘訣"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_player_turn_start",
+    "trigger": "on_action_start",
     "effects": [
       {"type": "damage_rate_up", "target": "self", "status_id": 39, "duration": {"type": "ally_turn", "value": 1}}
     ]
@@ -10737,7 +10740,7 @@
     "id": 734,
     "names": {"zh_cn": "サンシャインリフレクション", "zh_tw": "夏陽反射", "jp": "サンシャインリフレクション"},
     "kind": "active",
-    "cost": {"yes": {"sp": 6}, "no": {"sp": 12}}, "conditions": {"cost": "od()"},
+    "cost": {"yes": {"sp": 6}, "no": {"sp": 12}}, "conditions": {"cost": "in_od()"},
     "hit_count": 2,
     "target": "all",
     "attack_type": "stab",
