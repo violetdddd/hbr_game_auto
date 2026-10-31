@@ -2084,9 +2084,9 @@
     "attack_type": "stab",
     "elements": ["fire"],
     "effects": [
-      {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["fire"]},
       {"type": "resist_down", "target": "single", "elements": ["fire"], "status_id": 18, "target_condition": "target.weak('fire')", "duration": {"type": "permanent"}},
-      {"type": "fragile", "target": "single", "status_id": 22, "duration": {"type": "permanent"}}
+      {"type": "fragile", "target": "single", "status_id": 22, "duration": {"type": "permanent"}},
+      {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["fire"]}
     ]
   },
   "153": {
