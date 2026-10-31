@@ -4306,7 +4306,7 @@
     "cost": {"sp": 5},
     "target": "ally_single",
     "effects": [
-      {"type": "specify_sp", "target": "ally_single", "status_id": 26}
+      {"type": "specify_sp", "target": "ally_single", "status_id": 26, "value": 3}
     ]
   },
   "274": {
