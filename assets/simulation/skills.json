@@ -2775,7 +2775,7 @@
   "197": {
     "id": 197,
     "names": {"zh_cn": "原子火焰", "zh_tw": "原子火焰", "jp": "アトミックフレア"},
-    "conditions": {"cost": "ally.count(has(20)) > 0"},
+    "conditions": {"cost": "has(20)"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 0},
@@ -2784,11 +2784,23 @@
     "hit_count": 5,
     "target": "single",
     "attack_type": "strike",
-    "effects": [
-      {"type": "penetration_critical_attack", "target": "single", "attack_type": "strike"},
-      {"type": "ignore_e_shield_element", "target": "self", "status_id": 169, "duration": {"type": "ally_turn", "value": 1}},
-      {"type": "resource", "target": "od", "hit_condition": "break_hits()>0", "od": 100}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "penetration_critical_attack", "target": "single", "attack_type": "strike"},
+          {"type": "ignore_e_shield_element", "target": "self", "status_id": 169, "duration": {"type": "ally_turn", "value": 1}},
+          {"type": "resource", "target": "od", "od": 100}
+        ],
+        "description": "破盾"
+      },
+      "2": {
+        "effects": [
+          {"type": "penetration_critical_attack", "target": "single", "attack_type": "strike"},
+          {"type": "ignore_e_shield_element", "target": "self", "status_id": 169, "duration": {"type": "ally_turn", "value": 1}}
+        ],
+        "description": "不破盾"
+      }
+    }
   },
   "198": {
     "id": 198,
@@ -3270,9 +3282,9 @@
     "target": "all",
     "attack_type": "stab",
     "effects": [
-      {"type": "penetration_critical_attack", "target": "all", "attack_type": "stab"},
       {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "defense_down", "target": "self", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
+      {"type": "defense_down", "target": "self", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
+      {"type": "penetration_critical_attack", "target": "all", "attack_type": "stab"}
     ]
   },
   "225": {
@@ -4221,13 +4233,8 @@
     "attack_type": "slash",
     "effects": {
       "yes": [
-        {"type": "penetration_critical_attack", "target": "all", "attack_type": "slash"},
-        {
-          "type": "critical_damage_up",
-          "target": "self",
-          "status_id": 7,
-          "duration": {"type": "use", "value": 1}
-        }
+        {"type": "critical_damage_up", "target": "self", "status_id": 7, "duration": {"type": "use", "value": 1}},
+        {"type": "penetration_critical_attack", "target": "all", "attack_type": "slash"}
       ],
       "no": [{"type": "attack", "target": "all", "attack_type": "slash"}]
     }
@@ -9214,7 +9221,7 @@
   "602": {
     "id": 602,
     "names": {"zh_cn": "水花晶莹，浅蓝一抹", "zh_tw": "飛沫閃耀的水淺蔥色", "jp": "飛沫きらめく水浅葱"},
-    "conditions": {"cost": "not (used(602)>0)"},
+    "conditions": {"cost": "used(602) == 0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 7},
@@ -9399,7 +9406,7 @@
   "615": {
     "id": 615,
     "names": {"zh_cn": "洛可可式破坏", "zh_tw": "洛可可式破壞", "jp": "ロココ・デストラクション"},
-    "conditions": {"cost": "not (used(615)>0)"},
+    "conditions": {"cost": "used(615) == 0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 7},
@@ -9409,9 +9416,9 @@
     "target": "single",
     "attack_type": "slash",
     "effects": [
-      {"type": "penetration_critical_attack", "target": "single", "attack_type": "slash"},
       {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "defense_down", "target": "self", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
+      {"type": "defense_down", "target": "self", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
+      {"type": "penetration_critical_attack", "target": "single", "attack_type": "slash"}
     ]
   },
   "616": {
@@ -10503,17 +10510,17 @@
         {
           "when": "ally.count(has(154)) == 5",
           "effects": [
-            {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"},
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}}
+            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}},
+            {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"}
           ],
           "description": "下僕5人"
         },
         {
           "when": "ally.count(has(154)) == 6",
           "effects": [
-            {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"},
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}},
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}}
+            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}},
+            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}},
+            {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"}
           ],
           "description": "下僕6人"
         }
