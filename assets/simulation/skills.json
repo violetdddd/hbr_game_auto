@@ -1367,7 +1367,6 @@
     "target": "all",
     "attack_type": "slash",
     "elements": ["dark"],
-    "condition": "ally.count(has(154)) >= 6",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]},
       {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}}
@@ -2084,7 +2083,6 @@
     "target": "single",
     "attack_type": "stab",
     "elements": ["fire"],
-    "condition": "sp()<0",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["fire"]},
       {"type": "resist_down", "target": "single", "elements": ["fire"], "status_id": 18, "target_condition": "target.weak('fire')", "duration": {"type": "permanent"}},
@@ -4146,7 +4144,6 @@
     "kind": "active",
     "cost": {"sp": 0},
     "target": "self",
-    "condition": "sp()>19",
     "effects": [
       {"type": "buff_charge", "target": "self", "status_id": 25, "duration": {"type": "use", "value": 1}},
       {"type": "resource", "target": "self", "sp": 5}
@@ -4245,7 +4242,6 @@
     "target": "single",
     "attack_type": "slash",
     "elements": ["thunder"],
-    "condition": "sp()>0",
     "effects": {
       "yes": [{"type": "attack_by_sp", "target": "single", "attack_type": "slash", "elements": ["thunder"]}],
       "no": [{"type": "attack_by_sp", "target": "single", "attack_type": "slash", "elements": ["thunder"]}]
@@ -5169,7 +5165,6 @@
     "kind": "active",
     "cost": {"sp": 7},
     "target": "ally_single",
-    "condition": "level(119) >= 6",
     "effects": [
       {"type": "funnel", "target": "ally_single", "status_id": 13, "duration": {"type": "ally_turn", "value": 5}, "solo": true}
     ]
@@ -5599,7 +5594,6 @@
     "cost": {"sp": 0},
     "hit_count": 1,
     "target": "single",
-    "condition": "sp()<0",
     "effects": [
       {"type": "fixed_hp_damage_rate_attack", "target": "single"},
       {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}}
@@ -6326,7 +6320,6 @@
     "hit_count": 3,
     "target": "single",
     "attack_type": "strike",
-    "condition": "turn()==1",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "strike"},
       {"type": "resource", "target": "self", "sp": 7}
@@ -7522,7 +7515,6 @@
     "kind": "active",
     "cost": {"sp": 0},
     "target": "ally_all",
-    "condition": "od_gauge() < 0",
     "user_select": {
       "1": {
         "effects": [
@@ -7783,7 +7775,6 @@
     "kind": "active",
     "cost": {"sp": 4},
     "target": "self",
-    "condition": "not in_od()",
     "effects": [
       {"type": "defense_up", "target": "self", "status_id": 4, "duration": {"type": "enemy_turn", "value": 2}},
       {"type": "token", "target": "self", "level": 2},
@@ -7796,7 +7787,6 @@
     "kind": "active",
     "cost": {"sp": 8},
     "target": "ally_single",
-    "condition": "in_od()",
     "effects": [
       {"type": "attack_up", "target": "ally_single", "status_id": 1, "duration": {"type": "use", "value": 1}},
       {"type": "critical_damage_up", "target": "ally_single", "status_id": 7, "duration": {"type": "use", "value": 1}},
@@ -9662,7 +9652,6 @@
     "target": "all",
     "attack_type": "stab",
     "elements": ["thunder"],
-    "condition": "sp()>0",
     "effects": [
       {"type": "attack_by_sp", "target": "all", "attack_type": "stab", "elements": ["thunder"]}
     ]
@@ -9764,7 +9753,6 @@
     "kind": "active",
     "cost": {"sp": 7},
     "target": "ally_sub",
-    "condition": "ally.count(front()==0) > 0",
     "effects": [
       {"type": "attack_up", "target": "ally_sub", "status_id": 1, "duration": {"type": "use", "value": 1}},
       {"type": "attack_down", "target": "self", "status_id": 2, "duration": {"type": "enemy_turn", "value": 3}}
@@ -10321,7 +10309,6 @@
     "kind": "active",
     "cost": {"sp": 6},
     "target": "ally_sub",
-    "condition": "ally.count(front()==0) > 0",
     "effects": [
       {"type": "b_i_yamawaki_servant", "target": "ally_sub", "status_id": 154, "duration": {"type": "permanent"}}
     ]
@@ -10941,9 +10928,8 @@
     "kind": "active",
     "cost": {"sp": 7},
     "target": "ally_front",
-    "condition": "not has(20)",
     "effects": [
-      {"type": "additional_turn", "target": "ally_front", "status_id": 20}
+      {"type": "additional_turn", "target": "ally_front", "status_id": 20, "target_condition": "not has(20)"}
     ]
   },
   "720": {
