@@ -4418,7 +4418,7 @@
     "target": "ally_all",
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
-      {"type": "specify_sp", "target": "ally_all_without_self", "status_id": 26}
+      {"type": "specify_sp", "target": "ally_all_without_self", "status_id": 26, "value": 10}
     ]
   },
   "283": {
