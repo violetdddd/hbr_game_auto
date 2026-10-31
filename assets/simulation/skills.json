@@ -334,7 +334,7 @@
     "attack_type": "slash",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash"},
-      {"type": "shadow_clone", "target": "self", "status_id": 124, "duration": {"type": "use", "value": 2}},
+      {"type": "shadow_clone", "target": "self", "status_id": 124, "duration": {"type": "on_attack", "value": 2}},
       {"type": "confusion_random", "target": "all", "duration": {"type": "enemy_turn", "value": 2}}
     ]
   },
