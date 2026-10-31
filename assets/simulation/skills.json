@@ -11121,7 +11121,6 @@
     "target": "single",
     "attack_type": "stab",
     "elements": ["dark"],
-    "condition": "front()==0",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
       {"type": "attack_up", "target": "ally_front", "elements": ["dark"], "status_id": 1, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
@@ -11158,7 +11157,6 @@
     "kind": "active",
     "cost": {"sp": 7},
     "target": "ally_sub",
-    "condition": "ally.count(front()==0) > 0",
     "effects": [
       {"type": "attack_up", "target": "ally_sub", "status_id": 1, "duration": {"type": "use", "value": 1}},
       {"type": "recoil_random", "target": "self", "duration": {"type": "ally_turn", "value": 2}}
@@ -11183,7 +11181,6 @@
     "kind": "active",
     "cost": {"sp": 12},
     "target": "ally_sub",
-    "condition": "ally.count(front()==0) > 0",
     "effects": [
       {"type": "attack_up", "target": "ally_sub", "status_id": 1, "duration": {"type": "use", "value": 1}},
       {"type": "resource", "target": "od", "od": 25}
@@ -11214,7 +11211,6 @@
     "cost": {"sp": 12},
     "target": "ally_sub",
     "elements": ["fire"],
-    "condition": "ally.count(front()==0) > 0",
     "effects": [
       {"type": "attack_up", "target": "ally_sub", "elements": ["fire"], "status_id": 1, "duration": {"type": "use", "value": 1}},
       {"type": "critical_rate_up", "target": "ally_sub", "elements": ["fire"], "status_id": 5, "duration": {"type": "use", "value": 1}},
@@ -11228,7 +11224,6 @@
     "cost": {"sp": 11},
     "target": "ally_sub",
     "elements": ["light"],
-    "condition": "ally.count(front()==0) > 0",
     "effects": [
       {"type": "attack_up", "target": "ally_sub", "elements": ["light"], "status_id": 1, "duration": {"type": "use", "value": 1}},
       {"type": "critical_damage_up", "target": "ally_sub", "elements": ["light"], "status_id": 7, "duration": {"type": "use", "value": 1}},
@@ -11244,7 +11239,6 @@
     "target": "single",
     "attack_type": "stab",
     "elements": ["dark"],
-    "condition": "front()==0",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
       {"type": "attack_up", "target": "ally_front", "elements": ["dark"], "status_id": 1, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
