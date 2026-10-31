@@ -4548,12 +4548,10 @@
     "id": 292,
     "names": {"zh_cn": "光之路标", "zh_tw": "光之路標", "jp": "光の標"},
     "kind": "active",
-    "cost": {"sp": 0},
+    "cost": {"resource": "od", "od": 50},
     "target": "ally_front",
-    "condition": "od_gauge() >= 0",
     "effects": [
-      {"type": "resource", "target": "ally_front", "sp": 6},
-      {"type": "resource", "target": "self", "sp": 6}
+      {"type": "resource", "target": "ally_front", "sp": 6}
     ]
   },
   "293": {
@@ -6871,12 +6869,10 @@
     "id": 439,
     "names": {"zh_cn": "稀世魔药", "zh_tw": "稀世魔藥", "jp": "稀代の魔法薬"},
     "kind": "active",
-    "cost": {"sp": 0},
+    "cost": {"resource": "od", "od": 100},
     "target": "ally_all",
-    "condition": "od_gauge() >= 0",
     "effects": [
-      {"type": "remove_debuff", "target": "ally_all"},
-      {"type": "resource", "target": "od", "od": -100}
+      {"type": "remove_debuff", "target": "ally_all"}
     ]
   },
   "440": {
@@ -7676,13 +7672,11 @@
     "id": 496,
     "names": {"zh_cn": "尽染，第一片红叶", "zh_tw": "染上初楓之紅", "jp": "染められて、初紅葉"},
     "kind": "active",
-    "cost": {"sp": 0},
+    "cost": {"resource": "od", "od": 50},
     "target": "ally_all",
-    "condition": "od_gauge() >= 0",
     "effects": [
       {"type": "critical_rate_up", "target": "ally_all", "status_id": 5, "duration": {"type": "use", "value": 1}},
-      {"type": "critical_damage_up", "target": "ally_all", "status_id": 7, "duration": {"type": "use", "value": 1}},
-      {"type": "resource", "target": "od", "od": -50}
+      {"type": "critical_damage_up", "target": "ally_all", "status_id": 7, "duration": {"type": "use", "value": 1}}
     ]
   },
   "497": {
