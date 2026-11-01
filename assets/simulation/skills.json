@@ -1070,7 +1070,7 @@
     "target": "self",
     "effects": [
       {"type": "defense_up", "target": "self", "status_id": 4, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "provoke", "target": "all", "status_id": 12}
+      {"type": "provoke", "target": "all", "status_id": 12, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "84": {
@@ -1581,7 +1581,7 @@
     "attack_type": "strike",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "strike"},
-      {"type": "provoke", "target": "all", "status_id": 12}
+      {"type": "provoke", "target": "all", "status_id": 12, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "117": {
@@ -2109,7 +2109,7 @@
     "target": "self",
     "effects": [
       {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "enemy_turn", "value": 2}, "value": 15},
-      {"type": "provoke", "target": "all", "status_id": 12}
+      {"type": "provoke", "target": "all", "status_id": 12, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "155": {
@@ -2199,7 +2199,7 @@
     "attack_type": "strike",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "strike"},
-      {"type": "provoke", "target": "all", "status_id": 12}
+      {"type": "provoke", "target": "all", "status_id": 12, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "163": {
@@ -2216,7 +2216,7 @@
     "attack_type": "strike",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "strike"},
-      {"type": "provoke", "target": "all", "status_id": 12},
+      {"type": "provoke", "target": "all", "status_id": 12, "duration": {"type": "enemy_turn", "value": 3}},
       {"type": "defense_up", "target": "ally_front", "status_id": 4, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
@@ -2471,7 +2471,7 @@
     "target": "self",
     "effects": [
       {"type": "heal_dp", "target": "self"},
-      {"type": "provoke", "target": "all", "status_id": 12}
+      {"type": "provoke", "target": "all", "status_id": 12, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "181": {
@@ -4437,7 +4437,7 @@
     "target": "self",
     "effects": [
       {"type": "defense_up", "target": "self", "status_id": 4, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "provoke", "target": "all", "status_id": 12}
+      {"type": "provoke", "target": "all", "status_id": 12, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "289": {
@@ -4461,7 +4461,7 @@
     "target": "self",
     "effects": [
       {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "enemy_turn", "value": 2}, "value": 15},
-      {"type": "provoke", "target": "all", "status_id": 12}
+      {"type": "provoke", "target": "all", "status_id": 12, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "291": {
@@ -9270,7 +9270,7 @@
     "elements": ["thunder"],
     "effects": [
       {"type": "attack_up", "target": "self", "elements": ["thunder"], "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "provoke", "target": "all", "status_id": 12}
+      {"type": "provoke", "target": "all", "status_id": 12, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "611": {
@@ -9387,7 +9387,7 @@
     "attack_type": "strike",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "strike"},
-      {"type": "provoke", "target": "all", "status_id": 12}
+      {"type": "provoke", "target": "all", "status_id": 12, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "619": {
@@ -9398,7 +9398,7 @@
     "target": "self",
     "effects": [
       {"type": "heal_dp", "target": "self"},
-      {"type": "provoke", "target": "all", "status_id": 12}
+      {"type": "provoke", "target": "all", "status_id": 12, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "620": {
@@ -9548,7 +9548,7 @@
   },
   "629": {
     "id": 629,
-    "names": {"zh_cn": "重点突破", "zh_tw": "重點突破", "jp": "一点突破"},
+    "names": {"zh_cn": "一点突破", "zh_tw": "重點突破", "jp": "一点突破"},
     "kind": "active",
     "cost": {"sp": 10},
     "hit_count": 3,
@@ -9558,7 +9558,7 @@
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["thunder"]},
       {"type": "attack_down", "target": "single", "status_id": 2, "duration": {"type": "enemy_turn", "value": 2}},
-      {"type": "provoke", "target": "all", "status_id": 12}
+      {"type": "provoke", "target": "all", "status_id": 12, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "630": {
@@ -10051,7 +10051,7 @@
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "strike"},
       {"type": "defense_up", "target": "self", "status_id": 4, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "provoke", "target": "all", "status_id": 12}
+      {"type": "provoke", "target": "all", "status_id": 12, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "669": {
