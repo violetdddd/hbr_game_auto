@@ -3313,10 +3313,20 @@
     "target": "single",
     "attack_type": "stab",
     "elements": ["thunder"],
-    "effects": [
-      {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["thunder"]},
-      {"type": "resource", "target": "ally_all", "hit_condition": "break_hits()>0", "sp": 8}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["thunder"]},
+          {"type": "resource", "target": "ally_all", "sp": 8}
+        ],
+        "description": "破盾"
+      },
+      "2": {
+        "effects": [{"type": "attack", "target": "single", "attack_type": "stab", "elements": ["thunder"]}],
+        "description": "不破盾"
+      }
+    }
+
   },
   "227": {
     "id": 227,
@@ -8632,8 +8642,8 @@
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
       {"type": "remove_debuff", "target": "ally_all"},
-      {"type": "mind_eye", "target": "ally_all", "status_id": 78, "hit_condition": "removed_debuffs()>0", "duration": {"type": "use", "value": 1}},
-      {"type": "attack_up", "target": "ally_all", "status_id": 1, "hit_condition": "removed_debuffs()>0", "duration": {"type": "use", "value": 1}}
+      {"type": "mind_eye", "target": "ally_all", "status_id": 78, "target_condition": "removed_debuffs()>0", "duration": {"type": "use", "value": 1}},
+      {"type": "attack_up", "target": "ally_all", "status_id": 1, "target_condition": "removed_debuffs()>0", "duration": {"type": "use", "value": 1}}
     ]
   },
   "567": {
@@ -10586,7 +10596,7 @@
     "elements": ["dark"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["dark"]},
-      {"type": "heal_skill_used_count", "target": "self", "hit_condition": "break_hits()>0"}
+      {"type": "heal_skill_used_count", "target": "self"}
     ]
   },
   "701": {
