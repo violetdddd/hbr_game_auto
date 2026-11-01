@@ -2927,7 +2927,7 @@
     "cost": {
       "resource": "user_select",
       "user_select": {
-        "1": {"sp": 5, "description": "DP低于50%（sp消耗减半）"},
+        "1": {"sp": 5, "description": "DP小于等于50%（sp消耗减半）"},
         "2": {"sp": 10, "description": "DP高于50%"}
       }
     },
