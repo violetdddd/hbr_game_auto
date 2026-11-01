@@ -109,7 +109,7 @@
           {"type": "double_action_extra_skill", "target": "self", "status_id": 125, "duration": {"type": "use_ex", "value": 1}},
           {"type": "defense_down", "target": "self", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}}
         ],
-        "description": "失败"
+        "description": "失败（防御力降低）"
       }
     }
   },
@@ -157,7 +157,7 @@
           {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["ice"]},
           {"type": "resource", "target": "od", "od": 150}
         ],
-        "description": "破盾"
+        "description": "破盾（od上升150%）"
       },
       "2": {
         "effects": [
@@ -2206,7 +2206,7 @@
     "cost": {
       "resource": "user_select",
       "user_select": {
-        "1": {"sp": 5, "description": "DP为100%或以上"},
+        "1": {"sp": 5, "description": "DP为100%或以上（sp消耗减半）"},
         "2": {"sp": 10, "description": "DP低于100%"}
       }
     },
@@ -2789,7 +2789,7 @@
           {"type": "ignore_e_shield_element", "target": "self", "status_id": 169, "duration": {"type": "ally_turn", "value": 1}},
           {"type": "resource", "target": "od", "od": 100}
         ],
-        "description": "破盾"
+        "description": "破盾（od上升100%）"
       },
       "2": {
         "effects": [
@@ -2927,7 +2927,7 @@
     "cost": {
       "resource": "user_select",
       "user_select": {
-        "1": {"sp": 5, "description": "DP低于50%"},
+        "1": {"sp": 5, "description": "DP低于50%（sp消耗减半）"},
         "2": {"sp": 10, "description": "DP高于50%"}
       }
     },
@@ -3321,7 +3321,7 @@
           {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["thunder"]},
           {"type": "resource", "target": "ally_all", "sp": 8}
         ],
-        "description": "破盾"
+        "description": "破盾（全体友方回复8sp）"
       },
       "2": {
         "effects": [{"type": "attack", "target": "single", "attack_type": "stab", "elements": ["thunder"]}],
@@ -6681,7 +6681,7 @@
             "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}
           }
         ], 
-        "description": "存在破坏率200%以上的敌人"
+        "description": "存在破坏率200%以上的敌人（增加3颗大连击珠）"
       },
       "2": {
         "effects": [{"type": "attack", "target": "single", "attack_type": "stab", "elements": ["ice"]}],
@@ -8022,7 +8022,7 @@
     "cost": {
       "resource": "user_select",
       "user_select": {
-        "1": {"sp": 7, "description": "存在破坏率200%以上的敌人"},
+        "1": {"sp": 7, "description": "存在破坏率200%以上的敌人（sp消耗减半）"},
         "2": {"sp": 14, "description": "不存在破坏率200%以上的敌人"}
       }
     },
@@ -10119,7 +10119,7 @@
     "cost": {
       "resource": "user_select",
       "user_select": {
-        "1": {"sp": 7, "description": "DP为100%或以上"},
+        "1": {"sp": 7, "description": "DP为100%或以上（sp消耗减半）"},
         "2": {"sp": 14, "description": "DP低于100%"}
       }
     },
@@ -10241,7 +10241,7 @@
           {"type": "resource", "target": "self", "sp": 10},
           {"type": "defense_up", "target": "single", "status_id": 4, "duration": {"type": "enemy_turn", "value": 3}}
         ],
-        "description": "失败"
+        "description": "失败（防御力降低）"
       }
     }
   },
@@ -10277,7 +10277,7 @@
           {"type": "defense_down", "target": "all", "domain": "dp", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
           {"type": "attack_up", "target": "all", "status_id": 1, "duration": {"type": "enemy_turn", "value": 2}}
         ],
-        "description": "失败"
+        "description": "失败（敌方攻击力上升）"
       }
     }
   },
@@ -10315,7 +10315,7 @@
         "effects": [
           {"type": "attack", "target": "single", "attack_type": "stab"}
         ],
-        "description": "失败"
+        "description": "失败（伤害为1）"
       }
     }
   },
@@ -10342,7 +10342,7 @@
           {"type": "attack", "target": "single", "attack_type": "stab"},
           {"type": "zone", "target": "field", "elements": ["ice"], "status_id": 14, "duration": {"type": "permanent"}}
         ],
-        "description": "失败"
+        "description": "失败（伤害为1）"
       }
     }
   },
@@ -10637,7 +10637,7 @@
           {"type": "attack", "target": "all", "attack_type": "stab"},
           {"type": "resource", "target": "ally_front", "sp": 5}
         ],
-        "description": "破盾"
+        "description": "破盾（前锋回复5sp）"
       },
       "2": {
         "effects": [
@@ -10662,7 +10662,7 @@
           {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}},
           {"type": "resource", "target": "ally_front", "sp": 5}
         ],
-        "description": "破盾"
+        "description": "破盾（前锋回复5sp）"
       },
       "2": {
         "effects": [
