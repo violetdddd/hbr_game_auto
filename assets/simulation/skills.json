@@ -2962,7 +2962,7 @@
           "type": "misfortune",
           "target": "single",
           "status_id": 58,
-          "duration": {"type": "enemy_turn"}
+          "duration": {"type": "enemy_turn", "value": 2}
         }
       ],
       "no": [
@@ -2992,7 +2992,7 @@
           "type": "misfortune",
           "target": "single",
           "status_id": 58,
-          "duration": {"type": "enemy_turn"}
+          "duration": {"type": "enemy_turn", "value": 2}
         },
         {
           "type": "fragile",
@@ -5083,7 +5083,7 @@
     "attack_type": "slash",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "slash"},
-      {"type": "misfortune", "target": "single", "status_id": 58, "duration": {"type": "enemy_turn"}}
+      {"type": "misfortune", "target": "single", "status_id": 58, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "332": {
@@ -5649,7 +5649,7 @@
     "elements": ["dark"],
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["dark"]},
-      {"type": "misfortune", "target": "single", "status_id": 58, "duration": {"type": "enemy_turn"}}
+      {"type": "misfortune", "target": "single", "status_id": 58, "duration": {"type": "enemy_turn", "value": 2}}
     ]
   },
   "375": {
@@ -5858,7 +5858,7 @@
     "attack_type": "stab",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab"},
-      {"type": "misfortune", "target": "all", "status_id": 58, "duration": {"type": "enemy_turn"}}
+      {"type": "misfortune", "target": "all", "status_id": 58, "duration": {"type": "enemy_turn", "value": 2}}
     ]
   },
   "389": {
@@ -5871,7 +5871,7 @@
     "attack_type": "stab",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab"},
-      {"type": "misfortune", "target": "single", "status_id": 58, "duration": {"type": "enemy_turn"}},
+      {"type": "misfortune", "target": "single", "status_id": 58, "duration": {"type": "enemy_turn", "value": 2}},
       {"type": "additional_turn", "target": "self", "status_id": 20}
     ]
   },
@@ -10102,7 +10102,7 @@
       {"type": "attack", "target": "single", "attack_type": "strike"},
       {"type": "attack_down", "target": "single", "status_id": 2, "duration": {"type": "enemy_turn", "value": 3}},
       {"type": "imprison_random", "target": "single", "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "misfortune", "target": "single", "status_id": 58, "duration": {"type": "enemy_turn"}}
+      {"type": "misfortune", "target": "single", "status_id": 58, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "673": {
@@ -10119,7 +10119,7 @@
     "attack_type": "strike",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "strike"},
-      {"type": "misfortune", "target": "single", "status_id": 58, "duration": {"type": "enemy_turn"}},
+      {"type": "misfortune", "target": "single", "status_id": 58, "duration": {"type": "enemy_turn", "value": 3}},
       {"type": "attack_down", "target": "single", "status_id": 2, "duration": {"type": "enemy_turn", "value": 3}},
       {"type": "imprison_random", "target": "single", "duration": {"type": "enemy_turn", "value": 1}}
     ]
