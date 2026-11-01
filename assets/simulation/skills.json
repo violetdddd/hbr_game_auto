@@ -1008,7 +1008,7 @@
   "79": {
     "id": 79,
     "names": {"zh_cn": "灾难的业火", "zh_tw": "大災難", "jp": "カタストロフィー"},
-    "conditions": {"cost": "not (used(79)>0)"},
+    "conditions": {"cost": "used(79)==0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 8},
@@ -1609,7 +1609,7 @@
   "119": {
     "id": 119,
     "names": {"zh_cn": "微风轻拂", "zh_tw": "微風吹拂", "jp": "そよ風に吹かれて"},
-    "conditions": {"cost": "not (used(119)>0)"},
+    "conditions": {"cost": "used(119)==0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 6},
@@ -1675,7 +1675,7 @@
   "123": {
     "id": 123,
     "names": {"zh_cn": "必杀！旋翼飞踢+", "zh_tw": "滅！徒然飛踢+", "jp": "必滅！ヴェインキック+"},
-    "conditions": {"cost": "not (used(123)>0)"},
+    "conditions": {"cost": "used(123)==0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 7},
@@ -4121,7 +4121,7 @@
   "266": {
     "id": 266,
     "names": {"zh_cn": "夜风暴+", "zh_tw": "夜晚的強風+", "jp": "夜嵐+"},
-    "conditions": {"cost": "not (used(266)>0)", "effects": "charging()"},
+    "conditions": {"cost": "used(266)==0", "effects": "charging()"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 7},
@@ -4874,7 +4874,7 @@
   "321": {
     "id": 321,
     "names": {"zh_cn": "血腥之舞+", "zh_tw": "血腥之舞+", "jp": "ブラッディ・ダンス+"},
-    "conditions": {"cost": "not (used(321)>0)"},
+    "conditions": {"cost": "used(321)==0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 6},
@@ -6056,7 +6056,7 @@
   "403": {
     "id": 403,
     "names": {"zh_cn": "优势开局", "zh_tw": "優勢開局", "jp": "配牌上々"},
-    "conditions": {"cost": "not (used(403)>0)"},
+    "conditions": {"cost": "used(403)==0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 6},
@@ -6898,7 +6898,7 @@
   "448": {
     "id": 448,
     "names": {"zh_cn": "破坏+", "zh_tw": "毀滅+", "jp": "デストロイ+"},
-    "conditions": {"cost": "not (used(448)>0)"},
+    "conditions": {"cost": "used(448)==0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 7},
@@ -9278,7 +9278,7 @@
   "611": {
     "id": 611,
     "names": {"zh_cn": "猫眼", "zh_tw": "貓眼", "jp": "キャッツアイ"},
-    "conditions": {"cost": "not (used(611)>0)"},
+    "conditions": {"cost": "used(611)==0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 5},
