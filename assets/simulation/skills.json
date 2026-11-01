@@ -3102,6 +3102,7 @@
           "type": "defense_down",
           "target": "single",
           "status_id": 3,
+          "domain": "dp",
           "duration": {"type": "permanent"}
         },
         {
@@ -3123,6 +3124,7 @@
           "type": "defense_down",
           "target": "single",
           "status_id": 3,
+          "domain": "dp",
           "duration": {"type": "permanent"}
         },
         {"type": "additional_turn", "target": "self", "status_id": 20}
@@ -4689,7 +4691,7 @@
     "target": "all",
     "effects": [
       {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
+      {"type": "defense_down", "target": "all", "domain":"dp", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "308": {
@@ -6157,7 +6159,7 @@
     "elements": ["thunder"],
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["thunder"]},
-      {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}},
+      {"type": "defense_down", "target": "single", "domain": "dp", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}},
       {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}},
       {"type": "defense_down", "target": "single", "elements": ["thunder"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}}
     ]
@@ -10258,14 +10260,14 @@
       "1": {
         "effects": [
           {"type": "attack", "target": "all", "attack_type": "stab"},
-          {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
+          {"type": "defense_down", "target": "all", "domain": "dp", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
         ],
         "description": "成功"
       },
       "2": {
         "effects": [
           {"type": "attack", "target": "all", "attack_type": "stab"},
-          {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
+          {"type": "defense_down", "target": "all", "domain": "dp", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
           {"type": "attack_up", "target": "all", "status_id": 1, "duration": {"type": "enemy_turn", "value": 2}}
         ],
         "description": "失败"
