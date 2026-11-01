@@ -497,7 +497,7 @@
   "163": {"name": "makeup", "category": "buff", "removable": true, "forced_one": true},
   "164": {"name": "additional_hit_on_specified_skill", "category": "buff"},
   "165": {"name": "damage_up_by_over_drive", "category": "buff"},
-  "166": {"name": "fire_mark", "category": "buff", "removable": true, "forced_one": true},
+  "166": {"name": "element_mark", "category": "buff", "removable": true, "forced_one": true},
   "167": {"name": "ref_param_up_by_resonance", "category": "buff", "removable": true, "forced_one": true},
   "168": {"name": "damage_rate_limit_up", "category": "debuff", "forced_one": true},
   "169": {"name": "ignore_e_shield_element", "category": "buff", "forced_one": true},

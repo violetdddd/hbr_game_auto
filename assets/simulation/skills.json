@@ -5821,7 +5821,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "fire_mark", "target": "ally_all", "status_id": 166, "target_condition": "element('fire')==1", "duration": {"type": "permanent"}}
+      {"type": "element_mark", "elements": ["fire"], "target": "ally_all", "status_id": 166, "target_condition": "element('fire')==1", "duration": {"type": "permanent"}}
     ]
   },
   "386": {
