@@ -1117,7 +1117,7 @@
             {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}, "value": 5},
             {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}, "value": 5}
           ],
-          "description": "2名队员"
+          "description": "2名31C队员"
         },
         {
           "when": "team.member('31C') == 3",
@@ -1125,7 +1125,7 @@
             {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}, "value": 10},
             {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}, "value": 10}
           ],
-          "description": "3名队员"
+          "description": "3名31C队员"
         },
         {
           "when": "team.member('31C') == 4",
@@ -1133,7 +1133,7 @@
             {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}, "value": 15},
             {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}, "value": 15}
           ],
-          "description": "4名队员"
+          "description": "4名31C队员"
         },
         {
           "when": "team.member('31C') == 5",
@@ -1141,7 +1141,7 @@
             {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}, "value": 20},
             {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}, "value": 20}
           ],
-          "description": "5名队员"
+          "description": "5名31C队员"
         },
         {
           "when": "team.member('31C') == 6",
@@ -1149,7 +1149,7 @@
             {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}, "value": 25},
             {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}, "value": 25}
           ],
-          "description": "6名队员"
+          "description": "6名31C队员"
         }
       ]
     }
@@ -3440,7 +3440,7 @@
             {"type": "critical_rate_up", "target": "ally_single", "elements": ["ice"], "status_id": 5, "duration": {"type": "use", "value": 1}},
             {"type": "critical_damage_up", "target": "ally_single", "elements": ["ice"], "status_id": 7, "duration": {"type": "use", "value": 1}}
           ],
-          "description": "氷属性"
+          "description": "冰属性"
         },
         {
           "when": "zone('thunder')==1",
@@ -3464,7 +3464,7 @@
             {"type": "critical_rate_up", "target": "ally_single", "elements": ["dark"], "status_id": 5, "duration": {"type": "use", "value": 1}},
             {"type": "critical_damage_up", "target": "ally_single", "elements": ["dark"], "status_id": 7, "duration": {"type": "use", "value": 1}}
           ],
-          "description": "闇属性"
+          "description": "暗属性"
         },
         {
           "when": "zone('elements')==0",
@@ -3538,7 +3538,7 @@
             {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
             {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('ice')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
           ],
-          "description": "氷属性"
+          "description": "冰属性"
         },
         {
           "when": "zone('thunder')==1",
@@ -3562,7 +3562,7 @@
             {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
             {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('dark')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
           ],
-          "description": "闇属性"
+          "description": "暗属性"
         },
         {
           "when": "zone('elements')==0",
@@ -3669,7 +3669,7 @@
             {"type": "critical_rate_up", "target": "ally_front", "elements": ["ice"], "status_id": 5, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
             {"type": "critical_damage_up", "target": "ally_front", "elements": ["ice"], "status_id": 7, "duration": {"type": "ally_turn", "value": 5}, "solo": true}
           ],
-          "description": "氷属性"
+          "description": "冰属性"
         },
         {
           "when": "zone('thunder')==1",
@@ -3696,7 +3696,7 @@
             {"type": "critical_rate_up", "target": "ally_front", "elements": ["dark"], "status_id": 5, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
             {"type": "critical_damage_up", "target": "ally_front", "elements": ["dark"], "status_id": 7, "duration": {"type": "ally_turn", "value": 5}, "solo": true}
           ],
-          "description": "闇属性"
+          "description": "暗属性"
         },
         {
           "when": "zone('elements')==0",
@@ -4100,8 +4100,8 @@
     "cost": {"sp": 6},
     "target": "self",
     "effects": [
-      {"type": "give_attack_buff_up", "target": "self", "status_id": 54, "duration": {"type": "use", "value": 1}},
-      {"type": "give_debuff_up", "target": "self", "status_id": 118, "duration": {"type": "use", "value": 1}},
+      {"type": "give_attack_buff_up", "target": "self", "status_id": 54, "duration": {"type": "use_buff", "value": 1}},
+      {"type": "give_debuff_up", "target": "self", "status_id": 118, "duration": {"type": "use_debuff", "value": 1}},
       {"type": "additional_turn", "target": "self", "status_id": 20}
     ]
   },
@@ -5137,7 +5137,7 @@
     "effects": [
       {"type": "attack_up", "target": "ally_all_without_self", "status_id": 1, "duration": {"type": "use", "value": 1}},
       {"type": "resource", "target": "ally_all_without_self", "sp": 5},
-      {"type": "give_debuff_up", "target": "ally_all", "status_id": 118, "duration": {"type": "use", "value": 1}}
+      {"type": "give_debuff_up", "target": "ally_all", "status_id": 118, "duration": {"type": "use_debuff", "value": 1}}
     ]
   },
   "337": {
@@ -7009,7 +7009,7 @@
     "effects": [
       {"type": "replace_normal_skill", "target": "self", "attack_type": "strike", "elements": ["light"], "status_id": 151, "duration": {"type": "permanent"}}
     ],
-    "variants": [{"id": 4520001, "selection": "replace_normal_skill", "description": "敵全体に光属性攻撃"}]
+    "variants": [{"id": 4520001, "selection": "replace_normal_skill", "description": "普攻替换为群体光属性攻击"}]
   },
   "4520001": {
     "id": 4520001,
@@ -7454,7 +7454,7 @@
           {"type": "mocktail", "target": "ally_all", "status_id": 179},
           {"type": "steak", "target": "ally_all", "status_id": 190, "duration": {"type": "permanent"}}
         ],
-        "description": "Steak"
+        "description": "牛排"
       },
       "2": {
         "effects": [
@@ -7462,7 +7462,7 @@
           {"type": "mocktail", "target": "ally_all", "status_id": 179},
           {"type": "dim_sum", "target": "ally_all", "status_id": 202, "duration": {"type": "permanent"}}
         ],
-        "description": "DimSum"
+        "description": "点心"
       },
       "3": {
         "effects": [
@@ -7470,7 +7470,7 @@
           {"type": "mocktail", "target": "ally_all", "status_id": 179},
           {"type": "curry", "target": "ally_all", "status_id": 171, "duration": {"type": "permanent"}}
         ],
-        "description": "Curry"
+        "description": "印度咖喱"
       },
       "4": {
         "effects": [
@@ -7478,7 +7478,7 @@
           {"type": "mocktail", "target": "ally_all", "status_id": 179},
           {"type": "gelato", "target": "ally_all", "status_id": 191, "duration": {"type": "permanent"}}
         ],
-        "description": "Gelato"
+        "description": "意式冰淇淋"
       },
       "5": {
         "effects": [
@@ -7486,7 +7486,7 @@
           {"type": "mocktail", "target": "ally_all", "status_id": 179},
           {"type": "shchi", "target": "ally_all", "status_id": 172, "duration": {"type": "permanent"}}
         ],
-        "description": "Shchi"
+        "description": "白菜汤"
       }
     }
   },
@@ -8364,7 +8364,7 @@
             {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
             {"type": "defense_down", "target": "single", "elements": ["light"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
           ],
-          "description": "絶好調"
+          "description": "干劲极佳"
         },
         {
           "when": "level(174) == 4",
@@ -8376,7 +8376,7 @@
             {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
             {"type": "defense_down", "target": "single", "elements": ["light"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
           ],
-          "description": "好調"
+          "description": "干劲良好"
         },
         {
           "when": "level(174) == 3",
@@ -8386,7 +8386,7 @@
             {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
             {"type": "defense_down", "target": "single", "elements": ["light"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
           ],
-          "description": "普通"
+          "description": "干劲一般"
         },
         {
           "when": "level(174) == 2",
@@ -8395,7 +8395,7 @@
             {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
             {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
           ],
-          "description": "不調"
+          "description": "干劲不佳"
         },
         {
           "when": "level(174) == 1",
@@ -8403,7 +8403,7 @@
             {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["light"]},
             {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "ally_turn", "value": 3}, "solo": true}
           ],
-          "description": "絶不調"
+          "description": "干劲极差"
         }
       ]
     }
@@ -8568,28 +8568,28 @@
           {"type": "regeneration_dp", "target": "ally_single", "status_id": 34, "duration": {"type": "enemy_turn", "value": 6}},
           {"type": "remove_debuff", "target": "ally_single"}
         ],
-        "description": "DP継続回復5ターン"
+        "description": "DP持续恢复5回合"
       },
       "2": {
         "effects": [
           {"type": "regeneration_dp", "target": "ally_single", "status_id": 34, "duration": {"type": "enemy_turn", "value": 5}},
           {"type": "remove_debuff", "target": "ally_single"}
         ],
-        "description": "DP継続回復4ターン"
+        "description": "DP持续恢复4回合"
       },
       "3": {
         "effects": [
           {"type": "regeneration_dp", "target": "ally_single", "status_id": 34, "duration": {"type": "enemy_turn", "value": 4}},
           {"type": "remove_debuff", "target": "ally_single"}
         ],
-        "description": "DP継続回復3ターン"
+        "description": "DP持续恢复3回合"
       },
       "4": {
         "effects": [
           {"type": "regeneration_dp", "target": "ally_single", "status_id": 34, "duration": {"type": "enemy_turn", "value": 3}},
           {"type": "remove_debuff", "target": "ally_single"}
         ],
-        "description": "DP継続回復2ターン"
+        "description": "DP持续恢复2回合"
       }
     }
   },
@@ -8945,7 +8945,7 @@
           {"type": "attack_down", "target": "single", "status_id": 2, "duration": {"type": "enemy_turn", "value": 1}},
           {"type": "zone", "target": "field", "elements": ["thunder"], "status_id": 14, "duration": {"type": "permanent"}}
         ],
-        "description": "攻撃力ダウン"
+        "description": "攻击力下降"
       },
       "2": {
         "effects": [
@@ -8953,7 +8953,7 @@
           {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
           {"type": "zone", "target": "field", "elements": ["thunder"], "status_id": 14, "duration": {"type": "permanent"}}
         ],
-        "description": "防御力ダウン"
+        "description": "防御力下降"
       }
     }
   },
@@ -10415,28 +10415,28 @@
           "effects": [
             {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"}
           ],
-          "description": "下僕1人"
+          "description": "小跟班1人"
         },
         {
           "when": "team.count(has(154)) == 2",
           "effects": [
             {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"}
           ],
-          "description": "下僕2人"
+          "description": "小跟班2人"
         },
         {
           "when": "team.count(has(154)) == 3",
           "effects": [
             {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"}
           ],
-          "description": "下僕3人"
+          "description": "小跟班3人"
         },
         {
           "when": "team.count(has(154)) == 4",
           "effects": [
             {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"}
           ],
-          "description": "下僕4人"
+          "description": "小跟班4人"
         },
         {
           "when": "team.count(has(154)) == 5",
@@ -10444,7 +10444,7 @@
             {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}},
             {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"}
           ],
-          "description": "下僕5人"
+          "description": "小跟班5人"
         },
         {
           "when": "team.count(has(154)) == 6",
@@ -10453,7 +10453,7 @@
             {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}},
             {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"}
           ],
-          "description": "下僕6人"
+          "description": "小跟班6人"
         }
       ]
     }
@@ -11061,7 +11061,7 @@
         "id": 7280001,
         "selection": "replace_pursuit",
         "condition": "front()==0",
-        "description": "3ターン 前衛の闇属性スキル攻撃力と闇属性CRT率&ダメージを\n大きく上げ [単独発動] 敵に闇属性攻撃[追撃でのみ発動可能]"
+        "description": "自动追击，每回合满足条件时可释放大招1次"
       }
     ]
   },
