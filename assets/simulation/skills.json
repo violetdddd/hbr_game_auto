@@ -123,8 +123,8 @@
     "attack_type": "strike",
     "elements": ["light"],
     "effects": [
-      {"type": "disaster", "target": "all", "status_id": 193, "duration": {"type": "permanent"}, "level": 2},
-      {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]}
+      {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["light"]},
+      {"type": "disaster", "target": "all", "status_id": 193, "duration": {"type": "permanent"}, "level": 2}
     ]
   },
   "18": {
@@ -139,8 +139,8 @@
     "elements": ["dark"],
     "effects": [
       {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}},
-      {"type": "defense_down", "target": "self", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["dark"]}
+      {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["dark"]},
+      {"type": "defense_down", "target": "self", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "19": {
@@ -343,8 +343,8 @@
     "target": "all",
     "attack_type": "slash",
     "effects": [
-      {"type": "attack", "target": "all", "attack_type": "slash"},
       {"type": "shadow_clone", "target": "self", "status_id": 124, "duration": {"type": "on_attack", "value": 2}},
+      {"type": "attack", "target": "all", "attack_type": "slash"},
       {"type": "confusion_random", "target": "all", "duration": {"type": "enemy_turn", "value": 2}}
     ]
   },
@@ -481,8 +481,8 @@
     "target": "all",
     "attack_type": "strike",
     "effects": [
-      {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "all", "attack_type": "strike"}
+      {"type": "attack", "target": "all", "attack_type": "strike"},
+      {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "40": {
@@ -494,8 +494,8 @@
     "target": "single",
     "attack_type": "strike",
     "effects": [
-      {"type": "fragile", "target": "single", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "strike"}
+      {"type": "attack", "target": "single", "attack_type": "strike"},
+      {"type": "fragile", "target": "single", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "41": {
@@ -507,8 +507,8 @@
     "target": "all",
     "attack_type": "strike",
     "effects": [
-      {"type": "fragile", "target": "all", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "all", "attack_type": "strike"}
+      {"type": "attack", "target": "all", "attack_type": "strike"},
+      {"type": "fragile", "target": "all", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "42": {
@@ -564,8 +564,8 @@
     "target": "single",
     "attack_type": "strike",
     "effects": [
-      {"type": "attack", "target": "single", "attack_type": "strike"},
-      {"type": "resource", "target": "od", "od": 50}
+      {"type": "resource", "target": "od", "od": 50},
+      {"type": "attack", "target": "single", "attack_type": "strike"}
     ]
   },
   "46": {
@@ -579,8 +579,8 @@
     "attack_type": "strike",
     "effects": [
       {"type": "fragile", "target": "single", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "strike"},
-      {"type": "resource", "target": "od", "od": 50}
+      {"type": "resource", "target": "od", "od": 50},
+      {"type": "attack", "target": "single", "attack_type": "strike"}
     ]
   },
   "47": {
@@ -599,8 +599,8 @@
         {
           "when": "enemy.count() == 3",
           "effects": [
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 6, "number": 1}},
             {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
+            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 6, "number": 1}},
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["dark"]}
           ],
           "description": "3名敌人"
@@ -608,8 +608,8 @@
         {
           "when": "enemy.count() == 2",
           "effects": [
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 6, "number": 3}},
             {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
+            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 6, "number": 3}},
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["dark"]}
           ],
           "description": "2名敌人"
@@ -617,8 +617,8 @@
         {
           "when": "enemy.count() == 1",
           "effects": [
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 6, "number": 10}},
             {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
+            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 6, "number": 10}},
             {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["dark"]}
           ],
           "description": "1名敌人"
@@ -698,8 +698,8 @@
     "hit_count": 1,
     "target": "single",
     "effects": [
-      {"type": "attack_down", "target": "single", "status_id": 2, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "remove_buff", "target": "single"}
+      {"type": "remove_buff", "target": "single"},
+      {"type": "attack_down", "target": "single", "status_id": 2, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "53": {
@@ -830,8 +830,8 @@
     "cost": {"sp": 4},
     "target": "self",
     "effects": [
-      {"type": "heal_dp", "target": "self"},
-      {"type": "remove_debuff", "target": "self"}
+      {"type": "remove_debuff", "target": "self"},
+      {"type": "heal_dp", "target": "self"}
     ]
   },
   "65": {
@@ -883,8 +883,8 @@
     "target": "all",
     "attack_type": "slash",
     "effects": [
-      {"type": "attack", "target": "all", "attack_type": "slash"},
-      {"type": "resource", "target": "self", "sp": 3}
+      {"type": "resource", "target": "self", "sp": 3},
+      {"type": "attack", "target": "all", "attack_type": "slash"}
     ]
   },
   "70": {
@@ -1208,8 +1208,8 @@
     "target": "single",
     "attack_type": "slash",
     "effects": [
-      {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "slash"}
+      {"type": "attack", "target": "single", "attack_type": "slash"},
+      {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "use", "value": 1}}
     ]
   },
   "90": {
@@ -1419,8 +1419,8 @@
     "attack_type": "strike",
     "elements": ["ice"],
     "effects": [
-      {"type": "defense_down", "target": "single", "elements": ["ice"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["ice"]}
+      {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["ice"]},
+      {"type": "defense_down", "target": "single", "elements": ["ice"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "104": {
@@ -1504,8 +1504,8 @@
     "attack_type": "stab",
     "elements": ["dark"],
     "effects": [
-      {"type": "fragile", "target": "single", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]}
+      {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
+      {"type": "fragile", "target": "single", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "111": {
@@ -1518,8 +1518,8 @@
     "attack_type": "stab",
     "elements": ["dark"],
     "effects": [
-      {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "permanent"}},
-      {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]}
+      {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
+      {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "permanent"}}
     ]
   },
   "112": {
@@ -1633,8 +1633,8 @@
     "attack_type": "strike",
     "elements": ["dark"],
     "effects": [
-      {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["dark"]},
-      {"type": "defense_up", "target": "self", "status_id": 4, "duration": {"type": "enemy_turn", "value": 1}}
+      {"type": "defense_up", "target": "self", "status_id": 4, "duration": {"type": "enemy_turn", "value": 1}},
+      {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["dark"]}
     ]
   },
   "119": {
@@ -1666,8 +1666,8 @@
     },
     "target": "ally_front",
     "effects": [
-      {"type": "defense_up", "target": "ally_front", "status_id": 4, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "heal_dp", "target": "ally_front"}
+      {"type": "heal_dp", "target": "ally_front"},
+      {"type": "defense_up", "target": "ally_front", "status_id": 4, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "121": {
@@ -1734,9 +1734,9 @@
     },
     "target": "ally_all",
     "effects": [
-      {"type": "buff_charge", "target": "ally_all", "status_id": 25, "duration": {"type": "use", "value": 1}},
       {"type": "defense_up", "target": "ally_all", "status_id": 4, "target_condition": "element('light')", "duration": {"type": "enemy_turn", "value": 3}},
-      {"type": "regeneration_dp", "target": "ally_all", "status_id": 34, "target_condition": "element('light')", "duration": {"type": "enemy_turn", "value": 4}}
+      {"type": "regeneration_dp", "target": "ally_all", "status_id": 34, "target_condition": "element('light')", "duration": {"type": "enemy_turn", "value": 4}},
+      {"type": "buff_charge", "target": "ally_all", "status_id": 25, "duration": {"type": "use", "value": 1}}
     ]
   },
   "125": {
@@ -1783,9 +1783,9 @@
     "cost": {"sp": 0},
     "target": "self",
     "effects": [
-      {"type": "revive_dp", "target": "self"},
       {"type": "resource", "target": "self", "sp": 15},
-      {"type": "additional_turn", "target": "self", "status_id": 20}
+      {"type": "additional_turn", "target": "self", "status_id": 20},
+      {"type": "revive_dp", "target": "self"}
     ]
   },
   "127": {
@@ -1832,8 +1832,8 @@
     "attack_type": "slash",
     "elements": ["thunder"],
     "effects": [
-      {"type": "attack_up", "target": "self", "elements": ["thunder"], "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "slash"}
+      {"type": "attack", "target": "single", "attack_type": "slash"},
+      {"type": "attack_up", "target": "self", "elements": ["thunder"], "status_id": 1, "duration": {"type": "use", "value": 1}}
     ]
   },
   "131": {
@@ -1893,8 +1893,8 @@
     "cost": {"sp": 14},
     "target": "ally_all",
     "effects": [
-      {"type": "heal_dp", "target": "ally_all"},
       {"type": "attack_up", "target": "ally_front", "status_id": 1, "target_condition": "element('fire')", "duration": {"type": "use", "value": 1}},
+      {"type": "heal_dp", "target": "ally_all"},
       {"type": "funnel", "target": "ally_front", "status_id": 13, "target_condition": "element('fire')", "duration": {"type": "use", "value": 1}, "mode": {"value": 6, "number": 5}}
     ]
   },
@@ -1922,8 +1922,8 @@
     "cost": {"sp": 13},
     "target": "ally_all",
     "effects": [
-      {"type": "steak", "target": "ally_all", "status_id": 190, "duration": {"type": "permanent"}},
       {"type": "resource", "target": "self", "sp": 3},
+      {"type": "steak", "target": "ally_all", "status_id": 190, "duration": {"type": "permanent"}},
       {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('thunder')", "sp": 3}
     ]
   },
@@ -1995,8 +1995,8 @@
     "attack_type": "stab",
     "elements": ["thunder"],
     "effects": [
-      {"type": "defense_down", "target": "all", "elements": ["thunder"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "all", "attack_type": "stab"}
+      {"type": "attack", "target": "all", "attack_type": "stab"},
+      {"type": "defense_down", "target": "all", "elements": ["thunder"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "144": {
@@ -2034,8 +2034,8 @@
     "attack_type": "stab",
     "elements": ["fire"],
     "effects": [
-      {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "permanent"}},
-      {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["fire"]}
+      {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["fire"]},
+      {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "permanent"}}
     ]
   },
   "147": {
@@ -2773,9 +2773,9 @@
     "attack_type": "slash",
     "elements": ["dark"],
     "effects": [
-      {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
       {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["dark"]},
-      {"type": "attack_down", "target": "single", "status_id": 2, "duration": {"type": "enemy_turn", "value": 1}}
+      {"type": "attack_down", "target": "single", "status_id": 2, "duration": {"type": "enemy_turn", "value": 1}},
+      {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "195": {
@@ -2845,16 +2845,16 @@
     "user_select": {
       "1": {
         "effects": [
-          {"type": "penetration_critical_attack", "target": "single", "attack_type": "strike"},
           {"type": "ignore_e_shield_element", "target": "self", "status_id": 169, "duration": {"type": "ally_turn", "value": 1}},
+          {"type": "penetration_critical_attack", "target": "single", "attack_type": "strike"},
           {"type": "resource", "target": "od", "od": 100}
         ],
         "description": "破盾（od上升100%）"
       },
       "2": {
         "effects": [
-          {"type": "penetration_critical_attack", "target": "single", "attack_type": "strike"},
-          {"type": "ignore_e_shield_element", "target": "self", "status_id": 169, "duration": {"type": "ally_turn", "value": 1}}
+          {"type": "ignore_e_shield_element", "target": "self", "status_id": 169, "duration": {"type": "ally_turn", "value": 1}},
+          {"type": "penetration_critical_attack", "target": "single", "attack_type": "strike"}
         ],
         "description": "不破盾"
       }
@@ -2870,8 +2870,8 @@
     "attack_type": "slash",
     "elements": ["light"],
     "effects": [
-      {"type": "defense_down", "target": "all", "elements": ["light"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["light"]}
+      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["light"]},
+      {"type": "defense_down", "target": "all", "elements": ["light"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "199": {
@@ -2938,8 +2938,8 @@
     "target": "all",
     "attack_type": "slash",
     "effects": [
-      {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "all", "attack_type": "slash"}
+      {"type": "attack", "target": "all", "attack_type": "slash"},
+      {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "202": {
@@ -2952,8 +2952,8 @@
     "attack_type": "slash",
     "elements": ["dark"],
     "effects": [
-      {"type": "defense_down", "target": "single", "elements": ["dark"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "slash"}
+      {"type": "attack", "target": "single", "attack_type": "slash"},
+      {"type": "defense_down", "target": "single", "elements": ["dark"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "203": {
@@ -2997,8 +2997,8 @@
     "attack_type": "slash",
     "elements": ["fire"],
     "effects": [
-      {"type": "resist_down", "target": "all", "elements": ["fire"], "status_id": 18, "target_condition": "target.weak('fire')", "duration": {"type": "permanent"}},
-      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["fire"]}
+      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["fire"]},
+      {"type": "resist_down", "target": "all", "elements": ["fire"], "status_id": 18, "target_condition": "target.weak('fire')", "duration": {"type": "permanent"}}
     ]
   },
   "206": {
@@ -3141,8 +3141,8 @@
     "target": "all",
     "attack_type": "stab",
     "effects": [
-      {"type": "fragile", "target": "all", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "all", "attack_type": "stab"}
+      {"type": "attack", "target": "all", "attack_type": "stab"},
+      {"type": "fragile", "target": "all", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "212": {
@@ -3253,9 +3253,9 @@
     "attack_type": "stab",
     "elements": ["light"],
     "effects": [
+      {"type": "attack", "target": "single", "attack_type": "stab"},
       {"type": "defense_down", "target": "single", "elements": ["light"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "defense_down", "target": "single", "elements": ["dark"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "stab"}
+      {"type": "defense_down", "target": "single", "elements": ["dark"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "218": {
@@ -3294,8 +3294,8 @@
     "attack_type": "stab",
     "elements": ["ice"],
     "effects": [
-      {"type": "defense_down", "target": "all", "elements": ["ice"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
       {"type": "attack", "target": "all", "attack_type": "stab"},
+      {"type": "defense_down", "target": "all", "elements": ["ice"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
       {"type": "additional_turn", "target": "self", "status_id": 20}
     ]
   },
@@ -3321,8 +3321,8 @@
     "attack_type": "stab",
     "elements": ["fire"],
     "effects": [
-      {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["fire"]},
       {"type": "token", "target": "ally_front", "level": 2},
+      {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["fire"]},
       {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "not has(20)"}
     ]
   },
@@ -3352,8 +3352,8 @@
     "attack_type": "stab",
     "effects": [
       {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "defense_down", "target": "self", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "penetration_critical_attack", "target": "all", "attack_type": "stab"}
+      {"type": "penetration_critical_attack", "target": "all", "attack_type": "stab"},
+      {"type": "defense_down", "target": "self", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "225": {
@@ -3601,48 +3601,48 @@
         {
           "when": "zone('fire')",
           "effects": [
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
-            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('fire')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
+            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('fire')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
+            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
           ],
           "description": "火属性"
         },
         {
           "when": "zone('ice')",
           "effects": [
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
-            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('ice')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
+            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('ice')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
+            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
           ],
           "description": "冰属性"
         },
         {
           "when": "zone('thunder')",
           "effects": [
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
-            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('thunder')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
+            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('thunder')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
+            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
           ],
           "description": "雷属性"
         },
         {
           "when": "zone('light')",
           "effects": [
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
-            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('light')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
+            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('light')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
+            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
           ],
           "description": "光属性"
         },
         {
           "when": "zone('dark')",
           "effects": [
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
-            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('dark')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
+            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('dark')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
+            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
           ],
           "description": "暗属性"
         },
         {
           "when": "zone('elements')==0",
           "effects": [
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
-            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('none')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
+            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('none')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
+            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
           ],
           "description": "无属性场地"
         }
@@ -4130,8 +4130,8 @@
     "target": "single",
     "attack_type": "slash",
     "effects": [
-      {"type": "buff_charge", "target": "self", "status_id": 25, "duration": {"type": "use", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "slash"}
+      {"type": "attack", "target": "single", "attack_type": "slash"},
+      {"type": "buff_charge", "target": "self", "status_id": 25, "duration": {"type": "use", "value": 1}}
     ]
   },
   "260": {
@@ -4365,8 +4365,8 @@
     "attack_type": "stab",
     "elements": ["ice"],
     "effects": [
-      {"type": "defense_down", "target": "all", "elements": ["ice"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["ice"]}
+      {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["ice"]},
+      {"type": "defense_down", "target": "all", "elements": ["ice"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "277": {
@@ -4389,9 +4389,9 @@
     "target": "all",
     "attack_type": "stab",
     "effects": [
+      {"type": "attack", "target": "all", "attack_type": "stab"},
       {"type": "disaster", "target": "all", "status_id": 193, "duration": {"type": "permanent"}, "level": 5},
-      {"type": "attack_up", "target": "all", "status_id": 1, "duration": {"type": "permanent"}},
-      {"type": "attack", "target": "all", "attack_type": "stab"}
+      {"type": "attack_up", "target": "all", "status_id": 1, "duration": {"type": "permanent"}}
     ]
   },
   "279": {
@@ -4430,8 +4430,8 @@
     "target": "single",
     "attack_type": "stab",
     "effects": [
-      {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"},
-      {"type": "remove_buff", "target": "single"}
+      {"type": "remove_buff", "target": "single"},
+      {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"}
     ]
   },
   "282": {
@@ -4489,8 +4489,8 @@
     "cost": {"sp": 11},
     "target": "ally_all",
     "effects": [
-      {"type": "tea", "target": "ally_all", "status_id": 213, "duration": {"type": "permanent"}},
       {"type": "resource", "target": "ally_all_without_self", "sp": 2},
+      {"type": "tea", "target": "ally_all", "status_id": 213, "duration": {"type": "permanent"}},
       {"type": "remove_debuff", "target": "ally_all"},
       {"type": "remove_buff", "target": "all"}
     ]
@@ -4694,8 +4694,8 @@
     "attack_type": "slash",
     "elements": ["fire"],
     "effects": [
-      {"type": "defense_down", "target": "all", "elements": ["fire"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "all", "attack_type": "slash"}
+      {"type": "attack", "target": "all", "attack_type": "slash"},
+      {"type": "defense_down", "target": "all", "elements": ["fire"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "301": {
@@ -4708,8 +4708,8 @@
     "attack_type": "slash",
     "elements": ["fire"],
     "effects": [
-      {"type": "defense_down", "target": "single", "elements": ["fire"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "slash"}
+      {"type": "attack", "target": "single", "attack_type": "slash"},
+      {"type": "defense_down", "target": "single", "elements": ["fire"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "302": {
@@ -4734,8 +4734,8 @@
     "target": "all",
     "attack_type": "slash",
     "effects": [
-      {"type": "fragile", "target": "all", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "all", "attack_type": "slash"}
+      {"type": "attack", "target": "all", "attack_type": "slash"},
+      {"type": "fragile", "target": "all", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "304": {
@@ -4806,8 +4806,8 @@
     "target": "all",
     "elements": ["light"],
     "effects": [
-      {"type": "defense_down", "target": "all", "elements": ["light"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}},
       {"type": "zone", "target": "field", "elements": ["light"], "status_id": 14, "duration": {"type": "ally_turn", "value": 8}},
+      {"type": "defense_down", "target": "all", "elements": ["light"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}},
       {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}}
     ]
   },
@@ -5157,8 +5157,8 @@
     "attack_type": "slash",
     "elements": ["thunder"],
     "effects": [
-      {"type": "defense_down", "target": "single", "elements": ["thunder"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "slash"}
+      {"type": "attack", "target": "single", "attack_type": "slash"},
+      {"type": "defense_down", "target": "single", "elements": ["thunder"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "329": {
@@ -5196,8 +5196,8 @@
     "target": "single",
     "attack_type": "slash",
     "effects": [
-      {"type": "misfortune", "target": "single", "status_id": 58, "duration": {"type": "enemy_turn", "value": 3}},
-      {"type": "attack", "target": "single", "attack_type": "slash"}
+      {"type": "attack", "target": "single", "attack_type": "slash"},
+      {"type": "misfortune", "target": "single", "status_id": 58, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "332": {
@@ -5352,8 +5352,8 @@
     "target": "single",
     "attack_type": "stab",
     "effects": [
-      {"type": "buff_charge", "target": "self", "status_id": 25, "duration": {"type": "use", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "stab"}
+      {"type": "attack", "target": "single", "attack_type": "stab"},
+      {"type": "buff_charge", "target": "self", "status_id": 25, "duration": {"type": "use", "value": 1}}
     ]
   },
   "344": {
@@ -5534,8 +5534,8 @@
     "target": "single",
     "attack_type": "slash",
     "effects": [
-      {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "slash"}
+      {"type": "attack", "target": "single", "attack_type": "slash"},
+      {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "356": {
@@ -5559,8 +5559,8 @@
     "attack_type": "slash",
     "elements": ["thunder"],
     "effects": [
-      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["thunder"]},
-      {"type": "resource", "target": "self", "sp": 3}
+      {"type": "resource", "target": "self", "sp": 3},
+      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["thunder"]}
     ]
   },
   "358": {
@@ -5572,8 +5572,8 @@
     "target": "all",
     "attack_type": "slash",
     "effects": [
-      {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "all", "attack_type": "slash"}
+      {"type": "attack", "target": "all", "attack_type": "slash"},
+      {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "359": {
@@ -5586,8 +5586,8 @@
     "attack_type": "slash",
     "elements": ["fire"],
     "effects": [
-      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["fire"]},
-      {"type": "resource", "target": "self", "sp": 3}
+      {"type": "resource", "target": "self", "sp": 3},
+      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["fire"]}
     ]
   },
   "360": {
@@ -5649,8 +5649,8 @@
     "hit_count": 0,
     "target": "single",
     "effects": [
-      {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}},
-      {"type": "fixed_hp_damage_rate_attack", "target": "single"}
+      {"type": "fixed_hp_damage_rate_attack", "target": "single"},
+      {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}}
     ]
   },
   "365": {
@@ -5726,8 +5726,8 @@
     "target": "single",
     "attack_type": "strike",
     "effects": [
-      {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "strike"}
+      {"type": "attack", "target": "single", "attack_type": "strike"},
+      {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "371": {
@@ -5739,8 +5739,8 @@
     "target": "all",
     "attack_type": "strike",
     "effects": [
-      {"type": "fragile", "target": "all", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "all", "attack_type": "strike"}
+      {"type": "attack", "target": "all", "attack_type": "strike"},
+      {"type": "fragile", "target": "all", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "372": {
@@ -5776,8 +5776,8 @@
     "attack_type": "strike",
     "elements": ["dark"],
     "effects": [
-      {"type": "misfortune", "target": "single", "status_id": 58, "duration": {"type": "enemy_turn", "value": 2}},
-      {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["dark"]}
+      {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["dark"]},
+      {"type": "misfortune", "target": "single", "status_id": 58, "duration": {"type": "enemy_turn", "value": 2}}
     ]
   },
   "375": {
@@ -5790,8 +5790,8 @@
     "attack_type": "strike",
     "effects": [
       {"type": "self_damage", "target": "self"},
-      {"type": "fragile", "target": "all", "status_id": 22, "duration": {"type": "permanent"}},
-      {"type": "attack", "target": "all", "attack_type": "strike"}
+      {"type": "attack", "target": "all", "attack_type": "strike"},
+      {"type": "fragile", "target": "all", "status_id": 22, "duration": {"type": "permanent"}}
     ]
   },
   "376": {
@@ -5804,8 +5804,8 @@
     "attack_type": "strike",
     "elements": ["ice"],
     "effects": [
-      {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["ice"]}
+      {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["ice"]},
+      {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "377": {
@@ -5917,8 +5917,8 @@
     "target": "all",
     "elements": ["ice"],
     "effects": [
-      {"type": "defense_down", "target": "all", "elements": ["ice"], "status_id": 3, "duration": {"type": "permanent"}},
       {"type": "zone", "target": "field", "elements": ["ice"], "status_id": 14, "duration": {"type": "ally_turn", "value": 8}},
+      {"type": "defense_down", "target": "all", "elements": ["ice"], "status_id": 3, "duration": {"type": "permanent"}},
       {"type": "resist_down", "target": "all", "elements": ["ice"], "status_id": 18, "target_condition": "target.weak('ice')", "duration": {"type": "permanent"}}
     ]
   },
@@ -5933,8 +5933,8 @@
     "target": "all",
     "elements": ["thunder"],
     "effects": [
-      {"type": "defense_down", "target": "all", "elements": ["thunder"], "status_id": 3, "duration": {"type": "permanent"}},
       {"type": "zone", "target": "field", "elements": ["thunder"], "status_id": 14, "duration": {"type": "ally_turn", "value": 8}},
+      {"type": "defense_down", "target": "all", "elements": ["thunder"], "status_id": 3, "duration": {"type": "permanent"}},
       {"type": "resist_down", "target": "all", "elements": ["thunder"], "status_id": 18, "target_condition": "target.weak('thunder')", "duration": {"type": "permanent"}}
     ]
   },
@@ -5980,8 +5980,8 @@
     "target": "all",
     "attack_type": "stab",
     "effects": [
-      {"type": "fragile", "target": "all", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "all", "attack_type": "stab"}
+      {"type": "attack", "target": "all", "attack_type": "stab"},
+      {"type": "fragile", "target": "all", "status_id": 22, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "388": {
@@ -5993,8 +5993,8 @@
     "target": "all",
     "attack_type": "stab",
     "effects": [
-      {"type": "misfortune", "target": "all", "status_id": 58, "duration": {"type": "enemy_turn", "value": 2}},
-      {"type": "attack", "target": "all", "attack_type": "stab"}
+      {"type": "attack", "target": "all", "attack_type": "stab"},
+      {"type": "misfortune", "target": "all", "status_id": 58, "duration": {"type": "enemy_turn", "value": 2}}
     ]
   },
   "389": {
@@ -6006,8 +6006,8 @@
     "target": "single",
     "attack_type": "stab",
     "effects": [
-      {"type": "misfortune", "target": "single", "status_id": 58, "duration": {"type": "enemy_turn", "value": 2}},
       {"type": "attack", "target": "single", "attack_type": "stab"},
+      {"type": "misfortune", "target": "single", "status_id": 58, "duration": {"type": "enemy_turn", "value": 2}},
       {"type": "additional_turn", "target": "self", "status_id": 20}
     ]
   },
@@ -6062,9 +6062,9 @@
     "elements": ["light"],
     "effects": [
       {"type": "zone", "target": "field", "elements": ["light"], "status_id": 14, "duration": {"type": "permanent"}},
+      {"type": "attack_down", "target": "single", "status_id": 2, "duration": {"type": "enemy_turn", "value": 1}},
       {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "permanent"}},
-      {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["light"]},
-      {"type": "attack_down", "target": "single", "status_id": 2, "duration": {"type": "enemy_turn", "value": 1}}
+      {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["light"]}
     ]
   },
   "394": {
@@ -6154,8 +6154,8 @@
     "target": "all",
     "attack_type": "strike",
     "effects": [
-      {"type": "buff_charge", "target": "self", "status_id": 25, "duration": {"type": "use", "value": 1}},
-      {"type": "attack", "target": "all", "attack_type": "strike"}
+      {"type": "attack", "target": "all", "attack_type": "strike"},
+      {"type": "buff_charge", "target": "self", "status_id": 25, "duration": {"type": "use", "value": 1}}
     ]
   },
   "400": {
@@ -6178,8 +6178,8 @@
     "cost": {"sp": 7},
     "target": "ally_front",
     "effects": [
-      {"type": "attack_up", "target": "ally_front", "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "buff_charge", "target": "self", "status_id": 25, "duration": {"type": "use", "value": 1}}
+      {"type": "buff_charge", "target": "self", "status_id": 25, "duration": {"type": "use", "value": 1}},
+      {"type": "attack_up", "target": "ally_front", "status_id": 1, "duration": {"type": "use", "value": 1}}
     ]
   },
   "402": {
@@ -6210,9 +6210,9 @@
     "target": "all",
     "attack_type": "strike",
     "effects": [
+      {"type": "attack", "target": "all", "attack_type": "strike"},
       {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "permanent"}},
-      {"type": "buff_charge", "target": "self", "status_id": 25, "duration": {"type": "use", "value": 1}},
-      {"type": "attack", "target": "all", "attack_type": "strike"}
+      {"type": "buff_charge", "target": "self", "status_id": 25, "duration": {"type": "use", "value": 1}}
     ]
   },
   "404": {
@@ -6321,10 +6321,10 @@
     "attack_type": "strike",
     "elements": ["thunder"],
     "effects": [
+      {"type": "attack_down", "target": "all", "status_id": 2, "duration": {"type": "enemy_turn", "value": 2}},
       {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}},
       {"type": "undermine", "target": "all", "status_id": 201, "duration": {"type": "enemy_turn", "value": 2}},
-      {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["thunder"]},
-      {"type": "attack_down", "target": "all", "status_id": 2, "duration": {"type": "enemy_turn", "value": 2}}
+      {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["thunder"]}
     ]
   },
   "408": {
@@ -6346,8 +6346,8 @@
     "target": "all",
     "attack_type": "strike",
     "effects": [
-      {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "attack", "target": "all", "attack_type": "strike"}
+      {"type": "attack", "target": "all", "attack_type": "strike"},
+      {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "use", "value": 1}}
     ]
   },
   "410": {
@@ -6436,8 +6436,8 @@
     "attack_type": "strike",
     "elements": ["fire"],
     "effects": [
-      {"type": "attack_up", "target": "ally_front", "elements": ["fire"], "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "attack", "target": "all", "attack_type": "strike"}
+      {"type": "attack", "target": "all", "attack_type": "strike"},
+      {"type": "attack_up", "target": "ally_front", "elements": ["fire"], "status_id": 1, "duration": {"type": "use", "value": 1}}
     ]
   },
   "417": {
@@ -6701,9 +6701,9 @@
     "attack_type": "stab",
     "elements": ["light"],
     "effects": [
+      {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["light"]},
       {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 3}},
-      {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "permanent"}},
-      {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["light"]}
+      {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "permanent"}}
     ]
   },
   "432": {
@@ -6979,8 +6979,8 @@
     "target": "single",
     "attack_type": "stab",
     "effects": [
-      {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "stab"}
+      {"type": "attack", "target": "single", "attack_type": "stab"},
+      {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "442": {
@@ -6992,8 +6992,8 @@
     "target": "all",
     "attack_type": "stab",
     "effects": [
-      {"type": "critical_rate_up", "target": "self", "status_id": 5, "duration": {"type": "use", "value": 1}},
-      {"type": "attack", "target": "all", "attack_type": "stab"}
+      {"type": "attack", "target": "all", "attack_type": "stab"},
+      {"type": "critical_rate_up", "target": "self", "status_id": 5, "duration": {"type": "use", "value": 1}}
     ]
   },
   "443": {
@@ -7124,36 +7124,36 @@
         {
           "when": "used(451) == 0",
           "effects": [
-            {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
             {"type": "heal_dp", "target": "ally_all"},
-            {"type": "resource", "target": "ally_all_without_self", "sp": 1}
+            {"type": "resource", "target": "ally_all_without_self", "sp": 1},
+            {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]}
           ],
           "description": "第1次使用"
         },
         {
           "when": "used(451) == 1",
           "effects": [
-            {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
             {"type": "heal_dp", "target": "ally_all"},
-            {"type": "resource", "target": "ally_all_without_self", "sp": 2}
+            {"type": "resource", "target": "ally_all_without_self", "sp": 2},
+            {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]}
           ],
           "description": "第2次使用"
         },
         {
           "when": "used(451) == 2",
           "effects": [
-            {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
             {"type": "heal_dp", "target": "ally_all"},
-            {"type": "resource", "target": "ally_all_without_self", "sp": 3}
+            {"type": "resource", "target": "ally_all_without_self", "sp": 3},
+            {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]}
           ],
           "description": "第3次使用"
         },
         {
           "when": "used(451) >= 3",
           "effects": [
-            {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
             {"type": "heal_dp", "target": "ally_all"},
-            {"type": "resource", "target": "ally_all_without_self", "sp": 4}
+            {"type": "resource", "target": "ally_all_without_self", "sp": 4},
+            {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]}
           ],
           "description": "第4次及以后使用"
         }
@@ -7260,8 +7260,8 @@
     "attack_type": "strike",
     "elements": ["fire"],
     "effects": [
-      {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"]}
+      {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"]},
+      {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "459": {
@@ -7582,8 +7582,8 @@
     "attack_type": "strike",
     "elements": ["thunder"],
     "effects": [
-      {"type": "token_attack", "target": "all", "attack_type": "strike", "elements": ["thunder"]},
-      {"type": "remove_debuff", "target": "ally_all"}
+      {"type": "remove_debuff", "target": "ally_all"},
+      {"type": "token_attack", "target": "all", "attack_type": "strike", "elements": ["thunder"]}
     ]
   },
   "485": {
@@ -7872,8 +7872,8 @@
     "cost": {"sp": 6},
     "target": "ally_all",
     "effects": [
-      {"type": "heal_dp", "target": "ally_all"},
-      {"type": "remove_special_status", "target": "ally_all", "status_id": 30, "duration": {"type": "one_shot"}}
+      {"type": "remove_special_status", "target": "ally_all", "status_id": 30, "duration": {"type": "one_shot"}},
+      {"type": "heal_dp", "target": "ally_all"}
     ]
   },
   "504": {
@@ -8134,8 +8134,8 @@
     "target": "single",
     "attack_type": "slash",
     "effects": [
-      {"type": "damage_rate_up", "target": "self", "status_id": 39, "duration": {"type": "use", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "slash"}
+      {"type": "attack", "target": "single", "attack_type": "slash"},
+      {"type": "damage_rate_up", "target": "self", "status_id": 39, "duration": {"type": "use", "value": 1}}
     ]
   },
   "524": {
@@ -8683,8 +8683,8 @@
     "cost": {"sp": 8},
     "target": "ally_all",
     "effects": [
-      {"type": "heal_dp", "target": "ally_all"},
-      {"type": "babied", "target": "ally_all_without_self", "status_id": 133, "duration": {"type": "ally_turn", "value": 3}}
+      {"type": "babied", "target": "ally_all_without_self", "status_id": 133, "duration": {"type": "ally_turn", "value": 3}},
+      {"type": "heal_dp", "target": "ally_all"}
     ]
   },
   "555": {
@@ -8771,29 +8771,29 @@
     "user_select": {
       "1": {
         "effects": [
-          {"type": "regeneration_dp", "target": "ally_single", "status_id": 34, "duration": {"type": "enemy_turn", "value": 6}},
-          {"type": "remove_debuff", "target": "ally_single"}
+          {"type": "remove_debuff", "target": "ally_single"},
+          {"type": "regeneration_dp", "target": "ally_single", "status_id": 34, "duration": {"type": "enemy_turn", "value": 6}}
         ],
         "description": "DP持续恢复5回合"
       },
       "2": {
         "effects": [
-          {"type": "regeneration_dp", "target": "ally_single", "status_id": 34, "duration": {"type": "enemy_turn", "value": 5}},
-          {"type": "remove_debuff", "target": "ally_single"}
+          {"type": "remove_debuff", "target": "ally_single"},
+          {"type": "regeneration_dp", "target": "ally_single", "status_id": 34, "duration": {"type": "enemy_turn", "value": 5}}
         ],
         "description": "DP持续恢复4回合"
       },
       "3": {
         "effects": [
-          {"type": "regeneration_dp", "target": "ally_single", "status_id": 34, "duration": {"type": "enemy_turn", "value": 4}},
-          {"type": "remove_debuff", "target": "ally_single"}
+          {"type": "remove_debuff", "target": "ally_single"},
+          {"type": "regeneration_dp", "target": "ally_single", "status_id": 34, "duration": {"type": "enemy_turn", "value": 4}}
         ],
         "description": "DP持续恢复3回合"
       },
       "4": {
         "effects": [
-          {"type": "regeneration_dp", "target": "ally_single", "status_id": 34, "duration": {"type": "enemy_turn", "value": 3}},
-          {"type": "remove_debuff", "target": "ally_single"}
+          {"type": "remove_debuff", "target": "ally_single"},
+          {"type": "regeneration_dp", "target": "ally_single", "status_id": 34, "duration": {"type": "enemy_turn", "value": 3}}
         ],
         "description": "DP持续恢复2回合"
       }
@@ -8809,8 +8809,8 @@
     "target": "single",
     "attack_type": "stab",
     "effects": [
-      {"type": "attack", "target": "single", "attack_type": "stab"},
-      {"type": "fighting_spirit", "target": "ally_all", "status_id": 76, "duration": {"type": "enemy_turn", "value": 2}}
+      {"type": "fighting_spirit", "target": "ally_all", "status_id": 76, "duration": {"type": "enemy_turn", "value": 2}},
+      {"type": "attack", "target": "single", "attack_type": "stab"}
     ]
   },
   "564": {
@@ -8827,8 +8827,8 @@
     "target": "single",
     "attack_type": "stab",
     "effects": [
-      {"type": "attack", "target": "single", "attack_type": "stab"},
-      {"type": "morale", "target": "ally_all", "status_id": 119, "duration": {"type": "permanent"}, "level": 4}
+      {"type": "morale", "target": "ally_all", "status_id": 119, "duration": {"type": "permanent"}, "level": 4},
+      {"type": "attack", "target": "single", "attack_type": "stab"}
     ]
   },
   "565": {
@@ -8850,8 +8850,8 @@
     "cost": {"sp": 9},
     "target": "ally_all",
     "effects": [
-      {"type": "heal_dp", "target": "ally_all"},
       {"type": "remove_debuff", "target": "ally_all"},
+      {"type": "heal_dp", "target": "ally_all"},
       {"type": "mind_eye", "target": "ally_all", "status_id": 78, "condition": "removed_debuffs()>0", "duration": {"type": "use", "value": 1}},
       {"type": "attack_up", "target": "ally_all", "status_id": 1, "condition": "removed_debuffs()>0", "duration": {"type": "use", "value": 1}}
     ]
@@ -8903,8 +8903,8 @@
     "target": "all",
     "attack_type": "slash",
     "effects": [
-      {"type": "attack", "target": "all", "attack_type": "slash"},
-      {"type": "resource", "target": "self", "sp": 3}
+      {"type": "resource", "target": "self", "sp": 3},
+      {"type": "attack", "target": "all", "attack_type": "slash"}
     ]
   },
   "571": {
@@ -8928,8 +8928,8 @@
     "attack_type": "slash",
     "elements": ["ice"],
     "effects": [
-      {"type": "attack_up", "target": "ally_all", "elements": ["ice"], "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["ice"]}
+      {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["ice"]},
+      {"type": "attack_up", "target": "ally_all", "elements": ["ice"], "status_id": 1, "duration": {"type": "use", "value": 1}}
     ]
   },
   "573": {
@@ -9157,9 +9157,9 @@
     "user_select": {
       "1": {
         "effects": [
+          {"type": "attack_down", "target": "single", "status_id": 2, "duration": {"type": "enemy_turn", "value": 1}},
           {"type": "zone", "target": "field", "elements": ["thunder"], "status_id": 14, "duration": {"type": "permanent"}},
-          {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["thunder"]},
-          {"type": "attack_down", "target": "single", "status_id": 2, "duration": {"type": "enemy_turn", "value": 1}}
+          {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["thunder"]}
         ],
         "description": "攻击力下降"
       },
@@ -9184,10 +9184,10 @@
     "attack_type": "stab",
     "elements": ["thunder"],
     "effects": [
+      {"type": "attack_down", "target": "single", "status_id": 2, "duration": {"type": "enemy_turn", "value": 1}},
       {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
       {"type": "zone", "target": "field", "elements": ["thunder"], "status_id": 14, "duration": {"type": "permanent"}},
-      {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["thunder"]},
-      {"type": "attack_down", "target": "single", "status_id": 2, "duration": {"type": "enemy_turn", "value": 1}}
+      {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["thunder"]}
     ]
   },
   "588": {
@@ -9275,8 +9275,8 @@
     "attack_type": "slash",
     "elements": ["light"],
     "effects": [
-      {"type": "attack_up", "target": "self", "elements": ["light"], "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "slash"}
+      {"type": "attack", "target": "single", "attack_type": "slash"},
+      {"type": "attack_up", "target": "self", "elements": ["light"], "status_id": 1, "duration": {"type": "use", "value": 1}}
     ]
   },
   "595": {
@@ -9312,8 +9312,8 @@
     "attack_type": "slash",
     "elements": ["dark"],
     "effects": [
-      {"type": "attack_up", "target": "self", "elements": ["dark"], "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "slash"}
+      {"type": "attack", "target": "single", "attack_type": "slash"},
+      {"type": "attack_up", "target": "self", "elements": ["dark"], "status_id": 1, "duration": {"type": "use", "value": 1}}
     ]
   },
   "598": {
@@ -9468,8 +9468,8 @@
     "target": "single",
     "attack_type": "slash",
     "effects": [
-      {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "slash"}
+      {"type": "attack", "target": "single", "attack_type": "slash"},
+      {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "609": {
@@ -9481,8 +9481,8 @@
     "target": "single",
     "attack_type": "slash",
     "effects": [
-      {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "attack", "target": "single", "attack_type": "slash"}
+      {"type": "attack", "target": "single", "attack_type": "slash"},
+      {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "use", "value": 1}}
     ]
   },
   "610": {
@@ -9577,8 +9577,8 @@
     "attack_type": "slash",
     "effects": [
       {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "defense_down", "target": "self", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "penetration_critical_attack", "target": "single", "attack_type": "slash"}
+      {"type": "penetration_critical_attack", "target": "single", "attack_type": "slash"},
+      {"type": "defense_down", "target": "self", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "616": {
@@ -9697,8 +9697,8 @@
     "cost": {"sp": 9},
     "target": "ally_all",
     "effects": [
-      {"type": "critical_rate_up", "target": "ally_all", "status_id": 5, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
-      {"type": "critical_damage_up", "target": "ally_all", "status_id": 7, "duration": {"type": "ally_turn", "value": 5}, "solo": true}
+      {"type": "critical_damage_up", "target": "ally_all", "status_id": 7, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
+      {"type": "critical_rate_up", "target": "ally_all", "status_id": 5, "duration": {"type": "ally_turn", "value": 5}, "solo": true}
     ]
   },
   "626": {
@@ -9863,8 +9863,8 @@
     "target": "all",
     "attack_type": "slash",
     "effects": [
-      {"type": "attack", "target": "all", "attack_type": "slash"},
-      {"type": "resource", "target": "self", "sp": 3}
+      {"type": "resource", "target": "self", "sp": 3},
+      {"type": "attack", "target": "all", "attack_type": "slash"}
     ]
   },
   "636": {
@@ -9933,8 +9933,8 @@
     "cost": {"sp": 6},
     "target": "ally_front",
     "effects": [
-      {"type": "heal_dp", "target": "ally_front"},
-      {"type": "remove_special_status", "target": "ally_front", "status_id": 30, "duration": {"type": "one_shot"}}
+      {"type": "remove_special_status", "target": "ally_front", "status_id": 30, "duration": {"type": "one_shot"}},
+      {"type": "heal_dp", "target": "ally_front"}
     ]
   },
   "642": {
@@ -9967,8 +9967,8 @@
     "cost": {"sp": 11},
     "target": "ally_all",
     "effects": [
-      {"type": "heal_dp", "target": "ally_all"},
       {"type": "attack_up", "target": "ally_all", "status_id": 1, "duration": {"type": "use", "value": 1}},
+      {"type": "heal_dp", "target": "ally_all"},
       {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('fire')", "sp": 3}
     ]
   },
@@ -10063,8 +10063,8 @@
     "target": "single",
     "attack_type": "stab",
     "effects": [
-      {"type": "attack", "target": "single", "attack_type": "stab"},
-      {"type": "resource", "target": "self", "sp": 3}
+      {"type": "resource", "target": "self", "sp": 3},
+      {"type": "attack", "target": "single", "attack_type": "stab"}
     ]
   },
   "652": {
@@ -10138,9 +10138,9 @@
     "attack_type": "stab",
     "elements": ["fire"],
     "effects": [
+      {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["fire"]},
       {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}},
       {"type": "defense_down", "target": "single", "elements": ["fire"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}},
-      {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["fire"]},
       {"type": "confusion_random", "target": "single", "duration": {"type": "enemy_turn", "value": 2}}
     ]
   },
@@ -10171,8 +10171,8 @@
     "elements": ["fire"],
     "effects": [
       {"type": "zone", "target": "field", "elements": ["fire"], "status_id": 14, "duration": {"type": "permanent"}},
-      {"type": "give_attack_buff_up", "target": "ally_all", "status_id": 54, "duration": {"type": "use_buff", "value": 1}},
-      {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["fire"]}
+      {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["fire"]},
+      {"type": "give_attack_buff_up", "target": "ally_all", "status_id": 54, "duration": {"type": "use_buff", "value": 1}}
     ]
   },
   "660": {
@@ -10215,8 +10215,8 @@
     "target": "all",
     "elements": ["dark"],
     "effects": [
-      {"type": "resist_down_overwrite", "target": "all", "elements": ["dark"], "status_id": 108, "duration": {"type": "permanent"}},
       {"type": "funnel", "target": "ally_front", "status_id": 13, "target_condition": "element('dark')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 12, "number": 5}},
+      {"type": "resist_down_overwrite", "target": "all", "elements": ["dark"], "status_id": 108, "duration": {"type": "permanent"}},
       {"type": "resist_down", "target": "all", "elements": ["dark"], "status_id": 18, "duration": {"type": "permanent"}}
     ]
   },
@@ -10229,8 +10229,8 @@
     "target": "ally_all",
     "elements": ["ice"],
     "effects": [
-      {"type": "critical_rate_up", "target": "ally_all", "elements": ["ice"], "status_id": 5, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
       {"type": "zone", "target": "field", "elements": ["ice"], "status_id": 14, "duration": {"type": "ally_turn", "value": 8}},
+      {"type": "critical_rate_up", "target": "ally_all", "elements": ["ice"], "status_id": 5, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
       {"type": "critical_damage_up", "target": "ally_all", "elements": ["ice"], "status_id": 7, "duration": {"type": "ally_turn", "value": 5}, "solo": true}
     ]
   },
@@ -10348,10 +10348,10 @@
     "target": "single",
     "attack_type": "strike",
     "effects": [
-      {"type": "misfortune", "target": "single", "status_id": 58, "duration": {"type": "enemy_turn", "value": 3}},
       {"type": "attack", "target": "single", "attack_type": "strike"},
       {"type": "attack_down", "target": "single", "status_id": 2, "duration": {"type": "enemy_turn", "value": 3}},
-      {"type": "imprison_random", "target": "single", "duration": {"type": "enemy_turn", "value": 1}}
+      {"type": "imprison_random", "target": "single", "duration": {"type": "enemy_turn", "value": 1}},
+      {"type": "misfortune", "target": "single", "status_id": 58, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "673": {
@@ -10371,9 +10371,9 @@
     "attack_type": "strike",
     "effects": [
       {"type": "misfortune", "target": "single", "status_id": 58, "duration": {"type": "enemy_turn", "value": 3}},
-      {"type": "attack", "target": "single", "attack_type": "strike"},
       {"type": "attack_down", "target": "single", "status_id": 2, "duration": {"type": "enemy_turn", "value": 3}},
-      {"type": "imprison_random", "target": "single", "duration": {"type": "enemy_turn", "value": 1}}
+      {"type": "imprison_random", "target": "single", "duration": {"type": "enemy_turn", "value": 1}},
+      {"type": "attack", "target": "single", "attack_type": "strike"}
     ]
   },
   "674": {
@@ -10447,8 +10447,8 @@
     "attack_type": "stab",
     "elements": ["ice"],
     "effects": [
-      {"type": "defense_down", "target": "all", "elements": ["ice"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "attack", "target": "all", "attack_type": "stab"}
+      {"type": "attack", "target": "all", "attack_type": "stab"},
+      {"type": "defense_down", "target": "all", "elements": ["ice"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "680": {
@@ -10475,15 +10475,15 @@
     "user_select": {
       "1": {
         "effects": [
-          {"type": "attack", "target": "single", "attack_type": "stab"},
-          {"type": "resource", "target": "self", "sp": 10}
+          {"type": "resource", "target": "self", "sp": 10},
+          {"type": "attack", "target": "single", "attack_type": "stab"}
         ],
         "description": "成功"
       },
       "2": {
         "effects": [
-          {"type": "attack", "target": "single", "attack_type": "stab"},
           {"type": "resource", "target": "self", "sp": 10},
+          {"type": "attack", "target": "single", "attack_type": "stab"},
           {"type": "defense_up", "target": "single", "status_id": 4, "duration": {"type": "enemy_turn", "value": 3}}
         ],
         "description": "失败（防御力降低）"
@@ -10511,16 +10511,16 @@
     "user_select": {
       "1": {
         "effects": [
-          {"type": "defense_down", "target": "all", "domain": "dp", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-          {"type": "attack", "target": "all", "attack_type": "stab"}
+          {"type": "attack", "target": "all", "attack_type": "stab"},
+          {"type": "defense_down", "target": "all", "domain": "dp", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
         ],
         "description": "成功"
       },
       "2": {
         "effects": [
+          {"type": "attack", "target": "all", "attack_type": "stab"},
           {"type": "defense_down", "target": "all", "domain": "dp", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-          {"type": "attack_up", "target": "all", "status_id": 1, "duration": {"type": "enemy_turn", "value": 2}},
-          {"type": "attack", "target": "all", "attack_type": "stab"}
+          {"type": "attack_up", "target": "all", "status_id": 1, "duration": {"type": "enemy_turn", "value": 2}}
         ],
         "description": "失败（敌方攻击力上升）"
       }
@@ -10869,9 +10869,9 @@
     "attack_type": "stab",
     "elements": ["ice"],
     "effects": [
+      {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["ice"]},
       {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}},
-      {"type": "defense_down", "target": "all", "elements": ["ice"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}},
-      {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["ice"]}
+      {"type": "defense_down", "target": "all", "elements": ["ice"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}}
     ]
   },
   "702": {
@@ -10985,8 +10985,8 @@
     "elements": ["dark"],
     "effects": [
       {"type": "zone", "target": "field", "elements": ["dark"], "status_id": 14, "duration": {"type": "ally_turn", "value": 8}},
-      {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["dark"]},
-      {"type": "remove_buff", "target": "all"}
+      {"type": "remove_buff", "target": "all"},
+      {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["dark"]}
     ]
   },
   "7080001": {
@@ -11376,8 +11376,8 @@
     "target": "all",
     "attack_type": "stab",
     "effects": [
-      {"type": "attack", "target": "all", "attack_type": "stab"},
-      {"type": "resource", "target": "self", "sp": 3}
+      {"type": "resource", "target": "self", "sp": 3},
+      {"type": "attack", "target": "all", "attack_type": "stab"}
     ]
   },
   "731": {
