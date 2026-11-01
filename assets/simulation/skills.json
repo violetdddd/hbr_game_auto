@@ -4301,7 +4301,7 @@
     "attack_type": "stab",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab"},
-      {"type": "disaster", "target": "all", "status_id": 193, "duration": {"type": "permanent"}},
+      {"type": "disaster", "target": "all", "status_id": 193, "duration": {"type": "permanent"}, "level": 5},
       {"type": "attack_up", "target": "all", "status_id": 1, "duration": {"type": "permanent"}}
     ]
   },
@@ -6788,7 +6788,7 @@
     "elements": ["light"],
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["light"]},
-      {"type": "disaster", "target": "single", "status_id": 193, "target_condition": "target.weak('light')", "duration": {"type": "permanent"}},
+      {"type": "disaster", "target": "single", "status_id": 193, "target_condition": "target.weak('light')", "duration": {"type": "permanent"}, "level": 2},
       {"type": "venom", "target": "single", "status_id": 218, "target_condition": "target.weak('light')", "duration": {"type": "enemy_turn", "value": 10}}
     ]
   },
