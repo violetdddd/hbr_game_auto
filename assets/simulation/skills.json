@@ -631,7 +631,7 @@
   "49": {
     "id": 49,
     "names": {"zh_cn": "彩虹奇迹滑行", "zh_tw": "彩虹奇蹟滑水道", "jp": "レインボーミラクルスライダー"},
-    "conditions": {"cost": "enemy.count(down_turns()>0) > 0", "effects": "enemy.count(down_turns()>0) > 0"},
+    "conditions": {"cost": "enemy.count(during_down_turn()) > 0", "effects": "enemy.count(during_down_turn()) > 0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 0},
@@ -1340,7 +1340,7 @@
   "100": {
     "id": 100,
     "names": {"zh_cn": "意志之镰", "zh_tw": "信念之鐮", "jp": "ヴォリション・サイス"},
-    "conditions": {"cost": "enemy.count(down_turns()>0) > 0"},
+    "conditions": {"cost": "enemy.count(during_down_turn()) > 0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 0},
@@ -1864,7 +1864,7 @@
   "136": {
     "id": 136,
     "names": {"zh_cn": "正义之雷", "zh_tw": "正義雷霆", "jp": "サンダー・オブ・ジャスティス"},
-    "conditions": {"effects": "target.down_turns()>0"},
+    "conditions": {"effects": "target.during_down_turn()"},
     "kind": "active",
     "cost": {"sp": 17},
     "hit_count": 1,
@@ -2350,7 +2350,7 @@
   "173": {
     "id": 173,
     "names": {"zh_cn": "琶音", "zh_tw": "琶音", "jp": "アルペジオ"},
-    "conditions": {"cost": "enemy.count(down_turns()>0) > 0"},
+    "conditions": {"cost": "enemy.count(during_down_turn()) > 0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 0},
@@ -2701,7 +2701,7 @@
   "194": {
     "id": 194,
     "names": {"zh_cn": "加尔达因", "zh_tw": "加爾達因", "jp": "ガルダイン"},
-    "conditions": {"cost": "enemy.count(down_turns()>0) > 0"},
+    "conditions": {"cost": "enemy.count(during_down_turn()) > 0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 4},
@@ -4725,7 +4725,7 @@
     "kind": "passive",
     "cost": {"sp": 0},
     "trigger": "on_action_start",
-    "trigger_condition": "enemy.count(down_turns()>0) > 0",
+    "trigger_condition": "enemy.count(during_down_turn()) > 0",
     "effects": [
       {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "ally_turn", "value": 1}}
     ]
@@ -4987,7 +4987,7 @@
     "attack_type": "slash",
     "elements": ["fire"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["fire"], "target_condition": "target.down_turns()>0"}
+      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["fire"], "target_condition": "target.during_down_turn()"}
     ]
   },
   "3250002": {
@@ -5001,7 +5001,7 @@
     "attack_type": "slash",
     "elements": ["ice"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["ice"], "target_condition": "target.down_turns()>0"}
+      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["ice"], "target_condition": "target.during_down_turn()"}
     ]
   },
   "326": {
@@ -8014,7 +8014,7 @@
   "528": {
     "id": 528,
     "names": {"zh_cn": "仁慈曼舞金风中", "zh_tw": "仁慈曼舞金風中", "jp": "爽籟に舞う仁慈"},
-    "conditions": {"cost": "both() or enemy.count(broken()==1 and damage_rate()>=200) > 0"},
+    "conditions": {"cost": "enemy.damage_rate()>=200"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 7},
@@ -9777,7 +9777,7 @@
   "648": {
     "id": 648,
     "names": {"zh_cn": "秘技！灵符龙卷风", "zh_tw": "秘技！靈符龍捲風", "jp": "秘技！霊符トルネード"},
-    "conditions": {"cost": "enemy.count(down_turns()>0) > 0"},
+    "conditions": {"cost": "enemy.count(during_down_turn()) > 0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 0},
