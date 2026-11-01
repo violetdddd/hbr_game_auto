@@ -2427,7 +2427,7 @@
     "cost": {"sp": 0},
     "target": "ally_front",
     "effects": [
-      {"type": "attack_up_include_normal", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
+      {"type": "attack_up", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
     ]
   },
   "177": {
@@ -4405,7 +4405,7 @@
     "cost": {"sp": 0},
     "target": "ally_front",
     "effects": [
-      {"type": "attack_up_include_normal", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
+      {"type": "attack_up", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
     ]
   },
   "286": {
@@ -6189,7 +6189,7 @@
     "cost": {"sp": 0},
     "target": "ally_front",
     "effects": [
-      {"type": "attack_up_include_normal", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
+      {"type": "attack_up", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
     ]
   },
   "409": {
@@ -7170,7 +7170,7 @@
     "cost": {"sp": 0},
     "target": "ally_front",
     "effects": [
-      {"type": "attack_up_include_normal", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
+      {"type": "attack_up", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
     ]
   },
   "464": {
@@ -7816,7 +7816,7 @@
     "cost": {"sp": 0},
     "target": "ally_front",
     "effects": [
-      {"type": "attack_up_include_normal", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
+      {"type": "attack_up", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
     ]
   },
   "514": {
@@ -8051,7 +8051,7 @@
     "cost": {"sp": 0},
     "target": "ally_front",
     "effects": [
-      {"type": "attack_up_include_normal", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
+      {"type": "attack_up", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
     ]
   },
   "531": {
@@ -10778,7 +10778,7 @@
     "cost": {"sp": 0},
     "target": "ally_front",
     "effects": [
-      {"type": "attack_up_include_normal", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
+      {"type": "attack_up", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
     ]
   },
   "711": {
