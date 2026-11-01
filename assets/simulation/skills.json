@@ -1033,7 +1033,7 @@
     "elements": ["ice"],
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["ice"]},
-      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "condition": "target.weak('ice')==1"},
+      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "target_condition": "target.weak('ice')==1"},
       {"type": "critical_damage_up", "target": "ally_front", "elements": ["ice"], "status_id": 7, "duration": {"type": "ally_turn", "value": 3}, "solo": true}
     ]
   },
@@ -1350,10 +1350,9 @@
     "target": "single",
     "attack_type": "slash",
     "elements": ["ice"],
-    "not_use_condition": "enemy.count(down_turns()>0) > 0",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["ice"]},
-      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "condition": "target.weak('ice')==1"}
+      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "target_condition": "target.weak('ice')==1"}
     ]
   },
   "101": {
@@ -2606,7 +2605,6 @@
     "target": "all",
     "attack_type": "strike",
     "elements": ["dark"],
-    "not_use_condition": "level(119)>=10",
     "effects": {
       "cases": [
         {
@@ -4989,7 +4987,7 @@
     "attack_type": "slash",
     "elements": ["fire"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["fire"], "condition": "target.down_turns()>0"}
+      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["fire"], "target_condition": "target.down_turns()>0"}
     ]
   },
   "3250002": {
@@ -5003,7 +5001,7 @@
     "attack_type": "slash",
     "elements": ["ice"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["ice"], "condition": "target.down_turns()>0"}
+      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["ice"], "target_condition": "target.down_turns()>0"}
     ]
   },
   "326": {
@@ -5183,7 +5181,6 @@
     "target": "all",
     "attack_type": "slash",
     "elements": ["dark"],
-    "not_use_condition": "level(119) >= 6",
     "effects": {
       "yes": [{"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]}],
       "no": [{"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]}]
@@ -7157,7 +7154,6 @@
     "target": "single",
     "attack_type": "strike",
     "elements": ["light"],
-    "not_use_condition": "has(20)",
     "effects": {
       "yes": [{"type": "attack", "target": "single", "attack_type": "strike", "elements": ["light"]}],
       "no": [{"type": "attack", "target": "single", "attack_type": "strike", "elements": ["light"]}]
@@ -8039,7 +8035,6 @@
     "target": "all",
     "attack_type": "slash",
     "elements": ["dark"],
-    "not_use_condition": "has(163)",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]}
     ]
@@ -8307,7 +8302,7 @@
     "attack_type": "slash",
     "elements": ["dark"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["dark"], "condition": "target.weak_to_hit()"},
+      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["dark"], "target_condition": "target.weak('dark')==1"},
       {"type": "defense_down", "target": "single", "elements": ["dark"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
@@ -8322,7 +8317,7 @@
     "attack_type": "slash",
     "elements": ["fire"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["fire"], "condition": "target.weak_to_hit()"},
+      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["fire"], "target_condition": "target.weak('fire')==1"},
       {"type": "defense_down", "target": "single", "elements": ["fire"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
@@ -9785,7 +9780,6 @@
     "target": "all",
     "attack_type": "slash",
     "elements": ["ice"],
-    "not_use_condition": "enemy.count(down_turns()>0) > 0",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["ice"]},
       {"type": "defense_down", "target": "all", "elements": ["ice"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
@@ -10704,7 +10698,7 @@
     "elements": ["light"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["light"]},
-      {"type": "super_break", "target": "all", "elements": ["light"], "status_id": 105, "condition": "target.weak('light')==1"},
+      {"type": "super_break", "target": "all", "elements": ["light"], "status_id": 105, "target_condition": "target.weak('light')==1"},
       {"type": "attack_down", "target": "self", "status_id": 2, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
@@ -11053,13 +11047,13 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "replace_pursuit", "target": "self", "status_id": 158, "condition": "has_skill(737)==1", "duration": {"type": "permanent"}}
+      {"type": "replace_pursuit", "target": "self", "status_id": 158, "target_condition": "has_skill(737)==1", "duration": {"type": "permanent"}}
     ],
     "variants": [
       {
         "id": 7280001,
         "selection": "replace_pursuit",
-        "condition": "front()==0",
+        "target_condition": "front()==0",
         "description": "自动追击，每回合满足条件时可释放大招1次"
       }
     ]
