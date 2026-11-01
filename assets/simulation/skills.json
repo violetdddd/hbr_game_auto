@@ -7763,14 +7763,21 @@
   "509": {
     "id": 509,
     "names": {"zh_cn": "快感疾跑！+", "zh_tw": "快感短跑！+", "jp": "快感・スプリント！+"},
+    "conditions": {"effects": "in_od()"},
     "kind": "active",
     "cost": {"sp": 11},
     "target": "ally_all",
-    "effects": [
-      {"type": "heal_dp", "target": "ally_all"},
-      {"type": "mind_eye", "target": "ally_sub", "status_id": 78, "duration": {"type": "use", "value": 1}},
-      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "in_od()"}
-    ]
+    "effects": {
+      "yes": [
+        {"type": "heal_dp", "target": "ally_all"},
+        {"type": "mind_eye", "target": "ally_sub", "status_id": 78, "duration": {"type": "use", "value": 1}},
+        {"type": "additional_turn", "target": "self", "status_id": 20}
+      ],
+      "no": [
+        {"type": "heal_dp", "target": "ally_all"},
+        {"type": "mind_eye", "target": "ally_sub", "status_id": 78, "duration": {"type": "use", "value": 1}}
+      ]
+    }
   },
   "510": {
     "id": 510,
@@ -8637,8 +8644,8 @@
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
       {"type": "remove_debuff", "target": "ally_all"},
-      {"type": "mind_eye", "target": "ally_all", "status_id": 78, "target_condition": "removed_debuffs()>0", "duration": {"type": "use", "value": 1}},
-      {"type": "attack_up", "target": "ally_all", "status_id": 1, "target_condition": "removed_debuffs()>0", "duration": {"type": "use", "value": 1}}
+      {"type": "mind_eye", "target": "ally_all", "status_id": 78, "condition": "removed_debuffs()>0", "duration": {"type": "use", "value": 1}},
+      {"type": "attack_up", "target": "ally_all", "status_id": 1, "condition": "removed_debuffs()>0", "duration": {"type": "use", "value": 1}}
     ]
   },
   "567": {
@@ -11053,7 +11060,6 @@
       {
         "id": 7280001,
         "selection": "replace_pursuit",
-        "target_condition": "front()==0",
         "description": "自动追击，每回合满足条件时可释放大招1次"
       }
     ]
