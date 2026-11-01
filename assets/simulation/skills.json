@@ -5604,9 +5604,9 @@
       "yes": [
         {"type": "heal_dp", "target": "ally_all"},
         {"type": "resource", "target": "ally_all", "sp": 5},
-        {"type": "revive_territory", "target": "field", "status_id": 157}
+        {"type": "revive_territory", "target": "territory", "status_id": 157}
       ],
-      "no": [{"type": "heal_dp", "target": "ally_all"}, {"type": "revive_territory", "target": "field", "status_id": 157}]
+      "no": [{"type": "heal_dp", "target": "ally_all"}, {"type": "revive_territory", "target": "territory", "status_id": 157}]
     }
   },
   "366": {
