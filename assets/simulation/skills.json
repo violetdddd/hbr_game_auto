@@ -3213,7 +3213,7 @@
     "elements": ["ice"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["ice"]},
-      {"type": "recoil_random", "target": "self", "duration": {"type": "ally_turn", "value": 3}}
+      {"type": "recoil", "status_id": 33, "target": "self", "duration": {"type": "ally_turn", "value": 3}}
     ]
   },
   "220": {
@@ -3269,7 +3269,7 @@
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab"},
       {"type": "defense_down", "target": "self", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "recoil_random", "target": "self", "duration": {"type": "ally_turn", "value": 3}}
+      {"type": "recoil", "status_id": 33, "target": "self", "duration": {"type": "ally_turn", "value": 3}}
     ]
   },
   "224": {
@@ -3924,7 +3924,7 @@
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["fire"]},
       {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}},
-      {"type": "recoil_random", "target": "self", "duration": {"type": "ally_turn", "value": 3}}
+      {"type": "recoil", "status_id": 33, "target": "self", "duration": {"type": "ally_turn", "value": 3}}
     ]
   },
   "255": {
@@ -4778,7 +4778,7 @@
     "attack_type": "slash",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash"},
-      {"type": "recoil_random", "target": "self", "duration": {"type": "ally_turn", "value": 2}}
+      {"type": "recoil", "status_id": 33, "target": "self", "duration": {"type": "ally_turn", "value": 2}}
     ]
   },
   "315": {
@@ -4870,7 +4870,7 @@
     "attack_type": "slash",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "slash"},
-      {"type": "recoil_random", "target": "self", "duration": {"type": "ally_turn", "value": 3}}
+      {"type": "recoil", "status_id": 33, "target": "self", "duration": {"type": "ally_turn", "value": 3}}
     ]
   },
   "321": {
@@ -7535,7 +7535,7 @@
     "attack_type": "strike",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "strike"},
-      {"type": "recoil_random", "target": "self", "duration": {"type": "ally_turn", "value": 2}}
+      {"type": "recoil", "status_id": 33, "target": "self", "duration": {"type": "ally_turn", "value": 2}}
     ]
   },
   "492": {
@@ -7660,7 +7660,7 @@
     "target": "ally_all",
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
-      {"type": "recoil_random", "target": "self", "duration": {"type": "ally_turn", "value": 2}}
+      {"type": "recoil", "status_id": 33, "target": "self", "duration": {"type": "ally_turn", "value": 2}}
     ]
   },
   "501": {
@@ -10533,7 +10533,7 @@
     "attack_type": "stab",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab"},
-      {"type": "recoil_random", "target": "self", "duration": {"type": "ally_turn", "value": 2}}
+      {"type": "recoil", "status_id": 33, "target": "self", "duration": {"type": "ally_turn", "value": 2}}
     ]
   },
   "696": {
@@ -11113,7 +11113,7 @@
     "target": "ally_sub",
     "effects": [
       {"type": "attack_up", "target": "ally_sub", "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "recoil_random", "target": "self", "duration": {"type": "ally_turn", "value": 2}}
+      {"type": "recoil", "status_id": 33, "target": "self", "duration": {"type": "ally_turn", "value": 2}}
     ]
   },
   "732": {
