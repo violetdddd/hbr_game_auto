@@ -3079,7 +3079,7 @@
   "212": {
     "id": 212,
     "names": {"zh_cn": "虚心·百步穿杨", "zh_tw": "虛心‧百步穿楊", "jp": "虚心・百歩穿楊"},
-    "conditions": {"effects": "reinforced()"},
+    "conditions": {"effects": "chen_jin()"},
     "kind": "active",
     "cost": {"sp": 13},
     "hit_count": 5,
@@ -5141,7 +5141,7 @@
   "337": {
     "id": 337,
     "names": {"zh_cn": "冻结之咒", "zh_tw": "急凍咒語", "jp": "フリージング・スペル"},
-    "conditions": {"cost": "enemy.count(stacks(58)) > 0"},
+    "conditions": {"cost": "enemy.count(has(58)) > 0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 6},
@@ -9575,7 +9575,7 @@
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["thunder"]},
       {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "reinforced()"}
+      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "gui_shen_hua()"}
     ]
   },
   "631": {
@@ -10970,7 +10970,7 @@
   "7250001": {
     "id": 7250001,
     "names": {"zh_cn": "苍焰迷宫", "zh_tw": "蒼焰迷宮", "jp": "蒼焔ノ迷宮"},
-    "conditions": {"effects": "extra_turn()"},
+    "conditions": {"effects": "has(20)"},
     "link": 7250002,
     "kind": "active",
     "cost": {"sp": 15},
@@ -10994,7 +10994,7 @@
   "7250002": {
     "id": 7250002,
     "names": {"zh_cn": "苍焰螺旋", "zh_tw": "蒼焰螺旋", "jp": "蒼焔ノ螺旋"},
-    "conditions": {"cost": "extra_turn()"},
+    "conditions": {"cost": "has(20)"},
     "link": 7250001,
     "kind": "active",
     "cost": {
