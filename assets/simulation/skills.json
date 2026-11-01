@@ -5380,8 +5380,8 @@
     "interval_turn": 3,
     "effects": [
       {"type": "mind_eye", "target": "ally_all", "status_id": 78, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('thunder')==0", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": { "value": 12, "number": 5}},
-      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('thunder')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": { "value": 50, "number": 3}}
+      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('thunder')==0", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 12, "number": 5}},
+      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('thunder')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 50, "number": 3}}
     ]
   },
   "353": {
@@ -7697,7 +7697,7 @@
     "target": "ally_all",
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
-      {"type": "remove_special_status", "target": "ally_all", "status_ids": 30, "duration": {"type": "one_shot"}}
+      {"type": "remove_special_status", "target": "ally_all", "status_id": 30, "duration": {"type": "one_shot"}}
     ]
   },
   "504": {
@@ -9707,7 +9707,7 @@
     "target": "ally_front",
     "effects": [
       {"type": "heal_dp", "target": "ally_front"},
-      {"type": "remove_special_status", "target": "ally_front", "status_ids": 30, "duration": {"type": "one_shot"}}
+      {"type": "remove_special_status", "target": "ally_front", "status_id": 30, "duration": {"type": "one_shot"}}
     ]
   },
   "642": {
