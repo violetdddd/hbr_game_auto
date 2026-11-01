@@ -8603,7 +8603,7 @@
     "attack_type": "stab",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab"},
-      {"type": "fighting_spirit", "target": "ally_all", "status_id": 76, "duration": {"type": "enemy_turn"}}
+      {"type": "fighting_spirit", "target": "ally_all", "status_id": 76, "duration": {"type": "enemy_turn", "value": 2}}
     ]
   },
   "564": {
@@ -9664,7 +9664,7 @@
     "target": "ally_front",
     "effects": [
       {"type": "heal_dp", "target": "ally_front"},
-      {"type": "fighting_spirit", "target": "ally_front", "status_id": 76, "duration": {"type": "enemy_turn"}}
+      {"type": "fighting_spirit", "target": "ally_front", "status_id": 76, "duration": {"type": "enemy_turn", "value": 2}}
     ]
   },
   "639": {
