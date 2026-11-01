@@ -4416,7 +4416,7 @@
     "trigger": "on_first_battle_start",
     "effects": [
       {"type": "all_status_up_value", "target": "ally_all", "status_id": 95, "target_condition": "team.is_member('31E')==1", "duration": {"type": "permanent"}, "value": 10},
-      {"type": "resource", "target": "ally_all", "target_condition": "team.is_member('31E')==1", "duration": {"type": "permanent"}, "sp_minus": 1}
+      {"type": "resource", "target": "ally_all", "target_condition": "team.is_member('31E')==1", "duration": {"type": "permanent"}, "sp_modify": -1}
     ]
   },
   "287": {
@@ -5197,7 +5197,7 @@
     "trigger": "on_first_battle_start",
     "effects": [
       {"type": "all_status_up_value", "target": "ally_all", "status_id": 95, "target_condition": "character('Kanata_Maruyama')==1 or character('Miko_Tenne')==1 or character('Yayoi_Bungo')==1 or character('Hisame_Ogasahara')==1 or character('Yotsuha_Ohshima')==1 or character('Vritika_Balakrishnan')==1", "duration": {"type": "permanent"}, "value": 10},
-      {"type": "resource", "target": "ally_all", "target_condition": "character('Kanata_Maruyama')==1 or character('Miko_Tenne')==1 or character('Yayoi_Bungo')==1 or character('Hisame_Ogasahara')==1 or character('Yotsuha_Ohshima')==1 or character('Vritika_Balakrishnan')==1", "duration": {"type": "permanent"}, "sp_minus": 1}
+      {"type": "resource", "target": "ally_all", "target_condition": "character('Kanata_Maruyama')==1 or character('Miko_Tenne')==1 or character('Yayoi_Bungo')==1 or character('Hisame_Ogasahara')==1 or character('Yotsuha_Ohshima')==1 or character('Vritika_Balakrishnan')==1", "duration": {"type": "permanent"}, "sp_modify": -1}
     ]
   },
   "341": {
