@@ -100,13 +100,13 @@
     "user_select": {
       "1": {
         "effects": [
-          {"type": "double_action_extra_skill", "target": "self", "status_id": 125, "duration": {"type": "use", "value": 1}}
+          {"type": "double_action_extra_skill", "target": "self", "status_id": 125, "duration": {"type": "use_ex", "value": 1}}
         ],
         "description": "成功"
       },
       "2": {
         "effects": [
-          {"type": "double_action_extra_skill", "target": "self", "status_id": 125, "duration": {"type": "use", "value": 1}},
+          {"type": "double_action_extra_skill", "target": "self", "status_id": 125, "duration": {"type": "use_ex", "value": 1}},
           {"type": "defense_down", "target": "self", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}}
         ],
         "description": "失败"
@@ -1033,9 +1033,8 @@
     "elements": ["ice"],
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["ice"]},
-      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "condition": "target.weak_to_hit()"},
-      {"type": "critical_damage_up", "target": "ally_front", "elements": ["ice"], "status_id": 7, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "condition": "target.weak_to_hit()"}
+      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "condition": "target.weak('ice')==1"},
+      {"type": "critical_damage_up", "target": "ally_front", "elements": ["ice"], "status_id": 7, "duration": {"type": "ally_turn", "value": 3}, "solo": true}
     ]
   },
   "81": {
@@ -1354,8 +1353,7 @@
     "not_use_condition": "enemy.count(down_turns()>0) > 0",
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["ice"]},
-      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "condition": "target.weak_to_hit()"},
-      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "condition": "target.weak_to_hit()"}
+      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "condition": "target.weak('ice')==1"}
     ]
   },
   "101": {
@@ -4816,7 +4814,7 @@
     "cost": {"sp": 10},
     "target": "self",
     "effects": [
-      {"type": "double_action_extra_skill", "target": "self", "status_id": 125, "duration": {"type": "use", "value": 1}}
+      {"type": "double_action_extra_skill", "target": "self", "status_id": 125, "duration": {"type": "use_ex", "value": 1}}
     ]
   },
   "3180001": {
@@ -10706,8 +10704,7 @@
     "elements": ["light"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["light"]},
-      {"type": "super_break", "target": "all", "elements": ["light"], "status_id": 105, "condition": "target.weak_to_hit()"},
-      {"type": "super_break", "target": "all", "elements": ["light"], "status_id": 105, "condition": "target.weak_to_hit()"},
+      {"type": "super_break", "target": "all", "elements": ["light"], "status_id": 105, "condition": "target.weak('light')==1"},
       {"type": "attack_down", "target": "self", "status_id": 2, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
