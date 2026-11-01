@@ -2205,7 +2205,7 @@
   "163": {
     "id": 163,
     "names": {"zh_cn": "纯真狂野+", "zh_tw": "純真狂野+", "jp": "イノセントワイルド+"},
-    "conditions": {"cost": "dp_rate() >= 1"},
+    "conditions": {"cost": "both() or dp_rate() >= 1"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 5},
@@ -2925,7 +2925,7 @@
   "205": {
     "id": 205,
     "names": {"zh_cn": "孤独之刃", "zh_tw": "孤獨之刃", "jp": "ロンリーブレード"},
-    "conditions": {"cost": "dp_rate()<=0.5"},
+    "conditions": {"cost": "both() or dp_rate()<=0.5"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 5},
@@ -8011,7 +8011,7 @@
   "528": {
     "id": 528,
     "names": {"zh_cn": "仁慈曼舞金风中", "zh_tw": "仁慈曼舞金風中", "jp": "爽籟に舞う仁慈"},
-    "conditions": {"cost": "enemy.count(broken()==1 and damage_rate()>=200) > 0"},
+    "conditions": {"cost": "both() or enemy.count(broken()==1 and damage_rate()>=200) > 0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 7},
@@ -10108,7 +10108,7 @@
   "673": {
     "id": 673,
     "names": {"zh_cn": "狂舞乱炸的迦梨+", "zh_tw": "瘋狂亂舞的迦梨+", "jp": "狂気乱舞のカーリー+"},
-    "conditions": {"cost": "dp_rate() >= 1"},
+    "conditions": {"cost": "both() or dp_rate() >= 1"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 7},
