@@ -1211,7 +1211,7 @@
     "target": "self",
     "effects": [
       {"type": "defense_up", "target": "self", "status_id": 4, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}}
+      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 6, "number": 5}}
     ]
   },
   "92": {
@@ -1369,7 +1369,7 @@
     "elements": ["dark"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]},
-      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}}
+      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}}
     ]
   },
   "102": {
@@ -1568,7 +1568,7 @@
     "elements": ["dark"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["dark"]},
-      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('dark')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true}
+      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('dark')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 50, "number": 3}}
     ]
   },
   "116": {
@@ -3457,46 +3457,12 @@
           "description": "闇属性"
         },
         {
-          "when": "zone('none')",
+          "when": "zone('elements')==0",
           "effects": [
             {"type": "critical_rate_up", "target": "ally_single", "status_id": 5, "duration": {"type": "use", "value": 1}},
             {"type": "critical_damage_up", "target": "ally_single", "status_id": 7, "duration": {"type": "use", "value": 1}}
           ],
-          "description": "無属性"
-        }
-      ]
-    },
-    "elements": {
-      "cases": [
-        {
-          "when": "zone('fire')==1",
-          "elements": ["fire"],
-          "description": "火属性"
-        },
-        {
-          "when": "zone('ice')==1",
-          "elements": ["ice"],
-          "description": "氷属性"
-        },
-        {
-          "when": "zone('thunder')==1",
-          "elements": ["thunder"],
-          "description": "雷属性"
-        },
-        {
-          "when": "zone('light')==1",
-          "elements": ["light"],
-          "description": "光属性"
-        },
-        {
-          "when": "zone('dark')==1",
-          "elements": ["dark"],
-          "description": "闇属性"
-        },
-        {
-          "when": "zone('none')",
-          "elements": null,
-          "description": "無属性"
+          "description": "无属性场地"
         }
       ]
     }
@@ -3551,58 +3517,50 @@
         {
           "when": "zone('fire')==1",
           "effects": [
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('fire')", "duration": {"type": "ally_turn", "value": 3}, "solo": true}
+            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
+            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('fire')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
           ],
           "description": "火属性"
         },
         {
           "when": "zone('ice')==1",
           "effects": [
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('ice')", "duration": {"type": "ally_turn", "value": 3}, "solo": true}
+            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
+            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('ice')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
           ],
           "description": "氷属性"
         },
         {
           "when": "zone('thunder')==1",
           "effects": [
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('thunder')", "duration": {"type": "ally_turn", "value": 3}, "solo": true}
+            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
+            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('thunder')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
           ],
           "description": "雷属性"
         },
         {
           "when": "zone('light')==1",
           "effects": [
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('light')", "duration": {"type": "ally_turn", "value": 3}, "solo": true}
+            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
+            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('light')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
           ],
           "description": "光属性"
         },
         {
           "when": "zone('dark')==1",
           "effects": [
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('dark')", "duration": {"type": "ally_turn", "value": 3}, "solo": true}
+            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
+            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('dark')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
           ],
           "description": "闇属性"
         },
         {
-          "when": "zone('none')",
+          "when": "zone('elements')==0",
           "effects": [
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('none')", "duration": {"type": "ally_turn", "value": 3}, "solo": true}
+            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
+            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('none')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
           ],
-          "description": "無属性"
-        },
-        {
-          "when": "not zone('fire') and not zone('ice') and not zone('thunder') and not zone('light') and not zone('dark')",
-          "effects": [
-            {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-            {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('none')", "duration": {"type": "ally_turn", "value": 3}, "solo": true}
-          ],
-          "description": "元素属性フィールド無し"
+          "description": "无属性场地"
         }
       ]
     }
@@ -3624,7 +3582,7 @@
   "238": {
     "id": 238,
     "names": {"zh_cn": "无色子弹+", "zh_tw": "無色子彈+", "jp": "アクロマティックバレット+"},
-    "conditions": {"cost": "not (used(238)>0)", "effects": "used(238)==0"},
+    "conditions": {"cost": "used(238)==0", "effects": "used(238)==0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 6},
@@ -3731,47 +3689,13 @@
           "description": "闇属性"
         },
         {
-          "when": "zone('none')",
+          "when": "zone('elements')==0",
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "stab"},
             {"type": "critical_rate_up", "target": "ally_front", "status_id": 5, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
             {"type": "critical_damage_up", "target": "ally_front", "status_id": 7, "duration": {"type": "ally_turn", "value": 5}, "solo": true}
           ],
-          "description": "無属性"
-        }
-      ]
-    },
-    "elements": {
-      "cases": [
-        {
-          "when": "zone('fire')==1",
-          "elements": ["fire"],
-          "description": "火属性"
-        },
-        {
-          "when": "zone('ice')==1",
-          "elements": ["ice"],
-          "description": "氷属性"
-        },
-        {
-          "when": "zone('thunder')==1",
-          "elements": ["thunder"],
-          "description": "雷属性"
-        },
-        {
-          "when": "zone('light')==1",
-          "elements": ["light"],
-          "description": "光属性"
-        },
-        {
-          "when": "zone('dark')==1",
-          "elements": ["dark"],
-          "description": "闇属性"
-        },
-        {
-          "when": "zone('none')",
-          "elements": null,
-          "description": "無属性"
+          "description": "无属性场地"
         }
       ]
     }
@@ -4015,8 +3939,8 @@
     "elements": ["light"],
     "effects": [
       {"type": "zone", "target": "field", "elements": ["light"], "status_id": 14, "duration": {"type": "ally_turn", "value": 8}},
-      {"type": "motivation", "target": "ally_all", "status_id": 174, "duration": {"type": "permanent"}},
-      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('light')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true}
+      {"type": "motivation", "target": "ally_all", "status_id": 174, "duration": {"type": "permanent"}, "level": 5},
+      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('light')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 50, "number": 3}}
     ]
   },
   "2570001": {
@@ -9990,7 +9914,7 @@
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["fire"]},
       {"type": "zone", "target": "field", "elements": ["fire"], "status_id": 14, "duration": {"type": "permanent"}},
-      {"type": "give_attack_buff_up", "target": "ally_all", "status_id": 54, "duration": {"type": "use", "value": 1}}
+      {"type": "give_attack_buff_up", "target": "ally_all", "status_id": 54, "duration": {"type": "use_buff", "value": 1}}
     ]
   },
   "660": {
