@@ -201,7 +201,7 @@
     "elements": ["light"],
     "effects": [
       {"type": "defense_down", "target": "all", "elements": ["light"], "status_id": 3, "duration": {"type": "permanent"}},
-      {"type": "resist_down", "target": "all", "elements": ["light"], "status_id": 18, "target_condition": "target.weak('light')==1", "duration": {"type": "permanent"}},
+      {"type": "resist_down", "target": "all", "elements": ["light"], "status_id": 18, "target_condition": "target.weak('light')", "duration": {"type": "permanent"}},
       {"type": "fragile", "target": "all", "status_id": 22, "duration": {"type": "enemy_turn", "value": 2}}
     ]
   },
@@ -344,7 +344,7 @@
   "33": {
     "id": 33,
     "names": {"zh_cn": "神崎流忍术·冰晶", "zh_tw": "神崎流忍術‧冰塵", "jp": "神崎流忍術・氷塵"},
-    "conditions": {"effects": "target.weak('ice')==1"},
+    "conditions": {"effects": "target.weak('ice')"},
     "kind": "active",
     "cost": {"sp": 14},
     "hit_count": 6,
@@ -365,7 +365,7 @@
   "34": {
     "id": 34,
     "names": {"zh_cn": "神崎流忍术·散华", "zh_tw": "神崎流忍術‧散華", "jp": "神崎流忍術・散華"},
-    "conditions": {"effects": "target.weak('dark')==1"},
+    "conditions": {"effects": "target.weak('dark')"},
     "kind": "active",
     "cost": {"sp": 15},
     "hit_count": 4,
@@ -908,7 +908,7 @@
   "73": {
     "id": 73,
     "names": {"zh_cn": "天使光翼斩", "zh_tw": "天使光線", "jp": "エンジェルズ・レイ"},
-    "conditions": {"effects": "target.weak('light')==1"},
+    "conditions": {"effects": "target.weak('light')"},
     "kind": "active",
     "cost": {"sp": 15},
     "hit_count": 8,
@@ -1033,7 +1033,7 @@
     "elements": ["ice"],
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["ice"]},
-      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "target_condition": "target.weak('ice')==1"},
+      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "target_condition": "target.weak('ice')"},
       {"type": "critical_damage_up", "target": "ally_front", "elements": ["ice"], "status_id": 7, "duration": {"type": "ally_turn", "value": 3}, "solo": true}
     ]
   },
@@ -1352,7 +1352,7 @@
     "elements": ["ice"],
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["ice"]},
-      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "target_condition": "target.weak('ice')==1"}
+      {"type": "super_break", "target": "single", "elements": ["ice"], "status_id": 105, "target_condition": "target.weak('ice')"}
     ]
   },
   "101": {
@@ -1524,7 +1524,7 @@
   "114": {
     "id": 114,
     "names": {"zh_cn": "破坏女王", "zh_tw": "破壞女王", "jp": "破壊の女王"},
-    "conditions": {"effects": "target.weak('thunder')==1"},
+    "conditions": {"effects": "target.weak('thunder')"},
     "kind": "active",
     "cost": {"sp": 14},
     "hit_count": 9,
@@ -1565,7 +1565,7 @@
     "elements": ["dark"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["dark"]},
-      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('dark')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 50, "number": 3}}
+      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('dark')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 50, "number": 3}}
     ]
   },
   "116": {
@@ -1627,7 +1627,7 @@
   "120": {
     "id": 120,
     "names": {"zh_cn": "明星之路", "zh_tw": "星路", "jp": "スターダムロード"},
-    "conditions": {"cost": "charging()==1"},
+    "conditions": {"cost": "charging()"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 0},
@@ -1692,7 +1692,7 @@
   "124": {
     "id": 124,
     "names": {"zh_cn": "提神·干杯！", "zh_tw": "煥然一新聲援！", "jp": "リフレッシング・チアーズ！"},
-    "conditions": {"cost": "not (used(124)>0)"},
+    "conditions": {"cost": "used(124)==0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 6},
@@ -1701,8 +1701,8 @@
     "target": "ally_all",
     "effects": [
       {"type": "buff_charge", "target": "ally_all", "status_id": 25, "duration": {"type": "use", "value": 1}},
-      {"type": "defense_up", "target": "ally_all", "status_id": 4, "target_condition": "element('light')==1", "duration": {"type": "enemy_turn", "value": 3}},
-      {"type": "regeneration_dp", "target": "ally_all", "status_id": 34, "target_condition": "element('light')==1", "duration": {"type": "enemy_turn", "value": 4}}
+      {"type": "defense_up", "target": "ally_all", "status_id": 4, "target_condition": "element('light')", "duration": {"type": "enemy_turn", "value": 3}},
+      {"type": "regeneration_dp", "target": "ally_all", "status_id": 34, "target_condition": "element('light')", "duration": {"type": "enemy_turn", "value": 4}}
     ]
   },
   "125": {
@@ -1857,8 +1857,8 @@
     "target": "ally_all",
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
-      {"type": "attack_up", "target": "ally_front", "status_id": 1, "target_condition": "element('fire')==1", "duration": {"type": "use", "value": 1}},
-      {"type": "funnel", "target": "ally_front", "status_id": 13, "target_condition": "element('fire')==1", "duration": {"type": "use", "value": 1}, "mode": {"value": 6, "number": 5}}
+      {"type": "attack_up", "target": "ally_front", "status_id": 1, "target_condition": "element('fire')", "duration": {"type": "use", "value": 1}},
+      {"type": "funnel", "target": "ally_front", "status_id": 13, "target_condition": "element('fire')", "duration": {"type": "use", "value": 1}, "mode": {"value": 6, "number": 5}}
     ]
   },
   "136": {
@@ -1895,7 +1895,7 @@
     "cost": {"sp": 0},
     "trigger": "on_battle_start",
     "effects": [
-      {"type": "resource", "target": "ally_all", "target_condition": "character('Ruka_Kayamori')==1 or character('Charlotta_Skopovskaya')==1", "sp": 2}
+      {"type": "resource", "target": "ally_all", "target_condition": "character('Ruka_Kayamori') or character('Charlotta_Skopovskaya')", "sp": 2}
     ]
   },
   "139": {
@@ -2499,7 +2499,7 @@
   "183": {
     "id": 183,
     "names": {"zh_cn": "偶像的微笑", "zh_tw": "偶像微笑", "jp": "アイドルスマイル"},
-    "conditions": {"effects": "target.weak('fire')==1"},
+    "conditions": {"effects": "target.weak('fire')"},
     "kind": "active",
     "cost": {"sp": 8},
     "hit_count": 3,
@@ -2576,7 +2576,7 @@
     "target": "ally_all",
     "effects": [
       {"type": "debuff_guard", "target": "ally_all", "status_id": 110, "duration": {"type": "use", "value": 1}},
-      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('fire')==1", "sp": 5}
+      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('fire')", "sp": 5}
     ]
   },
   "190": {
@@ -2683,7 +2683,7 @@
     "target": "self",
     "effects": [
       {"type": "resource", "target": "od", "od": 50},
-      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('ice')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 50, "number": 3}}
+      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('ice')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 50, "number": 3}}
     ]
   },
   "193": {
@@ -2933,7 +2933,7 @@
     "elements": ["fire"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["fire"]},
-      {"type": "resist_down", "target": "all", "elements": ["fire"], "status_id": 18, "target_condition": "target.weak('fire')==1", "duration": {"type": "permanent"}}
+      {"type": "resist_down", "target": "all", "elements": ["fire"], "status_id": 18, "target_condition": "target.weak('fire')", "duration": {"type": "permanent"}}
     ]
   },
   "206": {
@@ -3354,8 +3354,8 @@
     "target": "ally_all",
     "elements": ["fire"],
     "effects": [
-      {"type": "attack_up", "target": "ally_all", "elements": ["fire"], "status_id": 1, "target_condition": "element('fire')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('fire')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 50, "number": 3}}
+      {"type": "attack_up", "target": "ally_all", "elements": ["fire"], "status_id": 1, "target_condition": "element('fire')", "duration": {"type": "ally_turn", "value": 3}, "solo": true},
+      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('fire')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 50, "number": 3}}
     ]
   },
   "229": {
@@ -3364,7 +3364,7 @@
     "kind": "passive",
     "cost": {"sp": 0},
     "trigger": "on_new_turn_start",
-    "trigger_condition": "zone('fire')==1 or zone('ice')==1 or zone('thunder')==1 or zone('light')==1 or zone('dark')==1",
+    "trigger_condition": "zone('fire') or zone('ice') or zone('thunder') or zone('light') or zone('dark')",
     "effects": [
       {"type": "resource", "target": "self", "sp": 1}
     ]
@@ -3425,7 +3425,7 @@
     "effects": {
       "cases": [
         {
-          "when": "zone('fire')==1",
+          "when": "zone('fire')",
           "effects": [
             {"type": "critical_rate_up", "target": "ally_single", "elements": ["fire"], "status_id": 5, "duration": {"type": "use", "value": 1}},
             {"type": "critical_damage_up", "target": "ally_single", "elements": ["fire"], "status_id": 7, "duration": {"type": "use", "value": 1}}
@@ -3433,7 +3433,7 @@
           "description": "火属性"
         },
         {
-          "when": "zone('ice')==1",
+          "when": "zone('ice')",
           "effects": [
             {"type": "critical_rate_up", "target": "ally_single", "elements": ["ice"], "status_id": 5, "duration": {"type": "use", "value": 1}},
             {"type": "critical_damage_up", "target": "ally_single", "elements": ["ice"], "status_id": 7, "duration": {"type": "use", "value": 1}}
@@ -3441,7 +3441,7 @@
           "description": "冰属性"
         },
         {
-          "when": "zone('thunder')==1",
+          "when": "zone('thunder')",
           "effects": [
             {"type": "critical_rate_up", "target": "ally_single", "elements": ["thunder"], "status_id": 5, "duration": {"type": "use", "value": 1}},
             {"type": "critical_damage_up", "target": "ally_single", "elements": ["thunder"], "status_id": 7, "duration": {"type": "use", "value": 1}}
@@ -3449,7 +3449,7 @@
           "description": "雷属性"
         },
         {
-          "when": "zone('light')==1",
+          "when": "zone('light')",
           "effects": [
             {"type": "critical_rate_up", "target": "ally_single", "elements": ["light"], "status_id": 5, "duration": {"type": "use", "value": 1}},
             {"type": "critical_damage_up", "target": "ally_single", "elements": ["light"], "status_id": 7, "duration": {"type": "use", "value": 1}}
@@ -3457,7 +3457,7 @@
           "description": "光属性"
         },
         {
-          "when": "zone('dark')==1",
+          "when": "zone('dark')",
           "effects": [
             {"type": "critical_rate_up", "target": "ally_single", "elements": ["dark"], "status_id": 5, "duration": {"type": "use", "value": 1}},
             {"type": "critical_damage_up", "target": "ally_single", "elements": ["dark"], "status_id": 7, "duration": {"type": "use", "value": 1}}
@@ -3478,7 +3478,7 @@
   "235": {
     "id": 235,
     "names": {"zh_cn": "雷光", "zh_tw": "雷光", "jp": "レビン"},
-    "conditions": {"effects": "zone('thunder')==1"},
+    "conditions": {"effects": "zone('thunder')"},
     "kind": "active",
     "cost": {"sp": 14},
     "target": "ally_front",
@@ -3523,7 +3523,7 @@
     "effects": {
       "cases": [
         {
-          "when": "zone('fire')==1",
+          "when": "zone('fire')",
           "effects": [
             {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
             {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('fire')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
@@ -3531,7 +3531,7 @@
           "description": "火属性"
         },
         {
-          "when": "zone('ice')==1",
+          "when": "zone('ice')",
           "effects": [
             {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
             {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('ice')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
@@ -3539,7 +3539,7 @@
           "description": "冰属性"
         },
         {
-          "when": "zone('thunder')==1",
+          "when": "zone('thunder')",
           "effects": [
             {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
             {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('thunder')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
@@ -3547,7 +3547,7 @@
           "description": "雷属性"
         },
         {
-          "when": "zone('light')==1",
+          "when": "zone('light')",
           "effects": [
             {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
             {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('light')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
@@ -3555,7 +3555,7 @@
           "description": "光属性"
         },
         {
-          "when": "zone('dark')==1",
+          "when": "zone('dark')",
           "effects": [
             {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
             {"type": "funnel", "target": "ally_all_without_self", "status_id": 13, "target_condition": "element('dark')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}}
@@ -3652,7 +3652,7 @@
     "effects": {
       "cases": [
         {
-          "when": "zone('fire')==1",
+          "when": "zone('fire')",
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["fire"]},
             {"type": "critical_rate_up", "target": "ally_front", "elements": ["fire"], "status_id": 5, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
@@ -3661,7 +3661,7 @@
           "description": "火属性"
         },
         {
-          "when": "zone('ice')==1",
+          "when": "zone('ice')",
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["ice"]},
             {"type": "critical_rate_up", "target": "ally_front", "elements": ["ice"], "status_id": 5, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
@@ -3670,7 +3670,7 @@
           "description": "冰属性"
         },
         {
-          "when": "zone('thunder')==1",
+          "when": "zone('thunder')",
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["thunder"]},
             {"type": "critical_rate_up", "target": "ally_front", "elements": ["thunder"], "status_id": 5, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
@@ -3679,7 +3679,7 @@
           "description": "雷属性"
         },
         {
-          "when": "zone('light')==1",
+          "when": "zone('light')",
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["light"]},
             {"type": "critical_rate_up", "target": "ally_front", "elements": ["light"], "status_id": 5, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
@@ -3688,7 +3688,7 @@
           "description": "光属性"
         },
         {
-          "when": "zone('dark')==1",
+          "when": "zone('dark')",
           "effects": [
             {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
             {"type": "critical_rate_up", "target": "ally_front", "elements": ["dark"], "status_id": 5, "duration": {"type": "ally_turn", "value": 5}, "solo": true},
@@ -3948,7 +3948,7 @@
     "effects": [
       {"type": "zone", "target": "field", "elements": ["light"], "status_id": 14, "duration": {"type": "ally_turn", "value": 8}},
       {"type": "motivation", "target": "ally_all", "status_id": 174, "duration": {"type": "permanent"}, "level": 5},
-      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('light')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 50, "number": 3}}
+      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('light')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 50, "number": 3}}
     ]
   },
   "2570001": {
@@ -4413,8 +4413,8 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "all_status_up_value", "target": "ally_all", "status_id": 95, "target_condition": "team.is_member('31E')==1", "duration": {"type": "permanent"}, "value": 10},
-      {"type": "resource", "target": "ally_all", "target_condition": "team.is_member('31E')==1", "duration": {"type": "permanent"}, "sp_modify": -1}
+      {"type": "all_status_up_value", "target": "ally_all", "status_id": 95, "target_condition": "team.is_member('31E')", "duration": {"type": "permanent"}, "value": 10},
+      {"type": "resource", "target": "ally_all", "target_condition": "team.is_member('31E')", "duration": {"type": "permanent"}, "sp_modify": -1}
     ]
   },
   "287": {
@@ -4424,7 +4424,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "attack_up", "target": "ally_all", "status_id": 1, "target_condition": "team.is_member('31E')==1", "duration": {"type": "permanent"}}
+      {"type": "attack_up", "target": "ally_all", "status_id": 1, "target_condition": "team.is_member('31E')", "duration": {"type": "permanent"}}
     ]
   },
   "288": {
@@ -4903,7 +4903,7 @@
   "323": {
     "id": 323,
     "names": {"zh_cn": "毁坏式犬儒主义", "zh_tw": "破壞式犬儒主義", "jp": "破壊のシニシズム"},
-    "conditions": {"effects": "target.weak('light')==1"},
+    "conditions": {"effects": "target.weak('light')"},
     "kind": "active",
     "cost": {"sp": 15},
     "hit_count": 5,
@@ -4934,7 +4934,7 @@
   "324": {
     "id": 324,
     "names": {"zh_cn": "河豚斩冲击", "zh_tw": "宰河豚烈擊", "jp": "フグリングクラッシュ"},
-    "conditions": {"effects": "target.weak('dark')==1"},
+    "conditions": {"effects": "target.weak('dark')"},
     "kind": "active",
     "cost": {"sp": 14},
     "hit_count": 6,
@@ -5193,8 +5193,8 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "all_status_up_value", "target": "ally_all", "status_id": 95, "target_condition": "character('Kanata_Maruyama')==1 or character('Miko_Tenne')==1 or character('Yayoi_Bungo')==1 or character('Hisame_Ogasahara')==1 or character('Yotsuha_Ohshima')==1 or character('Vritika_Balakrishnan')==1", "duration": {"type": "permanent"}, "value": 10},
-      {"type": "resource", "target": "ally_all", "target_condition": "character('Kanata_Maruyama')==1 or character('Miko_Tenne')==1 or character('Yayoi_Bungo')==1 or character('Hisame_Ogasahara')==1 or character('Yotsuha_Ohshima')==1 or character('Vritika_Balakrishnan')==1", "duration": {"type": "permanent"}, "sp_modify": -1}
+      {"type": "all_status_up_value", "target": "ally_all", "status_id": 95, "target_condition": "character('Kanata_Maruyama') or character('Miko_Tenne') or character('Yayoi_Bungo') or character('Hisame_Ogasahara') or character('Yotsuha_Ohshima') or character('Vritika_Balakrishnan')", "duration": {"type": "permanent"}, "value": 10},
+      {"type": "resource", "target": "ally_all", "target_condition": "character('Kanata_Maruyama') or character('Miko_Tenne') or character('Yayoi_Bungo') or character('Hisame_Ogasahara') or character('Yotsuha_Ohshima') or character('Vritika_Balakrishnan')", "duration": {"type": "permanent"}, "sp_modify": -1}
     ]
   },
   "341": {
@@ -5560,7 +5560,7 @@
     "target": "ally_single",
     "effects": [
       {"type": "resource", "target": "ally_single", "sp": 3},
-      {"type": "resource", "target": "ally_single", "target_condition": "target.is_member('31A')==1", "sp": 3}
+      {"type": "resource", "target": "ally_single", "target_condition": "target.is_member('31A')", "sp": 3}
     ]
   },
   "368": {
@@ -5781,7 +5781,7 @@
     "effects": [
       {"type": "defense_down", "target": "all", "elements": ["ice"], "status_id": 3, "duration": {"type": "permanent"}},
       {"type": "zone", "target": "field", "elements": ["ice"], "status_id": 14, "duration": {"type": "ally_turn", "value": 8}},
-      {"type": "resist_down", "target": "all", "elements": ["ice"], "status_id": 18, "target_condition": "target.weak('ice')==1", "duration": {"type": "permanent"}}
+      {"type": "resist_down", "target": "all", "elements": ["ice"], "status_id": 18, "target_condition": "target.weak('ice')", "duration": {"type": "permanent"}}
     ]
   },
   "3830002": {
@@ -5796,7 +5796,7 @@
     "effects": [
       {"type": "defense_down", "target": "all", "elements": ["thunder"], "status_id": 3, "duration": {"type": "permanent"}},
       {"type": "zone", "target": "field", "elements": ["thunder"], "status_id": 14, "duration": {"type": "ally_turn", "value": 8}},
-      {"type": "resist_down", "target": "all", "elements": ["thunder"], "status_id": 18, "target_condition": "target.weak('thunder')==1", "duration": {"type": "permanent"}}
+      {"type": "resist_down", "target": "all", "elements": ["thunder"], "status_id": 18, "target_condition": "target.weak('thunder')", "duration": {"type": "permanent"}}
     ]
   },
   "384": {
@@ -5816,7 +5816,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "element_mark", "elements": ["fire"], "target": "ally_all", "status_id": 166, "target_condition": "element('fire')==1", "duration": {"type": "permanent"}}
+      {"type": "element_mark", "elements": ["fire"], "target": "ally_all", "status_id": 166, "target_condition": "element('fire')", "duration": {"type": "permanent"}}
     ]
   },
   "386": {
@@ -5976,7 +5976,7 @@
     "elements": ["fire"],
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["fire"]},
-      {"type": "mind_eye", "target": "ally_all", "status_id": 78, "target_condition": "element('fire')==1", "duration": {"type": "ally_turn", "value": 5}, "solo": true}
+      {"type": "mind_eye", "target": "ally_all", "status_id": 78, "target_condition": "element('fire')", "duration": {"type": "ally_turn", "value": 5}, "solo": true}
     ]
   },
   "397": {
@@ -6041,7 +6041,7 @@
   "402": {
     "id": 402,
     "names": {"zh_cn": "专心一意", "zh_tw": "專心一意", "jp": "一意専心"},
-    "conditions": {"effects": "target.weak('thunder')==1"},
+    "conditions": {"effects": "target.weak('thunder')"},
     "kind": "active",
     "cost": {"sp": 8},
     "hit_count": 1,
@@ -6162,7 +6162,7 @@
   "407": {
     "id": 407,
     "names": {"zh_cn": "黑蝶霹雳制裁", "zh_tw": "黑蝶霹靂制裁", "jp": "黒蝶霹靂制裁"},
-    "conditions": {"cost": "charging()==1"},
+    "conditions": {"cost": "charging()"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 8},
@@ -6446,7 +6446,7 @@
     "cost": {"sp": 0},
     "trigger": "on_battle_start",
     "effects": [
-      {"type": "resource", "target": "ally_all", "target_condition": "team.is_member('31C')==1", "sp": 1}
+      {"type": "resource", "target": "ally_all", "target_condition": "team.is_member('31C')", "sp": 1}
     ]
   },
   "423": {
@@ -6532,10 +6532,10 @@
     "names": {"zh_cn": "谋略", "zh_tw": "謀略", "jp": "謀略"},
     "kind": "active",
     "cost": {"sp": 6},
-    "target": "ally_single_without_self",
+    "target": "ally_single_front_without_self",
     "effects": [
-      {"type": "additional_turn", "target": "ally_single_without_self", "status_id": 20, "target_condition": "front()==1"},
-      {"type": "additional_turn", "target": "self", "status_id": 20}
+      {"type": "additional_turn", "target": "ally_single_front_without_self", "status_id": 20, "target_condition": "not has(20)"},
+      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "not has(20)"}
     ]
   },
   "431": {
@@ -7177,7 +7177,7 @@
     "target": "ally_single_without_self",
     "effects": [
       {"type": "heal_dp", "target": "ally_single_without_self"},
-      {"type": "resource", "target": "ally_single_without_self", "target_condition": "character('Kanata_Maruyama')==1", "sp": 5},
+      {"type": "resource", "target": "ally_single_without_self", "target_condition": "character('Kanata_Maruyama')", "sp": 5},
       {"type": "additional_turn", "target": "self", "status_id": 20}
     ]
   },
@@ -8302,7 +8302,7 @@
     "attack_type": "slash",
     "elements": ["dark"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["dark"], "target_condition": "target.weak('dark')==1"},
+      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["dark"], "target_condition": "target.weak('dark')"},
       {"type": "defense_down", "target": "single", "elements": ["dark"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
@@ -8317,7 +8317,7 @@
     "attack_type": "slash",
     "elements": ["fire"],
     "effects": [
-      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["fire"], "target_condition": "target.weak('fire')==1"},
+      {"type": "damage_rate_change_attack_skill", "target": "single", "attack_type": "slash", "elements": ["fire"], "target_condition": "target.weak('fire')"},
       {"type": "defense_down", "target": "single", "elements": ["fire"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
@@ -8462,7 +8462,7 @@
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]},
       {"type": "defense_down", "target": "all", "elements": ["dark"], "status_id": 3, "duration": {"type": "permanent"}},
-      {"type": "resist_down", "target": "all", "elements": ["dark"], "status_id": 18, "target_condition": "target.weak('dark')==1", "duration": {"type": "permanent"}}
+      {"type": "resist_down", "target": "all", "elements": ["dark"], "status_id": 18, "target_condition": "target.weak('dark')", "duration": {"type": "permanent"}}
     ]
   },
   "554": {
@@ -8731,7 +8731,7 @@
   "574": {
     "id": 574,
     "names": {"zh_cn": "冷奏", "zh_tw": "冷奏", "jp": "フレッダメンテ"},
-    "conditions": {"cost": "has(204)==1"},
+    "conditions": {"cost": "has(204)"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 8},
@@ -8990,8 +8990,8 @@
     "elements": ["dark"],
     "effects": [
       {"type": "regeneration_dp", "target": "ally_all", "status_id": 34, "duration": {"type": "enemy_turn", "value": 4}},
-      {"type": "attack_up", "target": "ally_all", "elements": ["dark"], "status_id": 1, "target_condition": "element('dark')==1", "duration": {"type": "use", "value": 1}},
-      {"type": "mind_eye", "target": "ally_all", "status_id": 78, "target_condition": "element('dark')==1", "duration": {"type": "use", "value": 1}}
+      {"type": "attack_up", "target": "ally_all", "elements": ["dark"], "status_id": 1, "target_condition": "element('dark')", "duration": {"type": "use", "value": 1}},
+      {"type": "mind_eye", "target": "ally_all", "status_id": 78, "target_condition": "element('dark')", "duration": {"type": "use", "value": 1}}
     ]
   },
   "590": {
@@ -9134,7 +9134,7 @@
   "601": {
     "id": 601,
     "names": {"zh_cn": "极恶的款待", "zh_tw": "最狠的款待", "jp": "最凶のおもてなし"},
-    "conditions": {"effects": "target.weak('dark')==1"},
+    "conditions": {"effects": "target.weak('dark')"},
     "kind": "active",
     "cost": {"sp": 14},
     "hit_count": 6,
@@ -9726,7 +9726,7 @@
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
       {"type": "attack_up", "target": "ally_all", "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('fire')==1", "sp": 3}
+      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('fire')", "sp": 3}
     ]
   },
   "645": {
@@ -9752,7 +9752,7 @@
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
       {"type": "regeneration_dp", "target": "ally_all", "status_id": 34, "duration": {"type": "enemy_turn", "value": 4}},
-      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('light')==1", "sp": 3}
+      {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('light')", "sp": 3}
     ]
   },
   "647": {
@@ -9964,7 +9964,7 @@
     "elements": ["dark"],
     "effects": [
       {"type": "resist_down_overwrite", "target": "all", "elements": ["dark"], "status_id": 108, "duration": {"type": "permanent"}},
-      {"type": "funnel", "target": "ally_front", "status_id": 13, "target_condition": "element('dark')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 12, "number": 5}},
+      {"type": "funnel", "target": "ally_front", "status_id": 13, "target_condition": "element('dark')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 12, "number": 5}},
       {"type": "resist_down", "target": "all", "elements": ["dark"], "status_id": 18, "duration": {"type": "permanent"}}
     ]
   },
@@ -10698,7 +10698,7 @@
     "elements": ["light"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["light"]},
-      {"type": "super_break", "target": "all", "elements": ["light"], "status_id": 105, "target_condition": "target.weak('light')==1"},
+      {"type": "super_break", "target": "all", "elements": ["light"], "status_id": 105, "target_condition": "target.weak('light')"},
       {"type": "attack_down", "target": "self", "status_id": 2, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
@@ -10760,8 +10760,8 @@
     "elements": ["ice"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["ice"]},
-      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('ice')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 50, "number": 3}},
-      {"type": "resist_down", "target": "all", "elements": ["ice"], "status_id": 18, "target_condition": "target.weak('ice')==1", "duration": {"type": "enemy_turn", "value": 2}}
+      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('ice')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 50, "number": 3}},
+      {"type": "resist_down", "target": "all", "elements": ["ice"], "status_id": 18, "target_condition": "target.weak('ice')", "duration": {"type": "enemy_turn", "value": 2}}
     ]
   },
   "710": {
@@ -10897,7 +10897,7 @@
     "cost": {"sp": 9},
     "target": "ally_all",
     "effects": [
-      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('fire')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
+      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('fire')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
       {"type": "additional_turn", "target": "ally_front", "status_id": 20, "target_condition": "not has(20)"}
     ]
   },
@@ -11047,7 +11047,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "replace_pursuit", "target": "self", "status_id": 158, "target_condition": "has_skill(737)==1", "duration": {"type": "permanent"}}
+      {"type": "replace_pursuit", "target": "self", "status_id": 158, "target_condition": "has_skill(737)", "duration": {"type": "permanent"}}
     ],
     "variants": [
       {
@@ -11174,7 +11174,7 @@
     "effects": [
       {"type": "attack_up", "target": "ally_sub", "elements": ["light"], "status_id": 1, "duration": {"type": "use", "value": 1}},
       {"type": "critical_damage_up", "target": "ally_sub", "elements": ["light"], "status_id": 7, "duration": {"type": "use", "value": 1}},
-      {"type": "funnel", "target": "ally_sub", "status_id": 13, "target_condition": "element('light')==1", "duration": {"type": "use", "value": 1}, "mode": {"value": 6, "number": 5}}
+      {"type": "funnel", "target": "ally_sub", "status_id": 13, "target_condition": "element('light')", "duration": {"type": "use", "value": 1}, "mode": {"value": 6, "number": 5}}
     ]
   },
   "737": {
@@ -11204,9 +11204,9 @@
     "elements": ["light"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["light"]},
-      {"type": "critical_rate_up", "target": "ally_all", "elements": ["light"], "status_id": 5, "target_condition": "element('light')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-      {"type": "critical_damage_up", "target": "ally_all", "elements": ["light"], "status_id": 7, "target_condition": "element('light')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('light')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 50, "number": 3}}
+      {"type": "critical_rate_up", "target": "ally_all", "elements": ["light"], "status_id": 5, "target_condition": "element('light')", "duration": {"type": "ally_turn", "value": 3}, "solo": true},
+      {"type": "critical_damage_up", "target": "ally_all", "elements": ["light"], "status_id": 7, "target_condition": "element('light')", "duration": {"type": "ally_turn", "value": 3}, "solo": true},
+      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('light')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 50, "number": 3}}
     ]
   }
 }
