@@ -2202,11 +2202,13 @@
   "163": {
     "id": 163,
     "names": {"zh_cn": "纯真狂野+", "zh_tw": "純真狂野+", "jp": "イノセントワイルド+"},
-    "conditions": {"cost": "both() or dp_rate() >= 1"},
     "kind": "active",
     "cost": {
-      "yes": {"sp": 5},
-      "no": {"sp": 10}
+      "resource": "user_select",
+      "user_select": {
+        "1": {"sp": 5, "description": "DP为100%或以上"},
+        "2": {"sp": 10, "description": "DP低于100%"}
+      }
     },
     "hit_count": 3,
     "target": "all",
@@ -2921,11 +2923,13 @@
   "205": {
     "id": 205,
     "names": {"zh_cn": "孤独之刃", "zh_tw": "孤獨之刃", "jp": "ロンリーブレード"},
-    "conditions": {"cost": "both() or dp_rate()<=0.5"},
     "kind": "active",
     "cost": {
-      "yes": {"sp": 5},
-      "no": {"sp": 10}
+      "resource": "user_select",
+      "user_select": {
+        "1": {"sp": 5, "description": "DP低于50%"},
+        "2": {"sp": 10, "description": "DP高于50%"}
+      }
     },
     "hit_count": 3,
     "target": "all",
@@ -8014,11 +8018,13 @@
   "528": {
     "id": 528,
     "names": {"zh_cn": "仁慈曼舞金风中", "zh_tw": "仁慈曼舞金風中", "jp": "爽籟に舞う仁慈"},
-    "conditions": {"cost": "enemy.damage_rate()>=200"},
     "kind": "active",
     "cost": {
-      "yes": {"sp": 7},
-      "no": {"sp": 14}
+      "resource": "user_select",
+      "user_select": {
+        "1": {"sp": 7, "description": "存在破坏率200%以上的敌人"},
+        "2": {"sp": 14, "description": "不存在破坏率200%以上的敌人"}
+      }
     },
     "hit_count": 8,
     "target": "all",
@@ -10109,11 +10115,13 @@
   "673": {
     "id": 673,
     "names": {"zh_cn": "狂舞乱炸的迦梨+", "zh_tw": "瘋狂亂舞的迦梨+", "jp": "狂気乱舞のカーリー+"},
-    "conditions": {"cost": "both() or dp_rate() >= 1"},
     "kind": "active",
     "cost": {
-      "yes": {"sp": 7},
-      "no": {"sp": 14}
+      "resource": "user_select",
+      "user_select": {
+        "1": {"sp": 7, "description": "DP为100%或以上"},
+        "2": {"sp": 14, "description": "DP低于100%"}
+      }
     },
     "hit_count": 10,
     "target": "single",
