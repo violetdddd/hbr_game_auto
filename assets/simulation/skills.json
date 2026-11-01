@@ -5884,7 +5884,7 @@
     "cost": {"sp": 5},
     "target": "self",
     "effects": [
-      {"type": "arrow_cherry_blossoms", "target": "self", "status_id": 120, "duration": {"type": "use", "value": 1}}
+      {"type": "arrow_cherry_blossoms", "target": "self", "status_id": 120, "duration": {"type": "use_debuff", "value": 1}}
     ]
   },
   "391": {
@@ -6789,7 +6789,7 @@
     "effects": [
       {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["light"]},
       {"type": "disaster", "target": "single", "status_id": 193, "target_condition": "target.weak('light')", "duration": {"type": "permanent"}, "level": 2},
-      {"type": "venom", "target": "single", "status_id": 218, "target_condition": "target.weak('light')", "duration": {"type": "enemy_turn", "value": 10}}
+      {"type": "venom", "target": "single", "status_id": 218, "target_condition": "target.weak('light')", "duration": {"type": "enemy_turn", "value": 10}, "level": 2}
     ]
   },
   "439": {
