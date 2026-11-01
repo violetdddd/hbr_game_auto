@@ -1592,7 +1592,7 @@
     "target": "self",
     "effects": [
       {"type": "defense_up", "target": "self", "status_id": 4, "duration": {"type": "enemy_turn", "value": 1}},
-      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}}
+      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 6, "number": 5}}
     ]
   },
   "118": {
@@ -1861,7 +1861,7 @@
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
       {"type": "attack_up", "target": "ally_front", "status_id": 1, "target_condition": "element('fire')==1", "duration": {"type": "use", "value": 1}},
-      {"type": "funnel", "target": "ally_front", "status_id": 13, "target_condition": "element('fire')==1", "duration": {"type": "use", "value": 1}}
+      {"type": "funnel", "target": "ally_front", "status_id": 13, "target_condition": "element('fire')==1", "duration": {"type": "use", "value": 1}, "mode": {"value": 6, "number": 5}}
     ]
   },
   "136": {
@@ -2130,7 +2130,7 @@
     "target": "self",
     "effects": [
       {"type": "heal_dp", "target": "self"},
-      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}}
+      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}}
     ]
   },
   "157": {
@@ -2687,7 +2687,7 @@
     "target": "self",
     "effects": [
       {"type": "resource", "target": "od", "od": 50},
-      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('ice')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true}
+      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('ice')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 50, "number": 3}}
     ]
   },
   "193": {
@@ -2819,7 +2819,7 @@
   "199": {
     "id": 199,
     "names": {"zh_cn": "勇气步伐", "zh_tw": "勇氣步伐", "jp": "ブレイブステップ"},
-    "conditions": {"cost": "not (used(199)>0)"},
+    "conditions": {"cost": "used(199)==0"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 6},
@@ -2829,7 +2829,7 @@
     "effects": [
       {"type": "critical_rate_up", "target": "ally_front", "status_id": 5, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
       {"type": "critical_damage_up", "target": "ally_front", "status_id": 7, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-      {"type": "funnel", "target": "ally_front", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true}
+      {"type": "funnel", "target": "ally_front", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 12, "number": 5}}
     ]
   },
   "200": {
@@ -3788,7 +3788,7 @@
     "target": "self",
     "effects": [
       {"type": "attack_up", "target": "self", "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}}
+      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 6, "number": 5}}
     ]
   },
   "249": {
@@ -3913,7 +3913,7 @@
     "elements": ["fire"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["fire"]},
-      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}},
+      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}},
       {"type": "recoil_random", "target": "self", "duration": {"type": "ally_turn", "value": 3}}
     ]
   },
@@ -4220,7 +4220,7 @@
     "target": "self",
     "effects": [
       {"type": "critical_rate_up", "target": "self", "status_id": 5, "duration": {"type": "use", "value": 1}},
-      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}}
+      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 2}}
     ]
   },
   "273": {
@@ -4909,7 +4909,7 @@
           "type": "funnel",
           "target": "ally_front",
           "status_id": 13,
-          "duration": {"type": "use", "value": 1}
+          "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}
         }
       ],
       "no": [
@@ -4918,7 +4918,7 @@
           "type": "funnel",
           "target": "ally_front",
           "status_id": 13,
-          "duration": {"type": "use", "value": 1}
+          "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}
         }
       ]
     }
@@ -5094,7 +5094,7 @@
     "cost": {"sp": 7},
     "target": "ally_single",
     "effects": [
-      {"type": "funnel", "target": "ally_single", "status_id": 13, "duration": {"type": "ally_turn", "value": 5}, "solo": true}
+      {"type": "funnel", "target": "ally_single", "status_id": 13, "duration": {"type": "ally_turn", "value": 5}, "solo": true, "mode": {"value": 12, "number": 5}}
     ]
   },
   "334": {
@@ -5479,7 +5479,7 @@
     "target": "ally_single",
     "effects": [
       {"type": "attack_up", "target": "ally_single", "status_id": 1, "duration": {"type": "use", "value": 1}},
-      {"type": "funnel", "target": "ally_single", "status_id": 13, "duration": {"type": "use", "value": 1}}
+      {"type": "funnel", "target": "ally_single", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 6, "number": 5}}
     ]
   },
   "362": {
@@ -5490,7 +5490,7 @@
     "target": "ally_single",
     "effects": [
       {"type": "attack_up", "target": "ally_single", "status_id": 1, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-      {"type": "funnel", "target": "ally_single", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true}
+      {"type": "funnel", "target": "ally_single", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 5}}
     ]
   },
   "363": {
@@ -6351,7 +6351,7 @@
           "type": "funnel",
           "target": "self",
           "status_id": 13,
-          "duration": {"type": "use", "value": 1}
+          "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}
         }
       ],
       "no": [{"type": "attack", "target": "all", "attack_type": "strike", "elements": ["ice"]}]
@@ -6653,24 +6653,29 @@
   "435": {
     "id": 435,
     "names": {"zh_cn": "下次的主角就是你", "zh_tw": "下一個主角就是你", "jp": "次の主役はあなた"},
-    "conditions": {"effects": "enemy.count(broken()==1 and damage_rate()>=200) > 0"},
     "kind": "active",
     "cost": {"sp": 14},
     "hit_count": 4,
     "target": "single",
     "attack_type": "stab",
     "elements": ["ice"],
-    "effects": {
-      "yes": [
-        {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["ice"]},
-        {
-          "type": "funnel",
-          "target": "self",
-          "status_id": 13,
-          "duration": {"type": "use", "value": 1}
-        }
-      ],
-      "no": [{"type": "attack", "target": "single", "attack_type": "stab", "elements": ["ice"]}]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["ice"]},
+          {
+            "type": "funnel",
+            "target": "self",
+            "status_id": 13,
+            "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}
+          }
+        ], 
+        "description": "存在破坏率200%以上的敌人"
+      },
+      "2": {
+        "effects": [{"type": "attack", "target": "single", "attack_type": "stab", "elements": ["ice"]}],
+        "description": "不存在破坏率200%以上的敌人"
+      }
     }
   },
   "436": {
@@ -7917,7 +7922,7 @@
     "attack_type": "slash",
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "slash"},
-      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}}
+      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}}
     ]
   },
   "523": {
@@ -8162,8 +8167,8 @@
     "cost": {"sp": 7},
     "target": "ally_single",
     "effects": {
-      "yes": [{"type": "funnel", "target": "ally_single", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true}],
-      "no": [{"type": "funnel", "target": "ally_single", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true}]
+      "yes": [{"type": "funnel", "target": "ally_single", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 50, "number": 3}}],
+      "no": [{"type": "funnel", "target": "ally_single", "status_id": 13, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 12, "number": 5}}]
     }
   },
   "542": {
@@ -8785,7 +8790,7 @@
           "type": "funnel",
           "target": "ally_single",
           "status_id": 13,
-          "duration": {"type": "use", "value": 1}
+          "duration": {"type": "use", "value": 1}, "mode": {"value": 12, "number": 5}
         },
         {
           "type": "critical_rate_up",
@@ -8813,7 +8818,7 @@
           "type": "funnel",
           "target": "ally_single",
           "status_id": 13,
-          "duration": {"type": "use", "value": 1}
+          "duration": {"type": "use", "value": 1}, "mode": {"value": 12, "number": 5}
         }
       ]
     }
@@ -9955,7 +9960,7 @@
     "elements": ["dark"],
     "effects": [
       {"type": "resist_down_overwrite", "target": "all", "elements": ["dark"], "status_id": 108, "duration": {"type": "permanent"}},
-      {"type": "funnel", "target": "ally_front", "status_id": 13, "target_condition": "element('dark')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true},
+      {"type": "funnel", "target": "ally_front", "status_id": 13, "target_condition": "element('dark')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 12, "number": 5}},
       {"type": "resist_down", "target": "all", "elements": ["dark"], "status_id": 18, "duration": {"type": "permanent"}}
     ]
   },
@@ -10607,10 +10612,21 @@
     "hit_count": 1,
     "target": "all",
     "attack_type": "stab",
-    "effects": [
-      {"type": "attack", "target": "all", "attack_type": "stab"},
-      {"type": "resource", "target": "ally_front", "hit_condition": "break_hits()>0", "sp": 5}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "stab"},
+          {"type": "resource", "target": "ally_front", "sp": 5}
+        ],
+        "description": "破盾"
+      },
+      "2": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "stab"}
+        ],
+        "description": "不破盾"
+      }
+    }
   },
   "703": {
     "id": 703,
@@ -10620,11 +10636,23 @@
     "hit_count": 1,
     "target": "all",
     "attack_type": "stab",
-    "effects": [
-      {"type": "attack", "target": "all", "attack_type": "stab"},
-      {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}},
-      {"type": "resource", "target": "ally_front", "hit_condition": "break_hits()>0", "sp": 5}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "stab"},
+          {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}},
+          {"type": "resource", "target": "ally_front", "sp": 5}
+        ],
+        "description": "破盾"
+      },
+      "2": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "stab"},
+          {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}}
+        ],
+        "description": "不破盾"
+      }
+    }
   },
   "704": {
     "id": 704,
@@ -10729,7 +10757,7 @@
     "elements": ["ice"],
     "effects": [
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["ice"]},
-      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('ice')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true},
+      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('ice')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 50, "number": 3}},
       {"type": "resist_down", "target": "all", "elements": ["ice"], "status_id": 18, "target_condition": "target.weak('ice')==1", "duration": {"type": "enemy_turn", "value": 2}}
     ]
   },
@@ -10866,7 +10894,7 @@
     "cost": {"sp": 9},
     "target": "ally_all",
     "effects": [
-      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('fire')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true},
+      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('fire')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 25, "number": 3}},
       {"type": "additional_turn", "target": "ally_front", "status_id": 20, "target_condition": "not has(20)"}
     ]
   },
@@ -10947,7 +10975,7 @@
           "type": "funnel",
           "target": "self",
           "status_id": 13,
-          "duration": {"type": "use", "value": 1}
+          "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}
         }
       ],
       "no": [{"type": "attack", "target": "all", "attack_type": "slash", "elements": ["ice"]}]
@@ -11143,7 +11171,7 @@
     "effects": [
       {"type": "attack_up", "target": "ally_sub", "elements": ["light"], "status_id": 1, "duration": {"type": "use", "value": 1}},
       {"type": "critical_damage_up", "target": "ally_sub", "elements": ["light"], "status_id": 7, "duration": {"type": "use", "value": 1}},
-      {"type": "funnel", "target": "ally_sub", "status_id": 13, "target_condition": "element('light')==1", "duration": {"type": "use", "value": 1}}
+      {"type": "funnel", "target": "ally_sub", "status_id": 13, "target_condition": "element('light')==1", "duration": {"type": "use", "value": 1}, "mode": {"value": 6, "number": 5}}
     ]
   },
   "737": {
@@ -11175,7 +11203,7 @@
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["light"]},
       {"type": "critical_rate_up", "target": "ally_all", "elements": ["light"], "status_id": 5, "target_condition": "element('light')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true},
       {"type": "critical_damage_up", "target": "ally_all", "elements": ["light"], "status_id": 7, "target_condition": "element('light')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('light')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true}
+      {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('light')==1", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 50, "number": 3}}
     ]
   }
 }
