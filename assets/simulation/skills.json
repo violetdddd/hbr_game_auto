@@ -5553,7 +5553,7 @@
     "target": "ally_all",
     "effects": [
       {"type": "dim_sum", "target": "ally_all", "status_id": 202, "duration": {"type": "permanent"}},
-      {"type": "sprightly", "target": "ally_all", "status_id": 194, "duration": {"type": "use", "value": 1}},
+      {"type": "sprightly", "target": "ally_all", "status_id": 194, "duration": {"type": "use_any", "value": 1}},
       {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('dark')", "sp": 3}
     ]
   },
