@@ -217,7 +217,7 @@
     "trigger": "on_new_turn_start",
     "trigger_condition": "front() and has(124)",
     "effects": [
-      {"type": "cover", "target": "all", "status_id": 57, "duration": {"type": "enemy_turn"}}
+      {"type": "cover", "target": "all", "status_id": 57, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
   "23": {
@@ -1867,7 +1867,7 @@
     "target": "self",
     "effects": [
       {"type": "mind_eye", "target": "self", "status_id": 78, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
-      {"type": "cover", "target": "all", "status_id": 57, "duration": {"type": "enemy_turn"}}
+      {"type": "cover", "target": "all", "status_id": 57, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "134": {
@@ -2607,8 +2607,8 @@
     "cost": {"sp": 10},
     "target": "self",
     "effects": [
-      {"type": "invincible", "target": "self", "status_id": 15},
-      {"type": "cover", "target": "all", "status_id": 57, "duration": {"type": "enemy_turn"}}
+      {"type": "invincible", "target": "self", "status_id": 15, "duration": {"type": "on_attack", "value": 2}},
+      {"type": "cover", "target": "all", "status_id": 57, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "188": {
@@ -7908,7 +7908,7 @@
     "target": "self",
     "effects": [
       {"type": "heal_dp", "target": "self"},
-      {"type": "cover", "target": "all", "status_id": 57, "duration": {"type": "enemy_turn"}}
+      {"type": "cover", "target": "all", "status_id": 57, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "507": {
@@ -9675,7 +9675,7 @@
     "target": "self",
     "effects": [
       {"type": "break_guard", "target": "self", "status_id": 113, "duration": {"type": "use", "value": 1}},
-      {"type": "cover", "target": "all", "status_id": 57, "duration": {"type": "enemy_turn"}}
+      {"type": "cover", "target": "all", "status_id": 57, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
   "624": {
