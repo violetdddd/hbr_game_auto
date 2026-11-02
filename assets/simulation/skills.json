@@ -3129,7 +3129,7 @@
     "trigger_condition": "sp()>=20",
     "effects": [
       {"type": "resource", "target": "self", "sp": -3},
-      {"type": "resource", "target": "ally_all_without_self", "sp": 1}
+      {"type": "resource", "target": "ally_all_without_self", "sp": 1, "limit": 99}
     ]
   },
   "211": {
