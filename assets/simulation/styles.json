@@ -62,12 +62,7 @@
         {"id": 50002, "name": "星空", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "critical_rate_up", "target": "ally_all", "value": 10, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": {
-      "name": "玫瑰热情",
-      "kind": "support",
-      "trigger": "on_battle_start",
-      "effects": {"type": "over_drive_rate_up", "target": "self", "duration": {"type": "permanent"}, "value": [3,4,5,6,7]}
-    }
+    "support_skill": {"name": "玫瑰热情", "kind": "support", "trigger": "on_battle_start", "effects": {"type": "over_drive_rate_up", "target": "self", "duration": {"type": "permanent"}, "value": [3, 4, 5, 6, 7]}}
   },
   "6": {
     "id": 6,
@@ -137,7 +132,7 @@
         {"id": 90003, "name": "绝唱", "trigger": "on_new_turn_start", "trigger_condition": "SpecialStatusCountByType(144)>0", "effects": [{"type": "resource", "target": "self", "sp_modify": -2, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "31A"
+    "support_skill": {"name": "Beat Down, Rise Up", "kind": "support", "trigger": "on_battle_start", "effects": {"type": "heal_dp_rate", "target": "self", "value": [110, 120, 130, 140, 150]}}
   },
   "10": {
     "id": 10,
@@ -264,7 +259,7 @@
         {"id": 170003, "name": "决心", "trigger": "on_action_start", "trigger_condition": "sp()>=15 and front()", "effects": [{"type": "attack_up", "target": "self", "value": 30, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "SupportSkill_YIzumi01"
+    "support_skill": {"name": "放电", "kind": "support", "trigger": "on_action_start", "trigger_condition": "dp_rate()>=0.5", "effects": {"type": "give_defense_debuff_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [20, 22, 25, 27, 30]}}
   },
   "18": {
     "id": 18,
@@ -310,7 +305,7 @@
         {"id": 200003, "name": "破碎之喝彩", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_breaking", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_breaking", "reference": "Passive.Break_AttackUpAll01_2"}, {"type": "attack_up", "target": "ally_all", "value": 60, "duration": {"type": "ally_turn", "value": 8}, "solo": true}]}
       ]
     },
-    "support_skill": "31A"
+    "support_skill": {"name": "Beat Down, Rise Up", "kind": "support", "trigger": "on_battle_start", "effects": {"type": "heal_dp_rate", "target": "self", "value": [110, 120, 130, 140, 150]}}
   },
   "21": {
     "id": 21,
@@ -454,7 +449,7 @@
         {"id": 290003, "name": "侵蚀", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "give_defense_debuff_up", "target": "self", "value": 25, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "31A"
+    "support_skill": {"name": "Beat Down, Rise Up", "kind": "support", "trigger": "on_battle_start", "effects": {"type": "heal_dp_rate", "target": "self", "value": [110, 120, 130, 140, 150]}}
   },
   "30": {
     "id": 30,
@@ -539,7 +534,7 @@
         {"id": 350003, "name": "英雄凯歌", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "attack_up", "target": "ally_all", "value": 10, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "SupportSkill_TTojo01"
+    "support_skill": {"name": "狂热夏日时光", "kind": "support", "trigger": "on_action_start", "trigger_condition": "dp_rate()>=0.5", "effects": {"type": "give_attack_buff_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [20, 22, 25, 27, 30]}}
   },
   "36": {
     "id": 36,
@@ -605,7 +600,7 @@
         {"id": 390003, "name": "分享", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_healed_sp_without_self_heal", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_healed_sp_without_self_heal", "reference": "Passive.Start_SpUpSp02_2"}, {"type": "resource", "target": "ally_all", "sp": 2}]}
       ]
     },
-    "support_skill": "31A"
+    "support_skill": {"name": "Beat Down, Rise Up", "kind": "support", "trigger": "on_battle_start", "effects": {"type": "heal_dp_rate", "target": "self", "value": [110, 120, 130, 140, 150]}}
   },
   "40": {
     "id": 40,
@@ -725,7 +720,7 @@
         {"id": 470003, "name": "暗之威慑", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "attack_up", "target": "self", "elements": ["dark"], "value": 25, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "31A"
+    "support_skill": {"name": "Beat Down, Rise Up", "kind": "support", "trigger": "on_battle_start", "effects": {"type": "heal_dp_rate", "target": "self", "value": [110, 120, 130, 140, 150]}}
   },
   "48": {
     "id": 48,
@@ -901,7 +896,7 @@
         {"id": 580003, "name": "俊敏", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 5}]}
       ]
     },
-    "support_skill": "31A"
+    "support_skill": {"name": "Beat Down, Rise Up", "kind": "support", "trigger": "on_battle_start", "effects": {"type": "heal_dp_rate", "target": "self", "value": [110, 120, 130, 140, 150]}}
   },
   "59": {
     "id": 59,
@@ -1036,7 +1031,7 @@
         {"id": 670004, "name": "鼓舞", "trigger": "on_battle_start", "effects": [{"type": "resource", "target": "ally_all", "sp": 1}]}
       ]
     },
-    "support_skill": "31B"
+    "support_skill": {"name": "Love and Peace", "kind": "support", "trigger": "on_new_turn_start", "trigger_condition": "turn()<=3", "effects": {"type": "defense_up", "target": "self", "duration": {"type": "enemy_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}}
   },
   "68": {
     "id": 68,
@@ -1129,7 +1124,7 @@
         {"id": 730003, "name": "火之威慑", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "attack_up", "target": "self", "elements": ["fire"], "value": 25, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "SupportSkill_IMinase01"
+    "support_skill": {"name": "现场助力", "kind": "support", "trigger": "on_action_start", "effects": {"type": "attack_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [40, 48, 56, 64, 70]}}
   },
   "74": {
     "id": 74,
@@ -1148,7 +1143,7 @@
         {"id": 740004, "name": "昂扬", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "attack_up_per_token", "target": "self", "value": 5, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "31B"
+    "support_skill": {"name": "Love and Peace", "kind": "support", "trigger": "on_new_turn_start", "trigger_condition": "turn()<=3", "effects": {"type": "defense_up", "target": "self", "duration": {"type": "enemy_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}}
   },
   "75": {
     "id": 75,
@@ -1287,7 +1282,7 @@
         {"id": 830003, "name": "狂乱之型", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "funnel", "target": "self", "mode": {"number": 3, "value": 25}, "duration": {"type": "use", "value": 1}}]}
       ]
     },
-    "support_skill": "31B"
+    "support_skill": {"name": "Love and Peace", "kind": "support", "trigger": "on_new_turn_start", "trigger_condition": "turn()<=3", "effects": {"type": "defense_up", "target": "self", "duration": {"type": "enemy_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}}
   },
   "84": {
     "id": 84,
@@ -1305,7 +1300,7 @@
         {"id": 840003, "name": "两条尾巴", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_extra_skill", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_extra_skill", "reference": "Passive.Startt_UseEX_DoubleActionExtraSkill01_2"}, {"type": "double_action_extra_skill", "target": "self", "duration": {"type": "use", "value": 1}}]}
       ]
     },
-    "support_skill": "SupportSkill_SMinase01"
+    "support_skill": {"name": "磨爪", "kind": "support", "trigger": "on_action_start", "effects": {"type": "attack_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [40, 48, 56, 64, 70]}}
   },
   "85": {
     "id": 85,
@@ -1401,7 +1396,7 @@
         {"id": 910003, "name": "后方救援", "trigger": "on_new_turn_start", "trigger_condition": "not front()", "effects": [{"type": "heal_dp_rate", "target": "ally_all", "value": 7.0}]}
       ]
     },
-    "support_skill": "SupportSkill_SHiguchi01"
+    "support_skill": {"name": "强化", "kind": "support", "trigger": "on_action_start", "trigger_condition": "dp_rate()>=0.5", "effects": {"type": "give_attack_buff_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [20, 22, 25, 27, 30]}}
   },
   "92": {
     "id": 92,
@@ -1419,7 +1414,7 @@
         {"id": 920003, "name": "能量补给", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_healed_sp_without_self_heal", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_healed_sp_without_self_heal", "reference": "Passive.Start_SpUpSp04_2"}, {"type": "resource", "target": "ally_all", "sp": 2}]}
       ]
     },
-    "support_skill": "31B"
+    "support_skill": {"name": "Love and Peace", "kind": "support", "trigger": "on_new_turn_start", "trigger_condition": "turn()<=3", "effects": {"type": "defense_up", "target": "self", "duration": {"type": "enemy_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}}
   },
   "93": {
     "id": 93,
@@ -1510,7 +1505,7 @@
         {"id": 980003, "name": "意气风发", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_kill_count", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_kill_count", "reference": "Passive.Kill_HealSp02_2"}, {"type": "resource", "target": "ally_all", "sp": 2}]}
       ]
     },
-    "support_skill": "31B"
+    "support_skill": {"name": "Love and Peace", "kind": "support", "trigger": "on_new_turn_start", "trigger_condition": "turn()<=3", "effects": {"type": "defense_up", "target": "self", "duration": {"type": "enemy_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}}
   },
   "99": {
     "id": 99,
@@ -1578,7 +1573,7 @@
         {"id": 1030003, "name": "雷之威慑", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "attack_up", "target": "self", "elements": ["thunder"], "value": 25, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "31B"
+    "support_skill": {"name": "Love and Peace", "kind": "support", "trigger": "on_new_turn_start", "trigger_condition": "turn()<=3", "effects": {"type": "defense_up", "target": "self", "duration": {"type": "enemy_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}}
   },
   "104": {
     "id": 104,
@@ -1658,7 +1653,7 @@
         {"id": 1090002, "name": "英雄凯歌", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "attack_up", "target": "ally_all", "value": 10, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "SupportSkill_BIYamawaki02"
+    "support_skill": {"name": "冰角", "kind": "support", "trigger": "on_action_start", "effects": {"type": "attack_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [40, 48, 56, 64, 70]}}
   },
   "110": {
     "id": 110,
@@ -1690,7 +1685,7 @@
         {"id": 1110003, "name": "俊敏", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 5}]}
       ]
     },
-    "support_skill": "31C"
+    "support_skill": {"name": "Failure Is Not an Option", "kind": "support", "trigger": "on_first_battle_start", "effects": {"type": "skill_limit_count_up", "target": "self", "duration": {"type": "permanent"}, "value": [1, 2, 3, 4, 5], "skill_group": "attack"}}
   },
   "112": {
     "id": 112,
@@ -1746,7 +1741,7 @@
         {"id": 1140002, "name": "开始进军！", "trigger": "on_new_turn_start", "trigger_condition": "CountBC(IsPlayer() and SpecialStatusCountByType(155) > 0)>0", "effects": [{"type": "resource", "target": "ally_all", "sp": 1, "target_condition": "SpecialStatusCountByType(155) > 0"}]}
       ]
     },
-    "support_skill": "SupportSkill_BIYamawaki01"
+    "support_skill": {"name": "忠义", "kind": "support", "trigger": "on_first_battle_start", "effects": [{"type": "b_i_yamawaki_servant", "target": "self", "duration": {"type": "permanent"}, "value": [40, 40, 40, 40, 40]}, {"type": "defense_up", "target": "self", "duration": {"type": "permanent"}, "value": [10, 11, 12, 13, 15]}]}
   },
   "115": {
     "id": 115,
@@ -1846,7 +1841,7 @@
         {"id": 1210004, "name": "占星术", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_healed_sp_without_self_heal", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_healed_sp_without_self_heal", "reference": "Passive.Start_SpUpSp03_2"}, {"type": "resource", "target": "ally_all", "sp": 2}]}
       ]
     },
-    "support_skill": "31C"
+    "support_skill": {"name": "Failure Is Not an Option", "kind": "support", "trigger": "on_first_battle_start", "effects": {"type": "skill_limit_count_up", "target": "self", "duration": {"type": "permanent"}, "value": [1, 2, 3, 4, 5], "skill_group": "attack"}}
   },
   "122": {
     "id": 122,
@@ -1897,7 +1892,7 @@
         {"id": 1250002, "name": "侵蚀", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "give_defense_debuff_up", "target": "self", "value": 25, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "SupportSkill_MTenne01"
+    "support_skill": {"name": "梳毛", "kind": "support", "trigger": "on_overdrive_start", "effects": {"type": "give_defense_debuff_up", "target": "self", "duration": {"type": "od_end"}, "value": [20, 22, 25, 27, 30]}}
   },
   "126": {
     "id": 126,
@@ -1930,7 +1925,7 @@
         {"id": 1270004, "name": "无常风", "trigger": "on_action_start", "trigger_condition": "front() and not normal_attack() and Consumesp()<=8", "effects": [{"type": "give_heal_up", "target": "self", "value": 40, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "31C"
+    "support_skill": {"name": "Failure Is Not an Option", "kind": "support", "trigger": "on_first_battle_start", "effects": {"type": "skill_limit_count_up", "target": "self", "duration": {"type": "permanent"}, "value": [1, 2, 3, 4, 5], "skill_group": "attack"}}
   },
   "128": {
     "id": 128,
@@ -2012,7 +2007,7 @@
         {"id": 1330002, "name": "俊敏", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 5}]}
       ]
     },
-    "support_skill": "31C"
+    "support_skill": {"name": "Failure Is Not an Option", "kind": "support", "trigger": "on_first_battle_start", "effects": {"type": "skill_limit_count_up", "target": "self", "duration": {"type": "permanent"}, "value": [1, 2, 3, 4, 5], "skill_group": "attack"}}
   },
   "134": {
     "id": 134,
@@ -2155,7 +2150,7 @@
         {"id": 1420003, "name": "强烈", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "damage_rate_up", "target": "self", "value": 30, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "31C"
+    "support_skill": {"name": "Failure Is Not an Option", "kind": "support", "trigger": "on_first_battle_start", "effects": {"type": "skill_limit_count_up", "target": "self", "duration": {"type": "permanent"}, "value": [1, 2, 3, 4, 5], "skill_group": "attack"}}
   },
   "143": {
     "id": 143,
@@ -2261,7 +2256,7 @@
         {"id": 1490003, "name": "俊敏", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 5}]}
       ]
     },
-    "support_skill": "31C"
+    "support_skill": {"name": "Failure Is Not an Option", "kind": "support", "trigger": "on_first_battle_start", "effects": {"type": "skill_limit_count_up", "target": "self", "duration": {"type": "permanent"}, "value": [1, 2, 3, 4, 5], "skill_group": "attack"}}
   },
   "150": {
     "id": 150,
@@ -2280,7 +2275,7 @@
         {"id": 1500004, "name": "静谧的威压", "trigger": "on_action_start", "trigger_condition": "not normal_attack() and Consumesp()<=8", "effects": [{"type": "give_defense_debuff_up", "target": "self", "value": 30, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "SupportSkill_MSatsuki01"
+    "support_skill": {"name": "暗中活动", "kind": "support", "trigger": "on_action_start", "effects": {"type": "attack_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [40, 48, 56, 64, 70]}}
   },
   "151": {
     "id": 151,
@@ -2390,7 +2385,7 @@
         {"id": 1580003, "name": "暗之威慑", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "attack_up", "target": "self", "elements": ["dark"], "value": 25, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "30G"
+    "support_skill": {"name": "Faith", "kind": "support", "trigger": "on_first_battle_start", "effects": {"type": "morale", "target": "self", "duration": {"type": "permanent"}, "value": [1, 2, 3, 4, 5]}}
   },
   "159": {
     "id": 159,
@@ -2538,7 +2533,7 @@
         {"id": 1670004, "name": "光之瞬击", "trigger": "on_additional_turn_start", "effects": [{"type": "attack_up", "target": "self", "elements": ["light"], "value": 40, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "30G"
+    "support_skill": {"name": "Faith", "kind": "support", "trigger": "on_first_battle_start", "effects": {"type": "morale", "target": "self", "duration": {"type": "permanent"}, "value": [1, 2, 3, 4, 5]}}
   },
   "168": {
     "id": 168,
@@ -2631,7 +2626,7 @@
         {"id": 1740003, "name": "徒樱之一箭", "trigger": "on_battle_start", "effects": [{"type": "arrow_cherry_blossoms", "target": "self", "value": 0.5, "duration": {"type": "use", "value": 1}}]}
       ]
     },
-    "support_skill": "30G"
+    "support_skill": {"name": "Faith", "kind": "support", "trigger": "on_first_battle_start", "effects": {"type": "morale", "target": "self", "duration": {"type": "permanent"}, "value": [1, 2, 3, 4, 5]}}
   },
   "175": {
     "id": 175,
@@ -2744,7 +2739,7 @@
         {"id": 1820003, "name": "超越", "trigger": "on_additional_turn_start", "effects": [{"type": "give_attack_buff_up", "target": "self", "value": 30, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "SupportSkill_CSugahara01"
+    "support_skill": {"name": "炽焰引擎", "kind": "support", "trigger": "on_overdrive_start", "effects": {"type": "give_attack_buff_up", "target": "self", "duration": {"type": "od_end"}, "value": [20, 22, 25, 27, 30]}}
   },
   "183": {
     "id": 183,
@@ -2762,7 +2757,7 @@
         {"id": 1830003, "name": "全场助威", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_extra_skill", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_extra_skill", "reference": "Passive.Start_UseEX_Morale_2"}, {"type": "morale", "target": "ally_all", "value": 2, "duration": {"type": "permanent"}}]}
       ]
     },
-    "support_skill": "30G"
+    "support_skill": {"name": "Faith", "kind": "support", "trigger": "on_first_battle_start", "effects": {"type": "morale", "target": "self", "duration": {"type": "permanent"}, "value": [1, 2, 3, 4, 5]}}
   },
   "184": {
     "id": 184,
@@ -2850,7 +2845,7 @@
         {"id": 1890002, "name": "俊敏", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 5}]}
       ]
     },
-    "support_skill": "30G"
+    "support_skill": {"name": "Faith", "kind": "support", "trigger": "on_first_battle_start", "effects": {"type": "morale", "target": "self", "duration": {"type": "permanent"}, "value": [1, 2, 3, 4, 5]}}
   },
   "190": {
     "id": 190,
@@ -2882,7 +2877,7 @@
         {"id": 1910003, "name": "疾驱", "trigger": "on_additional_turn_start", "effects": [{"type": "resource", "target": "self", "sp_modify": -2, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "30G"
+    "support_skill": {"name": "Faith", "kind": "support", "trigger": "on_first_battle_start", "effects": {"type": "morale", "target": "self", "duration": {"type": "permanent"}, "value": [1, 2, 3, 4, 5]}}
   },
   "192": {
     "id": 192,
@@ -2981,7 +2976,7 @@
         {"id": 1980002, "name": "暗之威慑", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "attack_up", "target": "self", "elements": ["dark"], "value": 25, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "30G"
+    "support_skill": {"name": "Faith", "kind": "support", "trigger": "on_first_battle_start", "effects": {"type": "morale", "target": "self", "duration": {"type": "permanent"}, "value": [1, 2, 3, 4, 5]}}
   },
   "199": {
     "id": 199,
@@ -3066,7 +3061,7 @@
         {"id": 2040003, "name": "冰之威慑", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "attack_up", "target": "self", "elements": ["ice"], "value": 25, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "31D"
+    "support_skill": {"name": "Fly High!", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "damage_rate_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}, {"type": "attack_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}]}
   },
   "205": {
     "id": 205,
@@ -3210,7 +3205,7 @@
         {"id": 2140003, "name": "天长地久", "trigger": "on_first_battle_start", "effects": [{"type": "zone_up_eternal", "target": "field", "value": 15, "duration": {"type": "permanent"}}]}
       ]
     },
-    "support_skill": "31D"
+    "support_skill": {"name": "Fly High!", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "damage_rate_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}, {"type": "attack_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}]}
   },
   "215": {
     "id": 215,
@@ -3287,7 +3282,7 @@
         {"id": 2190003, "name": "究极刺激", "trigger": "on_new_turn_start", "trigger_condition": "dp_rate()<=0.5 and front()", "effects": [{"type": "resource", "target": "self", "od": 10}]}
       ]
     },
-    "support_skill": "31D"
+    "support_skill": {"name": "Fly High!", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "damage_rate_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}, {"type": "attack_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}]}
   },
   "220": {
     "id": 220,
@@ -3412,7 +3407,7 @@
         {"id": 2280003, "name": "注入活力", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_extra_skill", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_extra_skill", "reference": "Passive.Start_UseEX_HealSp01_2"}, {"type": "resource", "target": "ally_all", "sp": 2}]}
       ]
     },
-    "support_skill": "31D"
+    "support_skill": {"name": "Fly High!", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "damage_rate_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}, {"type": "attack_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}]}
   },
   "229": {
     "id": 229,
@@ -3489,7 +3484,7 @@
         {"id": 2330003, "name": "冰之威慑", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "attack_up", "target": "self", "elements": ["ice"], "value": 25, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "SupportSkill_ADate01"
+    "support_skill": {"name": "神圣恩典", "kind": "support", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": {"type": "resource", "target": "self", "od": [5, 6, 7, 8, 10]}}
   },
   "234": {
     "id": 234,
@@ -3508,7 +3503,7 @@
         {"id": 2340004, "name": "截击球", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_removing_buff", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_removing_buff", "reference": "Passive.disarmament_OverDriveUp01_2"}, {"type": "resource", "target": "self", "od": 50}]}
       ]
     },
-    "support_skill": "31D"
+    "support_skill": {"name": "Fly High!", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "damage_rate_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}, {"type": "attack_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}]}
   },
   "235": {
     "id": 235,
@@ -3593,7 +3588,7 @@
         {"id": 2400003, "name": "脆弱的鱼", "trigger": "on_action_start", "trigger_condition": "front() and not normal_attack() and Consumesp()<=8", "effects": [{"type": "give_defense_debuff_up", "target": "self", "value": 30, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "31D"
+    "support_skill": {"name": "Fly High!", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "damage_rate_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}, {"type": "attack_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}]}
   },
   "241": {
     "id": 241,
@@ -3611,7 +3606,7 @@
         {"id": 2410003, "name": "如虎添翼", "trigger": "on_overdrive_start", "effects": [{"type": "resource", "target": "self", "sp_modify": -2, "duration": {"type": "od_end"}}]}
       ]
     },
-    "support_skill": "31D"
+    "support_skill": {"name": "Fly High!", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "damage_rate_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}, {"type": "attack_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}]}
   },
   "242": {
     "id": 242,
@@ -3682,7 +3677,7 @@
         {"id": 2460003, "name": "锐气", "trigger": "on_action_start", "trigger_condition": "front() and CountBC(IsPlayer()==0 and IsDead()==0 and SpecialStatusCountByType(12)>0)>0 or CountBC(IsPlayer()==0 and IsDead()==0 and SpecialStatusCountByType(57)>0)>0", "effects": [{"type": "attack_up", "target": "self", "value": 30, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "31E"
+    "support_skill": {"name": "Get it together!", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": {"type": "give_defense_debuff_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [15, 18, 20, 22, 25]}}
   },
   "247": {
     "id": 247,
@@ -3821,7 +3816,7 @@
         {"id": 2550003, "name": "唯美", "trigger": "on_action_start", "trigger_condition": "SpecialStatusCountByType(164)>0 and front()", "effects": [{"type": "attack_up", "target": "self", "value": 50, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "31E"
+    "support_skill": {"name": "Get it together!", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": {"type": "give_defense_debuff_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [15, 18, 20, 22, 25]}}
   },
   "256": {
     "id": 256,
@@ -3875,7 +3870,7 @@
         {"id": 2590003, "name": "上进心", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "od": 5}]}
       ]
     },
-    "support_skill": "31E"
+    "support_skill": {"name": "Get it together!", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": {"type": "give_defense_debuff_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [15, 18, 20, 22, 25]}}
   },
   "260": {
     "id": 260,
@@ -3978,7 +3973,7 @@
         {"id": 2660004, "name": "休息充电", "trigger": "on_new_turn_start", "trigger_condition": "not front()", "effects": [{"type": "resource", "target": "self", "od": 5}]}
       ]
     },
-    "support_skill": "31E"
+    "support_skill": {"name": "Get it together!", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": {"type": "give_defense_debuff_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [15, 18, 20, 22, 25]}}
   },
   "267": {
     "id": 267,
@@ -4082,7 +4077,7 @@
         {"id": 2730004, "name": "双翻", "trigger": "on_first_battle_start", "effects": [{"type": "give_debuff_turn_up", "target": "self", "value": 1, "duration": {"type": "permanent"}}]}
       ]
     },
-    "support_skill": "31E"
+    "support_skill": {"name": "Get it together!", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": {"type": "give_defense_debuff_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [15, 18, 20, 22, 25]}}
   },
   "274": {
     "id": 274,
@@ -4101,7 +4096,7 @@
         {"id": 2740004, "name": "干练", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "token", "target": "self", "value": 5}]}
       ]
     },
-    "support_skill": "SupportSkill_IrOhshima01"
+    "support_skill": {"name": "美好的夜晚", "kind": "support", "trigger": "on_battle_start", "effects": {"type": "mocktail", "target": "self", "value": [10, 20, 30, 40, 50]}}
   },
   "275": {
     "id": 275,
@@ -4183,7 +4178,7 @@
         {"id": 2800003, "name": "陶醉", "trigger": "on_overdrive_start", "effects": [{"type": "resource", "target": "ally_all", "sp": 5}]}
       ]
     },
-    "support_skill": "31E"
+    "support_skill": {"name": "Get it together!", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": {"type": "give_defense_debuff_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [15, 18, 20, 22, 25]}}
   },
   "281": {
     "id": 281,
@@ -4256,7 +4251,7 @@
         {"id": 2850002, "name": "惠风", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "give_heal_up", "target": "self", "value": 20, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "31F"
+    "support_skill": {"name": "We Live Better", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": {"type": "give_attack_buff_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [15, 18, 20, 22, 25]}}
   },
   "286": {
     "id": 286,
@@ -4355,7 +4350,7 @@
         {"id": 2920003, "name": "强烈", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "damage_rate_up", "target": "self", "value": 30, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "31F"
+    "support_skill": {"name": "We Live Better", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": {"type": "give_attack_buff_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [15, 18, 20, 22, 25]}}
   },
   "293": {
     "id": 293,
@@ -4437,7 +4432,7 @@
         {"id": 2980003, "name": "机智", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "give_attack_buff_up", "target": "self", "value": 25, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "31F"
+    "support_skill": {"name": "We Live Better", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": {"type": "give_attack_buff_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [15, 18, 20, 22, 25]}}
   },
   "299": {
     "id": 299,
@@ -4546,7 +4541,7 @@
         {"id": 3050003, "name": "好戏已至高潮", "trigger": "on_new_turn_start", "trigger_condition": "SpecialStatusCountByType(25)>0", "effects": [{"type": "resource", "target": "ally_front", "sp": 1}]}
       ]
     },
-    "support_skill": "31F"
+    "support_skill": {"name": "We Live Better", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": {"type": "give_attack_buff_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [15, 18, 20, 22, 25]}}
   },
   "306": {
     "id": 306,
@@ -4628,7 +4623,7 @@
         {"id": 3110003, "name": "开幕", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "buff_charge", "target": "self", "value": 0.3, "duration": {"type": "use", "value": 1}}, {"type": "resource", "target": "self", "sp": 3}]}
       ]
     },
-    "support_skill": "31F"
+    "support_skill": {"name": "We Live Better", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": {"type": "give_attack_buff_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [15, 18, 20, 22, 25]}}
   },
   "312": {
     "id": 312,
@@ -4702,7 +4697,7 @@
         {"id": 3160003, "name": "激震", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_breaking", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_breaking", "reference": "Passive.Break_HealSp02_2"}, {"type": "resource", "target": "self", "sp": 8}]}
       ]
     },
-    "support_skill": "31F"
+    "support_skill": {"name": "We Live Better", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": {"type": "give_attack_buff_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [15, 18, 20, 22, 25]}}
   },
   "317": {
     "id": 317,
@@ -4801,7 +4796,7 @@
         {"id": 3230003, "name": "机智", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "give_attack_buff_up", "target": "self", "value": 25, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "31X"
+    "support_skill": {"name": "Excelsior!", "kind": "support", "trigger": "on_first_battle_start", "effects": {"type": "additional_hit_on_breaking", "target": "self", "duration": {"type": "permanent"}, "on_trigger": [{"type": "resource", "target": "self", "od": [12, 14, 16, 18, 20]}]}}
   },
   "324": {
     "id": 324,
@@ -4837,7 +4832,7 @@
         {"id": 3250004, "name": "Let's have a party!", "trigger": "on_battle_win", "effects": [{"type": "resource", "target": "ally_all", "sp": 3, "target_condition": "IsNatureElement(Thunder)"}]}
       ]
     },
-    "support_skill": "SupportSkill_CReaper01"
+    "support_skill": {"name": "法式薯条", "kind": "support", "trigger": "on_battle_win", "effects": {"type": "heal_skill_used_count", "target": "ally_all", "value": [1, 2, 3, 4, 5]}}
   },
   "326": {
     "id": 326,
@@ -4936,7 +4931,7 @@
         {"id": 3320003, "name": "锋矢", "trigger": "on_new_turn_start", "trigger_condition": "IsTerritory(ReviveTerritory)==1", "effects": [{"type": "resource", "target": "self", "sp_modify": -2, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "31X"
+    "support_skill": {"name": "Excelsior!", "kind": "support", "trigger": "on_first_battle_start", "effects": {"type": "additional_hit_on_breaking", "target": "self", "duration": {"type": "permanent"}, "on_trigger": [{"type": "resource", "target": "self", "od": [12, 14, 16, 18, 20]}]}}
   },
   "333": {
     "id": 333,
@@ -4958,7 +4953,7 @@
         {"id": 3330005, "name": "美食三昧[アビリティ強化]", "trigger": "on_battle_win", "effects": [{"type": "resource", "target": "ally_all", "sp": 3, "target_condition": "IsNatureElement(Dark)"}]}
       ]
     },
-    "support_skill": "SupportSkill_LShanhua01"
+    "support_skill": {"name": "杏仁豆腐", "kind": "support", "trigger": "on_battle_win", "effects": {"type": "heal_skill_used_count", "target": "ally_all", "value": [1, 2, 3, 4, 5]}}
   },
   "334": {
     "id": 334,
@@ -5029,7 +5024,7 @@
         {"id": 3380003, "name": "俊敏", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 5}]}
       ]
     },
-    "support_skill": "31X"
+    "support_skill": {"name": "Excelsior!", "kind": "support", "trigger": "on_first_battle_start", "effects": {"type": "additional_hit_on_breaking", "target": "self", "duration": {"type": "permanent"}, "on_trigger": [{"type": "resource", "target": "self", "od": [12, 14, 16, 18, 20]}]}}
   },
   "339": {
     "id": 339,
@@ -5061,7 +5056,7 @@
         {"id": 3400003, "name": "时间锁链", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_healed_sp_without_self_heal", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_healed_sp_without_self_heal", "reference": "Passive.Start_SpUpOverDriveUp01_2"}, {"type": "resource", "target": "self", "od": 25}]}
       ]
     },
-    "support_skill": "SupportSkill_IRedmayne01"
+    "support_skill": {"name": "Q.E.D.", "kind": "support", "trigger": "on_first_battle_start", "effects": {"type": "additional_hit_on_healed_sp_without_self_heal", "target": "self", "duration": {"type": "permanent"}, "on_trigger": [{"type": "resource", "target": "self", "od": [5, 8, 10, 12, 15]}]}}
   },
   "341": {
     "id": 341,
@@ -5150,7 +5145,7 @@
         {"id": 3460003, "name": "惠风", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "give_heal_up", "target": "self", "value": 20, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "31X"
+    "support_skill": {"name": "Excelsior!", "kind": "support", "trigger": "on_first_battle_start", "effects": {"type": "additional_hit_on_breaking", "target": "self", "duration": {"type": "permanent"}, "on_trigger": [{"type": "resource", "target": "self", "od": [12, 14, 16, 18, 20]}]}}
   },
   "347": {
     "id": 347,
@@ -5169,7 +5164,7 @@
         {"id": 3470004, "name": "再来一份吧", "trigger": "on_battle_win", "effects": [{"type": "resource", "target": "ally_all", "sp": 3, "target_condition": "IsNatureElement(Ice)"}]}
       ]
     },
-    "support_skill": "SupportSkill_VBalakrishnan01"
+    "support_skill": {"name": "穆克瓦斯", "kind": "support", "trigger": "on_battle_win", "effects": {"type": "heal_skill_used_count", "target": "ally_all", "value": [1, 2, 3, 4, 5]}}
   },
   "348": {
     "id": 348,
@@ -5257,7 +5252,7 @@
         {"id": 3530003, "name": "心情舒畅", "trigger": "on_new_turn_start", "trigger_condition": "dp_rate()>1.495", "effects": [{"type": "resource", "target": "ally_all", "sp": 1}]}
       ]
     },
-    "support_skill": "31X"
+    "support_skill": {"name": "Excelsior!", "kind": "support", "trigger": "on_first_battle_start", "effects": {"type": "additional_hit_on_breaking", "target": "self", "duration": {"type": "permanent"}, "on_trigger": [{"type": "resource", "target": "self", "od": [12, 14, 16, 18, 20]}]}}
   },
   "354": {
     "id": 354,
@@ -5287,7 +5282,7 @@
         {"id": 3550004, "name": "独食者易噎喉", "trigger": "on_battle_win", "effects": [{"type": "resource", "target": "ally_all", "sp": 3, "target_condition": "IsNatureElement(Light)"}]}
       ]
     },
-    "support_skill": "SupportSkill_MdAngelis01"
+    "support_skill": {"name": "浓缩咖啡", "kind": "support", "trigger": "on_battle_win", "effects": {"type": "heal_skill_used_count", "target": "ally_all", "value": [1, 2, 3, 4, 5]}}
   },
   "356": {
     "id": 356,
@@ -5358,7 +5353,7 @@
         {"id": 3600003, "name": "纯真面纱", "trigger": "on_new_turn_start", "trigger_condition": "CountBC(IsPlayer() and SpecialStatusCountByType(124)>0)>0", "effects": [{"type": "heal_dp_rate", "target": "ally_all", "value": 15, "target_condition": "SpecialStatusCountByType(124)>0"}]}
       ]
     },
-    "support_skill": "31X"
+    "support_skill": {"name": "Excelsior!", "kind": "support", "trigger": "on_first_battle_start", "effects": {"type": "additional_hit_on_breaking", "target": "self", "duration": {"type": "permanent"}, "on_trigger": [{"type": "resource", "target": "self", "od": [12, 14, 16, 18, 20]}]}}
   },
   "361": {
     "id": 361,
@@ -5388,7 +5383,7 @@
         {"id": 3620004, "name": "和亲爹相比还是白菜汤不会腻", "trigger": "on_battle_win", "effects": [{"type": "resource", "target": "ally_all", "sp": 3, "target_condition": "IsNatureElement(Fire)"}]}
       ]
     },
-    "support_skill": "SupportSkill_CSkopovskaya01"
+    "support_skill": {"name": "扎库斯卡", "kind": "support", "trigger": "on_battle_win", "effects": {"type": "heal_skill_used_count", "target": "ally_all", "value": [1, 2, 3, 4, 5]}}
   },
   "363": {
     "id": 363,
@@ -5680,7 +5675,7 @@
     "special": [
       {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.all_down()", "uses": 1, "advance_turn": false, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true}, {"type": "damage_rate_up", "target": "all", "value": 100}], "end_condition": "used_or_enemy_down_end"}
     ],
-    "support_skill": "SupportSkill_EmaB01"
+    "support_skill": {"name": "帕特拉", "kind": "support", "trigger": "on_new_turn_start", "effects": [{"type": "heal_dp_rate", "target": "self", "value": [2, 3, 4, 5, 6]}, {"type": "remove_special_status", "target": "self", "duration": {"type": "one_shot"}, "status": "stun"}]}
   },
   "379": {
     "id": 379,
