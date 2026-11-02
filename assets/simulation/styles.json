@@ -71,7 +71,7 @@
     "team": "31A", "tier": "S", "attack_type": "slash", "elements": ["fire"],
     "limit_break": {
       "3": [
-        {"id": 60001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 0.3, "random": true}]}
+        {"id": 60001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
       ],
       "10": [
         {"id": 60002, "name": "请勿玩火", "trigger": "on_action_start", "trigger_condition": "dp_rate()==0.0 and front()", "effects": [{"type": "attack_up", "target": "self", "elements": ["fire"], "value": 50, "duration": {"type": "ally_turn", "value": 1}}]}
@@ -500,7 +500,7 @@
     "team": "31A", "tier": "S", "attack_type": "stab", "elements": [],
     "limit_break": {
       "3": [
-        {"id": 330001, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "od": 30, "random": true}]}
+        {"id": 330001, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 30, "random": true}]}
       ]
     }
   },
@@ -754,10 +754,10 @@
       ],
       "3": [
         {"id": 490004, "name": "屹立于战场【朝仓可怜 专属】", "trigger": "on_action_start", "effects": [{"type": "attack_up", "target": "ally_all", "value": 25, "duration": {"type": "ally_turn", "value": 1}}]},
-        {"id": 490005, "name": "托付给你了【可镰 专属】", "trigger": "on_action_start", "effects": [{"type": "additional_hit_on_breaking", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "special_trigger": "additional_hit_on_breaking", "reference": "Passive.Break_OverDriveUp01_2"}, {"type": "resource", "target": "self", "od": 25}]}
+        {"id": 490005, "name": "托付给你了【可镰 专属】", "trigger": "on_action_start", "effects": [{"type": "additional_hit_on_breaking", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "special_trigger": "additional_hit_on_breaking", "reference": "Passive.Break_OverDriveUp01_2"}, {"type": "resource", "target": "od", "od": 25}]}
       ],
       "4": [
-        {"id": 490006, "name": "编织出的勇气【朝仓可怜 专属】", "trigger": "on_new_turn_start", "effects": [{"type": "resource", "target": "self", "od": 10}]}
+        {"id": 490006, "name": "编织出的勇气【朝仓可怜 专属】", "trigger": "on_new_turn_start", "effects": [{"type": "resource", "target": "od", "od": 10}]}
       ]
     },
     "special": [
@@ -803,7 +803,7 @@
     "team": "31A", "tier": "S", "attack_type": "slash", "elements": [],
     "limit_break": {
       "3": [
-        {"id": 520001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 0.3, "random": true}]}
+        {"id": 520001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
       ]
     }
   },
@@ -996,7 +996,7 @@
         {"id": 650002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 650003, "name": "上进心", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "od": 5}]}
+        {"id": 650003, "name": "上进心", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 5}]}
       ]
     }
   },
@@ -1323,7 +1323,7 @@
     "team": "31B", "tier": "A", "attack_type": "stab", "elements": [],
     "limit_break": {
       "5": [
-        {"id": 860001, "name": "咆哮", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "od": 10}]}
+        {"id": 860001, "name": "咆哮", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 10}]}
       ]
     }
   },
@@ -1348,7 +1348,7 @@
         {"id": 880001, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 880002, "name": "上进心", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "od": 5}]}
+        {"id": 880002, "name": "上进心", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 5}]}
       ]
     }
   },
@@ -1485,7 +1485,7 @@
         {"id": 970002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 970003, "name": "上进心", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "od": 5}]}
+        {"id": 970003, "name": "上进心", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 5}]}
       ]
     }
   },
@@ -1582,7 +1582,7 @@
     "team": "31B", "tier": "S", "attack_type": "stab", "elements": [],
     "limit_break": {
       "3": [
-        {"id": 1040001, "name": "咆哮", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "od": 10}]}
+        {"id": 1040001, "name": "咆哮", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 10}]}
       ]
     }
   },
@@ -1622,7 +1622,7 @@
     "team": "31C", "tier": "S", "attack_type": "slash", "elements": [],
     "limit_break": {
       "3": [
-        {"id": 1070001, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "od": 30, "random": true}]}
+        {"id": 1070001, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 30, "random": true}]}
       ]
     }
   },
@@ -1636,7 +1636,7 @@
         {"id": 1080001, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 1080002, "name": "上进心", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "od": 5}]}
+        {"id": 1080002, "name": "上进心", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 5}]}
       ]
     }
   },
@@ -1721,7 +1721,7 @@
         {"id": 1130004, "name": "你们几个，动手吧！", "trigger": "on_action_start", "trigger_condition": "CountBC(IsPlayer()==1 and not normal_attack() and Consumesp()<=8)>0", "effects": [{"type": "attack_up", "target": "ally_all", "value": 100, "target_condition": "IsAttackNormal()==0 && ConsumeSp()<=8", "duration": {"type": "ally_turn", "value": 1}}]}
       ],
       "4": [
-        {"id": 1130005, "name": "魔王军的大攻势！", "trigger": "on_new_turn_start", "trigger_condition": "CountBC(IsPlayer() and SpecialStatusCountByType(155) >= 1)>=6", "effects": [{"type": "resource", "target": "self", "od": 100}], "trigger_limit": 1}
+        {"id": 1130005, "name": "魔王军的大攻势！", "trigger": "on_new_turn_start", "trigger_condition": "CountBC(IsPlayer() and SpecialStatusCountByType(155) >= 1)>=6", "effects": [{"type": "resource", "target": "od", "od": 100}], "trigger_limit": 1}
       ]
     },
     "special": [
@@ -1789,7 +1789,7 @@
         {"id": 1180001, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 1180002, "name": "上进心", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "od": 5}]}
+        {"id": 1180002, "name": "上进心", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 5}]}
       ]
     }
   },
@@ -1803,7 +1803,7 @@
         {"id": 1190001, "name": "坚忍", "trigger": "on_enemy_turn_start", "trigger_condition": "dp_rate()==0.0 and front()", "effects": [{"type": "defense_up", "target": "self", "value": 50, "duration": {"type": "enemy_turn", "value": 1}}]}
       ],
       "10": [
-        {"id": 1190002, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "od": 30, "random": true}]}
+        {"id": 1190002, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 30, "random": true}]}
       ]
     }
   },
@@ -1959,7 +1959,7 @@
     "team": "31C", "tier": "S", "attack_type": "stab", "elements": [],
     "limit_break": {
       "3": [
-        {"id": 1300001, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "od": 30, "random": true}]}
+        {"id": 1300001, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 30, "random": true}]}
       ]
     }
   },
@@ -2026,7 +2026,7 @@
         {"id": 1340004, "name": "俯首称臣的说！", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_breaking", "target": "ally_all", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_breaking", "reference": "Passive.DownTurn01_2"}, {"type": "break_down_turn_up", "target": "none", "value": 1, "duration": {"type": "use", "value": 1}}]}
       ],
       "4": [
-        {"id": 1340005, "name": "开始征服世界了的说！", "trigger": "on_new_turn_start", "trigger_condition": "CountBC(IsPlayer() and SpecialStatusCountByType(155) >= 1)>=6", "effects": [{"type": "resource", "target": "self", "od": 100}], "trigger_limit": 1}
+        {"id": 1340005, "name": "开始征服世界了的说！", "trigger": "on_new_turn_start", "trigger_condition": "CountBC(IsPlayer() and SpecialStatusCountByType(155) >= 1)>=6", "effects": [{"type": "resource", "target": "od", "od": 100}], "trigger_limit": 1}
       ]
     }
   },
@@ -2188,7 +2188,7 @@
     "team": "31C", "tier": "S", "attack_type": "stab", "elements": [],
     "limit_break": {
       "3": [
-        {"id": 1450001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 0.3, "random": true}]}
+        {"id": 1450001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
       ],
       "10": [
         {"id": 1450002, "name": "突之意志", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "attack_up", "target": "ally_front", "value": 10, "duration": {"type": "ally_turn", "value": 1}}]}
@@ -2567,7 +2567,7 @@
     "team": "30G", "tier": "A", "attack_type": "stab", "elements": [],
     "limit_break": {
       "5": [
-        {"id": 1700001, "name": "咆哮", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "od": 10}]}
+        {"id": 1700001, "name": "咆哮", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 10}]}
       ]
     }
   },
@@ -2716,7 +2716,7 @@
     "team": "30G", "tier": "S", "attack_type": "strike", "elements": [],
     "limit_break": {
       "3": [
-        {"id": 1810001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 0.3, "random": true}]}
+        {"id": 1810001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
       ],
       "10": [
         {"id": 1810002, "name": "光之跃动", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "critical_damage_up", "target": "ally_front", "elements": ["light"], "value": 10, "duration": {"type": "ally_turn", "value": 1}}]}
@@ -2889,7 +2889,7 @@
         {"id": 1920001, "name": "比赛开始", "trigger": "on_first_battle_start", "effects": [{"type": "motivation", "target": "ally_all", "duration": {"type": "permanent"}}]}
       ],
       "3": [
-        {"id": 1920002, "name": "球界头脑", "trigger": "on_new_turn_start", "trigger_condition": "level('motivation') >= 4", "effects": [{"type": "resource", "target": "self", "od": 10}]}
+        {"id": 1920002, "name": "球界头脑", "trigger": "on_new_turn_start", "trigger_condition": "level('motivation') >= 4", "effects": [{"type": "resource", "target": "od", "od": 10}]}
       ],
       "10": [
         {"id": 1920003, "name": "干劲极佳的少女", "trigger": "on_new_turn_start", "effects": [{"type": "resource", "target": "ally_all", "sp": 1, "target_condition": "MotivationLevel() == 5"}]}
@@ -3027,7 +3027,7 @@
     "team": "31D", "tier": "S", "attack_type": "strike", "elements": [],
     "limit_break": {
       "3": [
-        {"id": 2020001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 0.3, "random": true}]}
+        {"id": 2020001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
       ]
     }
   },
@@ -3143,7 +3143,7 @@
     "team": "31D", "tier": "S", "attack_type": "stab", "elements": [],
     "limit_break": {
       "3": [
-        {"id": 2100001, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "od": 30, "random": true}]}
+        {"id": 2100001, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 30, "random": true}]}
       ]
     }
   },
@@ -3168,7 +3168,7 @@
     "team": "31D", "tier": "S", "attack_type": "stab", "elements": ["dark"],
     "limit_break": {
       "3": [
-        {"id": 2120001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 0.3, "random": true}]}
+        {"id": 2120001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
       ]
     }
   },
@@ -3179,7 +3179,7 @@
     "team": "31D", "tier": "SS", "attack_type": "stab", "elements": ["fire"],
     "limit_break": {
       "0": [
-        {"id": 2130001, "name": "厚涂画法", "trigger": "on_new_turn_start", "trigger_condition": "IsZone(Fire)==1", "effects": [{"type": "resource", "target": "self", "od": 5}]}
+        {"id": 2130001, "name": "厚涂画法", "trigger": "on_new_turn_start", "trigger_condition": "IsZone(Fire)==1", "effects": [{"type": "resource", "target": "od", "od": 5}]}
       ],
       "1": [
         {"id": 2130002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -3214,7 +3214,7 @@
     "team": "31D", "tier": "SSR", "attack_type": "stab", "elements": ["dark"],
     "limit_break": {
       "0": [
-        {"id": 2150001, "name": "改造", "trigger": "on_new_turn_start", "trigger_condition": "IsZone(Fire) or IsZone(Ice) or IsZone(Thunder) or IsZone(Light) or IsZone(Dark)", "effects": [{"type": "resource", "target": "ally_all", "sp": 1}, {"type": "resource", "target": "self", "od": 5}]}
+        {"id": 2150001, "name": "改造", "trigger": "on_new_turn_start", "trigger_condition": "IsZone(Fire) or IsZone(Ice) or IsZone(Thunder) or IsZone(Light) or IsZone(Dark)", "effects": [{"type": "resource", "target": "ally_all", "sp": 1}, {"type": "resource", "target": "od", "od": 5}]}
       ],
       "1": [
         {"id": 2150002, "name": "閃光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -3279,7 +3279,7 @@
         {"id": 2190002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 2190003, "name": "究极刺激", "trigger": "on_new_turn_start", "trigger_condition": "dp_rate()<=0.5 and front()", "effects": [{"type": "resource", "target": "self", "od": 10}]}
+        {"id": 2190003, "name": "究极刺激", "trigger": "on_new_turn_start", "trigger_condition": "dp_rate()<=0.5 and front()", "effects": [{"type": "resource", "target": "od", "od": 10}]}
       ]
     },
     "support_skill": {"name": "Fly High!", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "damage_rate_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}, {"type": "attack_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}]}
@@ -3359,7 +3359,7 @@
     "team": "31D", "tier": "S", "attack_type": "stab", "elements": [],
     "limit_break": {
       "3": [
-        {"id": 2250001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 0.3, "random": true}]}
+        {"id": 2250001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
       ]
     }
   },
@@ -3398,7 +3398,7 @@
     "team": "31D", "tier": "SS", "attack_type": "stab", "elements": [],
     "limit_break": {
       "0": [
-        {"id": 2280001, "name": "追加支援", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_extra_skill", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_extra_skill", "reference": "Passive.Start_UseEX_OverDriveUp01_2"}, {"type": "resource", "target": "self", "od": 10}]}
+        {"id": 2280001, "name": "追加支援", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_extra_skill", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_extra_skill", "reference": "Passive.Start_UseEX_OverDriveUp01_2"}, {"type": "resource", "target": "od", "od": 10}]}
       ],
       "1": [
         {"id": 2280002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -3500,7 +3500,7 @@
         {"id": 2340003, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 2340004, "name": "截击球", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_removing_buff", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_removing_buff", "reference": "Passive.disarmament_OverDriveUp01_2"}, {"type": "resource", "target": "self", "od": 50}]}
+        {"id": 2340004, "name": "截击球", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_removing_buff", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_removing_buff", "reference": "Passive.disarmament_OverDriveUp01_2"}, {"type": "resource", "target": "od", "od": 50}]}
       ]
     },
     "support_skill": {"name": "Fly High!", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "damage_rate_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}, {"type": "attack_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [30, 35, 40, 45, 50]}]}
@@ -3512,7 +3512,7 @@
     "team": "31D", "tier": "SSR", "attack_type": "strike", "elements": ["light"],
     "limit_break": {
       "0": [
-        {"id": 2350001, "name": "バトンパス", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_extra_skill", "target": "self", "duration": {"type": "use", "value": 1}, "special_trigger": "additional_hit_on_extra_skill", "reference": "Passive.Start_UseEX_OverDriveUp02_2"}, {"type": "resource", "target": "self", "od": 25}]}
+        {"id": 2350001, "name": "バトンパス", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_extra_skill", "target": "self", "duration": {"type": "use", "value": 1}, "special_trigger": "additional_hit_on_extra_skill", "reference": "Passive.Start_UseEX_OverDriveUp02_2"}, {"type": "resource", "target": "od", "od": 25}]}
       ],
       "1": [
         {"id": 2350002, "name": "閃光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -3540,7 +3540,7 @@
     "team": "31D", "tier": "S", "attack_type": "strike", "elements": [],
     "limit_break": {
       "3": [
-        {"id": 2370001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 0.3, "random": true}]}
+        {"id": 2370001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
       ]
     }
   },
@@ -3597,7 +3597,7 @@
     "team": "31D", "tier": "SS", "attack_type": "strike", "elements": ["fire"],
     "limit_break": {
       "0": [
-        {"id": 2410001, "name": "咆哮", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "od": 10}]}
+        {"id": 2410001, "name": "咆哮", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 10}]}
       ],
       "1": [
         {"id": 2410002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -3706,7 +3706,7 @@
         {"id": 2480002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 2480003, "name": "V字回复", "trigger": "on_new_turn_start", "trigger_condition": "od() < 0", "effects": [{"type": "resource", "target": "self", "od": 50}], "trigger_limit": 1}
+        {"id": 2480003, "name": "V字回复", "trigger": "on_new_turn_start", "trigger_condition": "od() < 0", "effects": [{"type": "resource", "target": "od", "od": 50}], "trigger_limit": 1}
       ]
     }
   },
@@ -3751,7 +3751,7 @@
     "team": "31E", "tier": "S", "attack_type": "slash", "elements": [],
     "limit_break": {
       "3": [
-        {"id": 2510001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 0.3, "random": true}]}
+        {"id": 2510001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
       ]
     }
   },
@@ -3825,7 +3825,7 @@
     "team": "31E", "tier": "A", "attack_type": "strike", "elements": [],
     "limit_break": {
       "5": [
-        {"id": 2560001, "name": "咆哮", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "od": 10}]}
+        {"id": 2560001, "name": "咆哮", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 10}]}
       ]
     }
   },
@@ -3861,13 +3861,13 @@
     "team": "31E", "tier": "SS", "attack_type": "strike", "elements": [],
     "limit_break": {
       "0": [
-        {"id": 2590001, "name": "咆哮", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "od": 10}]}
+        {"id": 2590001, "name": "咆哮", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 10}]}
       ],
       "1": [
         {"id": 2590002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 2590003, "name": "上进心", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "od": 5}]}
+        {"id": 2590003, "name": "上进心", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 5}]}
       ]
     },
     "support_skill": {"name": "Get it together!", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "give_defense_debuff_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [15, 18, 20, 22, 25]}]}
@@ -3896,7 +3896,7 @@
         {"id": 2610002, "name": "内在力量", "trigger": "on_new_turn_start", "effects": [{"type": "token", "target": "self", "value": 1}]}
       ],
       "3": [
-        {"id": 2610003, "name": "势如破竹", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_breaking", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_breaking", "reference": "Passive.Break_OverDriveUp02_2"}, {"type": "resource", "target": "self", "od": 25}]}
+        {"id": 2610003, "name": "势如破竹", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_breaking", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_breaking", "reference": "Passive.Break_OverDriveUp02_2"}, {"type": "resource", "target": "od", "od": 25}]}
       ]
     }
   },
@@ -3970,7 +3970,7 @@
         {"id": 2660003, "name": "后闪", "trigger": "on_new_turn_start", "trigger_condition": "not front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 2660004, "name": "休息充电", "trigger": "on_new_turn_start", "trigger_condition": "not front()", "effects": [{"type": "resource", "target": "self", "od": 5}]}
+        {"id": 2660004, "name": "休息充电", "trigger": "on_new_turn_start", "trigger_condition": "not front()", "effects": [{"type": "resource", "target": "od", "od": 5}]}
       ]
     },
     "support_skill": {"name": "Get it together!", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "give_defense_debuff_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [15, 18, 20, 22, 25]}]}
@@ -3982,10 +3982,10 @@
     "team": "31E", "tier": "S", "attack_type": "stab", "elements": [],
     "limit_break": {
       "3": [
-        {"id": 2670001, "name": "随性声援", "trigger": "on_new_turn_start", "trigger_condition": "not front()", "effects": [{"type": "resource", "target": "self", "od": 30, "random": true}]}
+        {"id": 2670001, "name": "随性声援", "trigger": "on_new_turn_start", "trigger_condition": "not front()", "effects": [{"type": "resource", "target": "od", "od": 30, "random": true}]}
       ],
       "10": [
-        {"id": 2670002, "name": "如梦心境", "trigger": "on_new_turn_start", "trigger_condition": "not front()", "effects": [{"type": "resource", "target": "self", "od": 3}]}
+        {"id": 2670002, "name": "如梦心境", "trigger": "on_new_turn_start", "trigger_condition": "not front()", "effects": [{"type": "resource", "target": "od", "od": 3}]}
       ]
     }
   },
@@ -3996,7 +3996,7 @@
     "team": "31E", "tier": "SSR", "attack_type": "stab", "elements": ["light"],
     "limit_break": {
       "0": [
-        {"id": 2680001, "name": "甘え上手", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_healed_sp_without_self_heal", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_healed_sp_without_self_heal", "reference": "Passive.Start_SpUpOverDriveUp02_2"}, {"type": "resource", "target": "self", "od": 10}]},
+        {"id": 2680001, "name": "甘え上手", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_healed_sp_without_self_heal", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_healed_sp_without_self_heal", "reference": "Passive.Start_SpUpOverDriveUp02_2"}, {"type": "resource", "target": "od", "od": 10}]},
         {"id": 2680002, "name": "光の猛打", "trigger": "on_first_battle_start", "effects": [{"type": "critical_damage_up", "target": "ally_all", "value": 25, "target_condition": "IsNatureElement(Light)", "duration": {"type": "permanent"}}]}
       ],
       "1": [
@@ -4359,7 +4359,7 @@
     "team": "31F", "tier": "S", "attack_type": "stab", "elements": ["light"],
     "limit_break": {
       "3": [
-        {"id": 2930001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 0.3, "random": true}]}
+        {"id": 2930001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
       ]
     }
   },
@@ -4412,7 +4412,7 @@
         {"id": 2970001, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 2970002, "name": "上进心", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "od": 5}]}
+        {"id": 2970002, "name": "上进心", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 5}]}
       ]
     }
   },
@@ -4908,7 +4908,7 @@
     "team": "31X", "tier": "S", "attack_type": "slash", "elements": ["fire"],
     "limit_break": {
       "3": [
-        {"id": 3310001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 0.3, "random": true}]}
+        {"id": 3310001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
       ],
       "10": [
         {"id": 3310002, "name": "斩之意志", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "attack_up", "target": "ally_front", "value": 10, "duration": {"type": "ally_turn", "value": 1}}]}
@@ -5053,7 +5053,7 @@
         {"id": 3400002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 3400003, "name": "时间锁链", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_healed_sp_without_self_heal", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_healed_sp_without_self_heal", "reference": "Passive.Start_SpUpOverDriveUp01_2"}, {"type": "resource", "target": "self", "od": 25}]}
+        {"id": 3400003, "name": "时间锁链", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_healed_sp_without_self_heal", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_healed_sp_without_self_heal", "reference": "Passive.Start_SpUpOverDriveUp01_2"}, {"type": "resource", "target": "od", "od": 25}]}
       ]
     },
     "support_skill": {"name": "Q.E.D.", "kind": "support", "trigger": "on_sp_up_by_active_skill", "effects": [{"type": "resource", "target": "od", "od": [5, 8, 10, 12, 15]}]}
@@ -5302,7 +5302,7 @@
     "team": "31X", "tier": "S", "attack_type": "stab", "elements": [],
     "limit_break": {
       "3": [
-        {"id": 3570001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 0.3, "random": true}]}
+        {"id": 3570001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
       ]
     }
   },
@@ -5419,10 +5419,10 @@
         {"id": 3640002, "name": "閃光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "2": [
-        {"id": 3640003, "name": "破竹の勢い(小)", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_breaking", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_breaking", "reference": "Passive.Break_OverDriveUp03_2"}, {"type": "resource", "target": "self", "od": 10}]}
+        {"id": 3640003, "name": "破竹の勢い(小)", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_breaking", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_breaking", "reference": "Passive.Break_OverDriveUp03_2"}, {"type": "resource", "target": "od", "od": 10}]}
       ],
       "3": [
-        {"id": 3640004, "name": "破竹の勢い[アビリティ強化]", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_breaking", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_breaking", "reference": "Passive.Break_OverDriveUp04_2"}, {"type": "resource", "target": "self", "od": 25}]}
+        {"id": 3640004, "name": "破竹の勢い[アビリティ強化]", "trigger": "on_first_battle_start", "effects": [{"type": "additional_hit_on_breaking", "target": "self", "duration": {"type": "permanent"}, "special_trigger": "additional_hit_on_breaking", "reference": "Passive.Break_OverDriveUp04_2"}, {"type": "resource", "target": "od", "od": 25}]}
       ]
     },
     "special": [
@@ -5447,7 +5447,7 @@
       ]
     },
     "special": [
-      {"type": "demonic_rage", "names": {"zh_cn": "鬼神状态", "zh_tw": "鬼神狀態", "jp": "鬼神"}, "trigger": "user_select", "uses": 3, "duration": {"type": "ally_turn", "value": 3}, "on_enter": [{"type": "resource", "target": "self", "od": 15}, {"type": "remove_debuff", "target": "self"}, {"type": "revive_dp_rate", "target": "self", "value": 100}], "effects": [{"type": "overwrite_sp", "target": "self", "sp": 0, "exclude": "use_all"}, {"type": "funnel", "target": "self", "mode": {"number": 3, "value": 25}, "solo": true}, {"type": "mind_eye", "target": "self", "value": 120, "solo": true}], "on_exit": [{"type": "recoil", "target": "self", "duration": {"type": "ally_turn", "value": 1}}]}
+      {"type": "demonic_rage", "names": {"zh_cn": "鬼神状态", "zh_tw": "鬼神狀態", "jp": "鬼神"}, "trigger": "user_select", "uses": 3, "duration": {"type": "ally_turn", "value": 3}, "on_enter": [{"type": "resource", "target": "od", "od": 15}, {"type": "remove_debuff", "target": "self"}, {"type": "revive_dp_rate", "target": "self", "value": 100}], "effects": [{"type": "overwrite_sp", "target": "self", "sp": 0, "exclude": "use_all"}, {"type": "funnel", "target": "self", "mode": {"number": 3, "value": 25}, "solo": true}, {"type": "mind_eye", "target": "self", "value": 120, "solo": true}], "on_exit": [{"type": "recoil", "target": "self", "duration": {"type": "ally_turn", "value": 1}}]}
     ]
   },
   "366": {
@@ -5566,7 +5566,7 @@
     "team": "31AB", "tier": "S", "attack_type": "strike", "elements": [],
     "limit_break": {
       "3": [
-        {"id": 3720001, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "od": 30, "random": true}]}
+        {"id": 3720001, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 30, "random": true}]}
       ],
       "10": [
         {"id": 3720002, "name": "佯攻战术", "trigger": "on_action_start", "trigger_condition": "dp_rate()<=0.3 and front()", "effects": [{"type": "attack_up", "target": "ally_front", "value": 30, "duration": {"type": "ally_turn", "value": 1}}]}
@@ -5598,7 +5598,7 @@
     "team": "31AB", "tier": "S", "attack_type": "strike", "elements": ["ice"],
     "limit_break": {
       "3": [
-        {"id": 3740001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 0.3, "random": true}]}
+        {"id": 3740001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
       ],
       "10": [
         {"id": 3740002, "name": "冰之指令", "trigger": "on_action_start", "trigger_condition": "dp_rate()>=0.8 and front()", "effects": [{"type": "attack_up", "target": "ally_front", "elements": ["ice"], "value": 18, "duration": {"type": "ally_turn", "value": 1}}]}
