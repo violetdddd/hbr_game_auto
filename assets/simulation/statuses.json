@@ -609,5 +609,8 @@
     "forced_one": true
   },
   "219": {"name": "reduce_consume_over_drive", "category": "buff", "removable": true},
-  "220": {"name": "additional_hit_on_debuff", "category": "buff"}
+  "220": {"name": "additional_hit_on_debuff", "category": "buff"},
+  "221": {"name": "reduce_consume_overdrive", "category": "rule"},
+  "222": {"name": "play_with_tama", "category": "buff"},
+  "223": {"name": "inscription", "category": "debuff"}
 }
