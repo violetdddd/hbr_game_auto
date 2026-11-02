@@ -123,7 +123,7 @@
     "team": "31A", "tier": "SS", "attack_type": "slash", "elements": [],
     "limit_break": {
       "0": [
-        {"id": 90001, "name": "灵魂共鸣", "trigger": "on_new_turn_start", "trigger_condition": "has(143)", "effects": [{"type": "resource", "target": "ally_front", "sp": 2}]}
+        {"id": 90001, "name": "灵魂共鸣", "trigger": "on_new_turn_start", "effects": [{"type": "resource", "target": "ally_front", "target_condition": "has(143)", "sp": 2}]}
       ],
       "1": [
         {"id": 90002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
