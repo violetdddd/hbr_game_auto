@@ -3829,7 +3829,7 @@
     "cost": {"sp": 0},
     "trigger": "on_battle_start",
     "effects": [
-      {"type": "overwrite_sp", "target": "self", "status_id": 175, "duration": {"type": "enemy_turn", "value": 2}, "sp": 8}
+      {"type": "overwrite_sp", "target": "self", "status_id": 175, "duration": {"type": "enemy_turn", "value": 2}, "skill_id": 256, "sp": 8}
     ]
   },
   "245": {
