@@ -62,7 +62,12 @@
         {"id": 50002, "name": "星空", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "critical_rate_up", "target": "ally_all", "value": 10, "duration": {"type": "ally_turn", "value": 1}}]}
       ]
     },
-    "support_skill": "SupportSkill_RKayamori01"
+    "support_skill": {
+      "name": "玫瑰热情",
+      "kind": "support",
+      "trigger": "on_battle_start",
+      "effects": {"type": "over_drive_rate_up", "target": "self", "duration": {"type": "permanent"}, "value": [3,4,5,6,7]}
+    }
   },
   "6": {
     "id": 6,
