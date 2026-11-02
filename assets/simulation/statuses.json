@@ -612,5 +612,6 @@
   "220": {"name": "additional_hit_on_debuff", "category": "buff"},
   "221": {"name": "reduce_consume_overdrive", "category": "rule"},
   "222": {"name": "play_with_tama", "category": "buff"},
-  "223": {"name": "inscription", "category": "debuff"}
+  "223": {"name": "inscription", "category": "debuff"},
+  "224": {"name": "always_persuit_sp8", "category": "rule"}
 }
