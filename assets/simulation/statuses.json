@@ -613,5 +613,8 @@
   "221": {"name": "reduce_consume_overdrive", "category": "rule"},
   "222": {"name": "play_with_tama", "category": "buff"},
   "223": {"name": "inscription", "category": "debuff"},
-  "224": {"name": "always_persuit_sp8", "category": "rule"}
+  "224": {"name": "always_persuit_sp8", "category": "rule"},
+  "225": {"name": "token_up_per_attack_enemy", "category": "rule"},
+  "226": {"name": "toughness_up_value_per_revenge_level", "category": "rule"},
+  "227": {"name": "double_attack_skill", "category": "rule"}
 }
