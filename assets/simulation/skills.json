@@ -38,7 +38,7 @@
     "cost": {"sp": 6},
     "target": "self",
     "effects": [
-      {"type": "dodge", "target": "self", "status_id": 121, "duration": {"type": "on_attack", "value": 2}},
+      {"type": "dodge", "target": "self", "status_id": 121, "value":100, "duration": {"type": "on_attack", "value": 2}},
       {"type": "resource", "target": "od", "od": 15}
     ]
   },
@@ -2362,7 +2362,7 @@
     "cost": {"sp": 9},
     "target": "ally_front",
     "effects": [
-      {"type": "dodge", "target": "ally_front", "status_id": 121, "duration": {"type": "use", "value": 1}}
+      {"type": "dodge", "target": "ally_front", "status_id": 121, "value": 50, "duration": {"type": "on_attack", "value": 1}}
     ]
   },
   "170": {
@@ -9453,7 +9453,8 @@
           "type": "dodge",
           "target": "self",
           "status_id": 121,
-          "duration": {"type": "use", "value": 2}
+          "value": 50,
+          "duration": {"type": "on_attack", "value": 2}
         }
       ],
       "no": [{"type": "attack", "target": "all", "attack_type": "slash"}]
