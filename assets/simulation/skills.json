@@ -11541,10 +11541,21 @@
     "hit_count": 2,
     "target": "all",
     "attack_type": "stab",
-    "effects": [
-      {"type": "resource", "target": "self", "sp": 3},
-      {"type": "attack", "target": "all", "attack_type": "stab"}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "stab"},
+          {"type": "resource", "target": "self", "sp": 3}
+        ],
+        "description": "回复3sp"
+      },
+      "2": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "stab"}
+        ],
+        "description": "不回复3sp"
+      }
+    }
   },
   "731": {
     "id": 731,
