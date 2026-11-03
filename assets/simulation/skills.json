@@ -3159,7 +3159,7 @@
   "212": {
     "id": 212,
     "names": {"zh_cn": "虚心·百步穿杨", "zh_tw": "虛心‧百步穿楊", "jp": "虚心・百歩穿楊"},
-    "conditions": {"effects": "chen_jin()"},
+    "conditions": {"effects": "has(228)"},
     "kind": "active",
     "ex_skill": true,
     "cost": {"sp": 13},
@@ -3207,6 +3207,30 @@
         {"type": "additional_turn", "target": "self", "status_id": 20}
       ]
     }
+  },
+  "2120001": {
+    "id": 2120001,
+    "names": {"zh_cn": "沉侵-雷", "zh_tw": "沉侵-雷", "jp": "没入-雷"},
+    "kind": "active",
+    "cost": {"sp": 0},
+    "target": "self",
+    "effects": [{"type": "immersion", "target": "self", "elements": ["thunder"], "duration": {"type": "use_immersion_ex"}, "status_id": 228}]
+  },
+  "2120002": {
+    "id": 2120002,
+    "names": {"zh_cn": "沉侵-光", "zh_tw": "沉侵-光", "jp": "没入-光"},
+    "kind": "active",
+    "cost": {"sp": 0},
+    "target": "self",
+    "effects": [{"type": "immersion", "target": "self", "elements": ["light"], "duration": {"type": "use_immersion_ex"}, "status_id": 228}]
+  },
+  "2120003": {
+    "id": 2120003,
+    "names": {"zh_cn": "沉侵-暗", "zh_tw": "沉侵-闇", "jp": "没入-闇"},
+    "kind": "active",
+    "cost": {"sp": 0},
+    "target": "self",
+    "effects": [{"type": "immersion", "target": "self", "elements": ["dark"], "duration": {"type": "use_immersion_ex"}, "status_id": 228}]
   },
   "213": {
     "id": 213,

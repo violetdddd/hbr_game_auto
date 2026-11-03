@@ -5433,20 +5433,20 @@
     "team": "19A", "tier": "SSR", "attack_type": "stab", "elements": ["void"],
     "limit_break": {
       "0": [
-        {"id": 3640001, "name": "機敏", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 2}]}
+        {"id": 3640001, "name": "机敏", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 2}]}
       ],
       "1": [
         {"id": 3640002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "2": [
-        {"id": 3640003, "name": "破竹の勢い(小)", "trigger": "on_break_enemy", "effects": [{"type": "resource", "target": "od", "od": 10}], "discard_limit_level": 3}
+        {"id": 3640003, "name": "势如破竹(小)", "trigger": "on_break_enemy", "effects": [{"type": "resource", "target": "od", "od": 10}], "discard_limit_level": 3}
       ],
       "3": [
-        {"id": 3640004, "name": "破竹の勢い[天赋强化]", "trigger": "on_break_enemy", "effects": [{"type": "resource", "target": "od", "od": 25}]}
+        {"id": 3640004, "name": "势如破竹[天赋强化]", "trigger": "on_break_enemy", "effects": [{"type": "resource", "target": "od", "od": 25}]}
       ]
     },
     "special": [
-      {"type": "immersion", "names": {"zh_cn": "沉浸狀態", "zh_tw": "沉浸狀態", "jp": "無念無想"}, "trigger": "user_select", "select_elements": ["thunder", "light", "dark"], "effects": [{"type": "add_attack_element", "target": "self", "elements": ["selected"]}, {"type": "overwrite_sp", "target": "self", "sp": 0, "exclude": "use_all", "status_id": 175}], "end_condition": "use_immersion_ex"}
+      {"type": "team_specific_skill", "names": {"zh_cn": "无念无想", "zh_tw": "無念無想", "jp": "無念無想"}, "trigger": "user_select", "select_elements": ["thunder", "light", "dark"]}
     ]
   },
   "365": {

@@ -615,5 +615,6 @@
   "224": {"name": "always_persuit_sp8", "category": "rule"},
   "225": {"name": "token_up_per_attack_enemy", "category": "rule"},
   "226": {"name": "toughness_up_value_per_revenge_level", "category": "rule"},
-  "227": {"name": "double_attack_skill", "category": "rule"}
+  "227": {"name": "double_attack_skill", "category": "rule"},
+  "228": {"name": "immersion", "category": "buff"}
 }
