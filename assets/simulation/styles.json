@@ -142,13 +142,13 @@
     "limit_break": {
       "0": [
         {"id": 100001, "name": "比赛开始", "trigger": "on_first_battle_start", "effects": [{"type": "motivation", "target": "ally_all", "duration": {"type": "permanent"}, "level": 1, "status_id": 174}]},
-        {"id": 100002, "name": "不屈之魂", "trigger": "on_enemy_turn_start", "trigger_condition": "level('motivation') == 5", "effects": [{"type": "debuff_guard", "target": "self", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 110}]}
+        {"id": 100002, "name": "不屈之魂", "trigger": "on_enemy_turn_start", "trigger_condition": "level(174) == 5", "effects": [{"type": "debuff_guard", "target": "self", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 110}]}
       ],
       "1": [
-        {"id": 100003, "name": "怪童", "trigger": "on_new_turn_start", "trigger_condition": "level('motivation') > 3", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
+        {"id": 100003, "name": "怪童", "trigger": "on_new_turn_start", "trigger_condition": "level(174) > 3", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 100004, "name": "特别组合", "trigger": "on_action_start", "trigger_condition": "team.count(level('motivation') >= 4) > 0", "effects": [{"type": "attack_up", "target": "ally_all", "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
+        {"id": 100004, "name": "特别组合", "trigger": "on_action_start", "trigger_condition": "team.count(level(174) >= 4) > 0", "effects": [{"type": "attack_up", "target": "ally_all", "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
       ]
     }
   },
@@ -159,7 +159,7 @@
     "team": "31A", "tier": "SSR", "attack_type": "slash", "elements": ["ice"],
     "limit_break": {
       "0": [
-        {"id": 110001, "name": "银冰之加护", "trigger": "on_enemy_turn_start", "effects": [{"type": "border_ref_p_down_by_admiral", "target": "all", "target_condition": "target.weak('ice')", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 188}]}
+        {"id": 110001, "name": "银冰之加护", "trigger": "on_enemy_turn_start", "effects": [{"type": "border_ref_p_down_by_admiral", "target": "all", "target_condition": "target.weak('ice')", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 186}]}
       ],
       "1": [
         {"id": 110002, "name": "冰天", "trigger": "on_first_battle_start", "effects": [{"type": "resource", "target": "ally_all", "sp_modify": -1, "target_condition": "target.element('ice')", "duration": {"type": "permanent"}}]}
@@ -1060,8 +1060,8 @@
     "team": "31B", "tier": "SSR", "attack_type": "strike", "elements": ["dark"],
     "limit_break": {
       "0": [
-        {"id": 680001, "name": "忘我", "trigger": "on_action_start", "trigger_condition": "level('morale')>=6", "effects": [{"type": "give_defense_debuff_up", "target": "self", "value": 25, "duration": {"type": "ally_turn", "value": 1}, "status_id": 94}]},
-        {"id": 680002, "name": "武运昌隆", "trigger": "on_action_start", "trigger_condition": "level('morale')>=6", "effects": [{"type": "zone_up_eternal_plus_15", "target": "self", "value": 15, "duration": {"type": "ally_turn", "value": 1}, "status_id": 126}]},
+        {"id": 680001, "name": "忘我", "trigger": "on_action_start", "trigger_condition": "level(119)>=6", "effects": [{"type": "give_defense_debuff_up", "target": "self", "value": 25, "duration": {"type": "ally_turn", "value": 1}, "status_id": 94}]},
+        {"id": 680002, "name": "武运昌隆", "trigger": "on_action_start", "trigger_condition": "level(119)>=6", "effects": [{"type": "zone_up_eternal_plus_15", "target": "self", "value": 15, "duration": {"type": "ally_turn", "value": 1}, "status_id": 126}]},
         {"id": 680003, "name": "暗之印", "trigger": "on_first_battle_start", "effects": [{"type": "element_mark", "target": "ally_all", "elements": ["dark"], "target_condition": "target.element('dark')", "duration": {"type": "permanent"}, "status_id": 166}]}
       ],
       "1": [
@@ -1085,7 +1085,7 @@
         {"id": 690002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 690003, "name": "冰岚之进击", "trigger": "on_first_battle_start", "trigger_condition": "level(166)>=6", "effects": [{"type": "resource", "target": "ally_all", "sp": 5}], "trigger_limit": 1}
+        {"id": 690003, "name": "冰岚之进击", "trigger": "on_new_turn_start", "trigger_condition": "mark_level('ice')>=6", "effects": [{"type": "resource", "target": "ally_all", "sp": 5}], "trigger_limit": 1}
       ]
     }
   },
@@ -1175,7 +1175,7 @@
         {"id": 750001, "name": "快速射击", "trigger": "on_action_start", "trigger_condition": "front() and not normal_attack() and skill_sp()<=8", "effects": [{"type": "attack_up", "target": "self", "value": 75, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
       ],
       "10": [
-        {"id": 750002, "name": "高涨的士气", "trigger": "on_new_turn_start", "trigger_condition": "level('morale')>=6 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
+        {"id": 750002, "name": "高涨的士气", "trigger": "on_new_turn_start", "trigger_condition": "level(119)>=6 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ]
     }
   },
@@ -1187,10 +1187,10 @@
     "limit_break": {
       "0": [
         {"id": 760001, "name": "比赛开始", "trigger": "on_first_battle_start", "effects": [{"type": "motivation", "target": "ally_all", "duration": {"type": "permanent"}, "level": 1, "status_id": 174}]},
-        {"id": 760002, "name": "明镜止水", "trigger": "on_enemy_turn_start", "trigger_condition": "level('motivation') == 5", "effects": [{"type": "debuff_guard", "target": "self", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 110}]}
+        {"id": 760002, "name": "明镜止水", "trigger": "on_enemy_turn_start", "trigger_condition": "level(174) == 5", "effects": [{"type": "debuff_guard", "target": "self", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 110}]}
       ],
       "1": [
-        {"id": 760003, "name": "干劲极佳的少女", "trigger": "on_new_turn_start", "effects": [{"type": "resource", "target": "ally_all", "sp": 1, "target_condition": "target.level('motivation') == 5"}]}
+        {"id": 760003, "name": "干劲极佳的少女", "trigger": "on_new_turn_start", "effects": [{"type": "resource", "target": "ally_all", "sp": 1, "target_condition": "target.level(174) == 5"}]}
       ],
       "3": [
         {"id": 760004, "name": "特别组合", "trigger": "on_action_start", "effects": [{"type": "attack_up", "target": "ally_all", "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
@@ -1332,7 +1332,7 @@
         {"id": 850001, "name": "烈風", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "attack_up", "target": "self", "value": 30, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
       ],
       "10": [
-        {"id": 850002, "name": "高昂士气", "trigger": "on_new_turn_start", "trigger_condition": "level('morale')>=6 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
+        {"id": 850002, "name": "高昂士气", "trigger": "on_new_turn_start", "trigger_condition": "level(119)>=6 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ]
     }
   },
@@ -1499,7 +1499,7 @@
     "team": "31B", "tier": "SS", "attack_type": "slash", "elements": [],
     "limit_break": {
       "0": [
-        {"id": 970001, "name": "高涨的士气", "trigger": "on_new_turn_start", "trigger_condition": "level('morale')>=6 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
+        {"id": 970001, "name": "高涨的士气", "trigger": "on_new_turn_start", "trigger_condition": "level(119)>=6 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "1": [
         {"id": 970002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -2436,10 +2436,10 @@
     "limit_break": {
       "0": [
         {"id": 1600001, "name": "乘胜追击", "trigger": "on_additional_turn_start", "effects": [{"type": "token", "target": "self", "level": 2}]},
-        {"id": 1600002, "name": "奋起", "trigger": "on_action_start", "effects": [{"type": "damage_rate_up_per_token", "target": "ally_all", "value": 3, "duration": {"type": "ally_turn", "value": 1}, "status_id": 149}]}
+        {"id": 1600002, "name": "奋起", "trigger": "on_action_start", "effects": [{"type": "damage_rate_up_per_token", "target": "ally_all", "value": 3, "duration": {"type": "ally_turn", "value": 1}, "status_id": 148}]}
       ],
       "1": [
-        {"id": 1600003, "name": "胜势", "trigger": "on_new_turn_start", "trigger_condition": "team.count(token()>3)>0", "effects": [{"type": "resource", "target": "ally_all", "sp": 1, "target_condition": "target.token()>3"}]}
+        {"id": 1600003, "name": "胜势", "trigger": "on_new_turn_start", "effects": [{"type": "resource", "target": "ally_all", "sp": 1, "target_condition": "target.token()>3"}]}
       ],
       "3": [
         {"id": 1600004, "name": "激励", "trigger": "on_action_start", "effects": [{"type": "attack_up_per_token", "target": "ally_all", "value": 3, "duration": {"type": "ally_turn", "value": 1}, "status_id": 27}]}
@@ -2467,7 +2467,7 @@
     "team": "30G", "tier": "SSR", "attack_type": "slash", "elements": ["fire"],
     "limit_break": {
       "0": [
-        {"id": 1620001, "name": "灼热之加护", "trigger": "on_enemy_turn_start", "effects": [{"type": "border_ref_p_down_by_admiral", "target": "all", "target_condition": "target.weak('fire')", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 188}]}
+        {"id": 1620001, "name": "灼热之加护", "trigger": "on_enemy_turn_start", "effects": [{"type": "border_ref_p_down_by_admiral", "target": "all", "target_condition": "target.weak('fire')", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 186}]}
       ],
       "1": [
         {"id": 1620002, "name": "火天", "trigger": "on_first_battle_start", "effects": [{"type": "resource", "target": "ally_all", "sp_modify": -1, "target_condition": "target.element('fire')", "duration": {"type": "permanent"}}]}
@@ -2526,7 +2526,7 @@
     "team": "30G", "tier": "SS", "attack_type": "strike", "elements": ["light"],
     "limit_break": {
       "0": [
-        {"id": 1660001, "name": "战功", "trigger": "on_first_battle_start", "effects": [{"type": "token", "target": "self", "level": 1}]}
+        {"id": 1660001, "name": "战功", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "token_up_per_attack_enemy", "target": "self", "level": 1, "status_id": 225}]}
       ],
       "1": [
         {"id": 1660002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -2543,8 +2543,8 @@
     "team": "30G", "tier": "SS", "attack_type": "strike", "elements": ["light"],
     "limit_break": {
       "0": [
-        {"id": 1670001, "name": "战功", "trigger": "on_first_battle_start", "effects": [{"type": "token", "target": "self", "level": 1}]},
-        {"id": 1670002, "name": "二度绽放", "trigger": "after_ex_use", "trigger_condition": "not has(20)", "effects": [{"type": "additional_turn", "target": "self", "value": 1}]}
+        {"id": 1670001, "name": "战功", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "token_up_per_attack_enemy", "target": "self", "level": 1, "status_id": 225}]},
+        {"id": 1670002, "name": "二度绽放", "trigger": "after_ex_use", "effects": [{"type": "additional_turn", "target": "self", "target_condition": "not has(20)"}]}
       ],
       "1": [
         {"id": 1670003, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -2612,7 +2612,7 @@
         {"id": 1720001, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 1720002, "name": "灾难", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "misfortune", "target": "all", "value": 2, "duration": {"type": "enemy_turn", "value": 1}, "status_id": 58}]}
+        {"id": 1720002, "name": "灾难", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "misfortune", "target": "all", "duration": {"type": "enemy_turn", "value": 2}, "status_id": 58}]}
       ]
     }
   },
@@ -2643,7 +2643,7 @@
         {"id": 1740002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 1740003, "name": "徒樱之一箭", "trigger": "on_battle_start", "effects": [{"type": "arrow_cherry_blossoms", "target": "self", "value": 0.5, "duration": {"type": "use", "value": 1}, "status_id": 120}]}
+        {"id": 1740003, "name": "徒樱之一箭", "trigger": "on_battle_start", "effects": [{"type": "arrow_cherry_blossoms", "target": "self", "duration": {"type": "use_debuff", "value": 1}, "status_id": 120}]}
       ]
     },
     "support_skill": {"name": "Faith", "kind": "support", "trigger": "on_first_battle_start", "effects": [{"type": "morale", "target": "self", "duration": {"type": "permanent"}, "value": [1, 2, 3, 4, 5], "status_id": 119}]}
@@ -2675,7 +2675,7 @@
         {"id": 1760002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 1760003, "name": "猛火进击", "trigger": "on_new_turn_start", "trigger_condition": "FireMarkLevel()>=6", "effects": [{"type": "resource", "target": "ally_all", "sp": 5}], "trigger_limit": 1}
+        {"id": 1760003, "name": "猛火进击", "trigger": "on_new_turn_start", "trigger_condition": "mark_level('fire')>=6", "effects": [{"type": "resource", "target": "ally_all", "sp": 5}], "trigger_limit": 1}
       ]
     }
   },
@@ -2725,7 +2725,7 @@
         {"id": 1800001, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 1800002, "name": "锐气", "trigger": "on_action_start", "trigger_condition": "front() and enemy.count(not dead() and has(12))>0 or enemy.count(not dead() and has(57))>0", "effects": [{"type": "attack_up", "target": "self", "value": 30, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
+        {"id": 1800002, "name": "锐气", "trigger": "on_action_start", "trigger_condition": "front() and ( enemy.count(has(12))>0 or enemy.count(has(57))>0 )", "effects": [{"type": "attack_up", "target": "self", "value": 30, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
       ]
     }
   },
@@ -2768,7 +2768,7 @@
     "team": "30G", "tier": "SS", "attack_type": "strike", "elements": ["light"],
     "limit_break": {
       "0": [
-        {"id": 1830001, "name": "战功", "trigger": "on_first_battle_start", "effects": [{"type": "token", "target": "self", "level": 1}]}
+        {"id": 1830001, "name": "战功", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "token_up_per_attack_enemy", "target": "self", "level": 1, "status_id": 225}]}
       ],
       "1": [
         {"id": 1830002, "name": "内在力量", "trigger": "on_new_turn_start", "effects": [{"type": "token", "target": "self", "level": 1}]}
@@ -2786,16 +2786,16 @@
     "team": "30G", "tier": "SSR", "attack_type": "strike", "elements": ["fire"],
     "limit_break": {
       "0": [
-        {"id": 1840001, "name": "フォトジェニック", "trigger": "on_additional_turn_start", "effects": [{"type": "token", "target": "self", "level": 1}]}
+        {"id": 1840001, "name": "美拍热点", "trigger": "on_additional_turn_start", "effects": [{"type": "token", "target": "self", "level": 1}]}
       ],
       "1": [
         {"id": 1840002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "2": [
-        {"id": 1840003, "name": "小悪魔スマイル(小)", "trigger": "on_additional_turn_start", "effects": [{"type": "morale", "target": "self", "level": 1, "duration": {"type": "permanent"}, "status_id": 119}], "discard_limit_level": 3}
+        {"id": 1840003, "name": "小恶魔微笑(小)", "trigger": "on_additional_turn_start", "effects": [{"type": "morale", "target": "self", "level": 1, "duration": {"type": "permanent"}, "status_id": 119}], "discard_limit_level": 3}
       ],
       "3": [
-        {"id": 1840004, "name": "小悪魔スマイル[アビリティ強化]", "trigger": "on_additional_turn_start", "effects": [{"type": "morale", "target": "ally_all", "level": 1, "duration": {"type": "permanent"}, "status_id": 119}]}
+        {"id": 1840004, "name": "小恶魔微笑[天赋强化]", "trigger": "on_additional_turn_start", "effects": [{"type": "morale", "target": "ally_all", "level": 1, "duration": {"type": "permanent"}, "status_id": 119}]}
       ]
     }
   },
@@ -2909,10 +2909,10 @@
         {"id": 1920001, "name": "比赛开始", "trigger": "on_first_battle_start", "effects": [{"type": "motivation", "target": "ally_all", "duration": {"type": "permanent"}, "level": 1, "status_id": 174}]}
       ],
       "3": [
-        {"id": 1920002, "name": "球界头脑", "trigger": "on_new_turn_start", "trigger_condition": "level('motivation') >= 4", "effects": [{"type": "resource", "target": "od", "od": 10}]}
+        {"id": 1920002, "name": "球界头脑", "trigger": "on_new_turn_start", "trigger_condition": "level(174) >= 4", "effects": [{"type": "resource", "target": "od", "od": 10}]}
       ],
       "10": [
-        {"id": 1920003, "name": "干劲极佳的少女", "trigger": "on_new_turn_start", "effects": [{"type": "resource", "target": "ally_all", "sp": 1, "target_condition": "target.level('motivation') == 5"}]}
+        {"id": 1920003, "name": "干劲极佳的少女", "trigger": "on_new_turn_start", "effects": [{"type": "resource", "target": "ally_all", "sp": 1, "target_condition": "target.level(174) == 5"}]}
       ]
     }
   },
@@ -3118,7 +3118,7 @@
     "team": "31D", "tier": "SSR", "attack_type": "strike", "elements": ["dark"],
     "limit_break": {
       "0": [
-        {"id": 2070001, "name": "漆黒の加護", "trigger": "on_enemy_turn_start", "effects": [{"type": "border_ref_p_down_by_admiral", "target": "all", "target_condition": "target.weak('dark')", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 188}]}
+        {"id": 2070001, "name": "漆黒の加護", "trigger": "on_enemy_turn_start", "effects": [{"type": "border_ref_p_down_by_admiral", "target": "all", "target_condition": "target.weak('dark')", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 186}]}
       ],
       "1": [
         {"id": 2070002, "name": "闇天", "trigger": "on_first_battle_start", "effects": [{"type": "resource", "target": "ally_all", "sp_modify": -1, "target_condition": "target.element('dark')", "duration": {"type": "permanent"}}]}
@@ -3737,7 +3737,7 @@
     "team": "31E", "tier": "SSR", "attack_type": "strike", "elements": ["light"],
     "limit_break": {
       "0": [
-        {"id": 2490001, "name": "白光の加護", "trigger": "on_enemy_turn_start", "effects": [{"type": "border_ref_p_down_by_admiral", "target": "all", "target_condition": "target.weak('light')", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 188}]}
+        {"id": 2490001, "name": "白光の加護", "trigger": "on_enemy_turn_start", "effects": [{"type": "border_ref_p_down_by_admiral", "target": "all", "target_condition": "target.weak('light')", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 186}]}
       ],
       "1": [
         {"id": 2490002, "name": "光天", "trigger": "on_first_battle_start", "effects": [{"type": "resource", "target": "ally_all", "sp_modify": -1, "target_condition": "target.element('light')", "duration": {"type": "permanent"}}]}
@@ -4107,7 +4107,7 @@
     "limit_break": {
       "0": [
         {"id": 2740001, "name": "魅惑的一滴", "trigger": "on_battle_start", "effects": [{"type": "mocktail", "target": "self", "value": 0.3, "status_id": 179}, {"type": "mocktail", "target": "ally_front_without_self", "value": 0.3, "target_condition": "target.element('dark')", "status_id": 179}]},
-        {"id": 2740002, "name": "战功", "trigger": "on_first_battle_start", "effects": [{"type": "token", "target": "self", "level": 1}]}
+        {"id": 2740002, "name": "战功", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "token_up_per_attack_enemy", "target": "self", "level": 1, "status_id": 225}]}
       ],
       "1": [
         {"id": 2740003, "name": "内在力量", "trigger": "on_new_turn_start", "effects": [{"type": "token", "target": "self", "level": 1}]}
@@ -5497,7 +5497,7 @@
     "team": "Command", "tier": "SSR", "attack_type": "stab", "elements": ["thunder"],
     "limit_break": {
       "0": [
-        {"id": 3670001, "name": "雷光之加护", "trigger": "on_enemy_turn_start", "effects": [{"type": "border_ref_p_down_by_admiral", "target": "all", "target_condition": "target.weak('thunder')", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 188}]},
+        {"id": 3670001, "name": "雷光之加护", "trigger": "on_enemy_turn_start", "effects": [{"type": "border_ref_p_down_by_admiral", "target": "all", "target_condition": "target.weak('thunder')", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 186}]},
         {"id": 3670002, "name": "超速档", "trigger": "on_overdrive_start", "effects": [{"type": "ep_limit_overwrite", "target": "self", "value": 20, "duration": {"type": "od_end"}, "status_id": 189}, {"type": "resource", "target": "self", "ep": 5}]}
       ],
       "1": [
