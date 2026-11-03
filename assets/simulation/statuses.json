@@ -582,11 +582,10 @@
   },
   "202": {"name": "dim_sum", "category": "buff", "removable": true, "forced_one": true},
   "203": {"name": "additional_hit_on_extra_skill_all", "category": "buff"},
-  "204": {"name": "summers_end_territory", "category": "none", "forced_one": true},
+  "204": {"name": "summers_end_territory", "category": "territory", "forced_one": true},
   "205": {
-    "name": "attack_up_range_by_all_damage_rate",
-    "category": "buff",
-    "removable": true,
+    "name": "remove_summers_end_territory",
+    "category": "territory",
     "forced_one": true
   },
   "206": {"name": "light_mark", "category": "buff", "removable": true, "forced_one": true},
