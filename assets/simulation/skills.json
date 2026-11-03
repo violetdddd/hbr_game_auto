@@ -882,10 +882,21 @@
     "hit_count": 2,
     "target": "all",
     "attack_type": "slash",
-    "effects": [
-      {"type": "resource", "target": "self", "sp": 3},
-      {"type": "attack", "target": "all", "attack_type": "slash"}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "slash"},
+          {"type": "resource", "target": "self", "sp": 3}
+        ],
+        "description": "回复3sp"
+      },
+      "2": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "slash"}
+        ],
+        "description": "不回复3sp"
+      }
+    }
   },
   "70": {
     "id": 70,
@@ -3463,10 +3474,21 @@
     "hit_count": 1,
     "target": "single",
     "attack_type": "stab",
-    "effects": [
-      {"type": "attack", "target": "single", "attack_type": "stab"},
-      {"type": "resource", "target": "self", "sp": 2}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "attack", "target": "single", "attack_type": "stab"},
+          {"type": "resource", "target": "self", "sp": 2}
+        ],
+        "description": "回复2sp"
+      },
+      "2": {
+        "effects": [
+          {"type": "attack", "target": "single", "attack_type": "stab"}
+        ],
+        "description": "不回复2sp"
+      }
+    }
   },
   "232": {
     "id": 232,
@@ -5558,10 +5580,21 @@
     "target": "all",
     "attack_type": "slash",
     "elements": ["thunder"],
-    "effects": [
-      {"type": "resource", "target": "self", "sp": 3},
-      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["thunder"]}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["thunder"]},
+          {"type": "resource", "target": "self", "sp": 3}
+        ],
+        "description": "回复3sp"
+      },
+      "2": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["thunder"]}
+        ],
+        "description": "不回复3sp"
+      }
+    }
   },
   "358": {
     "id": 358,
@@ -5585,10 +5618,21 @@
     "target": "all",
     "attack_type": "slash",
     "elements": ["fire"],
-    "effects": [
-      {"type": "resource", "target": "self", "sp": 3},
-      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["fire"]}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["fire"]},
+          {"type": "resource", "target": "self", "sp": 3}
+        ],
+        "description": "回复3sp"
+      },
+      "2": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["fire"]}
+        ],
+        "description": "不回复3sp"
+      }
+    }
   },
   "360": {
     "id": 360,
@@ -6630,10 +6674,21 @@
     "hit_count": 3,
     "target": "single",
     "attack_type": "stab",
-    "effects": [
-      {"type": "attack", "target": "single", "attack_type": "stab"},
-      {"type": "resource", "target": "self", "sp": 3}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "attack", "target": "single", "attack_type": "stab"},
+          {"type": "resource", "target": "self", "sp": 3}
+        ],
+        "description": "回复3sp"
+      },
+      "2": {
+        "effects": [
+          {"type": "attack", "target": "single", "attack_type": "stab"}
+        ],
+        "description": "不回复3sp"
+      }
+    }
   },
   "426": {
     "id": 426,
@@ -7401,10 +7456,21 @@
     "hit_count": 1,
     "target": "single",
     "attack_type": "stab",
-    "effects": [
-      {"type": "attack", "target": "single", "attack_type": "stab"},
-      {"type": "resource", "target": "self", "sp": 3}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "attack", "target": "single", "attack_type": "stab"},
+          {"type": "resource", "target": "self", "sp": 3}
+        ],
+        "description": "回复3sp"
+      },
+      "2": {
+        "effects": [
+          {"type": "attack", "target": "single", "attack_type": "stab"}
+        ],
+        "description": "不回复3sp"
+      }
+    }
   },
   "470": {
     "id": 470,
@@ -7552,10 +7618,21 @@
     "target": "all",
     "attack_type": "strike",
     "elements": ["fire"],
-    "effects": [
-      {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"]},
-      {"type": "resource", "target": "self", "sp": 3}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"]},
+          {"type": "resource", "target": "self", "sp": 3}
+        ],
+        "description": "回复3sp"
+      },
+      "2": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"]}
+        ],
+        "description": "不回复3sp"
+      }
+    }
   },
   "483": {
     "id": 483,
@@ -7847,10 +7924,21 @@
     "hit_count": 3,
     "target": "all",
     "attack_type": "stab",
-    "effects": [
-      {"type": "attack", "target": "all", "attack_type": "stab"},
-      {"type": "resource", "target": "self", "sp": 3}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "stab"},
+          {"type": "resource", "target": "self", "sp": 3}
+        ],
+        "description": "回复3sp"
+      },
+      "2": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "stab"}
+        ],
+        "description": "不回复3sp"
+      }
+    }
   },
   "502": {
     "id": 502,
@@ -8094,10 +8182,21 @@
     "hit_count": 4,
     "target": "single",
     "attack_type": "slash",
-    "effects": [
-      {"type": "attack", "target": "single", "attack_type": "slash"},
-      {"type": "resource", "target": "self", "sp": 2}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "attack", "target": "single", "attack_type": "slash"},
+          {"type": "resource", "target": "self", "sp": 2}
+        ],
+        "description": "回复2sp"
+      },
+      "2": {
+        "effects": [
+          {"type": "attack", "target": "single", "attack_type": "slash"}
+        ],
+        "description": "不回复2sp"
+      }
+    }
   },
   "521": {
     "id": 521,
@@ -8725,10 +8824,21 @@
     "hit_count": 3,
     "target": "single",
     "attack_type": "stab",
-    "effects": [
-      {"type": "attack", "target": "single", "attack_type": "stab"},
-      {"type": "resource", "target": "self", "sp": 2}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "attack", "target": "single", "attack_type": "stab"},
+          {"type": "resource", "target": "self", "sp": 2}
+        ],
+        "description": "回复2sp"
+      },
+      "2": {
+        "effects": [
+          {"type": "attack", "target": "single", "attack_type": "stab"}
+        ],
+        "description": "不回复2sp"
+      }
+    }
   },
   "559": {
     "id": 559,
@@ -8902,10 +9012,21 @@
     "hit_count": 3,
     "target": "all",
     "attack_type": "slash",
-    "effects": [
-      {"type": "resource", "target": "self", "sp": 3},
-      {"type": "attack", "target": "all", "attack_type": "slash"}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "slash"},
+          {"type": "resource", "target": "self", "sp": 3}
+        ],
+        "description": "回复3sp"
+      },
+      "2": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "slash"}
+        ],
+        "description": "不回复3sp"
+      }
+    }
   },
   "571": {
     "id": 571,
@@ -9118,10 +9239,21 @@
     "target": "all",
     "attack_type": "stab",
     "elements": ["fire"],
-    "effects": [
-      {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["fire"]},
-      {"type": "resource", "target": "self", "sp": 3}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["fire"]},
+          {"type": "resource", "target": "self", "sp": 3}
+        ],
+        "description": "回复3sp"
+      },
+      "2": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["fire"]}
+        ],
+        "description": "不回复3sp"
+      }
+    }
   },
   "584": {
     "id": 584,
@@ -9863,10 +9995,21 @@
     "hit_count": 3,
     "target": "all",
     "attack_type": "slash",
-    "effects": [
-      {"type": "resource", "target": "self", "sp": 3},
-      {"type": "attack", "target": "all", "attack_type": "slash"}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "slash"},
+          {"type": "resource", "target": "self", "sp": 3}
+        ],
+        "description": "回复3sp"
+      },
+      "2": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "slash"}
+        ],
+        "description": "不回复3sp"
+      }
+    }
   },
   "636": {
     "id": 636,
@@ -10063,10 +10206,21 @@
     "hit_count": 1,
     "target": "single",
     "attack_type": "stab",
-    "effects": [
-      {"type": "resource", "target": "self", "sp": 3},
-      {"type": "attack", "target": "single", "attack_type": "stab"}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "attack", "target": "single", "attack_type": "stab"},
+          {"type": "resource", "target": "self", "sp": 3}
+        ],
+        "description": "回复3sp"
+      },
+      "2": {
+        "effects": [
+          {"type": "attack", "target": "single", "attack_type": "stab"}
+        ],
+        "description": "不回复3sp"
+      }
+    }
   },
   "652": {
     "id": 652,
@@ -11104,10 +11258,21 @@
     "hit_count": 3,
     "target": "all",
     "attack_type": "slash",
-    "effects": [
-      {"type": "attack", "target": "all", "attack_type": "slash"},
-      {"type": "resource", "target": "self", "sp": 3}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "slash"},
+          {"type": "resource", "target": "self", "sp": 3}
+        ],
+        "description": "回复3sp"
+      },
+      "2": {
+        "effects": [
+          {"type": "attack", "target": "all", "attack_type": "slash"}
+        ],
+        "description": "不回复3sp"
+      }
+    }
   },
   "716": {
     "id": 716,
