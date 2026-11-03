@@ -1042,7 +1042,7 @@
     "limit_break": {
       "0": [
         {"id": 670001, "name": "协心", "trigger": "on_first_battle_start", "effects": [{"type": "skill_limit_count_up", "target": "ally_all", "value": 1, "duration": {"type": "permanent"}, "status_id": 48}]},
-        {"id": 670002, "name": "戦陣", "trigger": "on_action_start", "effects": [{"type": "attack_up", "target": "ally_all", "target_condition": "target.skill_sp()<=10", "value": 50, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
+        {"id": 670002, "name": "戦陣", "trigger": "on_action_start", "effects": [{"type": "attack_up", "target": "ally_all", "target_condition": "not target.normal_attack() and target.skill_sp()<=10", "value": 50, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
       ],
       "1": [
         {"id": 670003, "name": "苍天", "trigger": "on_first_battle_start", "effects": [{"type": "resource", "target": "ally_all", "sp_modify": -1, "duration": {"type": "permanent"}}]}
@@ -1172,7 +1172,7 @@
     "team": "31B", "tier": "S", "attack_type": "stab", "elements": [],
     "limit_break": {
       "3": [
-        {"id": 750001, "name": "快速射击", "trigger": "on_action_start", "trigger_condition": "front() and skill_sp()<=8", "effects": [{"type": "attack_up", "target": "self", "value": 75, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
+        {"id": 750001, "name": "快速射击", "trigger": "on_action_start", "trigger_condition": "front() and not normal_attack() and skill_sp()<=8", "effects": [{"type": "attack_up", "target": "self", "value": 75, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
       ],
       "10": [
         {"id": 750002, "name": "高涨的士气", "trigger": "on_new_turn_start", "trigger_condition": "level('morale')>=6 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -1720,7 +1720,7 @@
         {"id": 1120002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 1120003, "name": "最终手段", "trigger": "on_new_turn_start", "trigger_condition": "enemy.count(not dead() and broken() and damage_rate()>=200.0)>0", "effects": [{"type": "resource", "target": "ally_all", "sp": 5}], "trigger_limit": 1}
+        {"id": 1120003, "name": "最终手段", "trigger": "on_new_turn_start", "trigger_condition": "False and damage_rate()>=200.0)>0", "effects": [{"type": "resource", "target": "ally_all", "sp": 5}], "trigger_limit": 1}
       ]
     }
   },
@@ -1731,21 +1731,21 @@
     "team": "31C", "tier": "SSR", "attack_type": "slash", "elements": ["dark"],
     "limit_break": {
       "0": [
-        {"id": 1130001, "name": "魔王大人降临！", "trigger": "on_first_battle_start", "effects": [{"type": "b_i_yamawaki_servant", "target": "self", "value": 0.4, "duration": {"type": "permanent"}, "status_id": 154}]},
-        {"id": 1130002, "name": "魔界骑兵启动！", "trigger": "on_battle_start", "effects": [{"type": "special_command_count_up", "target": "self", "value": 3, "reference": "BIYamawakiSkill55b"}], "trigger_limit": 1}
+        {"id": 1130001, "name": "魔王大人降临！", "trigger": "on_first_battle_start", "effects": [{"type": "b_i_yamawaki_servant", "target": "self", "duration": {"type": "permanent"}, "status_id": 154}]},
+        {"id": 1130002, "name": "魔界骑兵启动！", "trigger": "on_battle_start", "effects": [{"type": "demon_cavalry", "target": "self", "value": 3}]}
       ],
       "1": [
-        {"id": 1130003, "name": "开始进军！", "trigger": "on_new_turn_start", "trigger_condition": "team.count(has(154))>0", "effects": [{"type": "resource", "target": "ally_all", "sp": 1, "target_condition": "target.has(154)"}]}
+        {"id": 1130003, "name": "开始进军！", "trigger": "on_new_turn_start", "effects": [{"type": "resource", "target": "ally_all", "sp": 1, "target_condition": "target.has(154)"}]}
       ],
       "3": [
-        {"id": 1130004, "name": "你们几个，动手吧！", "trigger": "on_action_start", "trigger_condition": "team.count(not normal_attack() and skill_sp()<=8)>0", "effects": [{"type": "attack_up", "target": "ally_all", "value": 100, "target_condition": "not target.normal_attack() and target.skill_sp()<=8", "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
+        {"id": 1130004, "name": "你们几个，动手吧！", "trigger": "on_action_start", "effects": [{"type": "attack_up", "target": "ally_all", "value": 100, "target_condition": "not target.normal_attack() and target.skill_sp()<=8", "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
       ],
       "4": [
         {"id": 1130005, "name": "魔王军的大攻势！", "trigger": "on_new_turn_start", "trigger_condition": "team.count(has(154))>=6", "effects": [{"type": "resource", "target": "od", "od": 100}], "trigger_limit": 1}
       ]
     },
     "special": [
-      {"type": "demon_cavalry", "names": {"zh_cn": "魔界骑兵", "zh_tw": "魔界騎兵", "jp": "魔界騎兵"}, "trigger": "on_battle_start", "uses": 3, "action": "special_command"}
+      {"type": "demon_cavalry", "names": {"zh_cn": "魔界骑兵启动", "zh_tw": "魔界騎兵", "jp": "魔界騎兵"}, "trigger": "on_battle_start", "uses": 3, "action": "special_command"}
     ]
   },
   "114": {
@@ -1755,10 +1755,10 @@
     "team": "31C", "tier": "SS", "attack_type": "slash", "elements": [],
     "limit_break": {
       "1": [
-        {"id": 1140001, "name": "魔王大人降临！", "trigger": "on_first_battle_start", "effects": [{"type": "b_i_yamawaki_servant", "target": "self", "value": 0.4, "duration": {"type": "permanent"}, "status_id": 154}]}
+        {"id": 1140001, "name": "魔王大人降临！", "trigger": "on_first_battle_start", "effects": [{"type": "b_i_yamawaki_servant", "target": "self", "duration": {"type": "permanent"}, "status_id": 154}]}
       ],
       "3": [
-        {"id": 1140002, "name": "开始进军！", "trigger": "on_new_turn_start", "trigger_condition": "team.count(has(154))>0", "effects": [{"type": "resource", "target": "ally_all", "sp": 1, "target_condition": "target.has(154)"}]}
+        {"id": 1140002, "name": "开始进军！", "trigger": "on_new_turn_start", "effects": [{"type": "resource", "target": "ally_all", "sp": 1, "target_condition": "target.has(154)"}]}
       ]
     },
     "support_skill": {"name": "忠义", "kind": "support", "trigger": "on_first_battle_start", "effects": [{"type": "b_i_yamawaki_servant", "target": "self", "duration": {"type": "permanent"}, "value": [40, 40, 40, 40, 40], "status_id": 154}, {"type": "defense_up", "target": "self", "duration": {"type": "permanent"}, "value": [10, 11, 12, 13, 15], "status_id": 4}]}
@@ -1852,7 +1852,7 @@
     "limit_break": {
       "0": [
         {"id": 1210001, "name": "机敏", "trigger": "on_battle_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 2}]},
-        {"id": 1210002, "name": "……我是魔王大人直属的大魔法师", "trigger": "on_first_battle_start", "effects": [{"type": "b_i_yamawaki_servant", "target": "self", "value": 0.4, "duration": {"type": "permanent"}, "status_id": 154}]}
+        {"id": 1210002, "name": "……我是魔王大人直属的大魔法师", "trigger": "on_first_battle_start", "effects": [{"type": "b_i_yamawaki_servant", "target": "self", "duration": {"type": "permanent"}, "status_id": 154}]}
       ],
       "1": [
         {"id": 1210003, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -1935,7 +1935,7 @@
     "team": "31C", "tier": "SS", "attack_type": "stab", "elements": ["dark"],
     "limit_break": {
       "0": [
-        {"id": 1270001, "name": "吾是魔王大人直属的死灵法师！", "trigger": "on_first_battle_start", "effects": [{"type": "b_i_yamawaki_servant", "target": "self", "value": 0.4, "duration": {"type": "permanent"}, "status_id": 154}]},
+        {"id": 1270001, "name": "吾是魔王大人直属的死灵法师！", "trigger": "on_first_battle_start", "effects": [{"type": "b_i_yamawaki_servant", "target": "self", "duration": {"type": "permanent"}, "status_id": 154}]},
         {"id": 1270002, "name": "死灵的低语", "trigger": "on_battle_start", "trigger_condition": "not front()", "effects": [{"type": "resource", "target": "ally_front", "sp": 1}]}
       ],
       "1": [
@@ -2036,14 +2036,14 @@
     "team": "31C", "tier": "SSR", "attack_type": "stab", "elements": [],
     "limit_break": {
       "0": [
-        {"id": 1340001, "name": "帮忙毁灭世界的说！", "trigger": "on_new_turn_start", "trigger_condition": "team.count(has(154))>0", "effects": [{"type": "resource", "target": "ally_all", "sp": 1, "target_condition": "target.has(154)"}]},
-        {"id": 1340002, "name": "本使魔是直属的使魔的说！", "trigger": "on_first_battle_start", "effects": [{"type": "b_i_yamawaki_servant", "target": "self", "value": 0.4, "duration": {"type": "permanent"}, "status_id": 154}]}
+        {"id": 1340001, "name": "帮忙毁灭世界的说！", "trigger": "on_new_turn_start", "effects": [{"type": "resource", "target": "ally_all", "sp": 1, "target_condition": "target.has(154)"}]},
+        {"id": 1340002, "name": "本使魔是直属的使魔的说！", "trigger": "on_first_battle_start", "effects": [{"type": "b_i_yamawaki_servant", "target": "self", "duration": {"type": "permanent"}, "status_id": 154}]}
       ],
       "1": [
-        {"id": 1340003, "name": "邪恶军团是最强的说！", "trigger": "on_action_start", "trigger_condition": "team.count(not normal_attack() and skill_sp()<=8)>0", "effects": [{"type": "attack_up", "target": "ally_all", "value": 100, "target_condition": "not target.normal_attack() and target.skill_sp()<=8", "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
+        {"id": 1340003, "name": "邪恶军团是最强的说！", "trigger": "on_action_start", "effects": [{"type": "attack_up", "target": "ally_all", "value": 100, "target_condition": "not target.normal_attack() and target.skill_sp()<=8", "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
       ],
       "3": [
-        {"id": 1340004, "name": "俯首称臣的说！", "trigger": "on_break_enemy", "effects": [{"type": "break_down_turn_up", "target": "none", "value": 1, "duration": {"type": "use", "value": 1}, "status_id": 139}]}
+        {"id": 1340004, "name": "俯首称臣的说！", "trigger": "on_break_enemy", "effects": [{"type": "break_down_turn_up", "value": 1, "duration": {"type": "one_shot"}, "status_id": 139}]}
       ],
       "4": [
         {"id": 1340005, "name": "开始征服世界了的说！", "trigger": "on_new_turn_start", "trigger_condition": "team.count(has(154))>=6", "effects": [{"type": "resource", "target": "od", "od": 100}], "trigger_limit": 1}
@@ -2071,16 +2071,16 @@
     "team": "31C", "tier": "SSR", "attack_type": "stab", "elements": ["thunder"],
     "limit_break": {
       "0": [
-        {"id": 1360001, "name": "水分補給", "trigger": "on_break_enemy", "effects": [{"type": "break_down_turn_up", "target": "none", "value": 1, "duration": {"type": "use", "value": 1}, "status_id": 139}]}
+        {"id": 1360001, "name": "水分補給", "trigger": "on_break_enemy", "effects": [{"type": "break_down_turn_up", "value": 1, "duration": {"type": "one_shot"}, "status_id": 139}]}
       ],
       "1": [
         {"id": 1360002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "2": [
-        {"id": 1360003, "name": "スイカ割り(小)", "trigger": "on_first_battle_start", "effects": [{"type": "funnel", "target": "self", "mode": {"number": 1, "value": 12}, "duration": {"type": "permanent"}, "solo": true, "status_id": 13}], "discard_limit_level": 3}
+        {"id": 1360003, "name": "打西瓜(小)", "trigger": "on_first_battle_start", "effects": [{"type": "funnel", "target": "self", "mode": {"number": 1, "value": 12}, "duration": {"type": "permanent"}, "solo": true, "status_id": 13}], "discard_limit_level": 3}
       ],
       "3": [
-        {"id": 1360004, "name": "スイカ割り[アビリティ強化]", "trigger": "on_first_battle_start", "effects": [{"type": "funnel", "target": "self", "mode": {"number": 2, "value": 12}, "duration": {"type": "permanent"}, "solo": true, "status_id": 13}]}
+        {"id": 1360004, "name": "打西瓜[天赋强化]", "trigger": "on_first_battle_start", "effects": [{"type": "funnel", "target": "self", "mode": {"number": 2, "value": 12}, "duration": {"type": "permanent"}, "solo": true, "status_id": 13}]}
       ]
     }
   },
@@ -2161,7 +2161,7 @@
     "team": "31C", "tier": "SS", "attack_type": "slash", "elements": ["fire"],
     "limit_break": {
       "0": [
-        {"id": 1420001, "name": "忍法·影分身！", "trigger": "on_battle_start", "effects": [{"type": "shadow_clone", "target": "self", "value": 0.3, "duration": {"type": "use", "value": 2}, "status_id": 124}]}
+        {"id": 1420001, "name": "忍法·影分身！", "trigger": "on_battle_start", "effects": [{"type": "shadow_clone", "target": "self", "duration": {"type": "on_atack", "value": 2}, "status_id": 124}]}
       ],
       "1": [
         {"id": 1420002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -2179,7 +2179,7 @@
     "team": "31C", "tier": "SSR", "attack_type": "slash", "elements": ["dark"],
     "limit_break": {
       "0": [
-        {"id": 1430001, "name": "在下是魔王大人直属的驯兽师是也！", "trigger": "on_first_battle_start", "effects": [{"type": "b_i_yamawaki_servant", "target": "self", "value": 0.4, "duration": {"type": "permanent"}, "status_id": 154}]},
+        {"id": 1430001, "name": "在下是魔王大人直属的驯兽师是也！", "trigger": "on_first_battle_start", "effects": [{"type": "b_i_yamawaki_servant", "target": "self", "duration": {"type": "permanent"}, "status_id": 154}]},
         {"id": 1430002, "name": "暗之猛击", "trigger": "on_first_battle_start", "effects": [{"type": "critical_damage_up", "target": "ally_all", "value": 25, "target_condition": "target.element('dark')", "duration": {"type": "permanent"}, "status_id": 7}]}
       ],
       "1": [
@@ -2267,7 +2267,7 @@
     "team": "31C", "tier": "SS", "attack_type": "stab", "elements": ["fire"],
     "limit_break": {
       "0": [
-        {"id": 1490001, "name": "商店店员的素养", "trigger": "on_battle_start", "effects": [{"type": "shadow_clone", "target": "self", "value": 0.3, "duration": {"type": "use", "value": 2}, "status_id": 124}]}
+        {"id": 1490001, "name": "商店店员的素养", "trigger": "on_battle_start", "effects": [{"type": "shadow_clone", "target": "self", "duration": {"type": "on_atack", "value": 2}, "status_id": 124}]}
       ],
       "1": [
         {"id": 1490002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -2285,7 +2285,7 @@
     "team": "31C", "tier": "SS", "attack_type": "stab", "elements": [],
     "limit_break": {
       "0": [
-        {"id": 1500001, "name": "我是魔王大人直属的战略家♪", "trigger": "on_first_battle_start", "effects": [{"type": "b_i_yamawaki_servant", "target": "self", "value": 0.4, "duration": {"type": "permanent"}, "status_id": 154}]},
+        {"id": 1500001, "name": "我是魔王大人直属的战略家♪", "trigger": "on_first_battle_start", "effects": [{"type": "b_i_yamawaki_servant", "target": "self", "duration": {"type": "permanent"}, "status_id": 154}]},
         {"id": 1500002, "name": "售后服务", "trigger": "on_additional_turn_start", "effects": [{"type": "resource", "target": "ally_all_without_self", "sp": 2}]}
       ],
       "1": [
