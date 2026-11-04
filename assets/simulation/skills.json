@@ -2564,17 +2564,16 @@
   "183": {
     "id": 183,
     "names": {"zh_cn": "偶像的微笑", "zh_tw": "偶像微笑", "jp": "アイドルスマイル"},
-    "conditions": {"effects": "target.weak('fire')"},
     "kind": "active",
     "cost": {"sp": 8},
     "hit_count": 3,
     "target": "all",
     "attack_type": "strike",
     "elements": ["fire"],
-    "effects": {
-      "yes": [{"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"]}],
-      "no": [{"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"]}]
-    }
+    "effects": [
+      {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"], "target_condition": "target.weak('fire')"},
+      {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"], "target_condition": "not target.weak('fire')"}
+    ]
   },
   "184": {
     "id": 184,
@@ -5059,7 +5058,6 @@
   "323": {
     "id": 323,
     "names": {"zh_cn": "毁坏式犬儒主义", "zh_tw": "破壞式犬儒主義", "jp": "破壊のシニシズム"},
-    "conditions": {"effects": "target.weak('light')"},
     "kind": "active",
     "ex_skill": true,
     "cost": {"sp": 15},
@@ -5067,31 +5065,15 @@
     "target": "all",
     "attack_type": "slash",
     "elements": ["light"],
-    "effects": {
-      "yes": [
-        {
-          "type": "funnel",
-          "target": "ally_front",
-          "status_id": 13,
-          "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}
-        },
-        {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["light"]}
-      ],
-      "no": [
-        {
-          "type": "funnel",
-          "target": "ally_front",
-          "status_id": 13,
-          "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}
-        },
-        {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["light"]}
-      ]
-    }
+    "effects": [
+      {"type": "funnel", "target": "ally_front", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}},
+      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["light"], "target_condition": "target.weak('light')"},
+      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["light"], "target_condition": "not target.weak('light')"}
+    ]
   },
   "324": {
     "id": 324,
     "names": {"zh_cn": "河豚斩冲击", "zh_tw": "宰河豚烈擊", "jp": "フグリングクラッシュ"},
-    "conditions": {"effects": "target.weak('dark')"},
     "kind": "active",
     "ex_skill": true,
     "cost": {"sp": 14},
@@ -5099,40 +5081,12 @@
     "target": "all",
     "attack_type": "slash",
     "elements": ["dark"],
-    "effects": {
-      "yes": [
-        {
-          "type": "critical_rate_up",
-          "target": "ally_all",
-          "status_id": 5,
-          "duration": {"type": "use", "value": 1}
-        },
-        {
-          "type": "critical_damage_up",
-          "target": "ally_all",
-          "elements": ["dark"],
-          "status_id": 7,
-          "duration": {"type": "use", "value": 1}
-        },
-        {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]}
-      ],
-      "no": [
-        {
-          "type": "critical_rate_up",
-          "target": "ally_all",
-          "status_id": 5,
-          "duration": {"type": "use", "value": 1}
-        },
-        {
-          "type": "critical_damage_up",
-          "target": "ally_all",
-          "elements": ["dark"],
-          "status_id": 7,
-          "duration": {"type": "use", "value": 1}
-        },
-        {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]}
-      ]
-    }
+    "effects": [
+      {"type": "critical_rate_up", "target": "ally_all", "status_id": 5, "duration": {"type": "use", "value": 1}},
+      {"type": "critical_damage_up", "target": "ally_all", "elements": ["dark"], "status_id": 7, "duration": {"type": "use", "value": 1}},
+      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"], "target_condition": "target.weak('dark')"},
+      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"], "target_condition": "not target.weak('dark')"}
+    ]
   },
   "3250001": {
     "id": 3250001,
@@ -6252,17 +6206,16 @@
   "402": {
     "id": 402,
     "names": {"zh_cn": "专心一意", "zh_tw": "專心一意", "jp": "一意専心"},
-    "conditions": {"effects": "target.weak('thunder')"},
     "kind": "active",
     "cost": {"sp": 8},
     "hit_count": 1,
     "target": "all",
     "attack_type": "strike",
     "elements": ["thunder"],
-    "effects": {
-      "yes": [{"type": "attack", "target": "all", "attack_type": "strike", "elements": ["thunder"]}],
-      "no": [{"type": "attack", "target": "all", "attack_type": "strike", "elements": ["thunder"]}]
-    }
+    "effects": [
+      {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["thunder"], "target_condition": "target.weak('thunder')"},
+      {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["thunder"], "target_condition": "not target.weak('thunder')"}
+    ]
   },
   "403": {
     "id": 403,
@@ -9517,7 +9470,6 @@
   "601": {
     "id": 601,
     "names": {"zh_cn": "极恶的款待", "zh_tw": "最狠的款待", "jp": "最凶のおもてなし"},
-    "conditions": {"effects": "target.weak('dark')"},
     "kind": "active",
     "ex_skill": true,
     "cost": {"sp": 14},
@@ -9525,10 +9477,10 @@
     "target": "all",
     "attack_type": "slash",
     "elements": ["dark"],
-    "effects": {
-      "yes": [{"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]}],
-      "no": [{"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]}]
-    }
+    "effects": [
+      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"], "target_condition": "target.weak('dark')"},
+      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"], "target_condition": "not target.weak('dark')"}
+    ]
   },
   "602": {
     "id": 602,
