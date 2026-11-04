@@ -123,7 +123,7 @@
     "team": "31A", "tier": "SS", "attack_type": "slash", "elements": [],
     "limit_break": {
       "0": [
-        {"id": 90001, "name": "灵魂共鸣", "trigger": "on_new_turn_start", "effects": [{"type": "resource", "target": "ally_front", "target_condition": "has(143)", "sp": 2}]}
+        {"id": 90001, "name": "灵魂共鸣", "trigger": "on_new_turn_start", "effects": [{"type": "resource", "target": "ally_front", "target_condition": "target.has(143)", "sp": 2}]}
       ],
       "1": [
         {"id": 90002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -1193,7 +1193,7 @@
         {"id": 760003, "name": "干劲极佳的少女", "trigger": "on_new_turn_start", "effects": [{"type": "resource", "target": "ally_all", "sp": 1, "target_condition": "target.level(174) == 5"}]}
       ],
       "3": [
-        {"id": 760004, "name": "特别组合", "trigger": "on_action_start", "effects": [{"type": "attack_up", "target": "ally_all", "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
+        {"id": 760004, "name": "特别组合", "trigger": "on_action_start", "trigger_condition": "team.count(level(174) >= 4) > 0", "effects": [{"type": "attack_up", "target": "ally_all", "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
       ]
     }
   },
@@ -3299,7 +3299,7 @@
         {"id": 2190002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 2190003, "name": "究极刺激", "trigger": "on_new_turn_start", "trigger_condition": "(Ture or dp_rate()<=0.5) and front()", "effects": [{"type": "resource", "target": "od", "od": 10}]}
+        {"id": 2190003, "name": "究极刺激", "trigger": "on_new_turn_start", "trigger_condition": "(True or dp_rate()<=0.5) and front()", "effects": [{"type": "resource", "target": "od", "od": 10}]}
       ]
     },
     "support_skill": {"name": "Fly High!", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "damage_rate_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [30, 35, 40, 45, 50], "status_id": 39}, {"type": "attack_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [30, 35, 40, 45, 50], "status_id": 1}]}
@@ -5697,7 +5697,7 @@
     },
     "support_skill": {"name": "帕特拉", "kind": "support", "trigger": "on_new_turn_start", "effects": [{"type": "heal_dp_rate", "target": "self", "value": [2, 3, 4, 5, 6]}, {"type": "remove_special_status", "target": "self", "duration": {"type": "one_shot"}, "status": "stun", "status_id": 30}]},
     "special": [
-      {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.count(during_down_turn())>0 == enemy.count()", "uses": 1, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true, "hit": 7}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
+      {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.count(during_down_turn()) == enemy.count()", "uses": 1, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true, "hit": 7}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
     ]
   },
   "379": {
@@ -5720,7 +5720,7 @@
       ]
     },
     "special": [
-      {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.count(during_down_turn())>0 == enemy.count()", "uses": 1, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true, "hit": 7}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
+      {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.count(during_down_turn()) == enemy.count()", "uses": 1, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true, "hit": 7}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
     ]
   },
   "380": {
@@ -5743,7 +5743,7 @@
       ]
     },
     "special": [
-      {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.count(during_down_turn())>0 == enemy.count()", "uses": 1, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true, "hit": 7}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
+      {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.count(during_down_turn()) == enemy.count()", "uses": 1, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true, "hit": 7}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
     ]
   }
 }
