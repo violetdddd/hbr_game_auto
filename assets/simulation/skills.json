@@ -11696,5 +11696,61 @@
       {"type": "funnel", "target": "ally_all", "status_id": 13, "target_condition": "element('light')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 50, "number": 3}},
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["light"]}
     ]
+  },
+  "739": {
+    "id": 739,
+    "names": {"zh_cn": "桑纳托斯之镰", "zh_tw": "桑納托斯之鐮", "jp": "タナトスサイス"},
+    "kind": "active",
+    "cost": {"sp": 8},
+    "hit_count": 3,
+    "target": "all",
+    "attack_type": "slash",
+    "elements": ["dark"],
+    "effects": [
+      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]}, 
+      {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}, 
+      {"type": "defense_down", "target": "all", "elements": ["dark"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
+    ]
+  },
+  "740": {
+    "id": 740,
+    "names": {"zh_cn": "暗黑切断", "zh_tw": "暗黑切斷", "jp": "ダークセバー"},
+    "kind": "active",
+    "ex_skill": true,
+    "conditions": {"cost": "has(20)"},
+    "cost": {"yes": {"sp": 0}, "no": {"sp": 12}},
+    "hit_count": 3,
+    "target": "all",
+    "attack_type": "slash",
+    "elements": ["dark"],
+    "effects": [
+      {"type": "critical_rate_up", "target": "ally_front", "elements": ["dark"], "status_id": 5, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
+      {"type": "critical_damage_up", "target": "ally_front", "elements": ["dark"], "status_id": 7, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
+      {"type": "attack", "target": "all", "attack_type": "slash", "elements": ["dark"]}
+    ]
+  },
+  "741": {
+    "id": 741,
+    "names": {"zh_cn": "幽界鬼魂大游行", "zh_tw": "幽界鬼魂大行進", "jp": "幽界ゴーストマーチ"},
+    "kind": "active",
+    "ex_skill": true,
+    "cost": {"sp": 0},
+    "hit_count": 8,
+    "target": "single",
+    "attack_type": "slash",
+    "effects": [
+      {"type": "inscription_attack", "target": "single", "attack_type": "slash", "ignore_e_shield_element": true}
+    ]
+  },
+  "742": {
+    "id": 742,
+    "names": {"zh_cn": "心灵重置", "zh_tw": "心靈重置", "jp": "メンタルリセット"},
+    "kind": "active",
+    "cost": {"sp": 4},
+    "target": "self",
+    "effects": [
+      {"type": "remove_debuff", "target": "self", "value": 1},
+      {"type": "debuff_guard", "target": "self", "status_id": 110, "target_condition": "dp_rate()<=0.5"}
+    ]
   }
 }
