@@ -321,7 +321,7 @@
         {"id": 210003, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 210004, "name": "日食", "trigger": "on_first_battle_start", "effects": [{"type": "give_debuff_turn_up", "target": "self", "value": 1, "duration": {"type": "permanent"}, "status_id": 136}]}
+        {"id": 210004, "name": "日食", "trigger": "on_first_battle_start", "effects": [{"type": "give_debuff_turn_up", "target": "self", "value": 1, "duration": {"type": "permanent"}, "status_id": 135}]}
       ],
       "4": [
         {"id": 210005, "name": "算法", "trigger": "on_new_turn_start", "trigger_condition": "enemy.count(during_down_turn())>0", "effects": [{"type": "resource", "target": "ally_front", "sp": 5}], "trigger_limit": 1}
