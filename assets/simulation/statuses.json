@@ -145,7 +145,7 @@
     "category": "rule",
     "forced_one": true
   },
-  "205": {"name": "attack_up_range_by_all_damage_rate", "zh_cn": "按全体破坏率提高攻击", "category": "buff", "removable": true, "forced_one": true, "not_display": true},
+  "205": {"name": "attack_up_range_by_all_damage_rate", "zh_cn": "按全体破坏率提高攻击", "category": "buff", "stack_group": "attack_up", "removable": true, "forced_one": true, "not_display": true},
   "207": {
     "name": "force_one_damage_by_hit",
     "zh_cn": "每段伤害固定为1",

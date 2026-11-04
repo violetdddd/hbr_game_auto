@@ -4557,8 +4557,8 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "all_status_up_value", "target": "ally_all", "status_id": 95, "target_condition": "team.is_member('31E')", "duration": {"type": "permanent"}, "value": 10},
-      {"type": "resource", "target": "ally_all", "target_condition": "team.is_member('31E')", "duration": {"type": "permanent"}, "sp_modify": -1}
+      {"type": "all_status_up_value", "target": "ally_all", "status_id": 95, "target_condition": "target.is_member('31E')", "duration": {"type": "permanent"}, "value": 10},
+      {"type": "resource", "target": "ally_all", "target_condition": "target.is_member('31E')", "duration": {"type": "permanent"}, "sp_modify": -1}
     ]
   },
   "287": {
@@ -4568,7 +4568,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "attack_up", "target": "ally_all", "status_id": 1, "target_condition": "team.is_member('31E')", "duration": {"type": "permanent"}}
+      {"type": "attack_up", "target": "ally_all", "status_id": 1, "target_condition": "target.is_member('31E')", "duration": {"type": "permanent"}}
     ]
   },
   "288": {
@@ -6666,7 +6666,7 @@
     "cost": {"sp": 0},
     "trigger": "on_battle_start",
     "effects": [
-      {"type": "resource", "target": "ally_all", "target_condition": "team.is_member('31C')", "sp": 1}
+      {"type": "resource", "target": "ally_all", "target_condition": "target.is_member('31C')", "sp": 1}
     ]
   },
   "423": {
@@ -8992,7 +8992,7 @@
   "567": {
     "id": 567,
     "names": {"zh_cn": "好孩子们，集合囉!", "zh_tw": "好孩子們，集合囉！", "jp": "よいこのみんな、あつまれ！"},
-    "conditions": {"cost": "team.element('thunder') >= 4"},
+    "conditions": {"cost": "team.count(element('thunder')) >= 4"},
     "kind": "active",
     "ex_skill": true,
     "cost": {
@@ -9203,7 +9203,7 @@
     "effects": {
       "yes": [
         {"type": "remove_summers_end_territory", "target": "territory", "status_id": 205},
-        {"type": "attack_up", "target": "ally_all", "duration": {"type": "ally_turn", "value": 3} ,"status_id": 1}
+        {"type": "attack_up_range_by_all_damage_rate", "target": "ally_all", "duration": {"type": "ally_turn", "value": 3} ,"status_id": 205}
       ],
       "no": [
         {"type": "summers_end_territory", "target": "territory", "status_id": 204}
@@ -9533,7 +9533,7 @@
   "602": {
     "id": 602,
     "names": {"zh_cn": "水花晶莹，浅蓝一抹", "zh_tw": "飛沫閃耀的水淺蔥色", "jp": "飛沫きらめく水浅葱"},
-    "conditions": {"cost": "used(602) == 0"},
+    "conditions": {"cost": "used(602)==0"},
     "kind": "active",
     "ex_skill": true,
     "cost": {
@@ -9722,7 +9722,7 @@
   "615": {
     "id": 615,
     "names": {"zh_cn": "洛可可式破坏", "zh_tw": "洛可可式破壞", "jp": "ロココ・デストラクション"},
-    "conditions": {"cost": "used(615) == 0"},
+    "conditions": {"cost": "used(615)==0"},
     "kind": "active",
     "ex_skill": true,
     "cost": {
