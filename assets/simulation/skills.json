@@ -1694,8 +1694,7 @@
         {
           "type": "debuff_guard",
           "target": "ally_front",
-          "status_id": 110,
-          "duration": {"type": "use", "value": 1}
+          "status_id": 110
         }
       ],
       "no": [{"type": "remove_debuff", "target": "ally_all"}]
@@ -2644,7 +2643,7 @@
     "cost": {"sp": 11},
     "target": "ally_all",
     "effects": [
-      {"type": "debuff_guard", "target": "ally_all", "status_id": 110, "duration": {"type": "use", "value": 1}},
+      {"type": "debuff_guard", "target": "ally_all", "status_id": 110},
       {"type": "resource", "target": "ally_all_without_self", "target_condition": "element('fire')", "sp": 5}
     ]
   },
@@ -10565,7 +10564,7 @@
     "target": "ally_all",
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
-      {"type": "debuff_guard", "target": "ally_all", "status_id": 110, "duration": {"type": "use", "value": 1}}
+      {"type": "debuff_guard", "target": "ally_all", "status_id": 110}
     ]
   },
   "675": {
