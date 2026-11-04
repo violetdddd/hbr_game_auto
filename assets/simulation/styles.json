@@ -3694,7 +3694,7 @@
         {"id": 2460002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 2460003, "name": "锐气", "trigger": "on_action_start", "trigger_condition": "front() and enemy.count(has(12))>0 or enemy.count(has(57))>0", "effects": [{"type": "attack_up", "target": "self", "value": 30, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
+        {"id": 2460003, "name": "锐气", "trigger": "on_action_start", "trigger_condition": "front() and ( enemy.count(has(12))>0 or enemy.count(has(57))>0 )", "effects": [{"type": "attack_up", "target": "self", "value": 30, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
       ]
     },
     "support_skill": {"name": "Get it together!", "kind": "support", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "give_defense_debuff_up", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "value": [15, 18, 20, 22, 25], "status_id": 94}]}
