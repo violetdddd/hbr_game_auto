@@ -1,0 +1,366 @@
+二、Simulation 实现约定（来自当前数据库及原日志；为功能约定，不代表代码已经实现）
+
+执行顺序：
+  1. 评估技能使用条件、分支与费用。
+  2. 扣除 SP、OD、Token、EP 等技能费用。
+  3. 执行攻击前的增益、减益、Zone 等效果。
+  4. 处理 attack 事件（暂不计算伤害数值）。
+  5. 处理攻击后效果及相关事件。
+  6. 派发 Trigger，执行符合条件的被动与追加效果。
+  7. 根据回合、使用次数或事件更新持续时间。
+  OD、追加回合的边界由 simulation 单独定义，不能简单对每一次角色行动扣减回合持续时间。
+
+技能类型与基础字段：
+  kind 可为 active、passive、accessory、system、reserved。
+  ex_skill: true 标记 EX 技能。
+  attack_type 可为 slash、strike、stab。
+  elements 支持 fire、ice、thunder、light、dark、none。
+
+费用 cost：
+  固定 SP 费用使用 sp。
+  其他资源费用包括 od、token、ep、ct。
+  sp: -1 且 mode: use_all 表示使用全部当前 SP。
+  动态费用可使用 yes/no 分支或 cases。
+  cost 负责扣费；effect.type=resource 负责资源变化，二者不能混用。
+
+条件与分支：
+  conditions.cost 决定费用的 yes/no 分支。
+  conditions.effects 决定效果的 yes/no 分支。
+  cases 和 effects.cases[].when 选择首个匹配的效果分支。
+  user_select 的结果由用户手动选择，不根据概率自行推断。
+  trigger_condition 控制被动触发。
+  target_condition 对效果的每个候选目标分别进行筛选。
+  condition、hit_condition、not_use_condition、interval_turn 按字段用途分别处理。
+
+条件函数：
+  以第七项的最新函数清单为准，不依赖旧日志列举的全部函数均已实现。
+
+作用域：
+  conditions、trigger_condition、condition、hit_condition、cases.when 中无前缀的状态/属性函数默认读取发起者。
+  target_condition 中无前缀的 has()/level()/element()/character()/dp_rate()/sp() 等函数读取当前被筛选的目标。
+  target.has()/target.element()/target.weak() 等显式前缀函数读取当前目标。
+  target 为 all、ally_all、ally_front 等多目标时，target_condition 逐目标独立判断。
+  team.count(predicate)、enemy.count(predicate) 的内部谓词分别以当前遍历的队员、敌人为上下文。
+  顶层 conditions.effects 使用 target.xxx() 时，若是多目标技能，不能不加说明地当作一个固定目标；第八项以外的实际歧义见回复说明。
+
+缺少追踪信息的处理：
+  不储存我方 DP 和敌方破坏率。
+  dp_rate() 相关被动默认不触发；主动技能的相关结果由 user_select 确定。
+  敌方破盾、倒地由 GUI 明确输入；不依靠伤害自动推算。
+  自伤与 DP 回复数值暂不计算。
+
+随机与特别约定：
+  佳音默认获得 3 SP；野生直觉默认获得攻击增益；福运默认获得 10 OD。
+  random 字段依然留在原数据库，但当前 simulation 不据此随机决定以上结果。
+  最终手段默认不触发。
+  究极刺激、旺盛、引以为傲的浮空摩托默认触发。
+  回响（skill_id=9999）暂不触发。
+  特别组合的 attack_up 默认 value=30。
+  debuff_guard 暂不模拟、不需要 duration，因为不追踪敌方向我方附加的 Debuff。
+
+Duration：
+  permanent：持续存在直到移除或战斗重置。
+  use、use_debuff、use_buff、use_any、use_ex、use_immersion_ex：按相应技能使用事件消耗。
+  ally_turn、enemy_turn：按相应回合边界递减，而不是每名角色行动一次递减。
+  on_attacked、on_attack_weak、ally_dp_broken：由对应事件决定次数消耗；目前可以按模拟范围暂不处理。
+  od_end：OD 结束移除。
+  one_shot：使用或触发一次后结束。
+
+状态与增益：
+  give_debuff_up、give_attack_buff_up 分别使用 use_debuff、use_buff，不占用攻击 use 次数。
+  funnel.mode.value 与 funnel.mode.number 分别代表连击珠数值与数量。
+  solo: true 不等于持续时间或叠加层数。
+  状态叠加时考虑 status_id、elements、stack_group、持续时间等因素。
+
+攻击与资源：
+  attack、token_attack、penetration_critical_attack、attack_by_sp、attack_by_own_dp_rate、damage_rate_change_attack_skill、fixed_hp_damage_rate_attack、inscription_attack 等统一生成攻击事件，伤害数值暂不模拟。
+  resource 支持 sp、od、ep、sp_modify 等资源变化。
+  additional_turn、double_action_extra_skill、double_attack_skill 控制追加行动或重复执行。
+  heal_sp_by_token(limit)、over_drive_point_up_by_token、specify_sp、overwrite_sp、sp_limit_overwrite 需按各自独立的含义处理。
+
+场地机制：
+  zone(field) 与 territory 分开储存和更新。
+  zone、zone_up_eternal_plus_15、rice_field_zone、summers_end_territory、launch_summers_end_territory、revive_territory 属于相关机制。
+
+其他特殊机制：
+  replace_normal_skill、replace_pursuit 会改变可执行的动作。
+  ignore_e_shield_element、element_mark、motivation、venom、sprightly、high_boost、inscription、immersion、gui_shen 等需要由 simulation 解释。
+  recoil（33）：禁止行动。
+  resist_down_overwrite（108）：修改怪物弱点。
+  double_action_extra_skill（125）：下一 EX 执行两次。
+  give_debuff_turn_up（135）：施加的 Debuff 持续时间增加 1 回合。
+  sp_limit_overwrite（140）：改变 SP 上限。
+  high_boost（160）：技能 SP cost 增加 2。
+  element_mark（166）：初始等级按同属性风格人数确定；6 人时前排角色每回合 SP +1。
+  sprightly（194）：相同阶段比例减费取较大者，先算比例减费，再算 sp_modify 等固定修改。
+  venom（218）：每名中毒敌人新回合按 3 hit 增加 OD（每目标 +7.5）。
+  reduce_consume_overdrive（221）：OD 启动门槛仍为 100×n，实际消耗为 90×n。
+  double_attack_skill（227）：攻击技能执行两次。
+  immersion（228）和 gui_shen（229）：所有技能 SP 消耗为 0。
+
+三、全部 Trigger 类型（技能、突破被动、支援技能和特殊风格；按次数降序）
+  on_new_turn_start: 337
+  on_action_start: 241
+  on_battle_start: 128
+  on_first_battle_start: 128
+  on_enemy_turn_start: 37
+  on_battle_win: 25
+  on_break_enemy: 19
+  after_ex_use: 18
+  on_additional_turn_start: 17
+  on_overdrive_start: 13
+  before_new_turn_start: 12
+  on_kill_enemy: 11
+  on_use_specific_skill: 9
+  on_sp_up_by_nonself_active_skill: 8
+  user_select: 7
+  on_attack_weak: 5
+  on_attacked: 5
+  on_relieve_enemy_buff: 4
+  on_use_specific_status_skill: 2
+  after_new_turn_start: 1
+  on_active_zone: 1
+  on_heal_dp: 1
+  on_persuit: 1
+  on_relieve_enemy_buff_attack: 1
+  on_use_od_cost_skill: 1
+
+四、全部 Duration 类型（按次数降序）
+  ally_turn: 470
+  enemy_turn: 352
+  permanent: 278
+  use: 205
+  on_attacked: 14
+  on_attack_weak: 13
+  od_end: 12
+  one_shot: 7
+  use_ex: 6
+  use_debuff: 5
+  use_immersion_ex: 3
+  use_any: 2
+  use_buff: 2
+  ally_dp_broken: 1
+
+五、全部 Effect 类型（按次数降序；不含特殊风格顶层 type）
+  resource: 518
+  attack: 482
+  attack_up: 341
+  defense_down: 192
+  critical_damage_up: 86
+  defense_up: 76
+  funnel: 70
+  critical_rate_up: 64
+  heal_dp: 63
+  additional_turn: 51
+  heal_dp_rate: 48
+  zone: 40
+  fragile: 37
+  token: 34
+  morale: 30
+  mind_eye: 28
+  give_attack_buff_up: 26
+  give_defense_debuff_up: 26
+  damage_rate_up: 25
+  penetration_critical_attack: 23
+  remove_debuff: 23
+  buff_charge: 22
+  attack_down: 20
+  provoke: 16
+  heal_skill_used_count: 15
+  resist_down: 13
+  stun_random: 12
+  b_i_yamawaki_servant: 11
+  revive_dp: 11
+  debuff_guard: 10
+  give_heal_up: 10
+  heal_dp_by_damage: 10
+  regeneration_dp: 10
+  remove_buff: 10
+  element_mark: 9
+  misfortune: 9
+  recoil: 9
+  self_damage: 9
+  confusion_random: 8
+  mocktail: 8
+  token_attack: 8
+  toughness_up_value: 7
+  attack_up_per_token: 6
+  double_action_extra_skill: 6
+  imprison_random: 6
+  resist_down_overwrite: 6
+  attack_by_own_dp_rate: 5
+  border_ref_p_down_by_admiral: 5
+  cover: 5
+  power_up_value: 5
+  shadow_clone: 5
+  token_up_per_attack_enemy: 5
+  zone_up_eternal_plus_15: 5
+  attack_by_sp: 4
+  damage_rate_change_attack_skill: 4
+  disaster: 4
+  dodge: 4
+  motivation: 4
+  remove_special_status: 4
+  all_status_up_value: 3
+  break_down_turn_up: 3
+  defense_up_per_token: 3
+  give_debuff_up: 3
+  heal_down: 3
+  ignore_e_shield_element: 3
+  immersion: 3
+  overwrite_sp: 3
+  revenge: 3
+  revive_dp_rate: 3
+  super_break: 3
+  talisman: 3
+  arrow_cherry_blossoms: 2
+  break_guard: 2
+  curry: 2
+  dim_sum: 2
+  eternal_oath: 2
+  fighting_spirit: 2
+  gelato: 2
+  give_debuff_turn_up: 2
+  hacking: 2
+  infantilized: 2
+  invincible: 2
+  over_drive_rate_up: 2
+  revive_territory: 2
+  shchi: 2
+  sp_limit_overwrite: 2
+  specify_sp: 2
+  sprightly: 2
+  steak: 2
+  undermine: 2
+  zone_up: 2
+  always_persuit_sp8: 1
+  attack_up_by_token: 1
+  attack_up_range_by_all_damage_rate: 1
+  babied: 1
+  damage_rate_up_per_token: 1
+  demon_cavalry: 1
+  diva: 1
+  double_attack_skill: 1
+  e_a_guard: 1
+  ep_limit_overwrite: 1
+  fixed_hp_damage_rate_attack: 1
+  force_one_damage_by_hit: 1
+  gui_shen: 1
+  heal_sp_by_token: 1
+  high_boost: 1
+  inscription: 1
+  inscription_attack: 1
+  luck_up_value: 1
+  makeup: 1
+  negative_mind: 1
+  over_drive_point_up_by_token: 1
+  play_with_tama: 1
+  reduce_consume_overdrive: 1
+  remove_summers_end_territory: 1
+  replace_normal_skill: 1
+  replace_pursuit: 1
+  rice_field_zone: 1
+  shredding: 1
+  skill_limit_count_up: 1
+  summers_end_territory: 1
+  super_break_down: 1
+  tea: 1
+  toughness_up_value_per_revenge_level: 1
+  venom: 1
+
+七、条件表达式函数调用频次（按字段分类；同一表达式内的每次函数调用分别计数）
+【trigger_condition】 条件条目 684；函数调用合计 840
+  front(): 604
+  dp_rate(): 71
+  sp(): 30
+  has(): 22
+  team.count(): 18
+  enemy.count(): 17
+  level(): 14
+  turn(): 12
+  during_down_turn(): 9
+  element(): 9
+  zone(): 7
+  skill_sp(): 6
+  normal_attack(): 5
+  territory.has(): 5
+  damage_rate(): 2
+  mark_level(): 2
+  od(): 2
+  ep(): 1
+  role(): 1
+  team.member(): 1
+  token(): 1
+  used(): 1
+【target_condition】 条件条目 186；函数调用合计 204
+  target.element(): 60
+  element(): 47
+  has(): 31
+  target.weak(): 19
+  character(): 15
+  target.has(): 10
+  target.is_member(): 5
+  target.skill_sp(): 4
+  target.normal_attack(): 3
+  target.token(): 3
+  dp_rate(): 2
+  target.during_down_turn(): 2
+  target.level(): 2
+  has_skill(): 1
+【conditions.cost】 条件条目 68；函数调用合计 99
+  has(): 36
+  enemy.count(): 21
+  used(): 14
+  during_down_turn(): 5
+  in_od(): 4
+  level(): 4
+  team.member(): 4
+  team.count(): 3
+  charging(): 2
+  token(): 2
+  zone(): 2
+  element(): 1
+  sp(): 1
+【conditions.effects】 条件条目 66；函数调用合计 72
+  has(): 14
+  charging(): 13
+  used(): 11
+  in_od(): 9
+  target.weak(): 9
+  enemy.count(): 5
+  level(): 3
+  team.member(): 3
+  during_down_turn(): 1
+  target.during_down_turn(): 1
+  territory.has(): 1
+  token(): 1
+  zone(): 1
+【when】 条件条目 73；函数调用合计 84
+  used(): 19
+  zone(): 18
+  level(): 16
+  token(): 11
+  has(): 6
+  team.count(): 6
+  team.member(): 5
+  enemy.count(): 3
+【condition】 条件条目 8；函数调用合计 16
+  enemy.count(): 8
+  during_down_turn(): 4
+  removed_debuffs(): 2
+  has(): 1
+  zone(): 1
+
+八、特殊风格机制（仅 styles.special 的顶层 type；按次数降序）
+  elemental_admiral: 5
+  all_out_attack: 3
+  form_change: 2
+  overwrite_sp: 2
+  demon_cavalry: 1
+  demonic_rage: 1
+  team_specific_skill: 1
+
+十一、暂不模拟与需要手动选择的行为
+  不模拟：DP 受伤/回复量/自伤，敌方直接攻击造成的 debuff，debuff_guard，伤害数值，随机眩晕/混乱/封印，破坏率，力/体/运等属性数值，击杀和破盾的自动推定。
+  必须由 GUI 或用户显式提供：敌人是否处于倒地、技能是否破盾、主动技能 dp_rate() 分支、需要 user_select 的随机结果、OD 启动档位、技能目标与角色前后排等。
+  必须保留：触发事件来源、状态层数、次数及持续时间、EX 使用次数、技能使用次数、SP/OD/Token/EP、队伍构成和属性、Zone/Territory、额外回合状态。
