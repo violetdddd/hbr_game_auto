@@ -38,7 +38,7 @@
     "cost": {"sp": 6},
     "target": "self",
     "effects": [
-      {"type": "dodge", "target": "self", "status_id": 121, "value":100, "duration": {"type": "on_attack", "value": 2}},
+      {"type": "dodge", "target": "self", "status_id": 121, "value":100, "duration": {"type": "on_attacked", "value": 2}},
       {"type": "resource", "target": "od", "od": 15}
     ]
   },
@@ -297,7 +297,7 @@
     "cost": {"sp": 8},
     "target": "self",
     "effects": [
-      {"type": "shadow_clone", "target": "self", "status_id": 124, "duration": {"type": "on_attack", "value": 2}}
+      {"type": "shadow_clone", "target": "self", "status_id": 124, "duration": {"type": "on_attacked", "value": 2}}
     ]
   },
   "30": {
@@ -343,7 +343,7 @@
     "target": "all",
     "attack_type": "slash",
     "effects": [
-      {"type": "shadow_clone", "target": "self", "status_id": 124, "duration": {"type": "on_attack", "value": 2}},
+      {"type": "shadow_clone", "target": "self", "status_id": 124, "duration": {"type": "on_attacked", "value": 2}},
       {"type": "attack", "target": "all", "attack_type": "slash"},
       {"type": "confusion_random", "target": "all", "duration": {"type": "enemy_turn", "value": 2}}
     ]
@@ -905,7 +905,7 @@
     "cost": {"sp": 5},
     "target": "self",
     "effects": [
-      {"type": "mind_eye", "target": "self", "status_id": 78, "duration": {"type": "use", "value": 1}}
+      {"type": "mind_eye", "target": "self", "status_id": 78, "duration": {"type": "on_attack_weak", "value": 1}}
     ]
   },
   "71": {
@@ -2372,7 +2372,7 @@
     "cost": {"sp": 9},
     "target": "ally_front",
     "effects": [
-      {"type": "dodge", "target": "ally_front", "status_id": 121, "value": 50, "duration": {"type": "on_attack", "value": 1}}
+      {"type": "dodge", "target": "ally_front", "status_id": 121, "value": 50, "duration": {"type": "on_attacked", "value": 1}}
     ]
   },
   "170": {
@@ -2617,7 +2617,7 @@
     "cost": {"sp": 10},
     "target": "self",
     "effects": [
-      {"type": "invincible", "target": "self", "status_id": 15, "duration": {"type": "on_attack", "value": 2}},
+      {"type": "invincible", "target": "self", "status_id": 15, "duration": {"type": "on_attacked", "value": 2}},
       {"type": "cover", "target": "all", "status_id": 57, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
@@ -3987,7 +3987,7 @@
     "cost": {"sp": 0},
     "target": "self",
     "effects": [
-      {"type": "e_a_guard", "target": "self", "status_id": 209, "duration": {"type": "on_attack", "value": 2}}
+      {"type": "e_a_guard", "target": "self", "status_id": 209, "duration": {"type": "on_attacked", "value": 2}}
     ]
   },
   "252": {
@@ -6755,7 +6755,7 @@
     "cost": {"sp": 8},
     "target": "self",
     "effects": [
-      {"type": "shadow_clone", "target": "self", "status_id": 124, "duration": {"type": "use", "value": 2}}
+      {"type": "shadow_clone", "target": "self", "status_id": 124, "duration": {"type": "on_attacked", "value": 2}}
     ]
   },
   "430": {
@@ -6823,7 +6823,7 @@
           "type": "mind_eye",
           "target": "ally_all_without_self",
           "status_id": 78,
-          "duration": {"type": "use", "value": 1}
+          "duration": {"type": "on_attack_weak", "value": 1}
         },
         {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["ice"]},
         {"type": "resource", "target": "ally_all_without_self", "sp": 3}
@@ -6872,7 +6872,7 @@
           "type": "mind_eye",
           "target": "ally_front",
           "status_id": 78,
-          "duration": {"type": "use", "value": 1}
+          "duration": {"type": "on_attack_weak", "value": 1}
         }
       ],
       "no": [
@@ -6949,7 +6949,7 @@
           "type": "mind_eye",
           "target": "self",
           "status_id": 78,
-          "duration": {"type": "use", "value": 1}
+          "duration": {"type": "on_attack_weak", "value": 1}
         },
         {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["fire"]}
       ],
@@ -7846,7 +7846,7 @@
     "attack_type": "strike",
     "elements": ["fire"],
     "effects": [
-      {"type": "mind_eye", "target": "ally_front", "status_id": 78, "duration": {"type": "use", "value": 1}},
+      {"type": "mind_eye", "target": "ally_front", "status_id": 78, "duration": {"type": "on_attack_weak", "value": 1}},
       {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"]},
       {"type": "defense_down", "target": "self", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
     ]
@@ -7862,7 +7862,7 @@
     "attack_type": "strike",
     "elements": ["fire"],
     "effects": [
-      {"type": "mind_eye", "target": "ally_all", "status_id": 78, "duration": {"type": "use", "value": 1}},
+      {"type": "mind_eye", "target": "ally_all", "status_id": 78, "duration": {"type": "on_attack_weak", "value": 1}},
       {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"]}
     ]
   },
@@ -8049,7 +8049,7 @@
     "target": "ally_all",
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
-      {"type": "mind_eye", "target": "ally_sub", "status_id": 78, "duration": {"type": "use", "value": 1}}
+      {"type": "mind_eye", "target": "ally_sub", "status_id": 78, "duration": {"type": "on_attack_weak", "value": 1}}
     ]
   },
   "509": {
@@ -8063,12 +8063,12 @@
     "effects": {
       "yes": [
         {"type": "heal_dp", "target": "ally_all"},
-        {"type": "mind_eye", "target": "ally_sub", "status_id": 78, "duration": {"type": "use", "value": 1}},
+        {"type": "mind_eye", "target": "ally_sub", "status_id": 78, "duration": {"type": "on_attack_weak", "value": 1}},
         {"type": "additional_turn", "target": "self", "status_id": 20}
       ],
       "no": [
         {"type": "heal_dp", "target": "ally_all"},
-        {"type": "mind_eye", "target": "ally_sub", "status_id": 78, "duration": {"type": "use", "value": 1}}
+        {"type": "mind_eye", "target": "ally_sub", "status_id": 78, "duration": {"type": "on_attack_weak", "value": 1}}
       ]
     }
   },
@@ -8483,7 +8483,7 @@
     "cost": {"sp": 5},
     "target": "self",
     "effects": [
-      {"type": "mind_eye", "target": "self", "status_id": 78, "duration": {"type": "use", "value": 1}}
+      {"type": "mind_eye", "target": "self", "status_id": 78, "duration": {"type": "on_attack_weak", "value": 1}}
     ]
   },
   "541": {
@@ -8985,7 +8985,7 @@
     "effects": [
       {"type": "remove_debuff", "target": "ally_all"},
       {"type": "heal_dp", "target": "ally_all"},
-      {"type": "mind_eye", "target": "ally_all", "status_id": 78, "condition": "removed_debuffs()>0", "duration": {"type": "use", "value": 1}},
+      {"type": "mind_eye", "target": "ally_all", "status_id": 78, "condition": "removed_debuffs()>0", "duration": {"type": "on_attack_weak", "value": 1}},
       {"type": "attack_up", "target": "ally_all", "status_id": 1, "condition": "removed_debuffs()>0", "duration": {"type": "use", "value": 1}}
     ]
   },
@@ -9371,7 +9371,7 @@
     "effects": [
       {"type": "regeneration_dp", "target": "ally_all", "status_id": 34, "duration": {"type": "enemy_turn", "value": 4}},
       {"type": "attack_up", "target": "ally_all", "elements": ["dark"], "status_id": 1, "target_condition": "element('dark')", "duration": {"type": "use", "value": 1}},
-      {"type": "mind_eye", "target": "ally_all", "status_id": 78, "target_condition": "element('dark')", "duration": {"type": "use", "value": 1}}
+      {"type": "mind_eye", "target": "ally_all", "status_id": 78, "target_condition": "element('dark')", "duration": {"type": "on_attack_weak", "value": 1}}
     ]
   },
   "590": {
@@ -9610,7 +9610,7 @@
           "target": "self",
           "status_id": 121,
           "value": 50,
-          "duration": {"type": "on_attack", "value": 2}
+          "duration": {"type": "on_attacked", "value": 2}
         }
       ],
       "no": [{"type": "attack", "target": "all", "attack_type": "slash"}]
@@ -9831,7 +9831,7 @@
     "cost": {"sp": 6},
     "target": "self",
     "effects": [
-      {"type": "break_guard", "target": "self", "status_id": 113, "duration": {"type": "use", "value": 1}},
+      {"type": "break_guard", "target": "self", "status_id": 113, "duration": {"type": "on_attacked", "value": 1}},
       {"type": "cover", "target": "all", "status_id": 57, "duration": {"type": "enemy_turn", "value": 3}}
     ]
   },
@@ -10178,7 +10178,7 @@
     "effects": [
       {"type": "critical_rate_up", "target": "ally_single", "status_id": 5, "duration": {"type": "use", "value": 1}},
       {"type": "critical_damage_up", "target": "ally_single", "status_id": 7, "duration": {"type": "use", "value": 1}},
-      {"type": "mind_eye", "target": "ally_single", "status_id": 78, "duration": {"type": "use", "value": 1}}
+      {"type": "mind_eye", "target": "ally_single", "status_id": 78, "duration": {"type": "on_attack_weak", "value": 1}}
     ]
   },
   "648": {

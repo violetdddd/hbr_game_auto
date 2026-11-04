@@ -993,7 +993,7 @@
     "limit_break": {
       "0": [
         {"id": 640001, "name": "雷之波动", "trigger": "on_first_battle_start", "effects": [{"type": "attack_up", "target": "ally_all", "elements": ["thunder"], "value": 10, "duration": {"type": "permanent"}, "status_id": 1}]},
-        {"id": 640002, "name": "守护之精髓", "trigger": "on_attack", "effects": [{"type": "token", "target": "self", "level": 1}]}
+        {"id": 640002, "name": "守护之精髓", "trigger": "on_attacked", "effects": [{"type": "token", "target": "self", "level": 1}]}
       ],
       "1": [
         {"id": 640003, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -1218,7 +1218,7 @@
         {"id": 770006, "name": "圣域[天赋强化]", "trigger": "on_enemy_turn_start", "trigger_condition": "has(209)", "effects": [{"type": "debuff_guard", "target": "self", "status_id": 110}]}
       ],
       "4": [
-        {"id": 770007, "name": "护身符", "trigger": "on_battle_start", "effects": [{"type": "invincible", "target": "self", "duration": {"type": "on_attack", "value": 1}, "status_id": 15}]}
+        {"id": 770007, "name": "护身符", "trigger": "on_battle_start", "effects": [{"type": "invincible", "target": "self", "duration": {"type": "on_attacked", "value": 1}, "status_id": 15}]}
       ]
     }
   },
@@ -1265,7 +1265,7 @@
     "team": "31B", "tier": "SS", "attack_type": "slash", "elements": ["ice"], "role": "attacker",
     "limit_break": {
       "0": [
-        {"id": 810001, "name": "防卫本能", "trigger": "on_battle_start", "effects": [{"type": "dodge", "target": "self", "value": 50, "duration": {"type": "on_atack", "value": 2}, "status_id": 121}]}
+        {"id": 810001, "name": "防卫本能", "trigger": "on_battle_start", "effects": [{"type": "dodge", "target": "self", "value": 50, "duration": {"type": "on_attacked", "value": 2}, "status_id": 121}]}
       ],
       "1": [
         {"id": 810002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -2161,7 +2161,7 @@
     "team": "31C", "tier": "SS", "attack_type": "slash", "elements": ["fire"], "role": "blaster",
     "limit_break": {
       "0": [
-        {"id": 1420001, "name": "忍法·影分身！", "trigger": "on_battle_start", "effects": [{"type": "shadow_clone", "target": "self", "duration": {"type": "on_atack", "value": 2}, "status_id": 124}]}
+        {"id": 1420001, "name": "忍法·影分身！", "trigger": "on_battle_start", "effects": [{"type": "shadow_clone", "target": "self", "duration": {"type": "on_attacked", "value": 2}, "status_id": 124}]}
       ],
       "1": [
         {"id": 1420002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -2267,7 +2267,7 @@
     "team": "31C", "tier": "SS", "attack_type": "stab", "elements": ["fire"], "role": "attacker",
     "limit_break": {
       "0": [
-        {"id": 1490001, "name": "商店店员的素养", "trigger": "on_battle_start", "effects": [{"type": "shadow_clone", "target": "self", "duration": {"type": "on_atack", "value": 2}, "status_id": 124}]}
+        {"id": 1490001, "name": "商店店员的素养", "trigger": "on_battle_start", "effects": [{"type": "shadow_clone", "target": "self", "duration": {"type": "on_attacked", "value": 2}, "status_id": 124}]}
       ],
       "1": [
         {"id": 1490002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -4189,7 +4189,7 @@
     "team": "31E", "tier": "SS", "attack_type": "stab", "elements": [], "role": "defender",
     "limit_break": {
       "0": [
-        {"id": 2800001, "name": "抖M的精髓", "trigger": "on_attack", "effects": [{"type": "token", "target": "self", "level": 1}]}
+        {"id": 2800001, "name": "抖M的精髓", "trigger": "on_attacked", "effects": [{"type": "token", "target": "self", "level": 1}]}
       ],
       "1": [
         {"id": 2800002, "name": "内在力量", "trigger": "on_new_turn_start", "effects": [{"type": "token", "target": "self", "level": 1}]}
@@ -4208,7 +4208,7 @@
     "limit_break": {
       "0": [
         {"id": 2810001, "name": "光之印", "trigger": "on_first_battle_start", "effects": [{"type": "element_mark", "target": "ally_all", "elements": ["light"], "target_condition": "target.element('light')", "duration": {"type": "permanent"}, "status_id": 166}]},
-        {"id": 2810002, "name": "抖M的精髓", "trigger": "on_attack", "effects": [{"type": "token", "target": "self", "level": 1}]},
+        {"id": 2810002, "name": "抖M的精髓", "trigger": "on_attacked", "effects": [{"type": "token", "target": "self", "level": 1}]},
         {"id": 2810003, "name": "极限游泳", "trigger": "on_use_specific_skill", "trigger_condition": "token()>=10", "effects": [{"type": "morale", "target": "ally_all", "level": 10, "duration": {"type": "permanent"}, "status_id": 119}], "skill_id": 512}
       ],
       "1": [
@@ -5602,8 +5602,8 @@
     "team": "31AB", "tier": "SSR", "attack_type": "strike", "elements": ["ice"], "role": "defender",
     "limit_break": {
       "0": [
-        {"id": 3730001, "name": "毅力", "trigger": "on_battle_start", "effects": [{"type": "break_guard", "target": "self", "value": 0.5, "duration": {"type": "use", "value": 1}, "status_id": 113}]},
-        {"id": 3730002, "name": "转闪", "trigger": "on_attack", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
+        {"id": 3730001, "name": "毅力", "trigger": "on_battle_start", "effects": [{"type": "break_guard", "target": "self", "value": 0.5, "duration": {"type": "on_attacked", "value": 1}, "status_id": 113}]},
+        {"id": 3730002, "name": "转闪", "trigger": "on_attacked", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "1": [
         {"id": 3730003, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
