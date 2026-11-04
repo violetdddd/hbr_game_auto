@@ -5446,6 +5446,7 @@
       ]
     },
     "special": [
+      {"type": "overwrite_sp", "target": "self", "sp": 0, "exclude": "use_all", "status_id": 175, "target_condition": "has(228)"},
       {"type": "team_specific_skill", "names": {"zh_cn": "无念无想", "zh_tw": "無念無想", "jp": "無念無想"}, "trigger": "user_select", "select_elements": ["thunder", "light", "dark"]}
     ]
   },
@@ -5457,7 +5458,7 @@
     "limit_break": {
       "0": [
         {"id": 3650001, "name": "身经百战", "trigger": "on_first_battle_start", "effects": [{"type": "sp_limit_overwrite", "target": "self", "value": 30, "duration": {"type": "permanent"}, "status_id": 140}]},
-        {"id": 3650002, "name": "鬼道", "trigger": "on_action_start", "trigger_condition": "gui_shen_hua()", "effects": [{"type": "attack_up", "target": "self", "value": 300, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
+        {"id": 3650002, "name": "鬼道", "trigger": "on_action_start", "trigger_condition": "has(229)", "effects": [{"type": "attack_up", "target": "self", "value": 300, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
       ],
       "1": [
         {"id": 3650003, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -5467,7 +5468,9 @@
       ]
     },
     "special": [
-      {"type": "demonic_rage", "names": {"zh_cn": "鬼神状态", "zh_tw": "鬼神狀態", "jp": "鬼神"}, "trigger": "user_select", "uses": 3, "duration": {"type": "ally_turn", "value": 3}, "on_enter": [{"type": "resource", "target": "od", "od": 15}, {"type": "remove_debuff", "target": "self"}, {"type": "revive_dp_rate", "target": "self", "value": 100}], "effects": [{"type": "overwrite_sp", "target": "self", "sp": 0, "exclude": "use_all", "status_id": 175}, {"type": "funnel", "target": "self", "mode": {"number": 3, "value": 25}, "solo": true, "status_id": 13}, {"type": "mind_eye", "target": "self", "value": 120, "solo": true, "status_id": 78}], "on_exit": [{"type": "recoil", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "status_id": 33}]}
+      {"type": "overwrite_sp", "target": "self", "sp": 0, "exclude": "use_all", "status_id": 175, "target_condition": "has(229)"},
+      {"type": "demonic_rage", "names": {"zh_cn": "鬼神化", "zh_tw": "鬼神化", "jp": "鬼神化"}, "trigger": "user_select", "uses": 3, "effects": [
+        {"type": "gui_shen", "duration": {"type": "ally_turn", "value": 3}, "status_id": 229, "target": "self"}, {"type": "resource", "target": "od", "od": 15}, {"type": "remove_debuff", "target": "self"}, {"type": "revive_dp_rate", "target": "self", "value": 100}, {"type": "funnel", "target": "self", "mode": {"number": 3, "value": 25}, "solo": true, "status_id": 13, "duration": {"type": "ally_turn", "value": 3}}, {"type": "mind_eye", "target": "self", "value": 120, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "status_id": 78}]}
     ]
   },
   "366": {
@@ -5477,7 +5480,7 @@
     "team": "Command", "tier": "SSR", "attack_type": "stab", "elements": ["thunder"],
     "limit_break": {
       "0": [
-        {"id": 3660001, "name": "引以为傲的浮空摩托", "trigger": "on_action_start", "trigger_condition": "ConquestBikeLevel()>=80", "effects": [{"type": "give_attack_buff_up", "target": "self", "value": 25, "duration": {"type": "ally_turn", "value": 1}, "status_id": 54}]}
+        {"id": 3660001, "name": "引以为傲的浮空摩托", "trigger": "on_action_start", "effects": [{"type": "give_attack_buff_up", "target": "self", "value": 25, "duration": {"type": "ally_turn", "value": 1}, "status_id": 54}]}
       ],
       "1": [
         {"id": 3660002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -5498,7 +5501,7 @@
     "limit_break": {
       "0": [
         {"id": 3670001, "name": "雷光之加护", "trigger": "on_enemy_turn_start", "effects": [{"type": "border_ref_p_down_by_admiral", "target": "all", "target_condition": "target.weak('thunder')", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 186}]},
-        {"id": 3670002, "name": "超速档", "trigger": "on_overdrive_start", "effects": [{"type": "ep_limit_overwrite", "target": "self", "value": 20, "duration": {"type": "od_end"}, "status_id": 189}, {"type": "resource", "target": "self", "ep": 5}]}
+        {"id": 3670002, "name": "超速档", "trigger": "on_overdrive_start", "effects": [{"type": "ep_limit_overwrite", "target": "self", "value": 20, "duration": {"type": "od_end"}, "status_id": 187}, {"type": "resource", "target": "self", "ep": 5}]}
       ],
       "1": [
         {"id": 3670003, "name": "雷天", "trigger": "on_first_battle_start", "effects": [{"type": "resource", "target": "ally_all", "sp_modify": -1, "target_condition": "target.element('thunder')", "duration": {"type": "permanent"}}]}
@@ -5524,7 +5527,7 @@
         {"id": 3680002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 3680003, "name": "光の猛威", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "attack_up", "target": "self", "elements": ["light"], "value": 70, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
+        {"id": 3680003, "name": "光之猛威", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "attack_up", "target": "self", "elements": ["light"], "value": 70, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
       ]
     }
   },
@@ -5558,7 +5561,7 @@
         {"id": 3700002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 3700003, "name": "火の猛威", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "attack_up", "target": "self", "elements": ["fire"], "value": 70, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
+        {"id": 3700003, "name": "火之猛威", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "attack_up", "target": "self", "elements": ["fire"], "value": 70, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
       ]
     }
   },
@@ -5569,13 +5572,13 @@
     "team": "31AB", "tier": "SSR", "attack_type": "stab", "elements": ["ice"],
     "limit_break": {
       "0": [
-        {"id": 3710001, "name": "震荡", "trigger": "on_break_enemy", "effects": [{"type": "resource", "target": "self", "sp": 8}]}
+        {"id": 3710001, "name": "震荡", "trigger": "on_break_enemy", "effects": [{"type": "resource", "target": "self", "sp": 8, "trigger_limit": 1}]}
       ],
       "1": [
         {"id": 3710002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 3710003, "name": "氷の猛威", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "attack_up", "target": "self", "elements": ["ice"], "value": 70, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
+        {"id": 3710003, "name": "冰之猛威", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "attack_up", "target": "self", "elements": ["ice"], "value": 70, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
       ]
     }
   },
@@ -5601,7 +5604,7 @@
     "limit_break": {
       "0": [
         {"id": 3730001, "name": "毅力", "trigger": "on_battle_start", "effects": [{"type": "break_guard", "target": "self", "value": 0.5, "duration": {"type": "use", "value": 1}, "status_id": 113}]},
-        {"id": 3730002, "name": "転閃", "trigger": "before_new_turn_start", "effects": [{"type": "resource", "target": "self", "sp": 1}], "trigger_condition": "sp()<0"}
+        {"id": 3730002, "name": "转闪", "trigger": "on_attack", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "1": [
         {"id": 3730003, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -5694,7 +5697,7 @@
     },
     "support_skill": {"name": "帕特拉", "kind": "support", "trigger": "on_new_turn_start", "effects": [{"type": "heal_dp_rate", "target": "self", "value": [2, 3, 4, 5, 6]}, {"type": "remove_special_status", "target": "self", "duration": {"type": "one_shot"}, "status": "stun", "status_id": 30}]},
     "special": [
-      {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.all_down()", "uses": 1, "advance_turn": false, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
+      {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.count(during_down_turn())>0 == enemy.count()", "uses": 1, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true, "hit": 7}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
     ]
   },
   "379": {
@@ -5717,7 +5720,7 @@
       ]
     },
     "special": [
-      {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.all_down()", "uses": 1, "advance_turn": false, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
+      {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.count(during_down_turn())>0 == enemy.count()", "uses": 1, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true, "hit": 7}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
     ]
   },
   "380": {
@@ -5740,7 +5743,7 @@
       ]
     },
     "special": [
-      {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.all_down()", "uses": 1, "advance_turn": false, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
+      {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.count(during_down_turn())>0 == enemy.count()", "uses": 1, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true, "hit": 7}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
     ]
   }
 }

@@ -3136,7 +3136,7 @@
     "names": {"zh_cn": "求生战略", "zh_tw": "求生戰略", "jp": "サバイブストラテジー"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_new_turn_start",
+    "trigger": "after_new_turn_start",
     "trigger_condition": "sp()>=20",
     "effects": [
       {"type": "resource", "target": "self", "sp": -3},
@@ -9965,7 +9965,7 @@
     "effects": [
       {"type": "defense_down", "target": "all", "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}},
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["thunder"]},
-      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "gui_shen_hua()"}
+      {"type": "additional_turn", "target": "self", "status_id": 20, "target_condition": "has(229)"}
     ]
   },
   "631": {

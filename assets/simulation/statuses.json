@@ -616,5 +616,6 @@
   "225": {"name": "token_up_per_attack_enemy", "category": "rule"},
   "226": {"name": "toughness_up_value_per_revenge_level", "category": "rule"},
   "227": {"name": "double_attack_skill", "category": "rule"},
-  "228": {"name": "immersion", "category": "buff"}
+  "228": {"name": "immersion", "category": "buff"},
+  "229": {"name": "gui_shen", "category": "buff", "on_exit": [{"type": "recoil", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "status_id": 33}]}
 }
