@@ -8379,7 +8379,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "memory_spirit", "target": "self", "status_id": 134, "duration": {"type": "permanent"}}
+      {"type": "all_status_up_value", "target": "self", "status_id": 95, "duration": {"type": "permanent"}, "value": 25}
     ]
   },
   "532": {
