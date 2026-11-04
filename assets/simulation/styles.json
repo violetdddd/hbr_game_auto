@@ -2031,7 +2031,7 @@
   },
   "134": {
     "id": 134,
-    "names": {"zh_cn": "邪恶军团开始进军的说！", "zh_tw": "悪の軍団進軍開始でゲス！", "jp": "悪の軍団進軍開始でゲス！"},
+    "names": {"zh_cn": "邪恶军团开始进军的说！", "zh_tw": "邪惡軍團開始進軍餒！", "jp": "悪の軍団進軍開始でゲス！"},
     "character_names": {"zh_cn": "丰后 弥生", "zh_tw": "豐後 彌生", "jp": "豊後 弥生", "en": "Yayoi_Bungo"},
     "team": "31C", "tier": "SSR", "attack_type": "stab", "elements": [], "role": "breaker",
     "limit_break": {
@@ -3085,7 +3085,7 @@
   },
   "205": {
     "id": 205,
-    "names": {"zh_cn": "甜美的悠闲时光", "zh_tw": "スイート・メロウタイム", "jp": "スイート・メロウタイム"},
+    "names": {"zh_cn": "甜美的悠闲时光", "zh_tw": "甜蜜的悠閒時光", "jp": "スイート・メロウタイム"},
     "character_names": {"zh_cn": "二阶堂 三乡", "zh_tw": "二階堂 三鄉", "jp": "二階堂 三郷", "en": "Misato_Nikaido"},
     "team": "31D", "tier": "S", "attack_type": "strike", "elements": [], "role": "attacker",
     "limit_break": {
@@ -3118,13 +3118,13 @@
     "team": "31D", "tier": "SSR", "attack_type": "strike", "elements": ["dark"], "role": "admiral",
     "limit_break": {
       "0": [
-        {"id": 2070001, "name": "漆黒の加護", "trigger": "on_enemy_turn_start", "effects": [{"type": "border_ref_p_down_by_admiral", "target": "all", "target_condition": "target.weak('dark')", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 186}]}
+        {"id": 2070001, "name": "漆黒之加护", "trigger": "on_enemy_turn_start", "effects": [{"type": "border_ref_p_down_by_admiral", "target": "all", "target_condition": "target.weak('dark')", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 186}]}
       ],
       "1": [
-        {"id": 2070002, "name": "闇天", "trigger": "on_first_battle_start", "effects": [{"type": "resource", "target": "ally_all", "sp_modify": -1, "target_condition": "target.element('dark')", "duration": {"type": "permanent"}}]}
+        {"id": 2070002, "name": "暗天", "trigger": "on_first_battle_start", "effects": [{"type": "resource", "target": "ally_all", "sp_modify": -1, "target_condition": "target.element('dark')", "duration": {"type": "permanent"}}]}
       ],
       "3": [
-        {"id": 2070003, "name": "闇の鳴動", "trigger": "on_first_battle_start", "effects": [{"type": "critical_damage_up", "target": "ally_all", "value": 30, "target_condition": "target.element('dark')", "duration": {"type": "permanent"}, "status_id": 7}]}
+        {"id": 2070003, "name": "暗之鸣动", "trigger": "on_first_battle_start", "effects": [{"type": "critical_damage_up", "target": "ally_all", "value": 30, "target_condition": "target.element('dark')", "duration": {"type": "permanent"}, "status_id": 7}]}
       ]
     },
     "special": [
@@ -3141,7 +3141,7 @@
         {"id": 2080001, "name": "増幅", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "give_attack_buff_up", "target": "self", "value": 10, "duration": {"type": "ally_turn", "value": 1}, "status_id": 54}]}
       ],
       "10": [
-        {"id": 2080002, "name": "火の慧眼", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "critical_rate_up", "target": "ally_front", "elements": ["fire"], "value": 20, "duration": {"type": "ally_turn", "value": 1}, "status_id": 5}]}
+        {"id": 2080002, "name": "火之慧眼", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "critical_rate_up", "target": "ally_front", "elements": ["fire"], "value": 20, "duration": {"type": "ally_turn", "value": 1}, "status_id": 5}]}
       ]
     }
   },
@@ -3327,7 +3327,7 @@
   },
   "221": {
     "id": 221,
-    "names": {"zh_cn": "しがらみからの解放", "zh_tw": "しがらみからの解放", "jp": "しがらみからの解放"},
+    "names": {"zh_cn": "摆脱束缚", "zh_tw": "擺脫束縛", "jp": "しがらみからの解放"},
     "character_names": {"zh_cn": "命 吹雪", "zh_tw": "命 吹雪", "jp": "命 吹雪", "en": "Fubuki_Mikoto"},
     "team": "31D", "tier": "S", "attack_type": "slash", "elements": [], "role": "debuffer",
     "limit_break": {
@@ -3737,7 +3737,7 @@
     "team": "31E", "tier": "SSR", "attack_type": "strike", "elements": ["light"], "role": "admiral",
     "limit_break": {
       "0": [
-        {"id": 2490001, "name": "白光の加護", "trigger": "on_enemy_turn_start", "effects": [{"type": "border_ref_p_down_by_admiral", "target": "all", "target_condition": "target.weak('light')", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 186}]}
+        {"id": 2490001, "name": "白光之加护", "trigger": "on_enemy_turn_start", "effects": [{"type": "border_ref_p_down_by_admiral", "target": "all", "target_condition": "target.weak('light')", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 186}]}
       ],
       "1": [
         {"id": 2490002, "name": "光天", "trigger": "on_first_battle_start", "effects": [{"type": "resource", "target": "ally_all", "sp_modify": -1, "target_condition": "target.element('light')", "duration": {"type": "permanent"}}]}
@@ -4043,7 +4043,7 @@
   },
   "270": {
     "id": 270,
-    "names": {"zh_cn": "和平的气息", "zh_tw": "ピースフルフレーバー", "jp": "ピースフルフレーバー"},
+    "names": {"zh_cn": "和平的气息", "zh_tw": "平穩的風情", "jp": "ピースフルフレーバー"},
     "character_names": {"zh_cn": "大岛 五十铃", "zh_tw": "大島 五十鈴", "jp": "大島 五十鈴", "en": "Isuzu_Ohshima"},
     "team": "31E", "tier": "S", "attack_type": "slash", "elements": [], "role": "debuffer",
     "limit_break": {
@@ -4737,7 +4737,7 @@
     "team": "31F", "tier": "SSR", "attack_type": "strike", "elements": ["thunder"], "role": "debuffer",
     "limit_break": {
       "0": [
-        {"id": 3180001, "name": "雷の印", "trigger": "on_first_battle_start", "effects": [{"type": "element_mark", "target": "ally_all", "elements": ["thunder"], "target_condition": "target.element('thunder')", "duration": {"type": "permanent"}, "status_id": 166}]}
+        {"id": 3180001, "name": "雷之印", "trigger": "on_first_battle_start", "effects": [{"type": "element_mark", "target": "ally_all", "elements": ["thunder"], "target_condition": "target.element('thunder')", "duration": {"type": "permanent"}, "status_id": 166}]}
       ],
       "1": [
         {"id": 3180002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
