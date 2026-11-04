@@ -31,7 +31,7 @@
   "25": {"name": "buff_charge", "zh_cn": "充能", "category": "buff", "removable": true, "forced_one": true},
   "26": {
     "name": "specify_sp",
-    "zh_cn": "指定SP",
+    "zh_cn": "指定回复到SP",
     "category": "rule",
     "forced_one": true
   },
@@ -109,11 +109,11 @@
     "category": "rule",
     "forced_one": true
   },
-  "160": {"name": "high_boost", "zh_cn": "高阶增强", "category": "buff", "removable": true, "forced_one": true},
+  "160": {"name": "high_boost", "zh_cn": "高阶增强", "category": "buff", "removable": true, "forced_one": true, "sp_modify": 2},
   "163": {"name": "makeup", "zh_cn": "彩妆", "category": "buff", "removable": true, "forced_one": true, "not_display": true},
   "166": {"name": "element_mark", "zh_cn": "属性印记", "category": "buff", "removable": true, "forced_one": true},
   "169": {"name": "ignore_e_shield_element", "zh_cn": "无视元素护盾", "category": "rule", "forced_one": true},
-  "170": {"name": "super_break_down", "zh_cn": "超破盾下降", "category": "debuff", "forced_one": true, "not_display": true},
+  "170": {"name": "super_break_down", "zh_cn": "超倒下", "category": "debuff", "forced_one": true, "not_display": true},
   "171": {"name": "curry", "zh_cn": "咖喱", "category": "buff", "removable": true, "forced_one": true},
   "172": {"name": "shchi", "zh_cn": "白菜汤", "category": "buff", "removable": true, "forced_one": true},
   "174": {"name": "motivation", "zh_cn": "干劲", "category": "buff", "forced_one": true},
@@ -162,7 +162,7 @@
     "zh_cn": "领域增强",
     "category": "rule"
   },
-  "218": {"name": "venom", "zh_cn": "猛毒", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true},
+  "218": {"name": "venom", "zh_cn": "猛毒", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "hit":3},
   "221": {
     "name": "reduce_consume_overdrive",
     "zh_cn": "OD消耗降低",
@@ -189,12 +189,14 @@
     "name": "immersion",
     "zh_cn": "沉浸",
     "category": "buff",
+    "overwrite_sp": 0,
     "not_display": true
   },
   "229": {
     "name": "gui_shen",
     "zh_cn": "鬼神化",
     "category": "buff", 
+    "overwrite_sp": 0,
     "not_display": true
   }
 }
