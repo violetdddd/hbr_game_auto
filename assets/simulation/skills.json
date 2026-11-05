@@ -3134,7 +3134,7 @@
     "names": {"zh_cn": "求生战略", "zh_tw": "求生戰略", "jp": "サバイブストラテジー"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "after_new_turn_start",
+    "trigger": "on_new_turn_start",
     "trigger_condition": "sp()>=20",
     "effects": [
       {"type": "resource", "target": "self", "sp": -3},

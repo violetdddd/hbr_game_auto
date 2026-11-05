@@ -143,7 +143,9 @@
     "name": "summers_end_territory",
     "zh_cn": "晚夏之阵",
     "category": "rule",
-    "forced_one": true
+    "forced_one": true,
+    "sp": 1,
+    "target": "ally_all"
   },
   "205": {"name": "attack_up_range_by_all_damage_rate", "zh_cn": "按全体破坏率提高攻击", "category": "buff", "stack_group": "attack_up", "removable": true, "forced_one": true, "not_display": true},
   "207": {
