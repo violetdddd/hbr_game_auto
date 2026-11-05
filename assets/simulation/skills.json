@@ -8935,12 +8935,24 @@
     "ex_skill": true,
     "cost": {"sp": 9},
     "target": "ally_all",
-    "effects": [
-      {"type": "remove_debuff", "target": "ally_all"},
-      {"type": "heal_dp", "target": "ally_all"},
-      {"type": "mind_eye", "target": "ally_all", "status_id": 78, "condition": "removed_debuffs()>0", "duration": {"type": "on_attack_weak", "value": 1}},
-      {"type": "attack_up", "target": "ally_all", "status_id": 1, "condition": "removed_debuffs()>0", "duration": {"type": "use", "value": 1}}
-    ]
+    "user_select": {
+      "1": {
+        "effects": [
+          {"type": "remove_debuff", "target": "ally_all"},
+          {"type": "heal_dp", "target": "ally_all"},
+          {"type": "mind_eye", "target": "ally_all", "status_id": 78, "duration": {"type": "on_attack_weak", "value": 1}},
+          {"type": "attack_up", "target": "ally_all", "status_id": 1, "duration": {"type": "use", "value": 1}}
+        ],
+        "description": "解除己方减益获得心眼和加攻"
+      },
+      "2": {
+        "effects": [
+          {"type": "remove_debuff", "target": "ally_all"},
+          {"type": "heal_dp", "target": "ally_all"}
+        ],
+        "description": "没有解除己方减益"
+      }
+    }
   },
   "567": {
     "id": 567,
