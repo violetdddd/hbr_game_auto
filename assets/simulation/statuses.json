@@ -19,7 +19,7 @@
     "category": "rule",
     "forced_one": true
   },
-  "15": {"name": "invincible", "zh_cn": "无敌", "category": "buff", "removable": true, "forced_one": true},
+  "15": {"name": "invincible", "zh_cn": "无敌", "category": "buff", "removable": true, "forced_one": true, "not_display": true},
   "18": {"name": "resist_down", "zh_cn": "属性耐性降低", "category": "debuff", "stack_group": "resist_down", "removable": true, "debuff_guard": true},
   "20": {
     "name": "additional_turn",
