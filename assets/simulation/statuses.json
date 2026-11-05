@@ -61,7 +61,7 @@
   "110": {"name": "debuff_guard", "zh_cn": "负面状态防护", "category": "buff", "removable": true, "forced_one": true, "not_display": true},
   "113": {"name": "break_guard", "zh_cn": "破盾防护", "category": "buff", "forced_one": true, "not_display": true},
   "118": {"name": "give_debuff_up", "zh_cn": "减益效果强化", "category": "buff", "stack_group": "give_debuff_up", "removable": true},
-  "119": {"name": "morale", "zh_cn": "士气", "category": "buff", "forced_one": true},
+  "119": {"name": "morale", "zh_cn": "士气", "category": "buff", "forced_one": true, "has_level": true},
   "120": {"name": "arrow_cherry_blossoms", "zh_cn": "樱花箭", "category": "buff", "stack_group": "give_debuff_up", "removable": true, "forced_one": true},
   "121": {"name": "dodge", "zh_cn": "闪避", "category": "buff", "removable": true, "forced_one": true},
   "123": {"name": "eternal_oath", "zh_cn": "永恒誓约", "category": "buff", "forced_one": true},
@@ -111,19 +111,19 @@
   },
   "160": {"name": "high_boost", "zh_cn": "高阶增强", "category": "buff", "removable": true, "forced_one": true, "sp_modify": 2},
   "163": {"name": "makeup", "zh_cn": "彩妆", "category": "buff", "removable": true, "forced_one": true, "not_display": true},
-  "166": {"name": "element_mark", "zh_cn": "属性印记", "category": "buff", "removable": true, "forced_one": true},
+  "166": {"name": "element_mark", "zh_cn": "属性印记", "category": "buff", "removable": true, "forced_one": true, "has_level": true},
   "169": {"name": "ignore_e_shield_element", "zh_cn": "无视元素护盾", "category": "rule", "forced_one": true},
   "170": {"name": "super_break_down", "zh_cn": "超倒下", "category": "debuff", "forced_one": true, "not_display": true},
   "171": {"name": "curry", "zh_cn": "咖喱", "category": "buff", "removable": true, "forced_one": true},
   "172": {"name": "shchi", "zh_cn": "白菜汤", "category": "buff", "removable": true, "forced_one": true},
-  "174": {"name": "motivation", "zh_cn": "干劲", "category": "buff", "forced_one": true},
+  "174": {"name": "motivation", "zh_cn": "干劲", "category": "buff", "forced_one": true, "has_level": true},
   "175": {
     "name": "overwrite_sp",
     "zh_cn": "SP消耗覆盖",
     "category": "rule",
     "forced_one": true
   },
-  "177": {"name": "talisman", "zh_cn": "灵符", "category": "debuff", "forced_one": true},
+  "177": {"name": "talisman", "zh_cn": "灵符", "category": "debuff", "forced_one": true, "has_level": true},
   "179": {"name": "mocktail", "zh_cn": "鸡尾酒", "category": "buff", "removable": true, "forced_one": true},
   "186": {"name": "border_ref_p_down_by_admiral", "zh_cn": "超越量表敌方属性降低", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "not_display": true},
   "187": {
@@ -135,7 +135,7 @@
   },
   "190": {"name": "steak", "zh_cn": "牛排", "category": "buff", "removable": true, "forced_one": true},
   "191": {"name": "gelato", "zh_cn": "意式冰淇淋", "category": "buff", "removable": true, "forced_one": true},
-  "193": {"name": "disaster", "zh_cn": "祸", "category": "debuff", "debuff_guard": true, "forced_one": true},
+  "193": {"name": "disaster", "zh_cn": "祸", "category": "debuff", "debuff_guard": true, "forced_one": true, "has_level": true},
   "194": {"name": "sprightly", "zh_cn": "轻快状态", "category": "buff", "removable": true, "forced_one": true},
   "201": {"name": "undermine", "zh_cn": "蚀", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true},
   "202": {"name": "dim_sum", "zh_cn": "点心", "category": "buff", "removable": true, "forced_one": true},
@@ -152,23 +152,23 @@
     "category": "rule",
     "forced_one": true
   },
-  "208": {"name": "revenge", "zh_cn": "复仇", "category": "buff", "forced_one": true},
+  "208": {"name": "revenge", "zh_cn": "复仇", "category": "buff", "forced_one": true, "has_level": true},
   "209": {"name": "e_a_guard", "zh_cn": "埃癸斯无敌护盾", "category": "buff", "removable": true, "forced_one": true, "not_display": true},
   "212": {"name": "attack_up_by_token", "zh_cn": "依Token提升攻击", "category": "buff", "removable": true, "forced_one": true, "not_display": true},
   "213": {"name": "tea", "zh_cn": "红茶", "category": "buff", "removable": true, "forced_one": true},
-  "214": {"name": "infantilized", "zh_cn": "返婴状态", "category": "debuff", "forced_one": true},
+  "214": {"name": "infantilized", "zh_cn": "返婴状态", "category": "debuff", "forced_one": true, "has_level": true},
   "217": {
     "name": "zone_up",
     "zh_cn": "领域增强",
     "category": "rule"
   },
-  "218": {"name": "venom", "zh_cn": "猛毒", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "hit":3},
+  "218": {"name": "venom", "zh_cn": "猛毒", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "hit":3, "has_level": true},
   "221": {
     "name": "reduce_consume_overdrive",
     "zh_cn": "OD消耗降低",
     "category": "rule"
   },
-  "223": {"name": "inscription", "zh_cn": "诅咒刻印", "category": "debuff"},
+  "223": {"name": "inscription", "zh_cn": "诅咒刻印", "category": "debuff", "has_level": true},
   "224": {
     "name": "always_persuit_sp8",
     "zh_cn": "追击固定消耗8SP",

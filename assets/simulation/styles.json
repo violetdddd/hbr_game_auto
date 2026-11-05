@@ -458,7 +458,7 @@
     "team": "31A", "tier": "SSR", "attack_type": "strike", "elements": ["ice", "thunder"], "role": "debuffer",
     "limit_break": {
       "0": [
-        {"id": 300001, "name": "小玉合奏", "trigger": "on_battle_start", "effects": [{"type": "play_with_tama", "target": "self", "duration": {"type": "ally_dp_broken", "value": 3}}]}
+        {"id": 300001, "name": "小玉合奏", "trigger": "ally_dp_broken", "effects": [{"type": "heal_dp_rate", "target": "ally_all", "value": 50}], "trigger_limit": 3}
       ],
       "1": [
         {"id": 300002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -467,7 +467,7 @@
         {"id": 300003, "name": "侵蚀", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "give_defense_debuff_up", "target": "self", "value": 25, "duration": {"type": "ally_turn", "value": 1}, "status_id": 94}]}
       ],
       "4": [
-        {"id": 300004, "name": "回响", "trigger": "on_use_specific_skill", "skill_id": 9999, "effects": [{"type": "resource", "target": "ally_all", "sp": 5}]}
+        {"id": 300004, "name": "回响", "trigger": "ally_dp_broken", "effects": [{"type": "resource", "target": "ally_all", "sp": 5, "limit": 30}], "trigger_limit": 3}
       ]
     }
   },
@@ -1153,7 +1153,7 @@
     "team": "31B", "tier": "SS", "attack_type": "stab", "elements": ["light"], "role": "attacker",
     "limit_break": {
       "0": [
-        {"id": 740001, "name": "战功", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "token_up_per_attack_enemy", "target": "self", "level": 1, "status_id": 225}]},
+        {"id": 740001, "name": "战功", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "token_up_per_attack_enemy", "target": "self", "value": 1, "status_id": 225}]},
         {"id": 740002, "name": "光之波动", "trigger": "on_first_battle_start", "effects": [{"type": "attack_up", "target": "ally_all", "elements": ["light"], "value": 10, "duration": {"type": "permanent"}, "status_id": 1}]}
       ],
       "1": [
@@ -2526,7 +2526,7 @@
     "team": "30G", "tier": "SS", "attack_type": "strike", "elements": ["light"], "role": "attacker",
     "limit_break": {
       "0": [
-        {"id": 1660001, "name": "战功", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "token_up_per_attack_enemy", "target": "self", "level": 1, "status_id": 225}]}
+        {"id": 1660001, "name": "战功", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "token_up_per_attack_enemy", "target": "self", "value": 1, "status_id": 225}]}
       ],
       "1": [
         {"id": 1660002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
@@ -2543,7 +2543,7 @@
     "team": "30G", "tier": "SS", "attack_type": "strike", "elements": ["light"], "role": "attacker",
     "limit_break": {
       "0": [
-        {"id": 1670001, "name": "战功", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "token_up_per_attack_enemy", "target": "self", "level": 1, "status_id": 225}]},
+        {"id": 1670001, "name": "战功", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "token_up_per_attack_enemy", "target": "self", "value": 1, "status_id": 225}]},
         {"id": 1670002, "name": "二度绽放", "trigger": "after_ex_use", "effects": [{"type": "additional_turn", "target": "self", "target_condition": "not has(20)"}]}
       ],
       "1": [
@@ -2768,7 +2768,7 @@
     "team": "30G", "tier": "SS", "attack_type": "strike", "elements": ["light"], "role": "healer",
     "limit_break": {
       "0": [
-        {"id": 1830001, "name": "战功", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "token_up_per_attack_enemy", "target": "self", "level": 1, "status_id": 225}]}
+        {"id": 1830001, "name": "战功", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "token_up_per_attack_enemy", "target": "self", "value": 1, "status_id": 225}]}
       ],
       "1": [
         {"id": 1830002, "name": "内在力量", "trigger": "on_new_turn_start", "effects": [{"type": "token", "target": "self", "level": 1}]}
@@ -4107,7 +4107,7 @@
     "limit_break": {
       "0": [
         {"id": 2740001, "name": "魅惑的一滴", "trigger": "on_battle_start", "effects": [{"type": "mocktail", "target": "self", "value": 0.3, "status_id": 179}, {"type": "mocktail", "target": "ally_front_without_self", "value": 0.3, "target_condition": "target.element('dark')", "status_id": 179}]},
-        {"id": 2740002, "name": "战功", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "token_up_per_attack_enemy", "target": "self", "level": 1, "status_id": 225}]}
+        {"id": 2740002, "name": "战功", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "token_up_per_attack_enemy", "target": "self", "value": 1, "status_id": 225}]}
       ],
       "1": [
         {"id": 2740003, "name": "内在力量", "trigger": "on_new_turn_start", "effects": [{"type": "token", "target": "self", "level": 1}]}
