@@ -71,7 +71,11 @@
     "team": "31A", "tier": "S", "attack_type": "slash", "elements": ["fire"], "role": "attacker",
     "limit_break": {
       "3": [
-        {"id": 60001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
+        {"id": 60001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "user_select": {
+            "1": {"effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}], "description": "回复3sp"},
+            "2": {"effects": [{"type": "resource", "target": "self", "sp": 0}], "description": "不回复3sp"}
+          }
+        }
       ],
       "10": [
         {"id": 60002, "name": "请勿玩火", "trigger": "on_action_start", "trigger_condition": "dp_rate()==0.0 and front()", "effects": [{"type": "attack_up", "target": "self", "elements": ["fire"], "value": 50, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
@@ -827,7 +831,11 @@
     "team": "31A", "tier": "S", "attack_type": "slash", "elements": [], "role": "healer",
     "limit_break": {
       "3": [
-        {"id": 520001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
+        {"id": 520001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "user_select": {
+            "1": {"effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}], "description": "回复3sp"},
+            "2": {"effects": [{"type": "resource", "target": "self", "sp": 0}], "description": "不回复3sp"}
+          }
+        }
       ]
     }
   },
@@ -2224,7 +2232,11 @@
     "team": "31C", "tier": "S", "attack_type": "stab", "elements": [], "role": "buffer",
     "limit_break": {
       "3": [
-        {"id": 1450001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
+        {"id": 1450001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "user_select": {
+            "1": {"effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}], "description": "回复3sp"},
+            "2": {"effects": [{"type": "resource", "target": "self", "sp": 0}], "description": "不回复3sp"}
+          }
+        }
       ],
       "10": [
         {"id": 1450002, "name": "突之意志", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "attack_up", "target": "ally_front", "value": 10, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
@@ -2752,7 +2764,11 @@
     "team": "30G", "tier": "S", "attack_type": "strike", "elements": [], "role": "healer",
     "limit_break": {
       "3": [
-        {"id": 1810001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
+        {"id": 1810001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "user_select": {
+            "1": {"effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}], "description": "回复3sp"},
+            "2": {"effects": [{"type": "resource", "target": "self", "sp": 0}], "description": "不回复3sp"}
+          }
+        }
       ],
       "10": [
         {"id": 1810002, "name": "光之跃动", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "critical_damage_up", "target": "ally_front", "elements": ["light"], "value": 10, "duration": {"type": "ally_turn", "value": 1}, "status_id": 7}]}
@@ -3063,7 +3079,11 @@
     "team": "31D", "tier": "S", "attack_type": "strike", "elements": [], "role": "attacker",
     "limit_break": {
       "3": [
-        {"id": 2020001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
+        {"id": 2020001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "user_select": {
+            "1": {"effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}], "description": "回复3sp"},
+            "2": {"effects": [{"type": "resource", "target": "self", "sp": 0}], "description": "不回复3sp"}
+          }
+        }
       ]
     }
   },
@@ -3208,7 +3228,11 @@
     "team": "31D", "tier": "S", "attack_type": "stab", "elements": ["dark"], "role": "buffer",
     "limit_break": {
       "3": [
-        {"id": 2120001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
+        {"id": 2120001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "user_select": {
+            "1": {"effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}], "description": "回复3sp"},
+            "2": {"effects": [{"type": "resource", "target": "self", "sp": 0}], "description": "不回复3sp"}
+          }
+        }
       ]
     }
   },
@@ -3399,7 +3423,11 @@
     "team": "31D", "tier": "S", "attack_type": "stab", "elements": [], "role": "healer",
     "limit_break": {
       "3": [
-        {"id": 2250001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
+        {"id": 2250001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "user_select": {
+            "1": {"effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}], "description": "回复3sp"},
+            "2": {"effects": [{"type": "resource", "target": "self", "sp": 0}], "description": "不回复3sp"}
+          }
+        }
       ]
     }
   },
@@ -3580,7 +3608,11 @@
     "team": "31D", "tier": "S", "attack_type": "strike", "elements": [], "role": "debuffer",
     "limit_break": {
       "3": [
-        {"id": 2370001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
+        {"id": 2370001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "user_select": {
+            "1": {"effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}], "description": "回复3sp"},
+            "2": {"effects": [{"type": "resource", "target": "self", "sp": 0}], "description": "不回复3sp"}
+          }
+        }
       ]
     }
   },
@@ -3791,7 +3823,11 @@
     "team": "31E", "tier": "S", "attack_type": "slash", "elements": [], "role": "blaster",
     "limit_break": {
       "3": [
-        {"id": 2510001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
+        {"id": 2510001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "user_select": {
+            "1": {"effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}], "description": "回复3sp"},
+            "2": {"effects": [{"type": "resource", "target": "self", "sp": 0}], "description": "不回复3sp"}
+          }
+        }
       ]
     }
   },
@@ -4403,7 +4439,11 @@
     "team": "31F", "tier": "S", "attack_type": "stab", "elements": ["light"], "role": "breaker",
     "limit_break": {
       "3": [
-        {"id": 2930001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
+        {"id": 2930001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "user_select": {
+            "1": {"effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}], "description": "回复3sp"},
+            "2": {"effects": [{"type": "resource", "target": "self", "sp": 0}], "description": "不回复3sp"}
+          }
+        }
       ]
     }
   },
@@ -5350,7 +5390,11 @@
     "team": "31X", "tier": "S", "attack_type": "stab", "elements": [], "role": "debuffer",
     "limit_break": {
       "3": [
-        {"id": 3570001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
+        {"id": 3570001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "user_select": {
+            "1": {"effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}], "description": "回复3sp"},
+            "2": {"effects": [{"type": "resource", "target": "self", "sp": 0}], "description": "不回复3sp"}
+          }
+        }
       ]
     }
   },
@@ -5652,7 +5696,11 @@
     "team": "31AB", "tier": "S", "attack_type": "strike", "elements": ["ice"], "role": "debuffer",
     "limit_break": {
       "3": [
-        {"id": 3740001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}]}
+        {"id": 3740001, "name": "佳音", "trigger": "on_new_turn_start", "trigger_condition": "front()", "user_select": {
+            "1": {"effects": [{"type": "resource", "target": "self", "sp": 3, "random": 0.3}], "description": "回复3sp"},
+            "2": {"effects": [{"type": "resource", "target": "self", "sp": 0}], "description": "不回复3sp"}
+          }
+        }
       ],
       "10": [
         {"id": 3740002, "name": "冰之指令", "trigger": "on_action_start", "trigger_condition": "dp_rate()>=0.8 and front()", "effects": [{"type": "attack_up", "target": "ally_front", "elements": ["ice"], "value": 18, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
