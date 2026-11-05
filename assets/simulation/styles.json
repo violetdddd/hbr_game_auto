@@ -1745,7 +1745,7 @@
       ]
     },
     "special": [
-      {"type": "demon_cavalry", "names": {"zh_cn": "魔界骑兵启动", "zh_tw": "魔界騎兵", "jp": "魔界騎兵"}, "trigger": "on_battle_start", "uses": 3, "action": "special_command"}
+      {"type": "demon_cavalry", "names": {"zh_cn": "魔界骑兵启动", "zh_tw": "魔界騎兵启动", "jp": "魔界騎兵启动"}, "trigger": "user_select", "trigger_limit": 3, "effect": [{"type": "fear_for_demon", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 230}, {"type": "attack", "hit": 6, "target": "all"}]}
     ]
   },
   "114": {
@@ -5469,7 +5469,7 @@
     },
     "special": [
       {"type": "overwrite_sp", "target": "self", "sp": 0, "exclude": "use_all", "status_id": 175, "target_condition": "has(229)"},
-      {"type": "demonic_rage", "names": {"zh_cn": "鬼神化", "zh_tw": "鬼神化", "jp": "鬼神化"}, "trigger": "user_select", "uses": 3, "effects": [{"type": "gui_shen", "duration": {"type": "ally_turn", "value": 3}, "status_id": 229, "target": "self"}, {"type": "resource", "target": "od", "od": 15}, {"type": "remove_debuff", "target": "self"}, {"type": "revive_dp_rate", "target": "self", "value": 100}, {"type": "funnel", "target": "self", "mode": {"number": 3, "value": 25}, "solo": true, "status_id": 13, "duration": {"type": "ally_turn", "value": 3}}, {"type": "mind_eye", "target": "self", "value": 120, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "status_id": 78}]}
+      {"type": "demonic_rage", "names": {"zh_cn": "鬼神化", "zh_tw": "鬼神化", "jp": "鬼神化"}, "trigger": "user_select", "trigger_limit": 3, "effects": [{"type": "gui_shen", "duration": {"type": "ally_turn", "value": 3}, "status_id": 229, "target": "self"}, {"type": "resource", "target": "od", "od": 15}, {"type": "remove_debuff", "target": "self"}, {"type": "revive_dp_rate", "target": "self", "value": 100}, {"type": "funnel", "target": "self", "mode": {"number": 3, "value": 25}, "solo": true, "status_id": 13, "duration": {"type": "ally_turn", "value": 3}}, {"type": "mind_eye", "target": "self", "value": 120, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "status_id": 78}]}
     ]
   },
   "366": {
@@ -5696,7 +5696,7 @@
     },
     "support_skill": {"name": "帕特拉", "kind": "support", "trigger": "on_new_turn_start", "effects": [{"type": "heal_dp_rate", "target": "self", "value": [2, 3, 4, 5, 6]}, {"type": "remove_special_status", "target": "self", "duration": {"type": "one_shot"}, "status": "stun", "status_id": 30}]},
     "special": [
-      {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.count(during_down_turn()) == enemy.count()", "uses": 1, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true, "hit": 7}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
+      {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.count(during_down_turn()) == enemy.count()", "trigger_limit": 1, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true, "hit": 7}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
     ]
   },
   "379": {
@@ -5719,7 +5719,7 @@
       ]
     },
     "special": [
-      {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.count(during_down_turn()) == enemy.count()", "uses": 1, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true, "hit": 7}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
+      {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.count(during_down_turn()) == enemy.count()", "trigger_limit": 1, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true, "hit": 7}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
     ]
   },
   "380": {
@@ -5742,7 +5742,7 @@
       ]
     },
     "special": [
-      {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.count(during_down_turn()) == enemy.count()", "uses": 1, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true, "hit": 7}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
+      {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.count(during_down_turn()) == enemy.count()", "trigger_limit": 1, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true, "hit": 7}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
     ]
   }
 }

@@ -198,5 +198,10 @@
     "category": "buff", 
     "overwrite_sp": 0,
     "not_display": true
+  },
+  "230": {
+    "name": "fear_for_demon",
+    "zh_cn": "对魔王的恐惧",
+    "category": "debuff"
   }
 }
