@@ -10,7 +10,7 @@
     "english name": "NNanase",
     "style": {
       "天使危機": {
-        "value": "天使危機",
+        "value": "天使危機", "simulation_id": 366,
         "names": {
           "zh-TW": "天使危機",
           "jp": "エンジェルクライシス",
@@ -24,12 +24,12 @@
         "tier": "SSR"
       },
       "約定在晨曦的彼端": {
-        "value": "約定在晨曦的彼端",
+        "value": "約定在晨曦的彼端", "simulation_id": 367,
         "names": {
           "zh-TW": "約定在晨曦的彼端",
           "jp": "約束は暁の彼方で",
           "zh-CN": "约定在晨曦的彼端",
-          "zh-CN-CN": "约定在晨曦的彼端"
+          "zh-CN-CN": "约定在拂晓彼端"
         },
         "id": "002",
         "ele": [
@@ -41,7 +41,7 @@
     "skill": {
       "common": {
         "音速增強": {
-          "value": "音速增強",
+          "value": "音速增強", "simulation_id": 515,
           "names": {
             "zh-TW": "音速增強",
             "jp": "ソニックブースト",
@@ -51,7 +51,7 @@
           "sp": 7
         },
         "霓虹爆裂": {
-          "value": "霓虹爆裂",
+          "value": "霓虹爆裂", "simulation_id": 516,
           "names": {
             "zh-TW": "霓虹爆裂",
             "jp": "ネオンバースト",
@@ -61,7 +61,7 @@
           "sp": 7
         },
         "新星肅清": {
-          "value": "新星肅清",
+          "value": "新星肅清", "simulation_id": 518,
           "names": {
             "zh-TW": "新星肅清",
             "jp": "ノヴァエリミネーション",
@@ -73,7 +73,7 @@
       },
       "約定在晨曦的彼端": {
         "深藏的心意": {
-          "value": "深藏的心意",
+          "value": "深藏的心意", "simulation_id": 517,
           "names": {
             "zh-TW": "深藏的心意",
             "jp": "宿る想い",
@@ -83,18 +83,18 @@
           "sp": 8
         },
         "祈禱之花，託付風中": {
-          "value": "祈禱之花，託付風中",
+          "value": "祈禱之花，託付風中", "simulation_id": 519,
           "names": {
             "zh-TW": "祈禱之花，託付風中",
             "jp": "祈りの花、風に託して",
             "zh-CN": "祈祷之花，托付风中",
-            "zh-CN-CN": "祈祷之花，托付风中"
+            "zh-CN-CN": "祈祷之花，托付于风"
           },
           "sp": 0
         },
         "command action": {
           "指揮行動": {
-            "value": "指揮行動",
+            "value": "指揮行動", "simulation_id": 2,
             "names": {
               "zh-TW": "指揮行動",
               "jp": "指揮行動",
@@ -108,12 +108,12 @@
     },
     "passive skill": {
       "盛放的花朵": {
-        "value": "盛放的花朵",
+        "value": "盛放的花朵", "simulation_id": 514,
         "names": {
           "zh-TW": "盛放的花朵",
           "jp": "咲き誇る花",
           "zh-CN": "盛放的花朵",
-          "zh-CN-CN": "盛放的花朵"
+          "zh-CN-CN": "盛开的鲜花"
         }
       }
     }
@@ -129,12 +129,12 @@
     "english name": "STezuka",
     "style": {
       "希望的晨曦": {
-        "value": "希望的晨曦",
+        "value": "希望的晨曦", "simulation_id": 365,
         "names": {
           "zh-TW": "希望的晨曦",
           "jp": "希望の暁",
           "zh-CN": "希望的晨曦",
-          "zh-CN-CN": "希望的晨曦"
+          "zh-CN-CN": "希望的拂晓"
         },
         "id": "001",
         "ele": [
@@ -146,17 +146,17 @@
     "skill": {
       "common": {
         "重點突破": {
-          "value": "重點突破",
+          "value": "重點突破", "simulation_id": 629,
           "names": {
             "zh-TW": "重點突破",
             "jp": "一点突破",
             "zh-CN": "重点突破",
-            "zh-CN-CN": "重点突破"
+            "zh-CN-CN": "一点突破"
           },
           "sp": 10
         },
         "三槍狂襲": {
-          "value": "三槍狂襲",
+          "value": "三槍狂襲", "simulation_id": 631,
           "names": {
             "zh-TW": "三槍狂襲",
             "jp": "トリニティ・ブレイジング",
@@ -178,12 +178,12 @@
           "sp": 0
         },
         "凌霄的鐵鎚": {
-          "value": "凌霄的鐵鎚",
+          "value": "凌霄的鐵鎚", "simulation_id": 630,
           "names": {
             "zh-TW": "凌霄的鐵鎚",
             "jp": "天駆の鉄槌",
             "zh-CN": "凌霄的铁锤",
-            "zh-CN-CN": "凌霄的铁锤"
+            "zh-CN-CN": "凌空铁锤"
           },
           "sp": 12
         }

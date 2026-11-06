@@ -10,7 +10,7 @@
     "english name": "Carole_Reaper",
     "style": {
       "星之繼承者": {
-        "value": "星之繼承者",
+        "value": "星之繼承者", "simulation_id": 319,
         "names": {
           "zh-TW": "星之繼承者",
           "jp": "星の継承者",
@@ -22,7 +22,7 @@
         "tier": "A"
       },
       "心之風景": {
-        "value": "心之風景",
+        "value": "心之風景", "simulation_id": 320,
         "names": {
           "zh-TW": "心之風景",
           "jp": "心の風景",
@@ -34,7 +34,7 @@
         "tier": "S"
       },
       "泛紫之城": {
-        "value": "泛紫之城",
+        "value": "泛紫之城", "simulation_id": 322,
         "names": {
           "zh-TW": "泛紫之城",
           "jp": "キャッスル・オブ・パープル",
@@ -48,7 +48,7 @@
         "tier": "S"
       },
       "摩天樓的暗黑英雄": {
-        "value": "摩天樓的暗黑英雄",
+        "value": "摩天樓的暗黑英雄", "simulation_id": 321,
         "names": {
           "zh-TW": "摩天樓的暗黑英雄",
           "jp": "摩天楼のダークヒーロー",
@@ -62,7 +62,7 @@
         "tier": "SS"
       },
       "Carnival with You": {
-        "value": "Carnival with You",
+        "value": "Carnival with You", "simulation_id": 323,
         "names": {
           "zh-TW": "Carnival with You",
           "jp": "Carnival with You",
@@ -76,7 +76,7 @@
         "tier": "SS"
       },
       "Have no fear! I'm a hero!": {
-        "value": "Have no fear! I'm a hero!",
+        "value": "Have no fear! I'm a hero!", "simulation_id": 324,
         "names": {
           "zh-TW": "Have no fear! I'm a hero!",
           "jp": "Have no fear! I'm a hero!",
@@ -90,7 +90,7 @@
         "tier": "SSR"
       },
       "A Taste of Victory!": {
-        "value": "A Taste of Victory!",
+        "value": "A Taste of Victory!", "simulation_id": 325,
         "names": {
           "zh-TW": "A Taste of Victory!",
           "jp": "A Taste of Victory!",
@@ -107,7 +107,7 @@
     "skill": {
       "common": {
         "爆破斬": {
-          "value": "爆破斬",
+          "value": "爆破斬", "simulation_id": 128,
           "names": {
             "zh-TW": "爆破斬",
             "jp": "ブラスト・スラッシュ",
@@ -117,7 +117,7 @@
           "sp": 4
         },
         "制裁者": {
-          "value": "制裁者",
+          "value": "制裁者", "simulation_id": 129,
           "names": {
             "zh-TW": "制裁者",
             "jp": "パニッシャー",
@@ -127,7 +127,7 @@
           "sp": 10
         },
         "閃電怒吼": {
-          "value": "閃電怒吼",
+          "value": "閃電怒吼", "simulation_id": 130,
           "names": {
             "zh-TW": "閃電怒吼",
             "jp": "ライトニングロア",
@@ -137,7 +137,7 @@
           "sp": 8
         },
         "雷霆風暴": {
-          "value": "雷霆風暴",
+          "value": "雷霆風暴", "simulation_id": 134,
           "names": {
             "zh-TW": "雷霆風暴",
             "jp": "サンダーストーム",
@@ -147,7 +147,7 @@
           "sp": 14
         },
         "漩渦中的紫羅蘭": {
-          "value": "漩渦中的紫羅蘭",
+          "value": "漩渦中的紫羅蘭", "simulation_id": 131,
           "names": {
             "zh-TW": "漩渦中的紫羅蘭",
             "jp": "渦中のヴァイオレット",
@@ -157,7 +157,7 @@
           "sp": 10
         },
         "你的英雄": {
-          "value": "你的英雄",
+          "value": "你的英雄", "simulation_id": 132,
           "names": {
             "zh-TW": "你的英雄",
             "jp": "あなたのヒーロー",
@@ -167,7 +167,7 @@
           "sp": 8
         },
         "傳奇模式": {
-          "value": "傳奇模式",
+          "value": "傳奇模式", "simulation_id": 133,
           "names": {
             "zh-TW": "傳奇模式",
             "jp": "レジェンドモード",
@@ -179,7 +179,7 @@
       },
       "Carnival with You": {
         "秘密的浪漫": {
-          "value": "秘密的浪漫",
+          "value": "秘密的浪漫", "simulation_id": 135,
           "names": {
             "zh-TW": "秘密的浪漫",
             "jp": "秘密のロマンティック",
@@ -191,19 +191,19 @@
       },
       "Have no fear! I'm a hero!": {
         "正義雷霆": {
-          "value": "正義雷霆",
+          "value": "正義雷霆", "simulation_id": 136,
           "names": {
             "zh-TW": "正義雷霆",
             "jp": "サンダー・オブ・ジャスティス",
             "zh-CN": "正义雷霆",
-            "zh-CN-CN": "正义雷霆"
+            "zh-CN-CN": "正义之雷"
           },
           "sp": 17
         }
       },
       "A Taste of Victory!": {
         "Served Amazing": {
-          "value": "Served Amazing",
+          "value": "Served Amazing", "simulation_id": 137,
           "names": {
             "zh-TW": "Served Amazing",
             "jp": "サーブド・アメイジング",
@@ -214,12 +214,12 @@
         },
         "passive skill": {
           "荒野式補滿能量": {
-            "value": "荒野式補滿能量",
+            "value": "荒野式補滿能量", "simulation_id": 127,
             "names": {
               "zh-TW": "荒野式補滿能量",
               "jp": "荒野式フルチャージ",
               "zh-CN": "荒野式补满能量",
-              "zh-CN-CN": "荒野式补满能量"
+              "zh-CN-CN": "荒野式全充能"
             }
           }
         }
@@ -227,12 +227,12 @@
     },
     "passive skill": {
       "英雄的原則": {
-        "value": "英雄的原則",
+        "value": "英雄的原則", "simulation_id": 126,
         "names": {
           "zh-TW": "英雄的原則",
           "jp": "ヒーローの心得",
           "zh-CN": "英雄的原则",
-          "zh-CN-CN": "英雄的原则"
+          "zh-CN-CN": "英雄的心得"
         }
       }
     }
@@ -248,7 +248,7 @@
     "english name": "Yingxia_Li",
     "style": {
       "臥龍的代言人": {
-        "value": "臥龍的代言人",
+        "value": "臥龍的代言人", "simulation_id": 326,
         "names": {
           "zh-TW": "臥龍的代言人",
           "jp": "臥龍の代弁者",
@@ -260,7 +260,7 @@
         "tier": "A"
       },
       "武成在天": {
-        "value": "武成在天",
+        "value": "武成在天", "simulation_id": 327,
         "names": {
           "zh-TW": "武成在天",
           "jp": "武を成すは天に在り",
@@ -272,12 +272,12 @@
         "tier": "S"
       },
       "自豪的戰鬥服": {
-        "value": "自豪的戰鬥服",
+        "value": "自豪的戰鬥服", "simulation_id": 331,
         "names": {
           "zh-TW": "自豪的戰鬥服",
           "jp": "誇り高き戦装束",
           "zh-CN": "自豪的战斗服",
-          "zh-CN-CN": "自豪的战斗服"
+          "zh-CN-CN": "引以为傲的战斗服"
         },
         "id": "006",
         "ele": [
@@ -286,7 +286,7 @@
         "tier": "S"
       },
       "吾不勇，與無將同": {
-        "value": "吾不勇，與無將同",
+        "value": "吾不勇，與無將同", "simulation_id": 328,
         "names": {
           "zh-TW": "吾不勇，與無將同",
           "jp": "我、勇ならざるは将なきに同じ",
@@ -298,7 +298,7 @@
         "tier": "SS"
       },
       "引路一襲露草色": {
-        "value": "引路一襲露草色",
+        "value": "引路一襲露草色", "simulation_id": 329,
         "names": {
           "zh-TW": "引路一襲露草色",
           "jp": "いざなうつゆくさ",
@@ -312,7 +312,7 @@
         "tier": "SS"
       },
       "春宵我愛你": {
-        "value": "春宵我愛你",
+        "value": "春宵我愛你", "simulation_id": 330,
         "names": {
           "zh-TW": "春宵我愛你",
           "jp": "春宵ウォーアイニー",
@@ -324,19 +324,19 @@
         "tier": "SS"
       },
       "琉璃色的絢爛華美": {
-        "value": "琉璃色的絢爛華美",
+        "value": "琉璃色的絢爛華美", "simulation_id": 332,
         "names": {
           "zh-TW": "琉璃色的絢爛華美",
           "jp": "瑠璃色絢爛美々",
           "zh-CN": "琉璃色的绚烂华美",
-          "zh-CN-CN": "琉璃色的绚烂华美"
+          "zh-CN-CN": "绚烂华美琉璃色"
         },
         "id": "007",
         "ele": [],
         "tier": "SS"
       },
       "好吃♪飽腹桃花源": {
-        "value": "好吃♪飽腹桃花源",
+        "value": "好吃♪飽腹桃花源", "simulation_id": 333,
         "names": {
           "zh-TW": "好吃♪飽腹桃花源",
           "jp": "ハオチー♪満腹桃源郷",
@@ -353,7 +353,7 @@
     "skill": {
       "common": {
         "增強": {
-          "value": "增強",
+          "value": "增強", "simulation_id": 230,
           "names": {
             "zh-TW": "增強",
             "jp": "エンハンス",
@@ -363,7 +363,7 @@
           "sp": 6
         },
         "臥龍演舞斬": {
-          "value": "臥龍演舞斬",
+          "value": "臥龍演舞斬", "simulation_id": 355,
           "names": {
             "zh-TW": "臥龍演舞斬",
             "jp": "臥龍演舞斬",
@@ -373,7 +373,7 @@
           "sp": 6
         },
         "臥龍天命": {
-          "value": "臥龍天命",
+          "value": "臥龍天命", "simulation_id": 356,
           "names": {
             "zh-TW": "臥龍天命",
             "jp": "臥龍天命",
@@ -383,7 +383,7 @@
           "sp": 7
         },
         "第七計 無中生有": {
-          "value": "第七計 無中生有",
+          "value": "第七計 無中生有", "simulation_id": 361,
           "names": {
             "zh-TW": "第七計 無中生有",
             "jp": "第七計 無中生有",
@@ -393,7 +393,7 @@
           "sp": 11
         },
         "第七計 無中生有+": {
-          "value": "第七計 無中生有+",
+          "value": "第七計 無中生有+", "simulation_id": 362,
           "names": {
             "zh-TW": "第七計 無中生有+",
             "jp": "第七計 無中生有+",
@@ -403,7 +403,7 @@
           "sp": 11
         },
         "春雷": {
-          "value": "春雷",
+          "value": "春雷", "simulation_id": 357,
           "names": {
             "zh-TW": "春雷",
             "jp": "春雷",
@@ -413,7 +413,7 @@
           "sp": 8
         },
         "螳螂之斧": {
-          "value": "螳螂之斧",
+          "value": "螳螂之斧", "simulation_id": 358,
           "names": {
             "zh-TW": "螳螂之斧",
             "jp": "螳螂之斧",
@@ -423,7 +423,7 @@
           "sp": 10
         },
         "炎焰": {
-          "value": "炎焰",
+          "value": "炎焰", "simulation_id": 359,
           "names": {
             "zh-TW": "炎焰",
             "jp": "炎焔",
@@ -433,7 +433,7 @@
           "sp": 8
         },
         "輝耀": {
-          "value": "輝耀",
+          "value": "輝耀", "simulation_id": 360,
           "names": {
             "zh-TW": "輝耀",
             "jp": "輝耀",
@@ -445,7 +445,7 @@
       },
       "引路一襲露草色": {
         "霓裳羽衣舞‧霹靂": {
-          "value": "霓裳羽衣舞‧霹靂",
+          "value": "霓裳羽衣舞‧霹靂", "simulation_id": 363,
           "names": {
             "zh-TW": "霓裳羽衣舞‧霹靂",
             "jp": "霓裳羽衣ノ舞・霹靂",
@@ -457,7 +457,7 @@
       },
       "春宵我愛你": {
         "恰似春宵塵土": {
-          "value": "恰似春宵塵土",
+          "value": "恰似春宵塵土", "simulation_id": 364,
           "names": {
             "zh-TW": "恰似春宵塵土",
             "jp": "春の宵の塵に同じ",
@@ -469,19 +469,19 @@
       },
       "琉璃色的絢爛華美": {
         "藍薔薇圓舞曲": {
-          "value": "藍薔薇圓舞曲",
+          "value": "藍薔薇圓舞曲", "simulation_id": 365,
           "names": {
             "zh-TW": "藍薔薇圓舞曲",
             "jp": "青薔薇ノ円舞曲",
             "zh-CN": "蓝蔷薇圆舞曲",
-            "zh-CN-CN": "蓝蔷薇圆舞曲"
+            "zh-CN-CN": "青蔷薇圆舞曲"
           },
           "sp": 14
         }
       },
       "好吃♪飽腹桃花源": {
         "熱騰騰！飲茶時間": {
-          "value": "熱騰騰！飲茶時間",
+          "value": "熱騰騰！飲茶時間", "simulation_id": 366,
           "names": {
             "zh-TW": "熱騰騰！飲茶時間",
             "jp": "熱々！飲茶タイム",
@@ -492,7 +492,7 @@
         },
         "passive skill": {
           "滿漢全席": {
-            "value": "滿漢全席",
+            "value": "滿漢全席", "simulation_id": 353,
             "names": {
               "zh-TW": "滿漢全席",
               "jp": "満漢全席",
@@ -516,7 +516,7 @@
     "english name": "Irene_Redmayne",
     "style": {
       "難解事件的探求者": {
-        "value": "難解事件的探求者",
+        "value": "難解事件的探求者", "simulation_id": 334,
         "names": {
           "zh-TW": "難解事件的探求者",
           "jp": "不可思議の探求者",
@@ -528,7 +528,7 @@
         "tier": "A"
       },
       "貝克街的軌跡": {
-        "value": "貝克街的軌跡",
+        "value": "貝克街的軌跡", "simulation_id": 335,
         "names": {
           "zh-TW": "貝克街的軌跡",
           "jp": "ベイカー街の軌跡",
@@ -540,7 +540,7 @@
         "tier": "S"
       },
       "香檸檬的撫慰": {
-        "value": "香檸檬的抚慰",
+        "value": "香檸檬的抚慰", "simulation_id": 339,
         "names": {
           "zh-TW": "香檸檬的抚慰",
           "jp": "ベルガモットの安らぎ",
@@ -554,7 +554,7 @@
         "tier": "S"
       },
       "藍色石榴石探案": {
-        "value": "藍色石榴石探案",
+        "value": "藍色石榴石探案", "simulation_id": 336,
         "names": {
           "zh-TW": "藍色石榴石探案",
           "jp": "碧いカーヴァンクル",
@@ -566,7 +566,7 @@
         "tier": "SS"
       },
       "月下的捉迷藏": {
-        "value": "月下的捉迷藏",
+        "value": "月下的捉迷藏", "simulation_id": 337,
         "names": {
           "zh-TW": "月下的捉迷藏",
           "jp": "月下のハイドアンドシーク",
@@ -578,7 +578,7 @@
         "tier": "SS"
       },
       "頌歌的微風所向": {
-        "value": "頌歌的微風所向",
+        "value": "頌歌的微風所向", "simulation_id": 338,
         "names": {
           "zh-TW": "頌歌的微風所向",
           "jp": "謳うそよ風の向かう先",
@@ -590,19 +590,19 @@
         "tier": "SS"
       },
       "迷霧之街的名偵探": {
-        "value": "迷霧之街的名偵探",
+        "value": "迷霧之街的名偵探", "simulation_id": 340,
         "names": {
           "zh-TW": "迷霧之街的名偵探",
           "jp": "霧煙る街の名探偵",
           "zh-CN": "迷雾之街的名侦探",
-          "zh-CN-CN": "迷雾之街的名侦探"
+          "zh-CN-CN": "雾之街的名侦探"
         },
         "id": "007",
         "ele": [],
         "tier": "SS"
       },
       "Spot of Tea": {
-        "value": "Spot of Tea",
+        "value": "Spot of Tea", "simulation_id": 341,
         "names": {
           "zh-TW": "Spot of Tea",
           "jp": "Spot of Tea",
@@ -617,7 +617,7 @@
     "skill": {
       "common": {
         "基礎子彈": {
-          "value": "基礎子彈",
+          "value": "基礎子彈", "simulation_id": 271,
           "names": {
             "zh-TW": "基礎子彈",
             "jp": "エレメンタリー・バレット",
@@ -627,7 +627,7 @@
           "sp": 4
         },
         "排除可能": {
-          "value": "排除可能",
+          "value": "排除可能", "simulation_id": 273,
           "names": {
             "zh-TW": "排除可能",
             "jp": "エリミネイト・ポッシブル",
@@ -637,7 +637,7 @@
           "sp": 5
         },
         "堅忍意志": {
-          "value": "堅忍意志",
+          "value": "堅忍意志", "simulation_id": 272,
           "names": {
             "zh-TW": "堅忍意志",
             "jp": "ホールドアップマインド",
@@ -647,7 +647,7 @@
           "sp": 8
         },
         "真相洞悉者": {
-          "value": "真相洞悉者",
+          "value": "真相洞悉者", "simulation_id": 279,
           "names": {
             "zh-TW": "真相洞悉者",
             "jp": "トゥルーペネトレーター",
@@ -657,7 +657,7 @@
           "sp": 15
         },
         "真相洞悉者+": {
-          "value": "真相洞悉者+",
+          "value": "真相洞悉者+", "simulation_id": 280,
           "names": {
             "zh-TW": "真相洞悉者+",
             "jp": "トゥルーペネトレーター+",
@@ -667,7 +667,7 @@
           "sp": 15
         },
         "沒有解不開的謎題": {
-          "value": "沒有解不開的謎題",
+          "value": "沒有解不開的謎題", "simulation_id": 274,
           "names": {
             "zh-TW": "沒有解不開的謎題",
             "jp": "解けない謎はない",
@@ -677,7 +677,7 @@
           "sp": 8
         },
         "回想": {
-          "value": "回想",
+          "value": "回想", "simulation_id": 275,
           "names": {
             "zh-TW": "回想",
             "jp": "リコレクション",
@@ -687,27 +687,27 @@
           "sp": 14
         },
         "下午茶小憩": {
-          "value": "下午茶小憩",
+          "value": "下午茶小憩", "simulation_id": 276,
           "names": {
             "zh-TW": "下午茶小憩",
             "jp": "ティーブレイク",
             "zh-CN": "下午茶小憩",
-            "zh-CN-CN": "下午茶小憩"
+            "zh-CN-CN": "茶歇"
           },
           "sp": 10
         },
         "背水的賭注": {
-          "value": "背水的賭注",
+          "value": "背水的賭注", "simulation_id": 277,
           "names": {
             "zh-TW": "背水的賭注",
             "jp": "背水のギャンビット",
             "zh-CN": "背水的赌注",
-            "zh-CN-CN": "背水的赌注"
+            "zh-CN-CN": "背水的弃兵"
           },
           "sp": 10
         },
         "仰望星空派": {
-          "value": "仰望星空派",
+          "value": "仰望星空派", "simulation_id": 278,
           "names": {
             "zh-TW": "仰望星空派",
             "jp": "スターゲイジー・パイ",
@@ -719,7 +719,7 @@
       },
       "月下的捉迷藏": {
         "華麗的幻影怪盜": {
-          "value": "華麗的幻影怪盜",
+          "value": "華麗的幻影怪盜", "simulation_id": 281,
           "names": {
             "zh-TW": "華麗的幻影怪盜",
             "jp": "華麗なるファントム・シーフ",
@@ -731,7 +731,7 @@
       },
       "頌歌的微風所向": {
         "夢想花田": {
-          "value": "夢想花田",
+          "value": "夢想花田", "simulation_id": 282,
           "names": {
             "zh-TW": "夢想花田",
             "jp": "ドリーミー・ガーデン",
@@ -743,19 +743,19 @@
       },
       "迷霧之街的名偵探": {
         "天球射擊": {
-          "value": "天球射擊",
+          "value": "天球射擊", "simulation_id": 283,
           "names": {
             "zh-TW": "天球射擊",
             "jp": "セレスティアルショット",
             "zh-CN": "天球射击",
-            "zh-CN-CN": "天球射击"
+            "zh-CN-CN": "天穹射击"
           },
           "sp": 14
         }
       },
       "Spot of Tea": {
         "私房茶會": {
-          "value": "私房茶會",
+          "value": "私房茶會", "simulation_id": 284,
           "names": {
             "zh-TW": "私房茶會",
             "jp": "とっておきのティーパーティ",
@@ -768,12 +768,12 @@
     },
     "passive skill": {
       "名偵探會照破一切": {
-        "value": "名偵探會照破一切",
+        "value": "名偵探會照破一切", "simulation_id": 270,
         "names": {
           "zh-TW": "名偵探會照破一切",
           "jp": "名探偵は明るく照らす",
           "zh-CN": "名侦探会照破一切",
-          "zh-CN-CN": "名侦探会照破一切"
+          "zh-CN-CN": "名侦探将照亮一切"
         }
       }
     }
@@ -789,7 +789,7 @@
     "english name": "Vritika_Balakrishnan",
     "style": {
       "華麗的飛天女神": {
-        "value": "華麗的飛天女神",
+        "value": "華麗的飛天女神", "simulation_id": 342,
         "names": {
           "zh-TW": "華麗的飛天女神",
           "jp": "華麗なるアプサラス",
@@ -801,7 +801,7 @@
         "tier": "A"
       },
       "前途未卜的吠陀支": {
-        "value": "前途未卜的吠陀支",
+        "value": "前途未卜的吠陀支", "simulation_id": 343,
         "names": {
           "zh-TW": "前途未卜的吠陀支",
           "jp": "未知数なヴェーダーンガ",
@@ -813,7 +813,7 @@
         "tier": "S"
       },
       "華麗的日常": {
-        "value": "華麗的日常",
+        "value": "華麗的日常", "simulation_id": 345,
         "names": {
           "zh-TW": "華麗的日常",
           "jp": "華麗なる日常",
@@ -825,7 +825,7 @@
         "tier": "S"
       },
       "連繫未來的戰略會議 ": {
-        "value": "連繫未來的戰略會議",
+        "value": "連繫未來的戰略會議", "simulation_id": 348,
         "names": {
           "zh-TW": "連繫未來的戰略會議",
           "jp": " 未来へつなぐ戦略会議",
@@ -837,7 +837,7 @@
         "tier": "S"
       },
       "凜然的杜爾迦": {
-        "value": "凜然的杜爾迦",
+        "value": "凜然的杜爾迦", "simulation_id": 344,
         "names": {
           "zh-TW": "凜然的杜爾迦",
           "jp": "凛々しきドゥルガー",
@@ -849,7 +849,7 @@
         "tier": "SS"
       },
       "美麗的聖虎": {
-        "value": "美麗的聖虎",
+        "value": "美麗的聖虎", "simulation_id": 346,
         "names": {
           "zh-TW": "美麗的聖虎",
           "jp": "美しきシャールドゥーラ",
@@ -861,12 +861,12 @@
         "tier": "SS"
       },
       "款待的安納布爾納": {
-        "value": "款待的安納布爾納",
+        "value": "款待的安納布爾納", "simulation_id": 347,
         "names": {
           "zh-TW": "款待的安納布爾納",
           "jp": "歓待のアンナプールナ",
           "zh-CN": "款待的安纳布尔纳",
-          "zh-CN-CN": "款待的安纳布尔纳"
+          "zh-CN-CN": "给予款待的安纳普尔纳"
         },
         "id": "006",
         "ele": [
@@ -878,7 +878,7 @@
     "skill": {
       "common": {
         "整體減法": {
-          "value": "整體減法",
+          "value": "整體減法", "simulation_id": 667,
           "names": {
             "zh-TW": "整體減法",
             "jp": "トータルサブトラクション",
@@ -888,7 +888,7 @@
           "sp": 6
         },
         "原理為韻律學": {
-          "value": "原理為韻律學",
+          "value": "原理為韻律學", "simulation_id": 668,
           "names": {
             "zh-TW": "原理為韻律學",
             "jp": "プリンシプルチャンダス",
@@ -898,7 +898,7 @@
           "sp": 10
         },
         "生存食糧": {
-          "value": "生存食糧",
+          "value": "生存食糧", "simulation_id": 670,
           "names": {
             "zh-TW": "生存食糧",
             "jp": "ジーナーカーナー",
@@ -908,7 +908,7 @@
           "sp": 8
         },
         "燦然光輝": {
-          "value": "燦然光輝",
+          "value": "燦然光輝", "simulation_id": 669,
           "names": {
             "zh-TW": "燦然光輝",
             "jp": "高輝の燦",
@@ -918,7 +918,7 @@
           "sp": 10
         },
         "瘋狂亂舞的迦梨": {
-          "value": "瘋狂亂舞的迦梨",
+          "value": "瘋狂亂舞的迦梨", "simulation_id": 672,
           "names": {
             "zh-TW": "瘋狂亂舞的迦梨",
             "jp": "狂気乱舞のカーリー",
@@ -928,7 +928,7 @@
           "sp": 14
         },
         "瘋狂亂舞的迦梨+": {
-          "value": "瘋狂亂舞的迦梨+",
+          "value": "瘋狂亂舞的迦梨+", "simulation_id": 673,
           "names": {
             "zh-TW": "瘋狂亂舞的迦梨+",
             "jp": "狂気乱舞のカーリー+",
@@ -938,7 +938,7 @@
           "sp": 14
         },
         "紅蓮舞蹈": {
-          "value": "紅蓮舞蹈",
+          "value": "紅蓮舞蹈", "simulation_id": 671,
           "names": {
             "zh-TW": "紅蓮舞蹈",
             "jp": "パドマ・ナーチュナー",
@@ -950,7 +950,7 @@
       },
       "美麗的聖虎": {
         "艷麗辯才天": {
-          "value": "艷麗辯才天",
+          "value": "艷麗辯才天", "simulation_id": 674,
           "names": {
             "zh-TW": "艷麗辯才天",
             "jp": "艶色のサラスヴァティー",
@@ -962,23 +962,23 @@
       },
       "款待的安納布爾納": {
         "ANURAGA的饗宴": {
-          "value": "ANURAGA的饗宴",
+          "value": "ANURAGA的饗宴", "simulation_id": 675,
           "names": {
             "zh-TW": "ANURAGA的饗宴",
             "jp": "饗宴アヌラーガ",
             "zh-CN": "ANURAGA的飨宴",
-            "zh-CN-CN": "ANURAGA的飨宴"
+            "zh-CN-CN": "爱之飨宴"
           },
           "sp": 13
         },
         "passive skill": {
           "再來一份印度烤餅": {
-            "value": "再來一份印度烤餅",
+            "value": "再來一份印度烤餅", "simulation_id": 665,
             "names": {
               "zh-TW": "再來一份印度烤餅",
               "jp": "ナンおかわり",
               "zh-CN": "再来一份印度烤饼",
-              "zh-CN-CN": "再来一份印度烤饼"
+              "zh-CN-CN": "再来一份印度烤馕"
             }
           }
         }
@@ -986,7 +986,7 @@
     },
     "passive skill": {
       "最佳防衛陣": {
-        "value": "最佳防衛陣",
+        "value": "最佳防衛陣", "simulation_id": 666,
         "names": {
           "zh-TW": "最佳防衛陣",
           "jp": "最適防衛陣",
@@ -1007,7 +1007,7 @@
     "english name": "Maria_de_Angelis",
     "style": {
       "真紅色的修女": {
-        "value": "真紅色的修女",
+        "value": "真紅色的修女", "simulation_id": 349,
         "names": {
           "zh-TW": "真紅色的修女",
           "jp": "くれないのシスター",
@@ -1019,7 +1019,7 @@
         "tier": "A"
       },
       "罪惡與榮耀": {
-        "value": "罪惡與榮耀",
+        "value": "罪惡與榮耀", "simulation_id": 350,
         "names": {
           "zh-TW": "罪惡與榮耀",
           "jp": "罪と栄光",
@@ -1031,12 +1031,12 @@
         "tier": "S"
       },
       "萊姆與草莓": {
-        "value": "萊姆與草莓",
+        "value": "萊姆與草莓", "simulation_id": 354,
         "names": {
           "zh-TW": "萊姆與草莓",
           "jp": "ライム・アンド・ストロベリー",
           "zh-CN": "莱姆与草莓",
-          "zh-CN-CN": "莱姆与草莓"
+          "zh-CN-CN": "青柠与草莓"
         },
         "id": "006",
         "ele": [
@@ -1045,7 +1045,7 @@
         "tier": "S"
       },
       "血色浮雕": {
-        "value": "血色浮雕",
+        "value": "血色浮雕", "simulation_id": 351,
         "names": {
           "zh-TW": "血色浮雕",
           "jp": "ブラッド・レリーフ",
@@ -1059,7 +1059,7 @@
         "tier": "SS"
       },
       "剎那的邂逅": {
-        "value": "剎那的邂逅",
+        "value": "剎那的邂逅", "simulation_id": 352,
         "names": {
           "zh-TW": "剎那的邂逅",
           "jp": "刹那の邂逅",
@@ -1073,7 +1073,7 @@
         "tier": "SS"
       },
       "優雅假期": {
-        "value": "優雅假期",
+        "value": "優雅假期", "simulation_id": 353,
         "names": {
           "zh-TW": "優雅假期",
           "jp": "ヴァカンザ・エレガンテ",
@@ -1087,12 +1087,12 @@
         "tier": "SS"
       },
       "沁甜聖佑": {
-        "value": "沁甜聖佑",
+        "value": "沁甜聖佑", "simulation_id": 355,
         "names": {
           "zh-TW": "沁甜聖佑",
           "jp": "ドルチェ・ベネディツィオーネ",
           "zh-CN": "沁甜圣佑",
-          "zh-CN-CN": "沁甜圣佑"
+          "zh-CN-CN": "甜蜜祝祷"
         },
         "id": "007",
         "ele": [
@@ -1104,7 +1104,7 @@
     "skill": {
       "common": {
         "嚴懲": {
-          "value": "嚴懲",
+          "value": "嚴懲", "simulation_id": 477,
           "names": {
             "zh-TW": "嚴懲",
             "jp": "パニッシュメント",
@@ -1114,7 +1114,7 @@
           "sp": 6
         },
         "飽和回復": {
-          "value": "飽和回復",
+          "value": "飽和回復", "simulation_id": 158,
           "names": {
             "zh-TW": "飽和回復",
             "jp": "フィルリカバー",
@@ -1124,7 +1124,7 @@
           "sp": 8
         },
         "獻祭": {
-          "value": "獻祭",
+          "value": "獻祭", "simulation_id": 478,
           "names": {
             "zh-TW": "獻祭",
             "jp": "サクリファイス",
@@ -1134,7 +1134,7 @@
           "sp": 5
         },
         "零之斷罪": {
-          "value": "零之斷罪",
+          "value": "零之斷罪", "simulation_id": 483,
           "names": {
             "zh-TW": "零之斷罪",
             "jp": "コンヴィクション・ゼロ",
@@ -1144,7 +1144,7 @@
           "sp": 14
         },
         "幸福": {
-          "value": "幸福",
+          "value": "幸福", "simulation_id": 480,
           "names": {
             "zh-TW": "幸福",
             "jp": "フェリチータ",
@@ -1154,7 +1154,7 @@
           "sp": 8
         },
         "日光": {
-          "value": "日光",
+          "value": "日光", "simulation_id": 481,
           "names": {
             "zh-TW": "日光",
             "jp": "ソラーレ",
@@ -1164,19 +1164,19 @@
           "sp": 8
         },
         "甜蜜爆裂": {
-          "value": "甜蜜爆裂",
+          "value": "甜蜜爆裂", "simulation_id": 482,
           "names": {
             "zh-TW": "甜蜜爆裂",
             "jp": "スイート・ブレイク",
             "zh-CN": "甜蜜爆裂",
-            "zh-CN-CN": "甜蜜爆裂"
+            "zh-CN-CN": "甜蜜·爆裂"
           },
           "sp": 9
         }
       },
       "剎那的邂逅": {
         "救贖的送葬曲": {
-          "value": "救贖的送葬曲",
+          "value": "救贖的送葬曲", "simulation_id": 484,
           "names": {
             "zh-TW": "救贖的送葬曲",
             "jp": "救済のレクイエム",
@@ -1188,7 +1188,7 @@
       },
       "優雅假期": {
         "鮮明生動": {
-          "value": "鮮明生動",
+          "value": "鮮明生動", "simulation_id": 485,
           "names": {
             "zh-TW": "鮮明生動",
             "jp": "ディナミコ・アチェーゾ",
@@ -1200,23 +1200,23 @@
       },
       "沁甜聖佑": {
         "驚嘆不已的BUON APPETITO": {
-          "value": "驚嘆不已的BUON APPETITO",
+          "value": "驚嘆不已的BUON APPETITO", "simulation_id": 486,
           "names": {
             "zh-TW": "驚嘆不已的BUON APPETITO",
             "jp": "感嘆必至のボナペティート",
             "zh-CN": "惊叹不已的BUON APPETITO",
-            "zh-CN-CN": "惊叹不已的BUON APPETITO"
+            "zh-CN-CN": "惊叹不已的餐前介绍"
           },
           "sp": 13
         },
         "passive skill": {
           "至高幸福的BUONO": {
-            "value": "至高幸福的BUONO",
+            "value": "至高幸福的BUONO", "simulation_id": 476,
             "names": {
               "zh-TW": "至高幸福的BUONO",
               "jp": "至福のボーノ",
               "zh-CN": "至高幸福的BUONO",
-              "zh-CN-CN": "至高幸福的BUONO"
+              "zh-CN-CN": "至福的美好"
             }
           }
         }
@@ -1224,7 +1224,7 @@
     },
     "passive skill": {
       "背負著前進的覺悟": {
-        "value": "背負著前進的覺悟",
+        "value": "背負著前進的覺悟", "simulation_id": 475,
         "names": {
           "zh-TW": "背負著前進的覺悟",
           "jp": "背負い進む覚悟",
@@ -1245,7 +1245,7 @@
     "english name": "Charlotta_Skopovskaya",
     "style": {
       "北風使者": {
-        "value": "北風使者",
+        "value": "北風使者", "simulation_id": 356,
         "names": {
           "zh-TW": "北風使者",
           "jp": "北風の使者",
@@ -1257,7 +1257,7 @@
         "tier": "A"
       },
       "雪花的鄉愁": {
-        "value": "雪花的鄉愁",
+        "value": "雪花的鄉愁", "simulation_id": 357,
         "names": {
           "zh-TW": "雪花的鄉愁",
           "jp": "雪華ノスタルジア",
@@ -1269,7 +1269,7 @@
         "tier": "S"
       },
       "和煦的眼神": {
-        "value": "和煦的眼神",
+        "value": "和煦的眼神", "simulation_id": 361,
         "names": {
           "zh-TW": "和煦的眼神",
           "jp": "麗らかなまなざし",
@@ -1283,7 +1283,7 @@
         "tier": "S"
       },
       "逆境盛放之花": {
-        "value": "逆境盛放之花",
+        "value": "逆境盛放之花", "simulation_id": 358,
         "names": {
           "zh-TW": "逆境盛放之花",
           "jp": "逆境に咲く華",
@@ -1297,7 +1297,7 @@
         "tier": "SS"
       },
       "永久的思念": {
-        "value": "永久的思念",
+        "value": "永久的思念", "simulation_id": 359,
         "names": {
           "zh-TW": "永久的思念",
           "jp": "とこしえの想い",
@@ -1311,7 +1311,7 @@
         "tier": "SS"
       },
       "聖潔新娘": {
-        "value": "聖潔新娘",
+        "value": "聖潔新娘", "simulation_id": 360,
         "names": {
           "zh-TW": "聖潔新娘",
           "jp": "清廉なるニヴェースタ",
@@ -1325,7 +1325,7 @@
         "tier": "SS"
       },
       "獻上愛的晚餐": {
-        "value": "獻上愛的晚餐",
+        "value": "獻上愛的晚餐", "simulation_id": 362,
         "names": {
           "zh-TW": "獻上愛的晚餐",
           "jp": "捧ぐ愛の晩餐",
@@ -1339,7 +1339,7 @@
         "tier": "SS"
       },
       "異國的皇女": {
-        "value": "異國的皇女",
+        "value": "異國的皇女", "simulation_id": 363,
         "names": {
           "zh-TW": "異國的皇女",
           "jp": "異国のプリンツェッサ",
@@ -1356,7 +1356,7 @@
     "skill": {
       "common": {
         "災厄": {
-          "value": "災厄",
+          "value": "災厄", "simulation_id": 140,
           "names": {
             "zh-TW": "災厄",
             "jp": "ディザスター",
@@ -1366,7 +1366,7 @@
           "sp": 5
         },
         "貓型坦克": {
-          "value": "貓型坦克",
+          "value": "貓型坦克", "simulation_id": 141,
           "names": {
             "zh-TW": "貓型坦克",
             "jp": "コーシュカ・アルマータ",
@@ -1376,7 +1376,7 @@
           "sp": "ALL"
         },
         "驚慌失措的子彈": {
-          "value": "驚慌失措的子彈",
+          "value": "驚慌失措的子彈", "simulation_id": 142,
           "names": {
             "zh-TW": "驚慌失措的子彈",
             "jp": "狼狽プーリァ",
@@ -1386,7 +1386,7 @@
           "sp": 9
         },
         "為你炸開的手榴彈": {
-          "value": "為你炸開的手榴彈",
+          "value": "為你炸開的手榴彈", "simulation_id": 147,
           "names": {
             "zh-TW": "為你炸開的手榴彈",
             "jp": "君に咲くグラナータ",
@@ -1396,7 +1396,7 @@
           "sp": 13
         },
         "為你炸開的手榴彈+": {
-          "value": "為你炸開的手榴彈+",
+          "value": "為你炸開的手榴彈+", "simulation_id": 148,
           "names": {
             "zh-TW": "為你炸開的手榴彈+",
             "jp": "君に咲くグラナータ+",
@@ -1406,7 +1406,7 @@
           "sp": 11
         },
         "依存": {
-          "value": "依存",
+          "value": "依存", "simulation_id": 143,
           "names": {
             "zh-TW": "依存",
             "jp": "ザヴィーシマスチ",
@@ -1416,7 +1416,7 @@
           "sp": 5
         },
         "宣誓": {
-          "value": "宣誓",
+          "value": "宣誓", "simulation_id": 144,
           "names": {
             "zh-TW": "宣誓",
             "jp": "クリャートヴァ",
@@ -1426,7 +1426,7 @@
           "sp": 9
         },
         "想守護的地方": {
-          "value": "想守護的地方",
+          "value": "想守護的地方", "simulation_id": 145,
           "names": {
             "zh-TW": "想守護的地方",
             "jp": "守りたい場所",
@@ -1436,7 +1436,7 @@
           "sp": 9
         },
         "華炎": {
-          "value": "華炎",
+          "value": "華炎", "simulation_id": 146,
           "names": {
             "zh-TW": "華炎",
             "jp": "華炎",
@@ -1448,7 +1448,7 @@
       },
       "永久的思念": {
         "純潔之吻": {
-          "value": "純潔之吻",
+          "value": "純潔之吻", "simulation_id": 149,
           "names": {
             "zh-TW": "純潔之吻",
             "jp": "純潔のパツィルーイ",
@@ -1460,7 +1460,7 @@
       },
       "聖潔新娘": {
         "如癡如醉的幸福走道": {
-          "value": "如癡如醉的幸福走道",
+          "value": "如癡如醉的幸福走道", "simulation_id": 150,
           "names": {
             "zh-TW": "如癡如醉的幸福走道",
             "jp": "恍惚のヴァージンロード",
@@ -1472,30 +1472,30 @@
       },
       "獻上愛的晚餐": {
         "請用吧，MILASHKA": {
-          "value": "請用吧，MILASHKA",
+          "value": "請用吧，MILASHKA", "simulation_id": 151,
           "names": {
             "zh-TW": "請用吧，MILASHKA",
             "jp": "召し上がれミラーシュカ",
             "zh-CN": "请用吧，MILASHKA",
-            "zh-CN-CN": "请用吧，MILASHKA"
+            "zh-CN-CN": "请享用吧小可爱"
           },
           "sp": 13
         },
         "passive skill": {
           "溫暖的手作料理": {
-            "value": "溫暖的手作料理",
+            "value": "溫暖的手作料理", "simulation_id": 139,
             "names": {
               "zh-TW": "溫暖的手作料理",
               "jp": "ぬくもりの手料理",
               "zh-CN": "温暖的手作料理",
-              "zh-CN-CN": "温暖的手作料理"
+              "zh-CN-CN": "亲手制作的温暖料理"
             }
           }
         }
       },
       "異國的皇女": {
         "吾愛": {
-          "value": "吾愛",
+          "value": "吾愛", "simulation_id": 152,
           "names": {
             "zh-TW": "吾愛",
             "jp": "リュボーフ・マヤー",
@@ -1508,12 +1508,12 @@
     },
     "passive skill": {
       "和月歌兩個人獨處......": {
-        "value": "和月歌兩個人獨處......",
+        "value": "和月歌兩個人獨處......", "simulation_id": 138,
         "names": {
           "zh-TW": "和月歌兩個人獨處......",
           "jp": "ルカとふたりきりですね・・・",
           "zh-CN": "和月歌两个人独处......",
-          "zh-CN-CN": "和月歌两人世界......"
+          "zh-CN-CN": "和月歌的二人世界......"
         }
       }
     }

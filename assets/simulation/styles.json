@@ -23,7 +23,7 @@
   },
   "3": {
     "id": 3,
-    "names": {"zh_cn": "闪光的电气脉冲", "zh_tw": "電路的爆裂闪光", "jp": "闪光のサーキットバースト"},
+    "names": {"zh_cn": "闪光的电气脉冲", "zh_tw": "電路的爆裂閃光", "jp": "閃光のサーキットバースト"},
     "character_names": {"zh_cn": "茅森 月歌", "zh_tw": "茅森 月歌", "jp": "茅森 月歌", "en": "Ruka_Kayamori"},
     "team": "31A", "tier": "SS", "attack_type": "slash", "elements": [], "role": "attacker",
     "limit_break": {

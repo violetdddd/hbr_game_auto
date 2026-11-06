@@ -10,7 +10,7 @@
     "english name": "Mona",
     "style": {
       "黎明的魔術師": {
-        "value": "黎明的魔術師",
+        "value": "黎明的魔術師", "simulation_id": 378,
         "names": {
           "zh-TW": "黎明的魔術師",
           "jp": "黎明の魔術師",
@@ -27,7 +27,7 @@
     "skill": {
       "common": {
         "迪亞拉翰": {
-          "value": "迪亞拉翰",
+          "value": "迪亞拉翰", "simulation_id": 193,
           "names": {
             "zh-TW": "迪亞拉翰",
             "jp": "ディアラハン",
@@ -37,7 +37,7 @@
           "sp": 8
         },
         "加爾達因": {
-          "value": "加爾達因",
+          "value": "加爾達因", "simulation_id": 194,
           "names": {
             "zh-TW": "加爾達因",
             "jp": "ガルダイン",
@@ -61,7 +61,7 @@
     "english name": "Queen",
     "style": {
       "慧眼的女教皇": {
-        "value": "慧眼的女教皇",
+        "value": "慧眼的女教皇", "simulation_id": 379,
         "names": {
           "zh-TW": "慧眼的女教皇",
           "jp": "慧眼の女教皇",
@@ -76,7 +76,7 @@
     "skill": {
       "common": {
         "瑪哈拉庫卡加": {
-          "value": "瑪哈拉庫卡加",
+          "value": "瑪哈拉庫卡加", "simulation_id": 195,
           "names": {
             "zh-TW": "瑪哈拉庫卡加",
             "jp": "マハラクカジャ",
@@ -86,7 +86,7 @@
           "sp": 12
         },
         "梅迪亞拉翰": {
-          "value": "梅迪亞拉翰",
+          "value": "梅迪亞拉翰", "simulation_id": 196,
           "names": {
             "zh-TW": "梅迪亞拉翰",
             "jp": "メディアラハン",
@@ -98,7 +98,7 @@
       },
       "慧眼的女教皇": {
         "原子火焰": {
-          "value": "原子火焰",
+          "value": "原子火焰", "simulation_id": 197,
           "names": {
             "zh-TW": "原子火焰",
             "jp": "アトミックフレア",
@@ -122,12 +122,12 @@
     "english name": "Violet",
     "style": {
       "堅定的信念": {
-        "value": "堅定的信念",
+        "value": "堅定的信念", "simulation_id": 380,
         "names": {
           "zh-TW": "堅定的信念",
           "jp": "揺るぎなき信念",
           "zh-CN": "坚定的信念",
-          "zh-CN-CN": "坚定的信念"
+          "zh-CN-CN": "坚定不移的信念"
         },
         "id": "001",
         "ele": [
@@ -139,7 +139,7 @@
     "skill": {
       "common": {
         "瑪哈克加翁": {
-          "value": "瑪哈克加翁",
+          "value": "瑪哈克加翁", "simulation_id": 198,
           "names": {
             "zh-TW": "瑪哈克加翁",
             "jp": "マハコウガオン",
@@ -149,7 +149,7 @@
           "sp": 8
         },
         "勇氣步伐": {
-          "value": "勇氣步伐",
+          "value": "勇氣步伐", "simulation_id": 199,
           "names": {
             "zh-TW": "勇氣步伐",
             "jp": "ブレイブステップ",
@@ -161,7 +161,7 @@
       },
       "堅定的信念": {
         "劍之舞": {
-          "value": "劍之舞",
+          "value": "劍之舞", "simulation_id": 200,
           "names": {
             "zh-TW": "劍之舞",
             "jp": "剣の舞",

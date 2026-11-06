@@ -10,7 +10,7 @@
     "english name": "Hikari_Naruse",
     "style": {
       "泰然自若的獵人": {
-        "value": "泰然自若的獵人",
+        "value": "泰然自若的獵人", "simulation_id": 364,
         "names": {
           "zh-TW": "泰然自若的獵人",
           "jp": "泰然たる狩人",
@@ -27,7 +27,7 @@
     "skill": {
       "common": {
         "技術射擊": {
-          "value": "技術射擊",
+          "value": "技術射擊", "simulation_id": 211,
           "names": {
             "zh-TW": "技術射擊",
             "jp": "テクニカルショット",
@@ -39,7 +39,7 @@
       },
       "泰然自若的獵人": {
         "沉侵-雷": {
-          "value": "沉侵-雷",
+          "value": "沉侵-雷", "simulation_id": 2120001,
           "names": {
             "zh-TW": "沉侵-雷",
             "jp": "没入-雷",
@@ -49,7 +49,7 @@
           "sp": 0
         },
         "沉侵-光": {
-          "value": "沉侵-光",
+          "value": "沉侵-光", "simulation_id": 2120002,
           "names": {
             "zh-TW": "沉侵-光",
             "jp": "没入-光",
@@ -59,17 +59,17 @@
           "sp": 0
         },
         "沉侵-闇": {
-          "value": "沉侵-闇",
+          "value": "沉侵-闇", "simulation_id": 2120003,
           "names": {
             "zh-TW": "沉侵-闇",
             "jp": "没入-闇",
             "zh-CN": "沉侵-闇",
-            "zh-CN-CN": "沉侵-闇"
+            "zh-CN-CN": "沉侵-暗"
           },
           "sp": 0
         },
         "虛心‧百步穿楊": {
-          "value": "虛心‧百步穿楊",
+          "value": "虛心‧百步穿楊", "simulation_id": 212,
           "names": {
             "zh-TW": "虛心‧百步穿楊",
             "jp": "虚心・百歩穿楊",
@@ -82,7 +82,7 @@
     },
     "passive skill": {
       "求生戰略": {
-        "value": "求生戰略",
+        "value": "求生戰略", "simulation_id": 210,
         "names": {
           "zh-TW": "求生戰略",
           "jp": "サバイブストラテジー",

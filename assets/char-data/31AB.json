@@ -10,7 +10,7 @@
     "english name": "Kanade_Tachibana",
     "style": {
       "Earth Angel": {
-        "value": "Earth Angel",
+        "value": "Earth Angel", "simulation_id": 368,
         "names": {
           "zh-TW": "Earth Angel",
           "jp": "Earth Angel",
@@ -24,7 +24,7 @@
         "tier": "SSR"
       },
       "翱穹之劍": {
-        "value": "翱穹之劍",
+        "value": "翱穹之劍", "simulation_id": 369,
         "names": {
           "zh-TW": "翱穹之劍",
           "jp": "天翔ける剣",
@@ -41,7 +41,7 @@
     "skill": {
       "common": {
         "洞察力": {
-          "value": "洞察力",
+          "value": "洞察力", "simulation_id": 70,
           "names": {
             "zh-TW": "洞察力",
             "jp": "インサイト",
@@ -51,7 +51,7 @@
           "sp": 5
         },
         "幸運斬": {
-          "value": "幸運斬",
+          "value": "幸運斬", "simulation_id": 69,
           "names": {
             "zh-TW": "幸運斬",
             "jp": "フォーチュンスラッシュ",
@@ -61,7 +61,7 @@
           "sp": 7
         },
         "天使光線": {
-          "value": "天使光線",
+          "value": "天使光線", "simulation_id": 73,
           "names": {
             "zh-TW": "天使光線",
             "jp": "エンジェルズ・レイ",
@@ -71,7 +71,7 @@
           "sp": 15
         },
         "冰凍瞬間": {
-          "value": "冰凍瞬間",
+          "value": "冰凍瞬間", "simulation_id": 72,
           "names": {
             "zh-TW": "冰凍瞬間",
             "jp": "フローズンタイム",
@@ -81,7 +81,7 @@
           "sp": 8
         },
         "天之心跳": {
-          "value": "天之心跳",
+          "value": "天之心跳", "simulation_id": 71,
           "names": {
             "zh-TW": "天之心跳",
             "jp": "ヘヴンズビート",
@@ -93,7 +93,7 @@
       },
       "翱穹之劍": {
         "垂直力": {
-          "value": "垂直力",
+          "value": "垂直力", "simulation_id": 74,
           "names": {
             "zh-TW": "垂直力",
             "jp": "バーチカルフォース",
@@ -117,7 +117,7 @@
     "english name": "Yuri_Nakamura",
     "style": {
       "Rain Fire": {
-        "value": "Rain Fire",
+        "value": "Rain Fire", "simulation_id": 370,
         "names": {
           "zh-TW": "Rain Fire",
           "jp": "Rain Fire",
@@ -131,7 +131,7 @@
         "tier": "SSR"
       },
       "平凡的非日常": {
-        "value": "平凡的非日常",
+        "value": "平凡的非日常", "simulation_id": 371,
         "names": {
           "zh-TW": "平凡的非日常",
           "jp": "ありふれた非日常",
@@ -148,7 +148,7 @@
     "skill": {
       "common": {
         "爆裂火焰": {
-          "value": "爆裂火焰",
+          "value": "爆裂火焰", "simulation_id": 76,
           "names": {
             "zh-TW": "爆裂火焰",
             "jp": "バーストファイア",
@@ -158,7 +158,7 @@
           "sp": 10
         },
         "突襲": {
-          "value": "突襲",
+          "value": "突襲", "simulation_id": 75,
           "names": {
             "zh-TW": "突襲",
             "jp": "オンラッシュ",
@@ -168,7 +168,7 @@
           "sp": 6
         },
         "大災難": {
-          "value": "大災難",
+          "value": "大災難", "simulation_id": 79,
           "names": {
             "zh-TW": "大災難",
             "jp": "カタストロフィー",
@@ -178,7 +178,7 @@
           "sp": 15
         },
         "冷冽子彈": {
-          "value": "冷冽子彈",
+          "value": "冷冽子彈", "simulation_id": 78,
           "names": {
             "zh-TW": "冷冽子彈",
             "jp": "コールドバレット",
@@ -188,7 +188,7 @@
           "sp": 10
         },
         "冰霜棘刺": {
-          "value": "冰霜棘刺",
+          "value": "冰霜棘刺", "simulation_id": 77,
           "names": {
             "zh-TW": "冰霜棘刺",
             "jp": "フロストソーン",
@@ -200,7 +200,7 @@
       },
       "平凡的非日常": {
         "真實冰錐": {
-          "value": "真實冰錐",
+          "value": "真實冰錐", "simulation_id": 80,
           "names": {
             "zh-TW": "真實冰錐",
             "jp": "トゥルー・アイシクル",
@@ -224,7 +224,7 @@
     "english name": "Miyuki_Irie",
     "style": {
       "Pure Cosmos": {
-        "value": "Pure Cosmos",
+        "value": "Pure Cosmos", "simulation_id": 372,
         "names": {
           "zh-TW": "Pure Cosmos",
           "jp": "Pure Cosmos",
@@ -236,7 +236,7 @@
         "tier": "S"
       },
       "Faraway Eden": {
-        "value": "Faraway Eden",
+        "value": "Faraway Eden", "simulation_id": 373,
         "names": {
           "zh-TW": "Faraway Eden",
           "jp": "Faraway Eden",
@@ -253,7 +253,7 @@
     "skill": {
       "common": {
         "休止消泛音": {
-          "value": "休止消泛音",
+          "value": "休止消泛音", "simulation_id": 82,
           "names": {
             "zh-TW": "休止消泛音",
             "jp": "ブレイクミュート",
@@ -263,7 +263,7 @@
           "sp": 9
         },
         "正拍": {
-          "value": "正拍",
+          "value": "正拍", "simulation_id": 81,
           "names": {
             "zh-TW": "正拍",
             "jp": "ダウンビート",
@@ -273,7 +273,7 @@
           "sp": 8
         },
         "冷冽打擊": {
-          "value": "冷冽打擊",
+          "value": "冷冽打擊", "simulation_id": 84,
           "names": {
             "zh-TW": "冷冽打擊",
             "jp": "コールドストローク",
@@ -283,7 +283,7 @@
           "sp": 9
         },
         "切分音": {
-          "value": "切分音",
+          "value": "切分音", "simulation_id": 83,
           "names": {
             "zh-TW": "切分音",
             "jp": "シンコペーション",
@@ -295,7 +295,7 @@
       },
       "Faraway Eden": {
         "佯動光輝波斯菊": {
-          "value": "佯動光輝波斯菊",
+          "value": "佯動光輝波斯菊", "simulation_id": 85,
           "names": {
             "zh-TW": "佯動光輝波斯菊",
             "jp": "フェイント・ルミナスコスモス",
@@ -319,7 +319,7 @@
     "english name": "Hisako_Fuchida",
     "style": {
       "Finally found our silver lining": {
-        "value": "Finally found our silver lining",
+        "value": "Finally found our silver lining", "simulation_id": 374,
         "names": {
           "zh-TW": "Finally found our silver lining",
           "jp": "Finally found our silver lining",
@@ -336,7 +336,7 @@
     "skill": {
       "common": {
         "冷冽碎擊": {
-          "value": "冷冽碎擊",
+          "value": "冷冽碎擊", "simulation_id": 103,
           "names": {
             "zh-TW": "冷冽碎擊",
             "jp": "コールドクラッシュ",
@@ -346,7 +346,7 @@
           "sp": 9
         },
         "大肆破壞": {
-          "value": "大肆破壞",
+          "value": "大肆破壞", "simulation_id": 102,
           "names": {
             "zh-TW": "大肆破壞",
             "jp": "ヴァンダリズム",
@@ -370,7 +370,7 @@
     "english name": "Shiori_Sekine",
     "style": {
       "溫暖的記憶": {
-        "value": "溫暖的記憶",
+        "value": "溫暖的記憶", "simulation_id": 375,
         "names": {
           "zh-TW": "溫暖的記憶",
           "jp": "ぬくもりの記憶",
@@ -385,7 +385,7 @@
     "skill": {
       "common": {
         "韻律樂音": {
-          "value": "韻律樂音",
+          "value": "韻律樂音", "simulation_id": 168,
           "names": {
             "zh-TW": "韻律樂音",
             "jp": "リズミカルステップ",
@@ -395,7 +395,7 @@
           "sp": 8
         },
         "技術性節拍": {
-          "value": "技術性節拍",
+          "value": "技術性節拍", "simulation_id": 169,
           "names": {
             "zh-TW": "技術性節拍",
             "jp": "テクニカルビート",
@@ -419,7 +419,7 @@
     "english name": "Yui_Yoshioka",
     "style": {
       "Stir Soul Song": {
-        "value": "Stir Soul Song",
+        "value": "Stir Soul Song", "simulation_id": 376,
         "names": {
           "zh-TW": "Stir Soul Song",
           "jp": "Stir Soul Song",
@@ -436,7 +436,7 @@
     "skill": {
       "common": {
         "魅力嗓音": {
-          "value": "魅力嗓音",
+          "value": "魅力嗓音", "simulation_id": 170,
           "names": {
             "zh-TW": "魅力嗓音",
             "jp": "チャーミングボイス",
@@ -446,7 +446,7 @@
           "sp": 12
         },
         "交互撥弦": {
-          "value": "交互撥弦",
+          "value": "交互撥弦", "simulation_id": 171,
           "names": {
             "zh-TW": "交互撥弦",
             "jp": "オルタネイトピッキング",
@@ -456,7 +456,7 @@
           "sp": 9
         },
         "美妙歌曲彈下去": {
-          "value": "美妙歌曲彈下去",
+          "value": "美妙歌曲彈下去", "simulation_id": 172,
           "names": {
             "zh-TW": "美妙歌曲彈下去",
             "jp": "かき鳴らせキラーチューン",
@@ -480,7 +480,7 @@
     "english name": "Masami_Iwasawa",
     "style": {
       "Dreamlike Days": {
-        "value": "Dreamlike Days",
+        "value": "Dreamlike Days", "simulation_id": 377,
         "names": {
           "zh-TW": "Dreamlike Days",
           "jp": "Dreamlike Days",
@@ -497,7 +497,7 @@
     "skill": {
       "common": {
         "琶音": {
-          "value": "琶音",
+          "value": "琶音", "simulation_id": 173,
           "names": {
             "zh-TW": "琶音",
             "jp": "アルペジオ",
@@ -507,7 +507,7 @@
           "sp": 12
         },
         "即興演奏": {
-          "value": "即興演奏",
+          "value": "即興演奏", "simulation_id": 174,
           "names": {
             "zh-TW": "即興演奏",
             "jp": "ジャムセッション",
@@ -517,7 +517,7 @@
           "sp": 7
         },
         "以烏鴉的叫聲": {
-          "value": "以烏鴉的叫聲",
+          "value": "以烏鴉的叫聲", "simulation_id": 175,
           "names": {
             "zh-TW": "以烏鴉的叫聲",
             "jp": "カラスの鳴き声で",

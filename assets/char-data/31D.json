@@ -10,19 +10,19 @@
     "english name": "Misato_Nikaido",
     "style": {
       "最年少名人": {
-        "value": "最年少名人",
+        "value": "最年少名人", "simulation_id": 201,
         "names": {
           "zh-TW": "最年少名人",
           "jp": "最年少名人",
           "zh-CN": "最年少名人",
-          "zh-CN-CN": "最年轻名人"
+          "zh-CN-CN": "最年少名人"
         },
         "id": "001",
         "ele": [],
         "tier": "A"
       },
       "今昔之感，思緒萬千": {
-        "value": "今昔之感，思緒萬千",
+        "value": "今昔之感，思緒萬千", "simulation_id": 202,
         "names": {
           "zh-TW": "今昔之感，思緒萬千",
           "jp": "今昔の感、想いは往きて",
@@ -34,7 +34,7 @@
         "tier": "S"
       },
       "甜蜜的悠閒時光": {
-        "value": "甜蜜的悠閒時光",
+        "value": "甜蜜的悠閒時光", "simulation_id": 205,
         "names": {
           "zh-TW": "甜蜜的悠閒時光",
           "jp": "甘い悠々時光",
@@ -46,7 +46,7 @@
         "tier": "S"
       },
       "對朋友的探究心 ": {
-        "value": "對朋友的探究心 ",
+        "value": "對朋友的探究心 ", "simulation_id": 208,
         "names": {
           "zh-TW": "對朋友的探究心 ",
           "jp": "友への探究心",
@@ -60,7 +60,7 @@
         "tier": "S"
       },
       "至高無上的終局": {
-        "value": "至高無上的終局",
+        "value": "至高無上的終局", "simulation_id": 203,
         "names": {
           "zh-TW": "至高無上的終局",
           "jp": "無上の終局",
@@ -74,7 +74,7 @@
         "tier": "SS"
       },
       "Holiday Ring a Bell": {
-        "value": "Holiday Ring a Bell",
+        "value": "Holiday Ring a Bell", "simulation_id": 204,
         "names": {
           "zh-TW": "Holiday Ring a Bell",
           "jp": "Holiday Ring a Bell",
@@ -88,7 +88,7 @@
         "tier": "SS"
       },
       "Lead by Example": {
-        "value": "Lead by Example",
+        "value": "Lead by Example", "simulation_id": 206,
         "names": {
           "zh-TW": "Lead by Example",
           "jp": "Lead by Example",
@@ -102,7 +102,7 @@
         "tier": "SSR"
       },
       "藍天全力應援歌": {
-        "value": "藍天全力應援歌",
+        "value": "藍天全力應援歌", "simulation_id": 207,
         "names": {
           "zh-TW": "藍天全力應援歌",
           "jp": "アオゾラ全力応援歌",
@@ -119,7 +119,7 @@
     "skill": {
       "common": {
         "扳殺": {
-          "value": "扳殺",
+          "value": "扳殺", "simulation_id": 409,
           "names": {
             "zh-TW": "扳殺",
             "jp": "ハネ殺し",
@@ -129,7 +129,7 @@
           "sp": 5
         },
         "冷卻": {
-          "value": "冷卻",
+          "value": "冷卻", "simulation_id": 261,
           "names": {
             "zh-TW": "冷卻",
             "jp": "クールダウン",
@@ -139,7 +139,7 @@
           "sp": 5
         },
         "究極的一手": {
-          "value": "究極的一手",
+          "value": "究極的一手", "simulation_id": 411,
           "names": {
             "zh-TW": "究極的一手",
             "jp": "極点の一手",
@@ -149,7 +149,7 @@
           "sp": 8
         },
         "石塔的手筋": {
-          "value": "石塔的手筋",
+          "value": "石塔的手筋", "simulation_id": 417,
           "names": {
             "zh-TW": "石塔的手筋",
             "jp": "石塔の手筋",
@@ -159,7 +159,7 @@
           "sp": 11
         },
         "石塔的手筋+": {
-          "value": "石塔的手筋+",
+          "value": "石塔的手筋+", "simulation_id": 418,
           "names": {
             "zh-TW": "石塔的手筋+",
             "jp": "石塔の手筋+",
@@ -169,7 +169,7 @@
           "sp": 11
         },
         "北風的昴星": {
-          "value": "北風的昴星",
+          "value": "北風的昴星", "simulation_id": 412,
           "names": {
             "zh-TW": "北風的昴星",
             "jp": "北風のスバル",
@@ -179,7 +179,7 @@
           "sp": 4
         },
         "補充甜點！": {
-          "value": "補充甜點！",
+          "value": "補充甜點！", "simulation_id": 413,
           "names": {
             "zh-TW": "補充甜點！",
             "jp": "スイーツチャージ！",
@@ -189,7 +189,7 @@
           "sp": 5
         },
         "優勢": {
-          "value": "優勢",
+          "value": "優勢", "simulation_id": 414,
           "names": {
             "zh-TW": "優勢",
             "jp": "追風",
@@ -199,7 +199,7 @@
           "sp": 12
         },
         "理解的喜悅": {
-          "value": "理解的喜悅",
+          "value": "理解的喜悅", "simulation_id": 416,
           "names": {
             "zh-TW": "理解的喜悅",
             "jp": "理解する喜び",
@@ -211,7 +211,7 @@
       },
       "Holiday Ring a Bell": {
         "冰凍圓舞曲": {
-          "value": "冰凍圓舞曲",
+          "value": "冰凍圓舞曲", "simulation_id": 419,
           "names": {
             "zh-TW": "冰凍圓舞曲",
             "jp": "フローズン・ワルツ",
@@ -223,7 +223,7 @@
       },
       "Lead by Example": {
         "國士無雙": {
-          "value": "國士無雙",
+          "value": "國士無雙", "simulation_id": 420,
           "names": {
             "zh-TW": "國士無雙",
             "jp": "国士無双",
@@ -235,7 +235,7 @@
       },
       "藍天全力應援歌": {
         "三三七拍": {
-          "value": "三三七拍",
+          "value": "三三七拍", "simulation_id": 415,
           "names": {
             "zh-TW": "三三七拍",
             "jp": "三三七拍子",
@@ -245,7 +245,7 @@
           "sp": 8
         },
         "活力聲援": {
-          "value": "活力聲援",
+          "value": "活力聲援", "simulation_id": 421,
           "names": {
             "zh-TW": "活力聲援",
             "jp": "チアフル・エール",
@@ -256,7 +256,7 @@
         },
         "command action": {
           "指揮行動": {
-            "value": "指揮行動",
+            "value": "指揮行動", "simulation_id": 2,
             "names": {
               "zh-TW": "指揮行動",
               "jp": "指揮行動",
@@ -281,7 +281,7 @@
     "english name": "Iroha_Ishii",
     "style": {
       "輕鬆多彩": {
-        "value": "輕鬆多彩",
+        "value": "輕鬆多彩", "simulation_id": 209,
         "names": {
           "zh-TW": "輕鬆多彩",
           "jp": "お気楽カラフル",
@@ -293,7 +293,7 @@
         "tier": "A"
       },
       "色彩繽紛的靈感": {
-        "value": "色彩繽紛的靈感",
+        "value": "色彩繽紛的靈感", "simulation_id": 210,
         "names": {
           "zh-TW": "色彩繽紛的靈感",
           "jp": "多彩なるインスピレーション",
@@ -305,7 +305,7 @@
         "tier": "S"
       },
       "純粹情感": {
-        "value": "純粹情感",
+        "value": "純粹情感", "simulation_id": 212,
         "names": {
           "zh-TW": "純粹情感",
           "jp": "ピュア・エモーション",
@@ -319,7 +319,7 @@
         "tier": "S"
       },
       "破壞無彩色之牆": {
-        "value": "破壞無彩色之牆",
+        "value": "破壞無彩色之牆", "simulation_id": 211,
         "names": {
           "zh-TW": "破壞無彩色之牆",
           "jp": "撃砕の無彩色",
@@ -333,7 +333,7 @@
         "tier": "SS"
       },
       "滿溢的情感": {
-        "value": "滿溢的情感",
+        "value": "滿溢的情感", "simulation_id": 213,
         "names": {
           "zh-TW": "滿溢的情感",
           "jp": "センシティビティ・オーバーフロー",
@@ -347,12 +347,12 @@
         "tier": "SS"
       },
       "幸福彩度": {
-        "value": "幸福彩度",
+        "value": "幸福彩度", "simulation_id": 214,
         "names": {
           "zh-TW": "幸福彩度",
           "jp": "ハピネス・クロマ",
           "zh-CN": "幸福彩度",
-          "zh-CN-CN": "幸福彩度"
+          "zh-CN-CN": "幸福色度"
         },
         "id": "006",
         "ele": [
@@ -361,7 +361,7 @@
         "tier": "SS"
       },
       "禁忌的組合": {
-        "value": "禁忌的組合",
+        "value": "禁忌的組合", "simulation_id": 215,
         "names": { "zh-TW": "禁忌的組合", "jp": "禁忌のシンセサイズ", "zh-CN": "禁忌的组合", "zh-CN-CN": "禁忌的组合" },
         "id": "007",
         "ele": ["Dark"],
@@ -371,7 +371,7 @@
     "skill": {
       "common": {
         "增強": {
-          "value": "增強",
+          "value": "增強", "simulation_id": 230,
           "names": {
             "zh-TW": "增強",
             "jp": "エンハンス",
@@ -381,7 +381,7 @@
           "sp": 6
         },
         "極彩射擊": {
-          "value": "極彩射擊",
+          "value": "極彩射擊", "simulation_id": 231,
           "names": {
             "zh-TW": "極彩射擊",
             "jp": "ヴィヴィットシュート",
@@ -391,7 +391,7 @@
           "sp": 5
         },
         "戰鬥熱情": {
-          "value": "戰鬥熱情",
+          "value": "戰鬥熱情", "simulation_id": 233,
           "names": {
             "zh-TW": "戰鬥熱情",
             "jp": "ファイトパッション",
@@ -401,7 +401,7 @@
           "sp": 7
         },
         "飽和增強": {
-          "value": "飽和增強",
+          "value": "飽和增強", "simulation_id": 232,
           "names": {
             "zh-TW": "飽和增強",
             "jp": "フィルエンハンス",
@@ -411,7 +411,7 @@
           "sp": 9
         },
         "無色子彈": {
-          "value": "無色子彈",
+          "value": "無色子彈", "simulation_id": 237,
           "names": {
             "zh-TW": "無色子彈",
             "jp": "アクロマティックバレット",
@@ -421,7 +421,7 @@
           "sp": 12
         },
         "無色子彈+": {
-          "value": "無色子彈+",
+          "value": "無色子彈+", "simulation_id": 238,
           "names": {
             "zh-TW": "無色子彈+",
             "jp": "アクロマティックバレット+",
@@ -431,7 +431,7 @@
           "sp": 12
         },
         "五彩繽紛": {
-          "value": "五彩繽紛",
+          "value": "五彩繽紛", "simulation_id": 234,
           "names": {
             "zh-TW": "五彩繽紛",
             "jp": "極彩色",
@@ -441,7 +441,7 @@
           "sp": 10
         },
         "雷光": {
-          "value": "雷光",
+          "value": "雷光", "simulation_id": 235,
           "names": {
             "zh-TW": "雷光",
             "jp": "レビン",
@@ -451,14 +451,14 @@
           "sp": 14
         },
         "瘋狂鍊金術": {
-          "value": "瘋狂鍊金術",
+          "value": "瘋狂鍊金術", "simulation_id": 236,
           "names": { "zh-TW": "瘋狂鍊金術", "jp": "マッドアルケミー", "zh-CN": "疯狂炼金术", "zh-CN-CN": "疯狂炼金术" },
           "sp": 10
         }
       },
       "滿溢的情感": {
         "奇觀藝術": {
-          "value": "奇觀藝術",
+          "value": "奇觀藝術", "simulation_id": 239,
           "names": {
             "zh-TW": "奇觀藝術",
             "jp": "スペクタクルアート",
@@ -470,19 +470,19 @@
       },
       "幸福彩度": {
         "晴空捧花彈": {
-          "value": "晴空捧花彈",
+          "value": "晴空捧花彈", "simulation_id": 240,
           "names": {
             "zh-TW": "晴空捧花彈",
             "jp": "ファーマメントブーケショット",
             "zh-CN": "晴空捧花弹",
-            "zh-CN-CN": "晴空捧花弹"
+            "zh-CN-CN": "天穹捧花射击"
           },
           "sp": 13
         }
       },
       "禁忌的組合": {
         "死亡科學怪人": {
-          "value": "死亡科學怪人",
+          "value": "死亡科學怪人", "simulation_id": 241,
           "names": {
             "zh-TW": "死亡科學怪人",
             "jp": "フランケン・オブ・ザ・デッド",
@@ -495,12 +495,12 @@
     },
     "passive skill": {
       "光彩絢爛的光譜": {
-        "value": "光彩絢爛的光譜",
+        "value": "光彩絢爛的光譜", "simulation_id": 229,
         "names": {
           "zh-TW": "光彩絢爛的光譜",
           "jp": "光彩陸離のスペクトル",
           "zh-CN": "光彩绚烂的光谱",
-          "zh-CN-CN": "光彩绚烂的光谱"
+          "zh-CN-CN": "光怪陆离的光谱"
         }
       }
     }
@@ -516,7 +516,7 @@
     "english name": "Fubuki_Mikoto",
     "style": {
       "Metal Crazy": {
-        "value": "Metal Crazy",
+        "value": "Metal Crazy", "simulation_id": 216,
         "names": {
           "zh-TW": "Metal Crazy",
           "jp": "Metal Crazy",
@@ -528,7 +528,7 @@
         "tier": "A"
       },
       "Silent Reverberations": {
-        "value": "Silent Reverberations",
+        "value": "Silent Reverberations", "simulation_id": 217,
         "names": {
           "zh-TW": "Silent Reverberations",
           "jp": "Silent Reverberations",
@@ -540,7 +540,7 @@
         "tier": "S"
       },
       "末日要幹嘛？": {
-        "value": "末日要幹嘛？",
+        "value": "末日要幹嘛？", "simulation_id": 218,
         "names": {
           "zh-TW": "末日要幹嘛？",
           "jp": "終末なにする？",
@@ -552,7 +552,7 @@
         "tier": "SS"
       },
       "Frozen Moon, Melting Heart": {
-        "value": "Frozen Moon, Melting Heart",
+        "value": "Frozen Moon, Melting Heart", "simulation_id": 219,
         "names": {
           "zh-TW": "Frozen Moon, Melting Heart",
           "jp": "Frozen Moon, Melting Heart",
@@ -566,7 +566,7 @@
         "tier": "SS"
       },
       "崩壞之夜的繆思": {
-        "value": "崩壞之夜的繆思",
+        "value": "崩壞之夜的繆思", "simulation_id": 220,
         "names": {
           "zh-TW": "崩壞之夜的繆思",
           "jp": "壊れた夜のミューズ",
@@ -580,7 +580,7 @@
         "tier": "SSR"
       },
       "擺脫束縛": {
-        "value": "擺脫束縛",
+        "value": "擺脫束縛", "simulation_id": 221,
         "names": { "zh-TW": "擺脫束縛", "jp": "しがらみからの解放", "zh-CN": "摆脱束缚", "zh-CN-CN": "摆脱束缚" },
         "id": "006",
         "ele": [],
@@ -590,7 +590,7 @@
     "skill": {
       "common": {
         "狂怒嘶吼": {
-          "value": "狂怒嘶吼",
+          "value": "狂怒嘶吼", "simulation_id": 201,
           "names": {
             "zh-TW": "狂怒嘶吼",
             "jp": "レイジングシャウト",
@@ -600,7 +600,7 @@
           "sp": 5
         },
         "R.I.P.": {
-          "value": "R.I.P.",
+          "value": "R.I.P.", "simulation_id": 203,
           "names": {
             "zh-TW": "R.I.P.",
             "jp": "R.I.P.",
@@ -610,7 +610,7 @@
           "sp": 7
         },
         "可別先掛點了啊": {
-          "value": "可別先掛點了啊",
+          "value": "可別先掛點了啊", "simulation_id": 202,
           "names": {
             "zh-TW": "可別先掛點了啊",
             "jp": "先に逝くなよ",
@@ -620,7 +620,7 @@
           "sp": 6
         },
         "以破滅道晚安": {
-          "value": "以破滅道晚安",
+          "value": "以破滅道晚安", "simulation_id": 206,
           "names": {
             "zh-TW": "以破滅道晚安",
             "jp": "破滅でおやすみ",
@@ -630,7 +630,7 @@
           "sp": 13
         },
         "以破滅道晚安+": {
-          "value": "以破滅道晚安+",
+          "value": "以破滅道晚安+", "simulation_id": 207,
           "names": {
             "zh-TW": "以破滅道晚安+",
             "jp": "破滅でおやすみ+",
@@ -640,7 +640,7 @@
           "sp": 12
         },
         "補償": {
-          "value": "補償",
+          "value": "補償", "simulation_id": 204,
           "names": {
             "zh-TW": "補償",
             "jp": "コンペンセーション",
@@ -650,7 +650,7 @@
           "sp": 5
         },
         "孤獨之刃": {
-          "value": "孤獨之刃",
+          "value": "孤獨之刃", "simulation_id": 205,
           "names": {
             "zh-TW": "孤獨之刃",
             "jp": "ロンリーブレード",
@@ -660,14 +660,14 @@
           "sp": 10
         },
         "心靈重置": {
-          "value": "心靈重置",
+          "value": "心靈重置", "simulation_id": 742,
           "names": { "zh-TW": "心靈重置", "jp": "メンタルリセット", "zh-CN": "心灵重置", "zh-CN-CN": "心灵重置" },
           "sp": 4
         }
       },
       "Frozen Moon, Melting Heart": {
         "給你的禮物": {
-          "value": "給你的禮物",
+          "value": "給你的禮物", "simulation_id": 208,
           "names": {
             "zh-TW": "給你的禮物",
             "jp": "プレゼント・フォー・ユー",
@@ -679,7 +679,7 @@
       },
       "崩壞之夜的繆思": {
         "奏響終焉業火": {
-          "value": "奏響終焉業火",
+          "value": "奏響終焉業火", "simulation_id": 209,
           "names": {
             "zh-TW": "奏響終焉業火",
             "jp": "奏でられし終焉の業火",
@@ -703,7 +703,7 @@
     "english name": "Risa_Murofushi",
     "style": {
       "母愛的接球手": {
-        "value": "母愛的接球手",
+        "value": "母愛的接球手", "simulation_id": 222,
         "names": {
           "zh-TW": "母愛的接球手",
           "jp": "親愛のレシーバー",
@@ -715,7 +715,7 @@
         "tier": "A"
       },
       "痛痛飛走～♪": {
-        "value": "痛痛飛走～♪",
+        "value": "痛痛飛走～♪", "simulation_id": 223,
         "names": {
           "zh-TW": "痛痛飛走～♪",
           "jp": "痛いの痛いの飛んでけ〜♪",
@@ -727,7 +727,7 @@
         "tier": "S"
       },
       "蔚藍之花": {
-        "value": "蔚藍之花",
+        "value": "蔚藍之花", "simulation_id": 225,
         "names": {
           "zh-TW": "蔚藍之花",
           "jp": "あまいろの花",
@@ -739,7 +739,7 @@
         "tier": "S"
       },
       "溫馨時光": {
-        "value": "溫馨時光",
+        "value": "溫馨時光", "simulation_id": 227,
         "names": {
           "zh-TW": "溫馨時光",
           "jp": "ハートフルデイズ",
@@ -751,7 +751,7 @@
         "tier": "S"
       },
       "趕快回家吧": {
-        "value": "趕快回家吧",
+        "value": "趕快回家吧", "simulation_id": 224,
         "names": {
           "zh-TW": "趕快回家吧",
           "jp": "早くおうちに帰りましょ",
@@ -763,7 +763,7 @@
         "tier": "SS"
       },
       "潛入，面帶笑容參加技術交流會": {
-        "value": "潛入，面帶笑容參加技術交流會",
+        "value": "潛入，面帶笑容參加技術交流會", "simulation_id": 226,
         "names": {
           "zh-TW": "潛入，面帶笑容參加技術交流會",
           "jp": "潜入、笑顔で技術交流会",
@@ -775,7 +775,7 @@
         "tier": "SS"
       },
       "今晚，在櫻花照映之下": {
-        "value": "今晚，在櫻花照映之下",
+        "value": "今晚，在櫻花照映之下", "simulation_id": 228,
         "names": {
           "zh-TW": "今晚，在櫻花照映之下",
           "jp": "今宵、花明かりの下で",
@@ -787,7 +787,7 @@
         "tier": "SS"
       },
       "療癒大腿枕": {
-        "value": "療癒大腿枕",
+        "value": "療癒大腿枕", "simulation_id": 229,
         "names": {
           "zh-TW": "療癒大腿枕",
           "jp": "ヒーリング・ラップピロー",
@@ -804,7 +804,7 @@
     "skill": {
       "common": {
         "回復": {
-          "value": "回復",
+          "value": "回復", "simulation_id": 155,
           "names": {
             "zh-TW": "回復",
             "jp": "リカバー",
@@ -814,7 +814,7 @@
           "sp": 5
         },
         "重生彈": {
-          "value": "重生彈",
+          "value": "重生彈", "simulation_id": 558,
           "names": {
             "zh-TW": "重生彈",
             "jp": "リバースショット",
@@ -824,7 +824,7 @@
           "sp": 5
         },
         "淒美覺醒": {
-          "value": "淒美覺醒",
+          "value": "淒美覺醒", "simulation_id": 560,
           "names": {
             "zh-TW": "淒美覺醒",
             "jp": "儚き目覚め",
@@ -834,7 +834,7 @@
           "sp": 7
         },
         "飽和回復": {
-          "value": "飽和回復",
+          "value": "飽和回復", "simulation_id": 158,
           "names": {
             "zh-TW": "飽和回復",
             "jp": "フィルリカバー",
@@ -844,7 +844,7 @@
           "sp": 8
         },
         "暖心轟炸機": {
-          "value": "暖心轟炸機",
+          "value": "暖心轟炸機", "simulation_id": 563,
           "names": {
             "zh-TW": "暖心轟炸機",
             "jp": "ハートフル・ボマー",
@@ -854,7 +854,7 @@
           "sp": 14
         },
         "暖心轟炸機+": {
-          "value": "暖心轟炸機+",
+          "value": "暖心轟炸機+", "simulation_id": 564,
           "names": {
             "zh-TW": "暖心轟炸機+",
             "jp": "ハートフル・ボマー",
@@ -864,7 +864,7 @@
           "sp": 14
         },
         "療癒微笑": {
-          "value": "療癒微笑",
+          "value": "療癒微笑", "simulation_id": 561,
           "names": {
             "zh-TW": "療癒微笑",
             "jp": "癒やされスマイル",
@@ -874,7 +874,7 @@
           "sp": 5
         },
         "活力綻放": {
-          "value": "活力綻放",
+          "value": "活力綻放", "simulation_id": 554,
           "names": {
             "zh-TW": "活力綻放",
             "jp": "バウンシー・ブルーミー",
@@ -884,7 +884,7 @@
           "sp": 8
         },
         "天之微笑": {
-          "value": "天之微笑",
+          "value": "天之微笑", "simulation_id": 562,
           "names": {
             "zh-TW": "天之微笑",
             "jp": "天の微笑み",
@@ -896,7 +896,7 @@
       },
       "潛入，面帶笑容參加技術交流會": {
         "智慧的恩賜": {
-          "value": "智慧的恩賜",
+          "value": "智慧的恩賜", "simulation_id": 565,
           "names": {
             "zh-TW": "智慧的恩賜",
             "jp": "叡智の賜物",
@@ -908,7 +908,7 @@
       },
       "今晚，在櫻花照映之下": {
         "蝶之邀約，照耀初旭": {
-          "value": "蝶之邀約，照耀初旭",
+          "value": "蝶之邀約，照耀初旭", "simulation_id": 566,
           "names": {
             "zh-TW": "蝶之邀約，照耀初旭",
             "jp": "胡蝶のいざない、照る初旭",
@@ -920,7 +920,7 @@
       },
       "療癒大腿枕": {
         "好孩子們，集合囉！": {
-          "value": "好孩子們，集合囉！",
+          "value": "好孩子們，集合囉！", "simulation_id": 567,
           "names": {
             "zh-TW": "好孩子們，集合囉！",
             "jp": "よいこのみんな、あつまれ！",
@@ -933,7 +933,7 @@
     },
     "passive skill": {
       "真心款待": {
-        "value": "真心款待",
+        "value": "真心款待", "simulation_id": 555,
         "names": {
           "zh-TW": "真心款待",
           "jp": "ふるまうまごころ",
@@ -942,7 +942,7 @@
         }
       },
       "無限散發的母性": {
-        "value": "無限散發的母性",
+        "value": "無限散發的母性", "simulation_id": 556,
         "names": {
           "zh-TW": "無限散發的母性",
           "jp": "溢れ出る母性",
@@ -963,7 +963,7 @@
     "english name": "Akari_Date",
     "style": {
       "悲觀王牌": {
-        "value": "悲觀王牌",
+        "value": "悲觀王牌", "simulation_id": 230,
         "names": {
           "zh-TW": "悲觀王牌",
           "jp": "ネガティブエース",
@@ -975,7 +975,7 @@
         "tier": "A"
       },
       "完美接招": {
-        "value": "完美接招",
+        "value": "完美接招", "simulation_id": 231,
         "names": {
           "zh-TW": "完美接招",
           "jp": "マーベルアプローチ",
@@ -987,7 +987,7 @@
         "tier": "S"
       },
       "網球場惡魔": {
-        "value": "網球場惡魔",
+        "value": "網球場惡魔", "simulation_id": 232,
         "names": {
           "zh-TW": "網球場惡魔",
           "jp": "テニスコートの悪魔",
@@ -1001,7 +1001,7 @@
         "tier": "SS"
       },
       "Holiday Star Night": {
-        "value": "Holiday Star Night",
+        "value": "Holiday Star Night", "simulation_id": 233,
         "names": {
           "zh-TW": "Holiday Star Night",
           "jp": "Holiday Star Night",
@@ -1015,7 +1015,7 @@
         "tier": "SS"
       },
       "幸運冬麗": {
-        "value": "幸運冬麗",
+        "value": "幸運冬麗", "simulation_id": 234,
         "names": {
           "zh-TW": "幸運冬麗",
           "jp": "幸運ふゆうらら",
@@ -1029,7 +1029,7 @@
         "tier": "SS"
       },
       "勇往直前永不放棄！": {
-        "value": "勇往直前永不放棄！",
+        "value": "勇往直前永不放棄！", "simulation_id": 235,
         "names": {
           "zh-TW": "勇往直前永不放棄！",
           "jp": "前進ネバーギブアップ！ ",
@@ -1046,7 +1046,7 @@
     "skill": {
       "common": {
         "發球得分": {
-          "value": "發球得分",
+          "value": "發球得分", "simulation_id": 12,
           "names": {
             "zh-TW": "發球得分",
             "jp": "サービス・エース",
@@ -1056,7 +1056,7 @@
           "sp": 5
         },
         "切削球": {
-          "value": "切削球",
+          "value": "切削球", "simulation_id": 13,
           "names": {
             "zh-TW": "切削球",
             "jp": "スライスショット",
@@ -1066,7 +1066,7 @@
           "sp": 8
         },
         "被害妄想": {
-          "value": "被害妄想",
+          "value": "被害妄想", "simulation_id": 14,
           "names": {
             "zh-TW": "被害妄想",
             "jp": "被害妄想",
@@ -1076,7 +1076,7 @@
           "sp": 4
         },
         "漆黑迷幻發球": {
-          "value": "漆黑迷幻發球",
+          "value": "漆黑迷幻發球", "simulation_id": 18,
           "names": {
             "zh-TW": "漆黑迷幻發球",
             "jp": "漆黒トランスサーブ",
@@ -1086,7 +1086,7 @@
           "sp": 14
         },
         "雪崩": {
-          "value": "雪崩",
+          "value": "雪崩", "simulation_id": 15,
           "names": {
             "zh-TW": "雪崩",
             "jp": "アバランチ",
@@ -1096,7 +1096,7 @@
           "sp": 8
         },
         "幸運機會": {
-          "value": "幸運機會",
+          "value": "幸運機會", "simulation_id": 16,
           "names": {
             "zh-TW": "幸運機會",
             "jp": "ラッキーチャンス",
@@ -1106,7 +1106,7 @@
           "sp": 7
         },
         "忍術·鵪鶉隱身術": {
-          "value": "忍術·鵪鶉隱身術",
+          "value": "忍術·鵪鶉隱身術", "simulation_id": 11,
           "names": {
             "zh-TW": "忍術·鵪鶉隱身術",
             "jp": "忍法・うずら隠れの術",
@@ -1116,7 +1116,7 @@
           "sp": 6
         },
         "交纏陷阱": {
-          "value": "交纏陷阱",
+          "value": "交纏陷阱", "simulation_id": 17,
           "names": {
             "zh-TW": "交纏陷阱",
             "jp": "もつれトラップ",
@@ -1128,7 +1128,7 @@
       },
       "Holiday Star Night": {
         "哀傷的雪花蓮": {
-          "value": "哀傷的雪花蓮",
+          "value": "哀傷的雪花蓮", "simulation_id": 19,
           "names": {
             "zh-TW": "哀傷的雪花蓮",
             "jp": "哀のスノードロップ",
@@ -1140,7 +1140,7 @@
       },
       "幸運冬麗": {
         "過熱祈禱": {
-          "value": "過熱祈禱",
+          "value": "過熱祈禱", "simulation_id": 20,
           "names": {
             "zh-TW": "過熱祈禱",
             "jp": "御祈祷オーバーヒート",
@@ -1152,7 +1152,7 @@
       },
       "勇往直前永不放棄！": {
         "大球恐慌亂烘烘": {
-          "value": "大球恐慌亂烘烘",
+          "value": "大球恐慌亂烘烘", "simulation_id": 21,
           "names": {
             "zh-TW": "大球恐慌亂烘烘",
             "jp": "大玉パニック・スクランブル",
@@ -1176,7 +1176,7 @@
     "english name": "Aina_Mizuhara",
     "style": {
       "深海的學習者": {
-        "value": "深海的學習者",
+        "value": "深海的學習者", "simulation_id": 236,
         "names": {
           "zh-TW": "深海的學習者",
           "jp": "深き海の学び手",
@@ -1188,7 +1188,7 @@
         "tier": "A"
       },
       "來自深淵的邀請": {
-        "value": "來自深淵的邀請",
+        "value": "來自深淵的邀請", "simulation_id": 237,
         "names": {
           "zh-TW": "來自深淵的邀請",
           "jp": "アビスからの誘い",
@@ -1200,7 +1200,7 @@
         "tier": "S"
       },
       "品嘗深奧滋味": {
-        "value": "品嘗深奧滋味",
+        "value": "品嘗深奧滋味", "simulation_id": 239,
         "names": {
           "zh-TW": "品嘗深奧滋味",
           "jp": "奥深い味わいを",
@@ -1214,7 +1214,7 @@
         "tier": "S"
       },
       "禁錮虎鯨": {
-        "value": "禁錮虎鯨",
+        "value": "禁錮虎鯨", "simulation_id": 238,
         "names": {
           "zh-TW": "禁錮虎鯨",
           "jp": "ロックアップオルカ",
@@ -1226,7 +1226,7 @@
         "tier": "SS"
       },
       "衝鋒！擊刺！鮪魚！": {
-        "value": "衝鋒！擊刺！鮪魚！",
+        "value": "衝鋒！擊刺！鮪魚！", "simulation_id": 240,
         "names": {
           "zh-TW": "衝鋒！擊刺！鮪魚！",
           "jp": "ラッシュ！スタブ！ツナ！",
@@ -1240,7 +1240,7 @@
         "tier": "SS"
       },
       "獻給大海的愛情": {
-        "value": "獻給大海的愛情",
+        "value": "獻給大海的愛情", "simulation_id": 241,
         "names": {
           "zh-TW": "獻給大海的愛情",
           "jp": "溟海に捧ぐアフェクション",
@@ -1254,12 +1254,12 @@
         "tier": "SS"
       },
       "跳進閃閃發亮的夏天！": {
-        "value": "跳進閃閃發亮的夏天！",
+        "value": "跳進閃閃發亮的夏天！", "simulation_id": 242,
         "names": {
           "zh-TW": "跳進閃閃發亮的夏天！",
           "jp": "キラキラサマーへ、ジャンプイン！",
           "zh-CN": "跳进闪闪发亮的夏天！",
-          "zh-CN-CN": "跳进闪闪发亮的夏天！"
+          "zh-CN-CN": "跳进闪耀的夏天！"
         },
         "id": "007",
         "ele": [
@@ -1271,7 +1271,7 @@
     "skill": {
       "common": {
         "皺鰓鯊硬刃": {
-          "value": "皺鰓鯊硬刃",
+          "value": "皺鰓鯊硬刃", "simulation_id": 39,
           "names": {
             "zh-TW": "皺鰓鯊硬刃",
             "jp": "ラブカ・ブレード",
@@ -1281,7 +1281,7 @@
           "sp": 6
         },
         "深層吐息": {
-          "value": "深層吐息",
+          "value": "深層吐息", "simulation_id": 40,
           "names": {
             "zh-TW": "深層吐息",
             "jp": "ディープブロー",
@@ -1291,17 +1291,17 @@
           "sp": 5
         },
         "出刃菜刀登場": {
-          "value": "出刃菜刀登場",
+          "value": "出刃菜刀登場", "simulation_id": 42,
           "names": {
             "zh-TW": "出刃菜刀登場",
             "jp": "デバノデバン",
             "zh-CN": "出刃菜刀登场",
-            "zh-CN-CN": "品尝深奥滋味"
+            "zh-CN-CN": "菜刀登场"
           },
           "sp": 8
         },
         "浩瀚大海": {
-          "value": "浩瀚大海",
+          "value": "浩瀚大海", "simulation_id": 41,
           "names": {
             "zh-TW": "浩瀚大海",
             "jp": "大海原",
@@ -1311,7 +1311,7 @@
           "sp": 8
         },
         "大海不良分子": {
-          "value": "大海不良分子",
+          "value": "大海不良分子", "simulation_id": 45,
           "names": {
             "zh-TW": "大海不良分子",
             "jp": "海のギャング",
@@ -1321,7 +1321,7 @@
           "sp": 15
         },
         "大海不良分子+": {
-          "value": "大海不良分子+",
+          "value": "大海不良分子+", "simulation_id": 46,
           "names": {
             "zh-TW": "大海不良分子+",
             "jp": "海のギャング+",
@@ -1331,7 +1331,7 @@
           "sp": 15
         },
         "神經痛": {
-          "value": "神經痛",
+          "value": "神經痛", "simulation_id": 43,
           "names": {
             "zh-TW": "神經痛",
             "jp": "ヌラルジャ",
@@ -1341,19 +1341,19 @@
           "sp": 12
         },
         "夏色嗨心": {
-          "value": "夏色嗨心",
+          "value": "夏色嗨心", "simulation_id": 44,
           "names": {
             "zh-TW": "夏色嗨心",
             "jp": "夏色ハイテンション",
             "zh-CN": "夏色嗨心",
-            "zh-CN-CN": "夏色嗨心"
+            "zh-CN-CN": "夏日狂热"
           },
           "sp": 7
         }
       },
       "衝鋒！擊刺！鮪魚！": {
         "豪邁！海盜加農炮": {
-          "value": "豪邁！海盜加農炮",
+          "value": "豪邁！海盜加農炮", "simulation_id": 47,
           "names": {
             "zh-TW": "豪邁！海盜加農炮",
             "jp": "豪快！パイレーツキャノン",
@@ -1365,7 +1365,7 @@
       },
       "獻給大海的愛情": {
         "水母之舞": {
-          "value": "水母之舞",
+          "value": "水母之舞", "simulation_id": 48,
           "names": {
             "zh-TW": "水母之舞",
             "jp": "ジェリーフィッシュ・ダンス",
@@ -1377,12 +1377,12 @@
       },
       "跳進閃閃發亮的夏天！": {
         "彩虹奇蹟滑水道": {
-          "value": "彩虹奇蹟滑水道",
+          "value": "彩虹奇蹟滑水道", "simulation_id": 49,
           "names": {
             "zh-TW": "彩虹奇蹟滑水道",
             "jp": "レインボーミラクルスライダー",
             "zh-CN": "彩虹奇迹滑水道",
-            "zh-CN-CN": "彩虹奇迹滑水道"
+            "zh-CN-CN": "彩虹奇迹滑行"
           },
           "sp": 16
         }
@@ -1390,7 +1390,7 @@
     },
     "passive skill": {
       "水光的波動": {
-        "value": "水光的波動",
+        "value": "水光的波動", "simulation_id": 38,
         "names": {
           "zh-TW": "水光的波動",
           "jp": "水光のゆらめき",
@@ -1399,7 +1399,7 @@
         }
       },
       "繼承母親的燈火": {
-        "value": "繼承母親的燈火",
+        "value": "繼承母親的燈火", "simulation_id": 37,
         "names": {
           "zh-TW": "繼承母親的燈火",
           "jp": "母の灯を継いで",
