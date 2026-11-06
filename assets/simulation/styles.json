@@ -4040,7 +4040,7 @@
     "limit_break": {
       "0": [
         {"id": 2660001, "name": "温泉巡游", "trigger": "on_battle_start", "effects": [{"type": "always_persuit_sp8", "target": "self", "status_id": 224, "duration": {"type": "permanent"}}]},
-        {"id": 2660002, "name": "嫩绿摇曳", "trigger": "on_persuit", "effects": [{"type": "resource", "target": "ally_front", "sp": 2}]}
+        {"id": 2660002, "name": "嫩绿摇曳", "trigger": "on_pursuit", "effects": [{"type": "resource", "target": "ally_front", "sp": 2}]}
       ],
       "1": [
         {"id": 2660003, "name": "后闪", "trigger": "on_new_turn_start", "trigger_condition": "not front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}

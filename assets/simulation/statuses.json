@@ -172,7 +172,7 @@
   },
   "223": {"name": "inscription", "zh_cn": "诅咒刻印", "category": "debuff", "has_level": true},
   "224": {
-    "name": "always_persuit_sp8",
+    "name": "always_pursuit_sp8",
     "zh_cn": "追击固定消耗8SP",
     "category": "rule"
   },

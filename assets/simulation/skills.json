@@ -2487,7 +2487,7 @@
     "cost": {"sp": 0},
     "target": "ally_front",
     "effects": [
-      {"type": "attack_up", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
+      {"type": "attack_up_include_normal", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
     ]
   },
   "177": {
@@ -4542,7 +4542,7 @@
     "cost": {"sp": 0},
     "target": "ally_front",
     "effects": [
-      {"type": "attack_up", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
+      {"type": "attack_up_include_normal", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
     ]
   },
   "286": {
@@ -6350,7 +6350,7 @@
     "cost": {"sp": 0},
     "target": "ally_front",
     "effects": [
-      {"type": "attack_up", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
+      {"type": "attack_up_include_normal", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
     ]
   },
   "409": {
@@ -7351,7 +7351,7 @@
     "cost": {"sp": 0},
     "target": "ally_front",
     "effects": [
-      {"type": "attack_up", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
+      {"type": "attack_up_include_normal", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
     ]
   },
   "464": {
@@ -8054,7 +8054,7 @@
     "cost": {"sp": 0},
     "target": "ally_front",
     "effects": [
-      {"type": "attack_up", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
+      {"type": "attack_up_include_normal", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
     ]
   },
   "514": {
@@ -8305,7 +8305,7 @@
     "cost": {"sp": 0},
     "target": "ally_front",
     "effects": [
-      {"type": "attack_up", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
+      {"type": "attack_up_include_normal", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
     ]
   },
   "531": {
@@ -9151,7 +9151,7 @@
     "target": "territory",
     "effects": {
       "yes": [
-        {"type": "remove_summers_end_territory", "target": "territory", "status_id": 205},
+        {"type": "remove_summers_end_territory", "target": "territory", "status_id": 204},
         {"type": "attack_up_range_by_all_damage_rate", "target": "ally_all", "duration": {"type": "ally_turn", "value": 3} ,"status_id": 205}
       ],
       "no": [
@@ -11171,7 +11171,7 @@
     "cost": {"sp": 0},
     "target": "ally_front",
     "effects": [
-      {"type": "attack_up", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
+      {"type": "attack_up_include_normal", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
     ]
   },
   "711": {
