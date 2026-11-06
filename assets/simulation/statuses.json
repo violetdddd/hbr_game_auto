@@ -1,34 +1,69 @@
 {
-  "1": {"name": "attack_up", "zh_cn": "攻击力提升", "category": "buff", "stack_group": "attack_up", "removable": true},
+  "1": {"name": "attack_up", "zh_cn": "攻击力提升", "category": "buff", "stack_group": "attack_up", "removable": true, "icons": {
+    "none": "AttackUp.webp",
+    "fire": "FireAttackUp.webp",
+    "ice": "IceAttackUp.webp",
+    "thunder": "ThunderAttackUp.webp",
+    "light": "LightAttackUp.webp",
+    "dark": "DarkAttackUp.webp"
+  }},
   "2": {"name": "attack_down", "zh_cn": "攻击力降低", "category": "debuff", "stack_group": "attack_down", "removable": true, "debuff_guard": true, "not_display": true},
-  "3": {"name": "defense_down", "zh_cn": "防御力降低", "category": "debuff", "stack_group": "defense_down", "removable": true, "debuff_guard": true},
+  "3": {"name": "defense_down", "zh_cn": "防御力降低", "category": "debuff", "stack_group": "defense_down", "removable": true, "debuff_guard": true, "icons": {
+    "none": "DefenseDown.webp",
+    "fire": "FireDefenseDown.webp",
+    "ice": "IceDefenseDown.webp",
+    "thunder": "ThunderDefenseDown.webp",
+    "light": "LightDefenseDown.webp",
+    "dark": "DarkDefenseDown.webp"
+  }},
   "4": {"name": "defense_up", "zh_cn": "防御力提升", "category": "buff", "stack_group": "defense_up", "removable": true, "not_display": true},
   "5": {"name": "critical_rate_up", "zh_cn": "暴击率提升", "category": "buff", "stack_group": "critical_rate_up", "removable": true, "not_display": true},
-  "7": {"name": "critical_damage_up", "zh_cn": "暴击伤害提升", "category": "buff", "stack_group": "critical_damage_up", "removable": true},
+  "7": {"name": "critical_damage_up", "zh_cn": "暴击伤害提升", "category": "buff", "stack_group": "critical_damage_up", "removable": true, "icons": {
+    "none": "CriticalDamageUp.webp",
+    "fire": "FireCriticalDamageUp.webp",
+    "ice": "IceCriticalDamageUp.webp",
+    "thunder": "ThunderCriticalDamageUp.webp",
+    "light": "LightCriticalDamageUp.webp",
+    "dark": "DarkCriticalDamageUp.webp"
+  }},
   "10": {"name": "stun", "zh_cn": "眩晕", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "not_display": true},
-  "12": {"name": "provoke", "zh_cn": "嘲讽", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true},
+  "12": {"name": "provoke", "zh_cn": "嘲讽", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "icon": "Provoke.webp"},
   "13": {
     "name": "funnel", 
     "zh_cn": "连击珠", 
     "category": "buff", 
-    "stack_group": "funnel"
+    "stack_group": "funnel",
+    "icon": "Funnel.webp"
   },
   "14": {
     "name": "zone",
     "zh_cn": "场地效果",
     "category": "rule",
-    "forced_one": true
+    "forced_one": true,
+    "icons": {
+      "fire": "FireZone.webp",
+      "ice": "IceZone.webp",
+      "thunder": "ThunderZone.webp",
+      "light": "LightZone.webp",
+      "dark": "DarkZone.webp"
+    }
   },
   "15": {"name": "invincible", "zh_cn": "无敌", "category": "buff", "removable": true, "forced_one": true, "not_display": true},
-  "18": {"name": "resist_down", "zh_cn": "属性耐性降低", "category": "debuff", "stack_group": "resist_down", "removable": true, "debuff_guard": true},
+  "18": {"name": "resist_down", "zh_cn": "属性耐性降低", "category": "debuff", "stack_group": "resist_down", "removable": true, "debuff_guard": true, "icons": {
+    "fire": "FireResistDown.webp",
+    "ice": "IceResistDown.webp",
+    "thunder": "ThunderResistDown.webp",
+    "light": "LightResistDown.webp",
+    "dark": "DarkResistDown.webp"
+  }},
   "20": {
     "name": "additional_turn",
     "zh_cn": "追加回合",
     "category": "rule",
     "forced_one": true
   },
-  "22": {"name": "fragile", "zh_cn": "脆弱", "category": "debuff", "stack_group": "fragile", "removable": true, "debuff_guard": true},
-  "25": {"name": "buff_charge", "zh_cn": "充能", "category": "buff", "removable": true, "forced_one": true},
+  "22": {"name": "fragile", "zh_cn": "脆弱", "category": "debuff", "stack_group": "fragile", "removable": true, "debuff_guard": true, "icon": "Fragile.png"},
+  "25": {"name": "buff_charge", "zh_cn": "充能", "category": "buff", "removable": true, "forced_one": true, "icon": "Charge.png"},
   "26": {
     "name": "specify_sp",
     "zh_cn": "指定回复到SP",
@@ -39,50 +74,52 @@
   "28": {"name": "defense_up_per_token", "zh_cn": "每层Token防御提升", "category": "buff", "stack_group": "defense_up", "removable": true, "not_display": true},
   "30": {"name": "virus", "zh_cn": "病毒", "category": "debuff", "removable": true, "debuff_guard": true, "not_display": true},
   "32": {"name": "attack_up_include_normal", "zh_cn": "攻击力提升（含普通攻击）", "category": "buff", "stack_group": "attack_up", "removable": true, "not_display": true},
-  "33": {"name": "recoil", "zh_cn": "疲劳", "category": "debuff", "removable": true, "debuff_guard": true},
+  "33": {"name": "recoil", "zh_cn": "疲劳", "category": "debuff", "removable": true, "debuff_guard": true, "icon": "Recoil.png"},
   "34": {"name": "regeneration_dp", "zh_cn": "DP持续回复", "category": "buff", "removable": true, "not_display": true},
   "39": {"name": "damage_rate_up", "zh_cn": "破坏率提升", "category": "buff", "stack_group": "damage_rate_up", "removable": true, "not_display": true},
   "42": {"name": "heal_down", "zh_cn": "回复量降低", "category": "debuff", "stack_group": "heal_down", "removable": true, "debuff_guard": true, "not_display": true},
   "48": {"name": "skill_limit_count_up", "zh_cn": "技能使用次数上限提升", "category": "rule", "removable": true},
   "52": {"name": "give_heal_up", "zh_cn": "回复效果强化", "category": "buff", "stack_group": "give_heal_up", "removable": true, "not_display": true},
-  "54": {"name": "give_attack_buff_up", "zh_cn": "攻击增益强化", "category": "buff", "stack_group": "give_attack_buff_up", "removable": true},
-  "57": {"name": "cover", "zh_cn": "掩护", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true},
-  "58": {"name": "misfortune", "zh_cn": "灾厄", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true},
-  "76": {"name": "fighting_spirit", "zh_cn": "斗志", "category": "buff", "removable": true, "forced_one": true},
-  "78": {"name": "mind_eye", "zh_cn": "心眼", "category": "buff", "stack_group": "mind_eye", "removable": true},
+  "54": {"name": "give_attack_buff_up", "zh_cn": "攻击增益强化", "category": "buff", "stack_group": "give_attack_buff_up", "removable": true, "icon": "GiveAttackBuffUp.png"},
+  "57": {"name": "cover", "zh_cn": "掩护", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "icon": "Cover.png"},
+  "58": {"name": "misfortune", "zh_cn": "灾厄", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "icon": "Misfortune.png"},
+  "76": {"name": "fighting_spirit", "zh_cn": "斗志", "category": "buff", "removable": true, "forced_one": true, "icon": "FightingSpirit.png"},
+  "78": {"name": "mind_eye", "zh_cn": "心眼", "category": "buff", "stack_group": "mind_eye", "removable": true, "icon": "MindEye.png"},
   "79": {"name": "restraint", "zh_cn": "束缚", "category": "debuff", "removable": true, "debuff_guard": true, "not_display": true},
   "81": {"name": "power_up_value", "zh_cn": "力量固定值提升", "category": "buff", "stack_group": "power_up_value", "removable": true, "not_display": true},
   "87": {"name": "toughness_up_value", "zh_cn": "体力固定值提升", "category": "buff", "stack_group": "toughness_up_value", "removable": true, "not_display": true},
   "91": {"name": "luck_up_value", "zh_cn": "幸运固定值提升", "category": "buff", "stack_group": "luck_up_value", "removable": true, "not_display": true},
-  "94": {"name": "give_defense_debuff_up", "zh_cn": "防御削弱效果强化", "category": "buff", "stack_group": "give_defense_debuff_up", "removable": true},
+  "94": {"name": "give_defense_debuff_up", "zh_cn": "防御削弱效果强化", "category": "buff", "stack_group": "give_defense_debuff_up", "removable": true, "not_display": true},
   "95": {"name": "all_status_up_value", "zh_cn": "全能力值提升", "category": "buff", "stack_group": "all_status_up_value", "removable": true, "not_display": true},
   "105": {"name": "super_break", "zh_cn": "超破盾", "category": "debuff", "forced_one": true, "not_display": true},
   "108": {"name": "resist_down_overwrite", "zh_cn": "耐性降低覆盖", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "not_display": true},
   "110": {"name": "debuff_guard", "zh_cn": "负面状态防护", "category": "buff", "removable": true, "forced_one": true, "not_display": true},
   "113": {"name": "break_guard", "zh_cn": "破盾防护", "category": "buff", "forced_one": true, "not_display": true},
-  "118": {"name": "give_debuff_up", "zh_cn": "减益效果强化", "category": "buff", "stack_group": "give_debuff_up", "removable": true},
-  "119": {"name": "morale", "zh_cn": "士气", "category": "buff", "forced_one": true, "has_level": true},
-  "120": {"name": "arrow_cherry_blossoms", "zh_cn": "樱花箭", "category": "buff", "stack_group": "give_debuff_up", "removable": true, "forced_one": true},
-  "121": {"name": "dodge", "zh_cn": "闪避", "category": "buff", "removable": true, "forced_one": true},
-  "123": {"name": "eternal_oath", "zh_cn": "永恒誓约", "category": "buff", "forced_one": true},
-  "124": {"name": "shadow_clone", "zh_cn": "影分身", "category": "buff", "removable": true, "forced_one": true},
+  "118": {"name": "give_debuff_up", "zh_cn": "减益效果强化", "category": "buff", "stack_group": "give_debuff_up", "removable": true, "icon": "GiveDebuffUp.png"},
+  "119": {"name": "morale", "zh_cn": "士气", "category": "buff", "forced_one": true, "has_level": true, "icon": "Morale.png"},
+  "120": {"name": "arrow_cherry_blossoms", "zh_cn": "樱花箭", "category": "buff", "stack_group": "give_debuff_up", "removable": true, "forced_one": true, "icon": "ArrowCherryBlossoms.png"},
+  "121": {"name": "dodge", "zh_cn": "闪避", "category": "buff", "removable": true, "forced_one": true, "icon": "Dodge.png"},
+  "123": {"name": "eternal_oath", "zh_cn": "永恒誓约", "category": "buff", "forced_one": true, "icon": "EternalOath.png"},
+  "124": {"name": "shadow_clone", "zh_cn": "影分身", "category": "buff", "removable": true, "forced_one": true, "icon": "ShadowClone.png"},
   "125": {
     "name": "double_action_extra_skill",
     "zh_cn": "EX技能双重行动",
     "category": "buff",
     "removable": true,
-    "forced_one": true
+    "forced_one": true,
+    "icon": "DoubleActionExtraSkill.png"
   },
   "126": {"name": "zone_up_eternal_plus_15", "zh_cn": "领域强化（常驻）", "category": "rule"},
   "132": {
     "name": "rice_field_zone",
     "zh_cn": "稻田领域",
     "category": "rule",
-    "forced_one": true
+    "forced_one": true,
+    "icon": "RiceFieldZone.webp"
   },
   "133": {"name": "babied", "zh_cn": "幼儿化", "category": "buff", "forced_one": true, "not_display": true},
   "135": {"name": "give_debuff_turn_up", "zh_cn": "减益持续回合延长", "category": "rule"},
-  "136": {"name": "hacking", "zh_cn": "骇入破解", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true},
+  "136": {"name": "hacking", "zh_cn": "骇入破解", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "icon": "Hacking.png"},
   "139": {"name": "break_down_turn_up", "zh_cn": "倒地回合延长", "category": "rule", "forced_one": true},
   "140": {
     "name": "sp_limit_overwrite",
@@ -91,12 +128,12 @@
     "removable": true,
     "forced_one": true
   },
-  "143": {"name": "diva", "zh_cn": "歌姬", "category": "buff", "stack_group": "diva", "removable": true},
-  "144": {"name": "shredding", "zh_cn": "速弹", "category": "buff", "removable": true},
-  "145": {"name": "negative_mind", "zh_cn": "消极状态", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true},
+  "143": {"name": "diva", "zh_cn": "歌姬", "category": "buff", "stack_group": "diva", "removable": true, "icon": "Diva.png"},
+  "144": {"name": "shredding", "zh_cn": "速弹", "category": "buff", "removable": true, "icon": "Shredding.png"},
+  "145": {"name": "negative_mind", "zh_cn": "消极状态", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "icon": "NegativeMind.png"},
   "148": {"name": "damage_rate_up_per_token", "zh_cn": "每层Token破坏率提升", "category": "buff", "stack_group": "damage_rate_up", "removable": true, "not_display": true},
   "151": {"name": "replace_normal_skill", "zh_cn": "普通技能替换", "category": "rule", "forced_one": true},
-  "154": {"name": "b_i_yamawaki_servant", "zh_cn": "山胁仆从", "category": "buff", "forced_one": true},
+  "154": {"name": "b_i_yamawaki_servant", "zh_cn": "山胁仆从", "category": "buff", "forced_one": true, "icon": "BIYamawakiServant.png"},
   "157": {
     "name": "revive_territory",
     "zh_cn": "再生之阵",
@@ -109,22 +146,28 @@
     "category": "rule",
     "forced_one": true
   },
-  "160": {"name": "high_boost", "zh_cn": "高阶增强", "category": "buff", "removable": true, "forced_one": true, "sp_modify": 2},
+  "160": {"name": "high_boost", "zh_cn": "高阶增强", "category": "buff", "removable": true, "forced_one": true, "sp_modify": 2, "icon": "HighBoost.png"},
   "163": {"name": "makeup", "zh_cn": "彩妆", "category": "buff", "removable": true, "forced_one": true, "not_display": true},
-  "166": {"name": "element_mark", "zh_cn": "属性印记", "category": "buff", "removable": true, "forced_one": true, "has_level": true},
+  "166": {"name": "element_mark", "zh_cn": "属性印记", "category": "buff", "removable": true, "forced_one": true, "has_level": true, "icons": {
+    "dark": "DarkMark.png",
+    "fire": "FireMark.png",
+    "ice": "IceMark.png",
+    "thunder": "ThunderMark.png",
+    "light": "LightMark.webp"
+  }},
   "169": {"name": "ignore_e_shield_element", "zh_cn": "无视元素护盾", "category": "rule", "forced_one": true},
   "170": {"name": "super_break_down", "zh_cn": "超倒下", "category": "debuff", "forced_one": true, "not_display": true},
-  "171": {"name": "curry", "zh_cn": "咖喱", "category": "buff", "removable": true, "forced_one": true},
-  "172": {"name": "shchi", "zh_cn": "白菜汤", "category": "buff", "removable": true, "forced_one": true},
-  "174": {"name": "motivation", "zh_cn": "干劲", "category": "buff", "forced_one": true, "has_level": true},
+  "171": {"name": "curry", "zh_cn": "咖喱", "category": "buff", "removable": true, "forced_one": true, "icon": "Curry.png"},
+  "172": {"name": "shchi", "zh_cn": "白菜汤", "category": "buff", "removable": true, "forced_one": true, "icon": "Shchi.png"},
+  "174": {"name": "motivation", "zh_cn": "干劲", "category": "buff", "forced_one": true, "has_level": true, "icon": "Motivation.webp"},
   "175": {
     "name": "overwrite_sp",
     "zh_cn": "SP消耗覆盖",
     "category": "rule",
     "forced_one": true
   },
-  "177": {"name": "talisman", "zh_cn": "灵符", "category": "debuff", "forced_one": true, "has_level": true},
-  "179": {"name": "mocktail", "zh_cn": "鸡尾酒", "category": "buff", "removable": true, "forced_one": true},
+  "177": {"name": "talisman", "zh_cn": "灵符", "category": "debuff", "forced_one": true, "has_level": true, "icon": "Talisman.png"},
+  "179": {"name": "mocktail", "zh_cn": "鸡尾酒", "category": "buff", "removable": true, "forced_one": true, "icon": "Mocktail.png"},
   "186": {"name": "border_ref_p_down_by_admiral", "zh_cn": "超越量表敌方属性降低", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "not_display": true},
   "187": {
     "name": "ep_limit_overwrite",
@@ -133,12 +176,12 @@
     "removable": true,
     "forced_one": true
   },
-  "190": {"name": "steak", "zh_cn": "牛排", "category": "buff", "removable": true, "forced_one": true},
-  "191": {"name": "gelato", "zh_cn": "意式冰淇淋", "category": "buff", "removable": true, "forced_one": true},
-  "193": {"name": "disaster", "zh_cn": "祸", "category": "debuff", "debuff_guard": true, "forced_one": true, "has_level": true},
-  "194": {"name": "sprightly", "zh_cn": "轻快状态", "category": "buff", "removable": true, "forced_one": true},
-  "201": {"name": "undermine", "zh_cn": "蚀", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true},
-  "202": {"name": "dim_sum", "zh_cn": "点心", "category": "buff", "removable": true, "forced_one": true},
+  "190": {"name": "steak", "zh_cn": "牛排", "category": "buff", "removable": true, "forced_one": true, "icon": "Steak.webp"},
+  "191": {"name": "gelato", "zh_cn": "意式冰淇淋", "category": "buff", "removable": true, "forced_one": true, "icon": "Gelato.webp"},
+  "193": {"name": "disaster", "zh_cn": "祸", "category": "debuff", "debuff_guard": true, "forced_one": true, "has_level": true, "icon": "Disaster.webp"},
+  "194": {"name": "sprightly", "zh_cn": "轻快状态", "category": "buff", "removable": true, "forced_one": true, "icon": "Sprightly.webp"},
+  "201": {"name": "undermine", "zh_cn": "蚀", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "icon": "Undermine.webp"},
+  "202": {"name": "dim_sum", "zh_cn": "点心", "category": "buff", "removable": true, "forced_one": true, "icon": "DimSum.webp"},
   "204": {
     "name": "summers_end_territory",
     "zh_cn": "晚夏之阵",
@@ -152,25 +195,26 @@
     "name": "force_one_damage_by_hit",
     "zh_cn": "每段伤害固定为1",
     "category": "rule",
-    "forced_one": true
+    "forced_one": true,
+    "icon": "ForceOneDamageByHit.png"
   },
-  "208": {"name": "revenge", "zh_cn": "复仇", "category": "buff", "forced_one": true, "has_level": true},
+  "208": {"name": "revenge", "zh_cn": "复仇", "category": "buff", "forced_one": true, "has_level": true, "icon": "Revenge.webp"},
   "209": {"name": "e_a_guard", "zh_cn": "埃癸斯无敌护盾", "category": "buff", "removable": true, "forced_one": true, "not_display": true},
   "212": {"name": "attack_up_by_token", "zh_cn": "依Token提升攻击", "category": "buff", "removable": true, "forced_one": true, "not_display": true},
   "213": {"name": "tea", "zh_cn": "红茶", "category": "buff", "removable": true, "forced_one": true},
-  "214": {"name": "infantilized", "zh_cn": "返婴状态", "category": "debuff", "forced_one": true, "has_level": true},
+  "214": {"name": "infantilized", "zh_cn": "返婴状态", "category": "debuff", "forced_one": true, "has_level": true, "icon": "Infantilized.webp"},
   "217": {
     "name": "zone_up",
     "zh_cn": "领域增强",
     "category": "rule"
   },
-  "218": {"name": "venom", "zh_cn": "猛毒", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "hit":3, "has_level": true},
+  "218": {"name": "venom", "zh_cn": "猛毒", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "hit":3, "has_level": true, "icon": "Venom.webp"},
   "221": {
     "name": "reduce_consume_overdrive",
     "zh_cn": "OD消耗降低",
     "category": "rule"
   },
-  "223": {"name": "inscription", "zh_cn": "诅咒刻印", "category": "debuff", "has_level": true},
+  "223": {"name": "inscription", "zh_cn": "诅咒刻印", "category": "debuff", "has_level": true, "icon": "Inscription.webp"},
   "224": {
     "name": "always_pursuit_sp8",
     "zh_cn": "追击固定消耗8SP",
@@ -185,7 +229,8 @@
   "227": {
     "name": "double_attack_skill",
     "zh_cn": "攻击技能二次行动",
-    "category": "buff"
+    "category": "buff",
+    "icon": "ByakkoDoubleActionAttackSkill.webp"
   },
   "228": {
     "name": "immersion",
@@ -204,6 +249,7 @@
   "230": {
     "name": "fear_for_demon",
     "zh_cn": "对魔王的恐惧",
-    "category": "debuff"
+    "category": "debuff",
+    "icon": "FearOfDevil.webp"
   }
 }
