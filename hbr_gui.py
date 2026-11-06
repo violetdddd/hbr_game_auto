@@ -1039,6 +1039,10 @@ class MainWindow(QMainWindow):
         card_form.addRow(self.card_stop_button)
         self.card_log = QTextEdit(); self.card_log.setReadOnly(True)
         card_form.addRow('状态', self.card_log)
+        # 战斗模拟：独立界面，Simulation 结算器后续接入
+        from simulation_gui import SimulationTab
+        self.simulation_tab = SimulationTab(self.catalog, StyleDialog, round_pixmap)
+        tabs.addTab(self.simulation_tab, '战斗模拟')
         # 样式表设置在主窗口上，会影响它的子控件
         self.setStyleSheet('''QMainWindow{background: #f7f8fa;} QWidget{color: #242933;font-size: 10pt;}
             QGroupBox{border:1px solid #dce2eb;border-radius:12px;margin-top:12px;padding:14px;background:white}
