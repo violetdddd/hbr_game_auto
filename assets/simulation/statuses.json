@@ -201,7 +201,7 @@
   "208": {"name": "revenge", "zh_cn": "复仇", "category": "buff", "forced_one": true, "has_level": true, "icon": "Revenge.webp"},
   "209": {"name": "e_a_guard", "zh_cn": "埃癸斯无敌护盾", "category": "buff", "removable": true, "forced_one": true, "not_display": true},
   "212": {"name": "attack_up_by_token", "zh_cn": "依Token提升攻击", "category": "buff", "removable": true, "forced_one": true, "not_display": true},
-  "213": {"name": "tea", "zh_cn": "红茶", "category": "buff", "removable": true, "forced_one": true},
+  "213": {"name": "tea", "zh_cn": "红茶", "category": "buff", "removable": true, "forced_one": true, "icon": "Tea.webp"},
   "214": {"name": "infantilized", "zh_cn": "返婴状态", "category": "debuff", "forced_one": true, "has_level": true, "icon": "Infantilized.webp"},
   "217": {
     "name": "zone_up",
