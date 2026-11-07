@@ -500,11 +500,7 @@
     "team": "31A", "tier": "S", "attack_type": "stab", "elements": [], "role": "buffer",
     "limit_break": {
       "3": [
-        {"id": 330001, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "user_select": {
-            "1": {"effects": [{"type": "resource", "target": "od", "od": 10, "random": 0.3}], "description": "增加10od"},
-            "2": {"effects": [{"type": "resource", "target": "od", "od": 0}], "description": "不增加10od"}
-          }
-        }
+        {"id": 330001, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 10, "random": 0.3}]}
       ]
     }
   },
@@ -1646,11 +1642,7 @@
     "team": "31C", "tier": "S", "attack_type": "slash", "elements": [], "role": "attacker",
     "limit_break": {
       "3": [
-        {"id": 1070001, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "user_select": {
-            "1": {"effects": [{"type": "resource", "target": "od", "od": 10, "random": 0.3}], "description": "增加10od"},
-            "2": {"effects": [{"type": "resource", "target": "od", "od": 0}], "description": "不增加10od"}
-          }
-        }
+        {"id": 1070001, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 10, "random": 0.3}]}
       ]
     }
   },
@@ -1831,11 +1823,7 @@
         {"id": 1190001, "name": "坚忍", "trigger": "on_enemy_turn_start", "trigger_condition": "dp_rate()==0.0 and front()", "effects": [{"type": "defense_up", "target": "self", "value": 50, "duration": {"type": "enemy_turn", "value": 1}, "status_id": 4}]}
       ],
       "10": [
-        {"id": 1190002, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "user_select": {
-            "1": {"effects": [{"type": "resource", "target": "od", "od": 10, "random": 0.3}], "description": "增加10od"},
-            "2": {"effects": [{"type": "resource", "target": "od", "od": 0}], "description": "不增加10od"}
-          }
-        }
+        {"id": 1190002, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 10, "random": 0.3}]}
       ]
     }
   },
@@ -1991,11 +1979,7 @@
     "team": "31C", "tier": "S", "attack_type": "stab", "elements": [], "role": "breaker",
     "limit_break": {
       "3": [
-        {"id": 1300001, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "user_select": {
-            "1": {"effects": [{"type": "resource", "target": "od", "od": 10, "random": 0.3}], "description": "增加10od"},
-            "2": {"effects": [{"type": "resource", "target": "od", "od": 0}], "description": "不增加10od"}
-          }
-        }
+        {"id": 1300001, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 10, "random": 0.3}]}
       ]
     }
   },
@@ -3179,11 +3163,7 @@
     "team": "31D", "tier": "S", "attack_type": "stab", "elements": [], "role": "buffer",
     "limit_break": {
       "3": [
-        {"id": 2100001, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "user_select": {
-            "1": {"effects": [{"type": "resource", "target": "od", "od": 10, "random": 0.3}], "description": "增加10od"},
-            "2": {"effects": [{"type": "resource", "target": "od", "od": 0}], "description": "不增加10od"}
-          }
-        }
+        {"id": 2100001, "name": "福运", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "od", "od": 10, "random": 0.3}]}
       ]
     }
   },
