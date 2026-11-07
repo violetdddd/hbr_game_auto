@@ -33,9 +33,9 @@ class Skill:
     names: JsonDict
     kind: str
     cost: JsonDict = field(default_factory=dict)
-    cost_type: str
-    default_cost: int
-    now_cost: int
+    cost_type: str = 'sp'
+    default_cost: int = 0
+    now_cost: int = 0
     used: int = 0
     target: Optional[str] = None
     effects: List[JsonDict] = field(default_factory=list)
@@ -55,15 +55,38 @@ class Skill:
     @classmethod
     def from_record(cls, record: JsonDict) -> 'Skill':
         if record.get('kind') not in ('active', 'system'):
-            raise ValueError(f"Skill 只能读取 active/system，收到 {record.get('kind')!r}")
+            raise ValueError(
+                f"Skill 只能读取 active/system，"
+                f"收到 {record.get('kind')!r}"
+            )
+
         data = _record_kwargs(cls, record)
         cost = data.get('cost') or {}
+
         if 'yes' in cost and 'no' in cost:
-            data['default_cost'] = max(cost['yes'].get('sp', 0), cost['no'].get('sp', 0))
+            data['cost_type'] = 'sp'
+            data['default_cost'] = max(
+                cost['yes'].get('sp', 0),
+                cost['no'].get('sp', 0)
+            )
         else:
-            data['default_cost'] = cost.get('sp', 0)
-        data['cost_type'] = 'sp' if cost.get('sp') else cost.get('resource')
-        data['extra'] = {k: deepcopy(v) for k, v in record.items() if k not in data}
+            data['cost_type'] = (
+                'sp' if 'sp' in cost
+                else cost.get('resource', 'sp')
+            )
+            data['default_cost'] = cost.get(
+                data['cost_type'], 0
+            )
+
+        data['now_cost'] = data['default_cost']
+        data['used'] = 0
+
+        data['extra'] = {
+            k: deepcopy(v)
+            for k, v in record.items()
+            if k not in data
+        }
+
         return cls(**data)
 
 
