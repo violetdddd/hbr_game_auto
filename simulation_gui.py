@@ -18,24 +18,52 @@ from PySide6.QtWidgets import (
 from paths import ROOT_DIR
 
 ELEMENTS = [('无', None), ('火', 'fire'), ('冰', 'ice'), ('雷', 'thunder'), ('光', 'light'), ('暗', 'dark')]
-FIELD_OPTIONS = [('无场地', None), ('稻田', 'rice_field'), ('火场地', 'fire'), ('冰场地', 'ice'),
-                 ('雷场地', 'thunder'), ('光场地', 'light'), ('暗场地', 'dark')]
+FIELD_OPTIONS = [('无', None), ('稻场', 'rice_field'), ('火场', 'fire'), ('冰场', 'ice'),
+                 ('雷场', 'thunder'), ('光场', 'light'), ('暗场', 'dark')]
 ELEMENT_NAMES = dict((value, label) for label, value in ELEMENTS)
 FIELD_NAMES = dict((value, label) for label, value in FIELD_OPTIONS)
 BLUE_BUTTON = ('QPushButton{background:#2563eb;color:white;border:1px solid #1d4ed8;'
                'border-radius:7px;padding:3px 9px;font-weight:600}'
                'QPushButton:hover{background:#1d4ed8}'
                'QPushButton:disabled{background:#cbd5e1;border-color:#cbd5e1}')
-COMPACT = ('QComboBox,QSpinBox,QDoubleSpinBox{padding:2px 4px;min-height:17px;'
-           'border:1px solid #d6deea;border-radius:5px;background:white}')
+WHITE_BUTTON = ('QPushButton{padding:2px 5px;min-height:0px;}')
+COMPACT = """
+QComboBox {
+    padding: 2px 4px;
+    min-height: 17px;
+    border: 1px solid #d6deea;
+    border-radius: 5px;
+    background: white;
+}
 
+QSpinBox, QDoubleSpinBox {
+    padding: 1px 1px;
+    min-height: 17px;
+    border: 1px solid #d6deea;
+    border-radius: 5px;
+    background: white;
+}
+
+/* 扩大上下箭头所在区域 */
+QSpinBox::up-button, QDoubleSpinBox::up-button, QSpinBox::down-button, QDoubleSpinBox::down-button  {
+    width: 15px;
+}
+
+/* 鼠标悬停时突出显示 */
+QSpinBox::up-button:hover,
+QSpinBox::down-button:hover,
+QDoubleSpinBox::up-button:hover,
+QDoubleSpinBox::down-button:hover {
+    background: #dbeafe;
+}
+"""
 
 class NoWheelComboBox(QComboBox):
     """与原 GUI 一致：滚轮只用于页面滚动，不改变下拉框选项。"""
     def wheelEvent(self, event):
         event.ignore()
 
-
+# 生成内容为options的下拉框
 def combo(options, width=None):
     box = NoWheelComboBox()
     for label, value in options:
@@ -45,15 +73,15 @@ def combo(options, width=None):
     box.setFixedHeight(22)
     return box
 
-
+# 可填整数数值，有上下箭头的编辑栏
 def spin(low=0, high=99999, value=0, width=None):
     box = QSpinBox(); box.setRange(low, high); box.setValue(value)
     box.setFixedHeight(22)
     if width: box.setFixedWidth(width)
     return box
 
-
-def dspin(low=0, high=999.99, value=0, width=None):
+# 可填小数数值，有上下箭头的编辑栏
+def dspin(low=0, high=9999.99, value=0, width=None):
     box = QDoubleSpinBox(); box.setRange(low, high); box.setDecimals(2)
     box.setSingleStep(1); box.setValue(value); box.setFixedHeight(22)
     if width: box.setFixedWidth(width)
@@ -98,7 +126,7 @@ class FullPopupCombo(NoWheelComboBox):
         view.setMinimumWidth(min(width, 650))
         super().showPopup()
 
-
+# 一般的图标显示
 def icon_label(path, size=23, fallback=''):
     label = QLabel(); label.setFixedSize(size, size)
     label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -111,7 +139,7 @@ def icon_label(path, size=23, fallback=''):
         label.setToolTip(f'图片不存在：{path}')
     return label
 
-
+# 清理一整个layout
 def clear_layout(layout):
     while layout.count():
         item = layout.takeAt(0)
@@ -120,7 +148,7 @@ def clear_layout(layout):
         elif item.layout():
             clear_layout(item.layout())
 
-
+# 调整面板默认值
 def initial_adjustments():
     return {'od': 0.0, 'members': [{'sp': 0, 'token': 0} for _ in range(6)]}
 
@@ -189,7 +217,7 @@ def effective_state(data):
         'bonus': data['bonus'], 'additional_turn': data['additional_turn'],
     }
 
-
+# 技能选择面板
 class SkillSelectionDialog(QDialog):
     def __init__(self, catalog, style, selection, parent=None):
         super().__init__(parent)
@@ -262,7 +290,7 @@ class BattleSetup(QGroupBox):
     """固定高度，敌人初始数据、六名上场风格及独立的共鸣风格。"""
     def __init__(self, catalog, style_dialog_class, round_pixmap, parent=None):
         super().__init__('战斗设置', parent)
-        self.setFixedHeight(240)
+        self.setFixedHeight(230)
         self.catalog = catalog
         self.style_dialog_class = style_dialog_class
         self.round_pixmap = round_pixmap
@@ -270,36 +298,35 @@ class BattleSetup(QGroupBox):
         self.resonances = [None] * 6
         self.skill_selections = [{'active': [], 'passive': [], 'orb': []} for _ in range(6)]
         root = QHBoxLayout(self)
-        root.setContentsMargins(8, 12, 8, 5); root.setSpacing(5)
+        root.setContentsMargins(4, 4, 4, 4); root.setSpacing(5)
 
-        enemy_panel = QWidget(); enemy_panel.setFixedWidth(157)
+        enemy_panel = QWidget(); enemy_panel.setFixedWidth(140)
         enemy_col = QVBoxLayout(enemy_panel)
-        enemy_col.setContentsMargins(0, 0, 0, 0); enemy_col.setSpacing(1)
+        enemy_col.setContentsMargins(0, 0, 0, 4); enemy_col.setSpacing(2)
         enemy_col.addWidget(QLabel('敌人数量'))
         self.enemy_count = combo([(str(n), n) for n in range(1, 4)])
         enemy_col.addWidget(self.enemy_count)
         enemy_col.addWidget(QLabel('敌人弱点'))
         self.enemy_weaknesses = []
         weakness_button = QPushButton('设置弱点')
-        weakness_button.setFixedHeight(26)
+        weakness_button.setStyleSheet(WHITE_BUTTON)
         weakness_button.clicked.connect(self.choose_weaknesses)
         self.weakness_button = weakness_button
         enemy_col.addWidget(weakness_button)
-        od_line = QHBoxLayout(); od_line.setSpacing(2)
-        od_line.addWidget(QLabel('开局OD'))
-        self.initial_od = dspin(0, 300, 0, 85)
+        enemy_col.addWidget(QLabel('开局OD'))
+        self.initial_od = dspin(0, 300, 0)
         self.initial_od.setSuffix('%')
-        od_line.addWidget(self.initial_od)
-        enemy_col.addLayout(od_line)
-        reset = QPushButton('重置战斗设置'); reset.setFixedHeight(27)
-        reset.setStyleSheet('QPushButton{padding:2px 5px;min-height:0px;}')
+        enemy_col.addWidget(self.initial_od)
+        enemy_col.addStretch(1)
+        reset = QPushButton('重置战斗设置')
+        reset.setStyleSheet(WHITE_BUTTON)
         reset.clicked.connect(self.reset)
         enemy_col.addWidget(reset)
-        enemy_col.addStretch(1)
         root.addWidget(enemy_panel)
-        divider = QFrame(); divider.setFrameShape(QFrame.Shape.VLine); root.addWidget(divider)
+        divider = QFrame(); divider.setFrameShape(QFrame.Shape.VLine); divider.setStyleSheet('color:#91bdff;')
+        root.addWidget(divider)
 
-        grid = QGridLayout(); grid.setHorizontalSpacing(3); grid.setVerticalSpacing(1)
+        grid = QGridLayout(); grid.setHorizontalSpacing(10); grid.setVerticalSpacing(1)
         for row, label in enumerate(('风格与共鸣', '突破', 'OD耳环', '项链', '技能', '共鸣突破')):
             caption = QLabel(label); caption.setFixedWidth(69)
             grid.addWidget(caption, row, 0)
@@ -316,7 +343,7 @@ class BattleSetup(QGroupBox):
             resonance.clicked.connect(lambda _=False, index=i: self.choose_resonance(index))
             resonance.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             resonance.customContextMenuRequested.connect(lambda _=None, index=i: self.clear_resonance(index))
-            av.addWidget(avatar); av.addWidget(resonance); av.addStretch(1)
+            av.addWidget(avatar); av.addWidget(resonance)
             grid.addWidget(avatars, 0, i+1)
             self.avatar_buttons.append(avatar); self.resonance_buttons.append(resonance)
             level = combo([(str(n), n) for n in range(5)])
@@ -385,8 +412,16 @@ class BattleSetup(QGroupBox):
             QMessageBox.warning(self, '风格冲突', '这个风格已经作为共鸣风格选中，请先取消共鸣。')
             return
         self.styles[index] = selected
-        self.skill_selections[index] = {'active': list(self.catalog.skills_for(selected)),
-                                        'passive': [], 'orb': []}
+        orb_names = set(self.catalog.common_global)
+        self.skill_selections[index] = {
+            'active': [
+                name
+                for name in self.catalog.skills_for(selected)
+                if name not in orb_names
+            ],
+            'passive': [],
+            'orb': []
+        }
         self._set_avatar(index)
         self._set_level(self.breaks[index], selected)
 
@@ -503,7 +538,7 @@ class PortraitWithSP(QWidget):
         else:
             painter.setPen(QPen(QColor('#94a3b8')))
             painter.drawEllipse(2, 4, self.size - 2, self.size - 2)
-        font = QFont(); font.setBold(True); font.setPointSize(11)
+        font = QFont(); font.setBold(True); font.setPointSize(13)
         painter.setFont(font)
         text = str(self.sp)
         rect = self.rect().adjusted(0, -2, -1, 0)
@@ -541,8 +576,8 @@ class BattleTurn(QGroupBox):
         divider = QFrame()
         divider.setFrameShape(QFrame.Shape.VLine)
         divider.setFrameShadow(QFrame.Shadow.Plain)
-        divider.setStyleSheet('color:#dce2eb;')
-        divider.setFixedWidth(1)
+        divider.setStyleSheet('color:#91bdff;')
+        divider.setFixedWidth(2)
         return divider
 
     def _make_combat_page(self):
@@ -558,18 +593,23 @@ class BattleTurn(QGroupBox):
         self.field_display = QHBoxLayout(); self.field_display.setSpacing(2)
         el.addLayout(self.field_display)
         el.addStretch(1)
-        root.addWidget(enemy, 23)
+        root.addWidget(enemy, 20)
         root.addWidget(self._separator())
 
         team = QWidget()
         tl = QHBoxLayout(team); tl.setContentsMargins(4, 3, 4, 3); tl.setSpacing(4)
         self.portraits, self.action_boxes, self.status_rows = [], [], []
-        for first, last, stretch in ((0, 3, 70), (3, 6, 30)):
+        for first, last, stretch in ((0, 3, 65), (3, 6, 35)):
             group = QHBoxLayout(); group.setSpacing(2)
             for pos in range(first, last):
                 column = QVBoxLayout(); column.setSpacing(1)
                 action = FullPopupCombo()
                 action.setFixedHeight(22)
+                action.setSizeAdjustPolicy(
+                    QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
+                )
+                action.setMinimumContentsLength(1)
+                action.setMinimumWidth(0)
                 action.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
                 action.currentIndexChanged.connect(lambda _=0, i=pos: self.update_action(i))
                 column.addWidget(action)
@@ -586,13 +626,13 @@ class BattleTurn(QGroupBox):
                 self.portraits.append((avatar_button, portrait))
                 self.action_boxes.append(action); self.status_rows.append(statuses)
             tl.addLayout(group, stretch)
-        root.addWidget(team, 60)
+        root.addWidget(team, 70)
         root.addWidget(self._separator())
 
         od = QWidget()
         ol = QVBoxLayout(od); ol.setContentsMargins(4, 3, 4, 2); ol.setSpacing(1)
         top = QHBoxLayout(); top.setSpacing(2)
-        self.od_icon = QLabel(); self.od_icon.setFixedSize(29, 29)
+        self.od_icon = QLabel(); self.od_icon.setFixedSize(35, 35)
         top.addWidget(self.od_icon)
         od_values = QVBoxLayout(); od_values.setSpacing(0)
         self.od_label = QLabel(); self.od_label.setStyleSheet('font-weight:700;')
@@ -611,7 +651,7 @@ class BattleTurn(QGroupBox):
         self.before_od.currentIndexChanged.connect(lambda: self.update_od('before'))
         self.after_od.currentIndexChanged.connect(lambda: self.update_od('after'))
         ol.addStretch(1)
-        root.addWidget(od, 8)
+        root.addWidget(od, 10)
         root.addWidget(self._separator())
 
         # ④ 操作栏：OD 区域只负责显示及发动设置，不再放置按钮。
@@ -634,7 +674,7 @@ class BattleTurn(QGroupBox):
         op.addWidget(self.next_button)
         op.addWidget(self.back_button)
         op.addStretch(1)
-        root.addWidget(operations, 12)
+        root.addWidget(operations, 6)
         self.stack.addWidget(page)
 
     def _make_adjust_page(self):
@@ -654,13 +694,13 @@ class BattleTurn(QGroupBox):
             eg.addWidget(heading, 0, i+1)
             self.enemy_headers.append(heading)
             down = QCheckBox(); down.setToolTip('倒下')
-            rate = spin(0, 999, 100, 54)
+            rate = spin(0, 999, 100)
             eg.addWidget(down, 1, i+1, alignment=Qt.AlignmentFlag.AlignCenter)
             eg.addWidget(rate, 2, i+1)
             self.enemy_edits.append((down, rate))
         eg.addWidget(QLabel('倒下'), 1, 0)
         eg.addWidget(QLabel('破坏率'), 2, 0)
-        root.addWidget(enemy_panel, 24)
+        root.addWidget(enemy_panel, 25)
         root.addWidget(self._separator())
 
         # ② 角色：DP 与头像横向并列，占据第一行；下面只有 SP 和信念。
@@ -711,7 +751,7 @@ class BattleTurn(QGroupBox):
         self.adjust_return.clicked.connect(self.toggle_mode)
         ol.addWidget(self.adjust_return, alignment=Qt.AlignmentFlag.AlignRight)
         ol.addStretch(1)
-        root.addWidget(od_panel, 11)
+        root.addWidget(od_panel, 7)
         self.stack.addWidget(page)
         self.adjust_enemies.currentIndexChanged.connect(self.update_enemy_edit_visibility)
 
@@ -834,9 +874,7 @@ class BattleTurn(QGroupBox):
         self.enemy_icons_row.addLayout(weak_line)
         for i, enemy in enumerate(data['enemies'], 1):
             line = QHBoxLayout(); line.setSpacing(1)
-            status_label = QLabel(f'敌人{i}状态：' + ('倒下' if enemy.get('down') else '正常'))
-            status_label.setStyleSheet('font-size:8pt;')
-            line.addWidget(status_label)
+            line.addWidget(QLabel(f'敌人{i}状态：'))
             line.addStretch(1)
             self.enemy_icons_row.addLayout(line)
         clear_layout(self.field_display)
