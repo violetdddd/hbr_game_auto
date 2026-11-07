@@ -1,3 +1,4 @@
+
 """战斗模拟 Tab。仅负责界面、状态快照与手动修正；实际结算由 engine.advance 提供。"""
 from __future__ import annotations
 
@@ -41,22 +42,61 @@ def combo(options, width=None):
         box.addItem(label, value)
     if width is not None:
         box.setFixedWidth(width)
-    box.setFixedHeight(25)
+    box.setFixedHeight(22)
     return box
 
 
 def spin(low=0, high=99999, value=0, width=None):
     box = QSpinBox(); box.setRange(low, high); box.setValue(value)
-    box.setFixedHeight(25)
+    box.setFixedHeight(22)
     if width: box.setFixedWidth(width)
     return box
 
 
 def dspin(low=0, high=999.99, value=0, width=None):
     box = QDoubleSpinBox(); box.setRange(low, high); box.setDecimals(2)
-    box.setSingleStep(1); box.setValue(value); box.setFixedHeight(25)
+    box.setSingleStep(1); box.setValue(value); box.setFixedHeight(22)
     if width: box.setFixedWidth(width)
     return box
+
+
+class WeaknessDialog(QDialog):
+    """所有敌人共享弱点，使用类似技能设置的复选弹窗。"""
+    def __init__(self, selected, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle('敌人弱点设置')
+        self.setMinimumWidth(260)
+        layout = QVBoxLayout(self)
+        self.checks = {}
+        for label, value in ELEMENTS[1:]:
+            check = QCheckBox(label)
+            check.setChecked(value in selected)
+            self.checks[value] = check
+            layout.addWidget(check)
+        controls = QHBoxLayout()
+        for title, checked in (('全选', True), ('全不选', False)):
+            button = QPushButton(title)
+            button.clicked.connect(lambda _=False, value=checked:
+                                   [c.setChecked(value) for c in self.checks.values()])
+            controls.addWidget(button)
+        layout.addLayout(controls)
+        save = QPushButton('确定')
+        save.setStyleSheet(BLUE_BUTTON)
+        save.clicked.connect(self.accept)
+        layout.addWidget(save)
+
+    def values(self):
+        return [key for key, check in self.checks.items() if check.isChecked()]
+
+
+class FullPopupCombo(NoWheelComboBox):
+    """技能下拉框本体保持紧凑，但弹出菜单保证完整显示所有技能名。"""
+    def showPopup(self):
+        view = self.view()
+        width = max(self.width(), *(self.fontMetrics().horizontalAdvance(self.itemText(i)) + 40
+                                    for i in range(self.count())))
+        view.setMinimumWidth(min(width, 650))
+        super().showPopup()
 
 
 def icon_label(path, size=23, fallback=''):
@@ -82,7 +122,7 @@ def clear_layout(layout):
 
 
 def initial_adjustments():
-    return {'od': 0.0, 'members': [{'sp': 0, 'token': 0, 'ep': 0} for _ in range(6)]}
+    return {'od': 0.0, 'members': [{'sp': 0, 'token': 0} for _ in range(6)]}
 
 
 def ensure_state(source):
@@ -97,26 +137,31 @@ def ensure_state(source):
     base.setdefault('od', 0.0)
     base.setdefault('members', [])
     while len(base['members']) < 6:
-        base['members'].append({'sp': 0, 'token': 0, 'ep': 0, 'dp': 100.0, 'statuses': []})
+        base['members'].append({'sp': 0, 'token': 0, 'dp': 100.0, 'statuses': []})
     for member in base['members']:
         member.setdefault('sp', 0); member.setdefault('token', 0)
-        member.setdefault('ep', 0); member.setdefault('dp', 100.0)
+        member.pop('ep', None); member.setdefault('dp', 100.0)
         member.setdefault('statuses', [])
     adjust = data.setdefault('adjustments', initial_adjustments())
     adjust.setdefault('od', 0.0)
     adjust.setdefault('members', [])
     while len(adjust['members']) < 6:
-        adjust['members'].append({'sp': 0, 'token': 0, 'ep': 0})
+        adjust['members'].append({'sp': 0, 'token': 0})
+    for delta in adjust['members']:
+        delta.pop('ep', None)
     data.setdefault('field', None)
-    data.setdefault('enemies', [{'weakness': None, 'damage_rate': 100.0, 'down_turns': 0}])
+    if 'enemy_weaknesses' not in data:
+        data['enemy_weaknesses'] = list((data.get('enemies') or [{}])[0].get('weakness') or [])
+    data.setdefault('enemies', [{'weakness': [], 'damage_rate': 100.0, 'down_turns': 0}])
     for enemy in data['enemies']:
-        enemy.setdefault('weakness', None)
+        enemy.pop('weakness', None)
         enemy.setdefault('damage_rate', 100.0)
-        enemy.setdefault('down_turns', 0)
+        enemy.setdefault('down', bool(enemy.pop('down_turns', 0)))
         enemy.pop('broken', None)
     data.setdefault('order', list(range(6)))
     data.setdefault('actions', ['normal_attack'] * 3 + ['none'] * 3)
     data.setdefault('od_timing', None); data.setdefault('od_level', 0)
+    data.setdefault('predicted_od', None)  # Simulation 将计算后的绝对 OD 写入此字段
     data.setdefault('bonus', 0); data.setdefault('additional_turn', False)
     return data
 
@@ -128,13 +173,15 @@ def effective_state(data):
     for index, member in enumerate(base['members']):
         result = copy.deepcopy(member)
         delta = adjustments['members'][index]
-        for key in ('sp', 'token', 'ep'):
+        for key in ('sp', 'token'):
             result[key] = member.get(key, 0) + delta.get(key, 0)
         members.append(result)
     return {
-        'od': max(0.0, base['od'] + adjustments['od']),
+        'od': base['od'] + adjustments['od'],
         'members': members,
         'enemies': copy.deepcopy(data['enemies']),
+        'enemy_weaknesses': list(data['enemy_weaknesses']),
+        'predicted_od': data['predicted_od'],
         'field': data['field'],
         'order': list(data['order']),
         'actions': list(data['actions']),
@@ -212,90 +259,163 @@ class SkillSelectionDialog(QDialog):
 
 
 class BattleSetup(QGroupBox):
+    """固定高度，敌人初始数据、六名上场风格及独立的共鸣风格。"""
     def __init__(self, catalog, style_dialog_class, round_pixmap, parent=None):
         super().__init__('战斗设置', parent)
+        self.setFixedHeight(240)
         self.catalog = catalog
         self.style_dialog_class = style_dialog_class
         self.round_pixmap = round_pixmap
         self.styles = [None] * 6
+        self.resonances = [None] * 6
         self.skill_selections = [{'active': [], 'passive': [], 'orb': []} for _ in range(6)]
-        root = QHBoxLayout(self); root.setContentsMargins(9, 12, 9, 8); root.setSpacing(8)
-        enemy_panel = QWidget(); enemy_panel.setFixedWidth(133)
-        enemy_col = QVBoxLayout(enemy_panel); enemy_col.setContentsMargins(0, 0, 0, 0)
-        enemy_col.setSpacing(3)
+        root = QHBoxLayout(self)
+        root.setContentsMargins(8, 12, 8, 5); root.setSpacing(5)
+
+        enemy_panel = QWidget(); enemy_panel.setFixedWidth(157)
+        enemy_col = QVBoxLayout(enemy_panel)
+        enemy_col.setContentsMargins(0, 0, 0, 0); enemy_col.setSpacing(1)
         enemy_col.addWidget(QLabel('敌人数量'))
-        self.enemy_count = combo([(f'{n} 个', n) for n in range(1, 4)])
+        self.enemy_count = combo([(str(n), n) for n in range(1, 4)])
         enemy_col.addWidget(self.enemy_count)
         enemy_col.addWidget(QLabel('敌人弱点'))
         self.enemy_weaknesses = []
-        for i in range(3):
-            line = QHBoxLayout(); line.setContentsMargins(0, 0, 0, 0)
-            label = QLabel(f'{i+1}'); label.setFixedWidth(13); line.addWidget(label)
-            weakness = combo(ELEMENTS)
-            line.addWidget(weakness, 1)
-            enemy_col.addLayout(line); self.enemy_weaknesses.append(weakness)
-        enemy_col.addStretch()
-        self.enemy_count.currentIndexChanged.connect(self._refresh_enemy_controls)
+        weakness_button = QPushButton('设置弱点')
+        weakness_button.setFixedHeight(26)
+        weakness_button.clicked.connect(self.choose_weaknesses)
+        self.weakness_button = weakness_button
+        enemy_col.addWidget(weakness_button)
+        od_line = QHBoxLayout(); od_line.setSpacing(2)
+        od_line.addWidget(QLabel('开局OD'))
+        self.initial_od = dspin(0, 300, 0, 85)
+        self.initial_od.setSuffix('%')
+        od_line.addWidget(self.initial_od)
+        enemy_col.addLayout(od_line)
+        reset = QPushButton('重置战斗设置'); reset.setFixedHeight(27)
+        reset.setStyleSheet('QPushButton{padding:2px 5px;min-height:0px;}')
+        reset.clicked.connect(self.reset)
+        enemy_col.addWidget(reset)
+        enemy_col.addStretch(1)
         root.addWidget(enemy_panel)
         divider = QFrame(); divider.setFrameShape(QFrame.Shape.VLine); root.addWidget(divider)
 
-        team_panel = QWidget(); team_layout = QVBoxLayout(team_panel)
-        team_layout.setContentsMargins(0, 0, 0, 0); team_layout.setSpacing(2)
-        header = QHBoxLayout(); header.addWidget(QLabel('六人队伍'))
-        reset = QPushButton('重置'); reset.clicked.connect(self.reset)
-        header.addWidget(reset); header.addStretch(); team_layout.addLayout(header)
-        grid = QGridLayout(); grid.setHorizontalSpacing(5); grid.setVerticalSpacing(2)
-        labels = ['风格', '突破', 'OD耳环', '普攻属性', '项链', '技能']
-        for row, name in enumerate(labels):
-            caption = QLabel(name); caption.setFixedWidth(58)
+        grid = QGridLayout(); grid.setHorizontalSpacing(3); grid.setVerticalSpacing(1)
+        for row, label in enumerate(('风格与共鸣', '突破', 'OD耳环', '项链', '技能', '共鸣突破')):
+            caption = QLabel(label); caption.setFixedWidth(69)
             grid.addWidget(caption, row, 0)
-        self.avatar_buttons = []; self.breaks = []; self.earrings = []
-        self.elements = []; self.necklaces = []; self.skill_buttons = []
-        for idx in range(6):
-            avatar = QPushButton('＋'); avatar.setFixedSize(56, 56)
-            avatar.clicked.connect(lambda _=False, i=idx: self.choose_style(i))
-            grid.addWidget(avatar, 0, idx+1, alignment=Qt.AlignmentFlag.AlignCenter)
-            self.avatar_buttons.append(avatar)
+        self.avatar_buttons, self.resonance_buttons = [], []
+        self.breaks, self.earrings, self.necklaces, self.skill_buttons, self.resonance_breaks = [], [], [], [], []
+        for i in range(6):
+            avatars = QWidget(); av = QHBoxLayout(avatars)
+            av.setContentsMargins(0, 0, 0, 0); av.setSpacing(3)
+            av.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+            avatar = QPushButton('＋'); avatar.setFixedSize(61, 61)
+            avatar.clicked.connect(lambda _=False, index=i: self.choose_style(index))
+            resonance = QPushButton('＋'); resonance.setFixedSize(35, 35)
+            resonance.setToolTip('选择共鸣风格（右键清空）')
+            resonance.clicked.connect(lambda _=False, index=i: self.choose_resonance(index))
+            resonance.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+            resonance.customContextMenuRequested.connect(lambda _=None, index=i: self.clear_resonance(index))
+            av.addWidget(avatar); av.addWidget(resonance); av.addStretch(1)
+            grid.addWidget(avatars, 0, i+1)
+            self.avatar_buttons.append(avatar); self.resonance_buttons.append(resonance)
             level = combo([(str(n), n) for n in range(5)])
             ear = combo([('无', 0), ('10%', 10), ('12%', 12), ('15%', 15)])
-            elem = combo(ELEMENTS)
             necklace = combo([(f'SP+{n}', n) for n in range(4)])
             self.breaks.append(level); self.earrings.append(ear)
-            self.elements.append(elem); self.necklaces.append(necklace)
+            self.necklaces.append(necklace)
             ear.setCurrentIndex(3); necklace.setCurrentIndex(3)
-            for row, widget in enumerate((level, ear, elem, necklace), 1):
-                widget.setMinimumWidth(67)
-                grid.addWidget(widget, row, idx+1)
-            setting = QPushButton('设置'); setting.setStyleSheet(BLUE_BUTTON)
-            setting.setFixedHeight(25)
-            setting.clicked.connect(lambda _=False, i=idx: self.choose_skills(i))
-            grid.addWidget(setting, 5, idx+1); self.skill_buttons.append(setting)
-        for column in range(1, 7): grid.setColumnStretch(column, 1)
-        team_layout.addLayout(grid)
-        root.addWidget(team_panel, 1)
-        self._refresh_enemy_controls()
+            for row, widget in enumerate((level, ear, necklace), 1):
+                widget.setMinimumWidth(77)
+                grid.addWidget(widget, row, i+1)
+            button = QPushButton('设置技能'); button.setStyleSheet(BLUE_BUTTON)
+            button.setFixedHeight(22)
+            button.clicked.connect(lambda _=False, index=i: self.choose_skills(index))
+            grid.addWidget(button, 4, i+1)
+            resonance_level = combo([(str(n), n) for n in range(5)])
+            resonance_level.setCurrentIndex(2)
+            resonance_level.setMinimumWidth(77)
+            grid.addWidget(resonance_level, 5, i+1)
+            self.resonance_breaks.append(resonance_level)
+            self.skill_buttons.append(button)
+        for col in range(1, 7): grid.setColumnStretch(col, 1)
+        root.addLayout(grid, 1)
+        self.weakness_button.setToolTip('无弱点')
 
-    def _refresh_enemy_controls(self):
-        count = self.enemy_count.currentData() or 1
-        for i, box in enumerate(self.enemy_weaknesses): box.setEnabled(i < count)
+    @staticmethod
+    def identity(style):
+        return (style.team, style.english, style.sid) if style else None
+
+    def choose_weaknesses(self):
+        dialog = WeaknessDialog(self.enemy_weaknesses, self)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            self.enemy_weaknesses = dialog.values()
+            names = '、'.join(ELEMENT_NAMES[x] for x in self.enemy_weaknesses) or '无'
+            self.weakness_button.setText('弱点：' + names)
+            self.weakness_button.setToolTip(names)
+
+    @staticmethod
+    def _set_level(box, style):
+        maximum = {'A': 20, 'S': 10, 'SS': 4, 'SSR': 4}.get(style.tier, 4) if style else 4
+        box.clear()
+        for n in range(maximum + 1):
+            box.addItem(str(n), n)
+        box.setCurrentIndex(maximum if style and style.tier in ('A', 'S') else min(2, maximum))
+
+    def _set_avatar(self, index, resonance=False):
+        style = self.resonances[index] if resonance else self.styles[index]
+        button = self.resonance_buttons[index] if resonance else self.avatar_buttons[index]
+        size = 32 if resonance else 58
+        button.setText('' if style else '＋')
+        button.setIcon(QIcon(self.round_pixmap(style.image, size)) if style else QIcon())
+        button.setIconSize(QSize(size, size))
+        button.setToolTip((('共鸣：' if resonance else '上场：') +
+                           style.label + ' · ' + style.localized_title) if style else
+                          ('选择共鸣风格（右键清空）' if resonance else '选择上场风格'))
 
     def choose_style(self, index):
         occupied = {style.name for i, style in enumerate(self.styles)
                     if style is not None and i != index}
-        dialog = self.style_dialog_class(self.catalog, occupied, self)
+        # 不允许与已经使用的共鸣风格相同：在选择弹窗内直接隐藏。
+        forbidden = {self.identity(style) for style in self.resonances if style}
+        dialog = self._filtered_dialog(occupied, forbidden)
         if dialog.exec() != QDialog.DialogCode.Accepted: return
-        style = dialog.chosen
-        self.styles[index] = style
-        self.skill_selections[index] = {'active': list(self.catalog.skills_for(style)),
+        selected = dialog.chosen
+        if any(self.identity(selected) == self.identity(x) for x in self.resonances if x):
+            QMessageBox.warning(self, '风格冲突', '这个风格已经作为共鸣风格选中，请先取消共鸣。')
+            return
+        self.styles[index] = selected
+        self.skill_selections[index] = {'active': list(self.catalog.skills_for(selected)),
                                         'passive': [], 'orb': []}
-        button = self.avatar_buttons[index]; button.setText('')
-        button.setIcon(QIcon(self.round_pixmap(style.image, 51)))
-        button.setIconSize(QSize(51, 51))
-        button.setToolTip(f'{style.label} · {style.localized_title}')
-        maximum = {'A': 20, 'S': 10, 'SS': 4, 'SSR': 4}.get(style.tier, 4)
-        level = self.breaks[index]; level.clear()
-        for n in range(maximum + 1): level.addItem(str(n), n)
-        level.setCurrentIndex(maximum if style.tier in ('A', 'S') else min(2, maximum))
+        self._set_avatar(index)
+        self._set_level(self.breaks[index], selected)
+
+    def _filtered_dialog(self, occupied, forbidden):
+        # StyleDialog 的过滤按角色名进行；通过轻量代理追加风格级精确排除，
+        # 不修改原 Catalog，不影响其余 GUI。
+        class CatalogView:
+            def __init__(self, catalog, blocked):
+                self._catalog = catalog
+                self.styles = [style for style in catalog.styles
+                               if BattleSetup.identity(style) not in blocked]
+            def __getattr__(self, name):
+                return getattr(self._catalog, name)
+        return self.style_dialog_class(CatalogView(self.catalog, forbidden), occupied, self)
+
+    def choose_resonance(self, index):
+        forbidden = {self.identity(style) for style in self.styles if style}
+        forbidden.update(self.identity(style) for i, style in enumerate(self.resonances)
+                         if i != index and style)
+        dialog = self._filtered_dialog(set(), forbidden)
+        if dialog.exec() != QDialog.DialogCode.Accepted: return
+        self.resonances[index] = dialog.chosen
+        self._set_level(self.resonance_breaks[index], dialog.chosen)
+        self._set_avatar(index, resonance=True)
+
+    def clear_resonance(self, index):
+        self.resonances[index] = None
+        self._set_level(self.resonance_breaks[index], None)
+        self._set_avatar(index, resonance=True)
 
     def choose_skills(self, index):
         style = self.styles[index]
@@ -304,55 +424,61 @@ class BattleSetup(QGroupBox):
         dialog = SkillSelectionDialog(self.catalog, style, self.skill_selections[index], self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.skill_selections[index] = dialog.selection()
-            amount = sum(len(group) for group in self.skill_selections[index].values())
-            self.skill_buttons[index].setToolTip(f'已选 {amount} 项技能')
+            count = sum(len(group) for group in self.skill_selections[index].values())
+            self.skill_buttons[index].setToolTip(f'已选 {count} 项技能')
 
     def reset(self):
-        self.styles = [None] * 6
+        self.styles = [None]*6; self.resonances = [None]*6
         self.skill_selections = [{'active': [], 'passive': [], 'orb': []} for _ in range(6)]
-        self.enemy_count.setCurrentIndex(0)
-        for box in self.enemy_weaknesses: box.setCurrentIndex(0)
-        for index, button in enumerate(self.avatar_buttons):
-            button.setText('＋'); button.setIcon(QIcon())
-            level = self.breaks[index]; level.clear()
+        self.enemy_count.setCurrentIndex(0); self.initial_od.setValue(0)
+        self.enemy_weaknesses = []
+        self.weakness_button.setText('设置弱点')
+        self.weakness_button.setToolTip('无弱点')
+        for i in range(6):
+            self._set_avatar(i); self._set_avatar(i, resonance=True)
+            level = self.breaks[i]; level.clear()
             for n in range(5): level.addItem(str(n), n)
             level.setCurrentIndex(2)
-            self.earrings[index].setCurrentIndex(3)
-            self.elements[index].setCurrentIndex(0)
-            self.necklaces[index].setCurrentIndex(3)
+            self.earrings[i].setCurrentIndex(3)
+            self.necklaces[i].setCurrentIndex(3)
+            self.skill_buttons[i].setToolTip('')
+            self._set_level(self.resonance_breaks[i], None)
 
     def state(self):
         return {
-            'enemies': [{'weakness': self.enemy_weaknesses[i].currentData(),
-                         'damage_rate': 100.0, 'down_turns': 0}
-                        for i in range(self.enemy_count.currentData() or 1)],
+            'initial_od': self.initial_od.value(),
+            'enemy_weaknesses': list(self.enemy_weaknesses),
+            'enemies': [{'damage_rate': 100, 'down': False}
+                        for _ in range(self.enemy_count.currentData() or 1)],
             'members': [{
-                'position': i+1, 'style_id': self._style_id(i),
+                'position': i+1, 'style_id': self._style_id(self.styles[i]),
                 'team': style.team if style else None,
                 'character': style.name if style else None,
                 'style': style.title if style else None,
                 'break_level': self.breaks[i].currentData(),
                 'od_earring': self.earrings[i].currentData(),
-                'normal_attack_element': self.elements[i].currentData(),
                 'necklace_sp': self.necklaces[i].currentData(),
                 'enabled_skills': copy.deepcopy(self.skill_selections[i]),
             } for i, style in enumerate(self.styles)],
+            'resonance_style_ids': [self._style_id(s) for s in self.resonances],
+            'resonance_break_levels': [self.resonance_breaks[i].currentData() if s else None
+                                       for i, s in enumerate(self.resonances)],
         }
 
-    def _style_id(self, index):
-        style = self.styles[index]
+    @staticmethod
+    def _style_id(style):
         if style is None: return None
         path = SkillSelectionDialog.catalog_data_path(style)
         if not path.exists(): return None
         data = json.loads(path.read_text(encoding='utf-8'))
-        person = next((item for item in data.values() if isinstance(item, dict) and
-                       item.get('english name') == style.english), {})
-        entry = next((item for item in person.get('style', {}).values()
-                      if item.get('value') == style.title and
-                      style.sid in [str(v) for v in
-                                    (item.get('id') if isinstance(item.get('id'), list) else [item.get('id')])]), {})
-        result = entry.get('simulation_id')
-        return result[0] if isinstance(result, list) and result else result
+        person = next((v for v in data.values() if isinstance(v, dict) and
+                       v.get('english name') == style.english), {})
+        entry = next((v for v in person.get('style', {}).values()
+                      if v.get('value') == style.title and
+                      style.sid in [str(k) for k in
+                                    (v.get('id') if isinstance(v.get('id'), list) else [v.get('id')])]), {})
+        value = entry.get('simulation_id')
+        return value[0] if isinstance(value, list) and value else value
 
 
 class PortraitWithSP(QWidget):
@@ -382,7 +508,7 @@ class PortraitWithSP(QWidget):
         text = str(self.sp)
         rect = self.rect().adjusted(0, -2, -1, 0)
         # 先绘制八方向黑色描边，再绘制白色文字。
-        painter.setPen(QPen(QColor('#111827')))
+        painter.setPen(QPen(QColor('#dc2626' if self.sp < 0 else '#111827'), 2 if self.sp < 0 else 1))
         for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1),
                        (-1, -1), (1, 1), (-1, 1), (1, -1)):
             painter.drawText(rect.translated(dx, dy),
@@ -393,168 +519,217 @@ class PortraitWithSP(QWidget):
 
 
 class BattleTurn(QGroupBox):
+    """固定高度战斗回合。普通与调整模式互相替换，状态数据不重复叠加。"""
+    HEIGHT = 105
+
     def __init__(self, owner, number, state):
         super().__init__('')
-        self.owner = owner
-        self.number = number
+        self.owner = owner; self.number = number
         self.state_data = ensure_state(state)
         self.select_first = None
         self.setObjectName('simulationTurn')
-        outer = QVBoxLayout(self); outer.setContentsMargins(8, 8, 8, 7)
-        outer.setSpacing(2)
-        header = QHBoxLayout(); header.setSpacing(5)
-        self.title = QLabel(); self.title.setStyleSheet('font-weight:600;')
-        header.addWidget(self.title)
-        header.addStretch(1)
-        outer.addLayout(header)
-        self.stack = QStackedWidget(); outer.addWidget(self.stack)
-        self._make_combat_page()
-        self._make_adjust_page()
-        footer = QHBoxLayout(); footer.setSpacing(4); footer.addStretch()
-        self.switch_button = QPushButton('调整'); self.switch_button.setStyleSheet(BLUE_BUTTON)
-        self.switch_button.setFixedHeight(24)
-        self.switch_button.clicked.connect(self.toggle_mode)
-        self.next_button = QPushButton('下一回合')
-        self.next_button.setStyleSheet(BLUE_BUTTON); self.next_button.setFixedHeight(24)
-        self.next_button.clicked.connect(lambda: self.owner.next_turn(self))
-        self.back_button = QPushButton('回到本回合'); self.back_button.setFixedHeight(24)
-        self.back_button.clicked.connect(lambda: self.owner.truncate_after(self))
-        footer.addWidget(self.switch_button)
-        footer.addWidget(self.next_button)
-        footer.addWidget(self.back_button)
-        outer.addLayout(footer)
+        self.setFixedHeight(self.HEIGHT)
+        outer = QVBoxLayout(self); outer.setContentsMargins(4, 3, 4, 3)
+        outer.setSpacing(0)
+        self.stack = QStackedWidget()
+        outer.addWidget(self.stack)
+        self._make_combat_page(); self._make_adjust_page()
         self.refresh()
+
+    @staticmethod
+    def _separator():
+        divider = QFrame()
+        divider.setFrameShape(QFrame.Shape.VLine)
+        divider.setFrameShadow(QFrame.Shadow.Plain)
+        divider.setStyleSheet('color:#dce2eb;')
+        divider.setFixedWidth(1)
+        return divider
 
     def _make_combat_page(self):
         page = QWidget(); root = QHBoxLayout(page)
-        root.setContentsMargins(0, 0, 0, 0); root.setSpacing(7)
-        # 仅展示敌人数量、弱点、场地，无编辑控件。
-        enemy = QFrame(); enemy.setObjectName('simulationSegment')
-        el = QVBoxLayout(enemy); el.setContentsMargins(6, 3, 6, 3); el.setSpacing(2)
-        el.addWidget(QLabel('敌人与场地'))
-        self.enemy_count_label = QLabel()
-        el.addWidget(self.enemy_count_label)
-        self.enemy_icons_row = QHBoxLayout(); self.enemy_icons_row.setSpacing(3)
+        root.setContentsMargins(0, 0, 0, 0); root.setSpacing(3)
+
+        enemy = QWidget()
+        el = QVBoxLayout(enemy); el.setContentsMargins(4, 1, 4, 1); el.setSpacing(0)
+        self.title = QLabel(); self.title.setStyleSheet('font-weight:700;')
+        el.addWidget(self.title)
+        self.enemy_icons_row = QVBoxLayout(); self.enemy_icons_row.setSpacing(0)
         el.addLayout(self.enemy_icons_row)
-        self.field_display = QHBoxLayout(); self.field_display.setSpacing(3)
-        el.addLayout(self.field_display); el.addStretch(1)
-        root.addWidget(enemy, 2)
-        od = QFrame(); od.setObjectName('simulationSegment')
-        ol = QVBoxLayout(od); ol.setContentsMargins(6, 3, 6, 3); ol.setSpacing(3)
-        ol.addWidget(QLabel('OD 发动'))
-        icon_row = QHBoxLayout(); icon_row.setSpacing(3)
-        self.od_icon = QLabel(); self.od_icon.setFixedSize(36, 36)
-        icon_row.addWidget(self.od_icon)
-        self.od_label = QLabel(); self.od_label.setStyleSheet('font-weight:600;')
-        icon_row.addWidget(self.od_label); icon_row.addStretch()
-        ol.addLayout(icon_row)
-        before_row = QHBoxLayout(); before_row.setSpacing(3)
-        before_row.addWidget(QLabel('前置'))
+        self.field_display = QHBoxLayout(); self.field_display.setSpacing(2)
+        el.addLayout(self.field_display)
+        el.addStretch(1)
+        root.addWidget(enemy, 23)
+        root.addWidget(self._separator())
+
+        team = QWidget()
+        tl = QHBoxLayout(team); tl.setContentsMargins(4, 3, 4, 3); tl.setSpacing(4)
+        self.portraits, self.action_boxes, self.status_rows = [], [], []
+        for first, last, stretch in ((0, 3, 70), (3, 6, 30)):
+            group = QHBoxLayout(); group.setSpacing(2)
+            for pos in range(first, last):
+                column = QVBoxLayout(); column.setSpacing(1)
+                action = FullPopupCombo()
+                action.setFixedHeight(22)
+                action.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+                action.currentIndexChanged.connect(lambda _=0, i=pos: self.update_action(i))
+                column.addWidget(action)
+                body = QHBoxLayout(); body.setSpacing(1)
+                avatar_button = QPushButton(); avatar_button.setFixedSize(55, 54)
+                avatar_button.setStyleSheet('QPushButton{background:transparent;border:0;padding:0}')
+                portrait = PortraitWithSP(45, avatar_button); portrait.move(2, 1)
+                avatar_button.clicked.connect(lambda _=False, i=pos: self.swap_position(i))
+                body.addWidget(avatar_button)
+                statuses = QHBoxLayout(); statuses.setSpacing(1)
+                body.addLayout(statuses)
+                column.addLayout(body); column.addStretch()
+                group.addLayout(column, 1)
+                self.portraits.append((avatar_button, portrait))
+                self.action_boxes.append(action); self.status_rows.append(statuses)
+            tl.addLayout(group, stretch)
+        root.addWidget(team, 60)
+        root.addWidget(self._separator())
+
+        od = QWidget()
+        ol = QVBoxLayout(od); ol.setContentsMargins(4, 3, 4, 2); ol.setSpacing(1)
+        top = QHBoxLayout(); top.setSpacing(2)
+        self.od_icon = QLabel(); self.od_icon.setFixedSize(29, 29)
+        top.addWidget(self.od_icon)
+        od_values = QVBoxLayout(); od_values.setSpacing(0)
+        self.od_label = QLabel(); self.od_label.setStyleSheet('font-weight:700;')
+        self.predicted_od_label = QLabel(); self.predicted_od_label.setStyleSheet('font-weight:700;')
+        od_values.addWidget(self.od_label)
+        od_values.addWidget(self.predicted_od_label)
+        top.addLayout(od_values); top.addStretch()
+        ol.addLayout(top)
         self.before_od = combo([('不发动', 0)])
-        before_row.addWidget(self.before_od, 1)
-        ol.addLayout(before_row)
-        after_row = QHBoxLayout(); after_row.setSpacing(3)
-        after_row.addWidget(QLabel('后置'))
         self.after_od = combo([('不发动', 0)])
-        after_row.addWidget(self.after_od, 1)
-        ol.addLayout(after_row)
+        for title, box in (('前置', self.before_od), ('后置', self.after_od)):
+            line = QHBoxLayout(); line.setSpacing(2)
+            caption = QLabel(title); caption.setFixedWidth(27)
+            line.addWidget(caption); line.addWidget(box, 1)
+            ol.addLayout(line)
         self.before_od.currentIndexChanged.connect(lambda: self.update_od('before'))
         self.after_od.currentIndexChanged.connect(lambda: self.update_od('after'))
         ol.addStretch(1)
-        root.addWidget(od, 2)
+        root.addWidget(od, 8)
+        root.addWidget(self._separator())
 
-        team = QFrame(); team.setObjectName('simulationSegment')
-        tl = QVBoxLayout(team); tl.setContentsMargins(5, 3, 5, 3); tl.setSpacing(2)
-        tl.addWidget(QLabel('我方行动（依次点击两名角色头像可交换位置）'))
-        members_row = QHBoxLayout(); members_row.setSpacing(3)
-        self.portraits = []; self.action_boxes = []; self.status_rows = []
-        for pos in range(6):
-            column = QVBoxLayout(); column.setSpacing(1)
-            action = combo([('普通攻击', 'normal_attack')] if pos < 3 else
-                           [('无', 'none'), ('追击', 'pursuit')])
-            action.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-            action.currentIndexChanged.connect(lambda _=0, i=pos: self.update_action(i))
-            column.addWidget(action)
-            body = QHBoxLayout(); body.setSpacing(1)
-            avatar_button = QPushButton(); avatar_button.setFixedSize(67, 61)
-            avatar_button.setStyleSheet('QPushButton{background:transparent;border:0;padding:0}')
-            portrait = PortraitWithSP(50, avatar_button)
-            portrait.move(3, 2)
-            avatar_button.clicked.connect(lambda _=False, i=pos: self.swap_position(i))
-            body.addWidget(avatar_button)
-            statuses = QHBoxLayout(); statuses.setSpacing(1)
-            body.addLayout(statuses)
-            column.addLayout(body)
-            members_row.addLayout(column, 1)
-            self.portraits.append((avatar_button, portrait))
-            self.action_boxes.append(action); self.status_rows.append(statuses)
-            if pos == 2:
-                separator = QFrame(); separator.setFrameShape(QFrame.Shape.VLine)
-                members_row.addWidget(separator)
-        tl.addLayout(members_row)
-        root.addWidget(team, 9)
+        # ④ 操作栏：OD 区域只负责显示及发动设置，不再放置按钮。
+        operations = QWidget()
+        op = QVBoxLayout(operations)
+        op.setContentsMargins(2, 2, 2, 2); op.setSpacing(2)
+        self.switch_button = QPushButton('调整')
+        self.switch_button.setStyleSheet(BLUE_BUTTON)
+        self.switch_button.setFixedHeight(26)
+        self.switch_button.clicked.connect(self.toggle_mode)
+        self.next_button = QPushButton('下一回合')
+        self.next_button.setStyleSheet(BLUE_BUTTON)
+        self.next_button.setFixedHeight(26)
+        self.next_button.clicked.connect(lambda: self.owner.next_turn(self))
+        self.back_button = QPushButton('回到本回合')
+        self.back_button.setFixedHeight(27)
+        self.back_button.setStyleSheet('QPushButton{padding:2px 4px;min-height:0px;}')
+        self.back_button.clicked.connect(lambda: self.owner.truncate_after(self))
+        op.addWidget(self.switch_button)
+        op.addWidget(self.next_button)
+        op.addWidget(self.back_button)
+        op.addStretch(1)
+        root.addWidget(operations, 12)
         self.stack.addWidget(page)
 
     def _make_adjust_page(self):
         page = QWidget(); root = QHBoxLayout(page)
-        root.setContentsMargins(0, 0, 0, 0); root.setSpacing(7)
-        # 全局、敌人、角色三个独立列，整个页面取代普通显示页面。
-        global_box = QGroupBox('全局调整'); gl = QGridLayout(global_box)
-        gl.setContentsMargins(6, 8, 6, 5); gl.setSpacing(3)
-        self.adjust_od = dspin(-999, 999, 0, 79)
-        self.adjust_field = combo(FIELD_OPTIONS, 93)
-        gl.addWidget(QLabel('OD 增减'), 0, 0); gl.addWidget(self.adjust_od, 0, 1)
-        gl.addWidget(QLabel('场地'), 1, 0); gl.addWidget(self.adjust_field, 1, 1)
-        self.adjust_enemies = combo([(f'{i} 个', i) for i in range(1, 4)], 93)
-        gl.addWidget(QLabel('敌人数'), 2, 0); gl.addWidget(self.adjust_enemies, 2, 1)
-        root.addWidget(global_box, 2)
+        root.setContentsMargins(0, 0, 0, 0); root.setSpacing(3)
 
-        enemy_box = QGroupBox('各敌人状态'); eg = QGridLayout(enemy_box)
-        eg.setContentsMargins(5, 8, 5, 5); eg.setSpacing(3)
-        eg.addWidget(QLabel(''), 0, 0)
+        # ① 敌人：敌人数和三名敌人在同一行。
+        enemy_panel = QWidget(); eg = QGridLayout(enemy_panel)
+        eg.setContentsMargins(3, 2, 3, 2); eg.setSpacing(2)
+        self.adjust_enemies = combo([(str(i), i) for i in range(1, 4)])
+        self.adjust_enemies.setFixedWidth(48)
+        eg.addWidget(self.adjust_enemies, 0, 0)
+        self.enemy_edits = []; self.enemy_headers = []
         for i in range(3):
-            eg.addWidget(QLabel(f'敌人{i+1}'), 0, i+1,
-                         alignment=Qt.AlignmentFlag.AlignCenter)
-        self.enemy_edits = []
-        for i in range(3):
-            down = spin(0, 99, 0, 65)
-            rate = dspin(0, 999.99, 100, 75)
-            weakness = combo(ELEMENTS, 75)
-            eg.addWidget(down, 1, i+1)
+            heading = QLabel(f'敌人{i+1}')
+            heading.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            eg.addWidget(heading, 0, i+1)
+            self.enemy_headers.append(heading)
+            down = QCheckBox(); down.setToolTip('倒下')
+            rate = spin(0, 999, 100, 54)
+            eg.addWidget(down, 1, i+1, alignment=Qt.AlignmentFlag.AlignCenter)
             eg.addWidget(rate, 2, i+1)
-            eg.addWidget(weakness, 3, i+1)
-            self.enemy_edits.append((down, rate, weakness))
-        for row, name in [(1, '倒下回合'), (2, '破坏率'), (3, '弱点')]:
-            eg.addWidget(QLabel(name), row, 0)
-        root.addWidget(enemy_box, 3)
+            self.enemy_edits.append((down, rate))
+        eg.addWidget(QLabel('倒下'), 1, 0)
+        eg.addWidget(QLabel('破坏率'), 2, 0)
+        root.addWidget(enemy_panel, 24)
+        root.addWidget(self._separator())
 
-        team_box = QGroupBox('角色资源调整（增减量）')
-        mg = QGridLayout(team_box)
-        mg.setContentsMargins(5, 8, 5, 5); mg.setSpacing(2)
+        # ② 角色：DP 与头像横向并列，占据第一行；下面只有 SP 和信念。
+        team_panel = QWidget(); mg = QGridLayout(team_panel)
+        mg.setContentsMargins(3, 2, 3, 2); mg.setSpacing(2)
         self.member_edits = []; self.member_portraits = []
         for i in range(6):
-            pic = QLabel(); pic.setFixedSize(34, 34)
+            first_row = QHBoxLayout(); first_row.setSpacing(1)
+            pic = QLabel(); pic.setFixedSize(25, 25)
             pic.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            mg.addWidget(pic, 0, i+1, alignment=Qt.AlignmentFlag.AlignCenter)
+            first_row.addWidget(pic)
             self.member_portraits.append(pic)
             fields = {}
-            for row, key in enumerate(('sp', 'token', 'ep'), 1):
-                box = spin(-999, 999, 0, 57)
-                mg.addWidget(box, row, i+1)
-                fields[key] = box
-            dp = dspin(0, 150, 100, 61); dp.setSuffix('%')
-            mg.addWidget(dp, 4, i+1); fields['dp'] = dp
+            dp = dspin(0, 150, 100)
+            dp.setSuffix('%'); dp.setFixedHeight(22); dp.setMinimumWidth(46)
+            dp.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)
+            first_row.addWidget(dp, 1); fields['dp'] = dp
+            mg.addLayout(first_row, 0, i+1)
+            for row, key in enumerate(('sp', 'token'), 1):
+                widget = spin(-999, 999, 0)
+                widget.setFixedHeight(21); widget.setMinimumWidth(58)
+                mg.addWidget(widget, row, i+1)
+                fields[key] = widget
             self.member_edits.append(fields)
-        for row, label in enumerate(('SP', 'Token', 'EP', 'DP'), 1):
-            mg.addWidget(QLabel(label), row, 0)
-        root.addWidget(team_box, 6)
+        mg.addWidget(QLabel('DP'), 0, 0)
+        for row, label in ((1, 'SP'), (2, '信念')):
+            caption = QLabel(label); caption.setFixedWidth(28)
+            mg.addWidget(caption, row, 0)
+        root.addWidget(team_panel, 65)
+        root.addWidget(self._separator())
+
+        # ③ OD/全局：三行内放入 OD 增减、场地以及返回按钮。
+        od_panel = QWidget(); ol = QVBoxLayout(od_panel)
+        ol.setContentsMargins(3, 2, 3, 2); ol.setSpacing(3)
+        od_line = QHBoxLayout(); od_line.setSpacing(2)
+        od_line.addWidget(QLabel('OD±'))
+        self.adjust_od = dspin(-999, 999, 0)
+        od_line.addWidget(self.adjust_od, 1)
+        ol.addLayout(od_line)
+        field_line = QHBoxLayout(); field_line.setSpacing(2)
+        field_line.addWidget(QLabel('场地'))
+        self.adjust_field = combo(FIELD_OPTIONS)
+        field_line.addWidget(self.adjust_field, 1)
+        ol.addLayout(field_line)
+        self.adjust_return = QPushButton('返回')
+        self.adjust_return.setStyleSheet(BLUE_BUTTON)
+        self.adjust_return.setFixedHeight(25)
+        self.adjust_return.clicked.connect(self.toggle_mode)
+        ol.addWidget(self.adjust_return, alignment=Qt.AlignmentFlag.AlignRight)
+        ol.addStretch(1)
+        root.addWidget(od_panel, 11)
         self.stack.addWidget(page)
         self.adjust_enemies.currentIndexChanged.connect(self.update_enemy_edit_visibility)
 
     def update_enemy_edit_visibility(self):
         count = self.adjust_enemies.currentData() or 1
         for i, controls in enumerate(self.enemy_edits):
-            for widget in controls: widget.setEnabled(i < count)
+            enabled = i < count
+            self.enemy_headers[i].setEnabled(enabled)
+            for widget in controls:
+                widget.setEnabled(enabled)
+                if isinstance(widget, QCheckBox):
+                    widget.setStyleSheet('' if enabled else
+                        'QCheckBox::indicator:disabled{background:#cbd5e1;'
+                        'border:1px solid #94a3b8;border-radius:3px;}')
+                else:
+                    widget.setStyleSheet('' if enabled else
+                        'QSpinBox:disabled{background:#e5e7eb;color:#6b7280;'
+                        'border:1px solid #cbd5e1;}')
 
     def update_action(self, position):
         self.state_data['actions'][position] = self.action_boxes[position].currentData()
@@ -586,101 +761,117 @@ class BattleTurn(QGroupBox):
             self.state_data['actions'][i] = box.currentData()
 
     def load_adjust(self):
-        data = self.state_data
-        adjust = data['adjustments']
+        data = self.state_data; adjust = data['adjustments']
         self.adjust_od.setValue(adjust['od'])
         self.adjust_field.setCurrentIndex(max(0, self.adjust_field.findData(data['field'])))
-        self.adjust_enemies.setCurrentIndex(max(0, len(data['enemies']) - 1))
-        for i, (down, rate, weak) in enumerate(self.enemy_edits):
+        self.adjust_enemies.setCurrentIndex(max(0, len(data['enemies'])-1))
+        for i, (down, rate) in enumerate(self.enemy_edits):
             enemy = data['enemies'][i] if i < len(data['enemies']) else {
-                'damage_rate': 100.0, 'down_turns': 0, 'weakness': None}
-            down.setValue(enemy.get('down_turns', 0))
-            rate.setValue(enemy.get('damage_rate', 100.0))
-            weak.setCurrentIndex(max(0, weak.findData(enemy.get('weakness'))))
-        for index, controls in enumerate(self.member_edits):
-            member = data['base']['members'][index]
-            delta = adjust['members'][index]
-            for key in ('sp', 'token', 'ep'): controls[key].setValue(delta.get(key, 0))
+                'damage_rate': 100.0, 'down': False}
+            down.setChecked(bool(enemy.get('down', enemy.get('down_turns', 0))))
+            rate.setValue(round(enemy.get('damage_rate', 100)))
+        for position, controls in enumerate(self.member_edits):
+            slot = data['order'][position]
+            member = data['base']['members'][slot]
+            delta = adjust['members'][slot]
+            for key in ('sp', 'token'): controls[key].setValue(delta.get(key, 0))
             controls['dp'].setValue(member.get('dp', 100.0))
-            style = self.owner.setup.styles[index]
-            avatar = self.member_portraits[index]
+            style = self.owner.setup.styles[slot]
+            pic = self.member_portraits[position]
             if style:
-                avatar.setPixmap(self.owner.setup.round_pixmap(style.image, 33))
-                avatar.setToolTip(style.localized_title)
+                pic.setPixmap(self.owner.setup.round_pixmap(style.image, 25))
+                pic.setToolTip(style.localized_title)
+                pic.setText('')
             else:
-                avatar.setText('＋')
+                pic.clear(); pic.setText('＋')
         self.update_enemy_edit_visibility()
 
     def save_adjust(self):
         data = self.state_data; adjust = data['adjustments']
-        # 绝不累加到 base，也不归零：这里保存的是完整、持久的调整量。
         adjust['od'] = self.adjust_od.value()
         data['field'] = self.adjust_field.currentData()
         count = self.adjust_enemies.currentData() or 1
-        data['enemies'] = [{'down_turns': down.value(), 'damage_rate': rate.value(),
-                            'weakness': weak.currentData()}
-                           for down, rate, weak in self.enemy_edits[:count]]
-        for i, controls in enumerate(self.member_edits):
-            for key in ('sp', 'token', 'ep'):
-                adjust['members'][i][key] = controls[key].value()
-            data['base']['members'][i]['dp'] = controls['dp'].value()
+        old_enemies = data['enemies']
+        new_enemies = []
+        for i, (down, rate) in enumerate(self.enemy_edits[:count]):
+            enemy = copy.deepcopy(old_enemies[i]) if i < len(old_enemies) else {}
+            enemy['down'] = down.isChecked()
+            enemy['damage_rate'] = rate.value()
+            enemy.pop('down_turns', None)
+            new_enemies.append(enemy)
+        data['enemies'] = new_enemies
+        for position, fields in enumerate(self.member_edits):
+            slot = data['order'][position]
+            for key in ('sp', 'token'):
+                adjust['members'][slot][key] = fields[key].value()
+            data['base']['members'][slot]['dp'] = fields['dp'].value()
 
     def toggle_mode(self):
         if self.stack.currentIndex() == 0:
             self.save_combat_state(); self.load_adjust()
             self.stack.setCurrentIndex(1)
-            self.switch_button.setText('返回')
-            self.next_button.hide(); self.back_button.hide()
         else:
             self.save_adjust(); self.stack.setCurrentIndex(0)
-            self.switch_button.setText('调整')
-            self.next_button.show(); self.back_button.show()
             self.refresh()
+            self.refresh_turn_controls()
+
+    def refresh_turn_controls(self):
+        latest = self.owner.turns and self.owner.turns[-1] is self
+        self.next_button.setVisible(bool(latest))
+        self.back_button.setVisible(not bool(latest))
 
     def refresh_enemy_info(self):
         data = self.state_data
-        self.enemy_count_label.setText(f"{len(data['enemies'])} 个敌人")
         clear_layout(self.enemy_icons_row)
-        for i, enemy in enumerate(data['enemies']):
-            item = QVBoxLayout(); item.setSpacing(0)
-            label = QLabel(str(i+1)); label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            item.addWidget(label)
-            elem = enemy.get('weakness')
-            path = ROOT_DIR / 'assets' / 'icons' / 'element' / f'{elem}.webp'
-            item.addWidget(icon_label(path, 23, '—' if elem is None else ELEMENT_NAMES.get(elem, '?')),
-                           alignment=Qt.AlignmentFlag.AlignCenter)
-            self.enemy_icons_row.addLayout(item)
-        self.enemy_icons_row.addStretch()
+        weak_line = QHBoxLayout(); weak_line.setSpacing(1)
+        weak_line.addWidget(QLabel('敌人弱点：'))
+        weaknesses = data['enemy_weaknesses']
+        for item in weaknesses:
+            path = ROOT_DIR / 'assets' / 'icons' / 'element' / f'{item}.webp'
+            weak_line.addWidget(icon_label(path, 18, ELEMENT_NAMES.get(item, '?')))
+        if not weaknesses: weak_line.addWidget(QLabel('无'))
+        weak_line.addStretch(1)
+        self.enemy_icons_row.addLayout(weak_line)
+        for i, enemy in enumerate(data['enemies'], 1):
+            line = QHBoxLayout(); line.setSpacing(1)
+            status_label = QLabel(f'敌人{i}状态：' + ('倒下' if enemy.get('down') else '正常'))
+            status_label.setStyleSheet('font-size:8pt;')
+            line.addWidget(status_label)
+            line.addStretch(1)
+            self.enemy_icons_row.addLayout(line)
         clear_layout(self.field_display)
+        self.field_display.addWidget(QLabel('场地：'))
         field = data.get('field')
         if field is None:
-            self.field_display.addWidget(QLabel('无场地'))
+            self.field_display.addWidget(QLabel('无'))
         elif field == 'rice_field':
             path = ROOT_DIR / 'assets' / 'icons' / 'status' / 'RiceFieldZone.webp'
-            self.field_display.addWidget(icon_label(path, 23, '稻'))
+            self.field_display.addWidget(icon_label(path, 19, '稻'))
         else:
             path = ROOT_DIR / 'assets' / 'icons' / 'status' / f'{field.capitalize()}Zone.webp'
-            self.field_display.addWidget(icon_label(path, 23, FIELD_NAMES.get(field, '场')))
-        self.field_display.addStretch()
+            self.field_display.addWidget(icon_label(path, 19, FIELD_NAMES.get(field, '场')))
+        self.field_display.addStretch(1)
 
     def refresh(self):
-        data = self.state_data
-        result = effective_state(data)
+        data = self.state_data; result = effective_state(data)
         self.title.setText(f'T{self.number}' +
                            (f"-bonus{data['bonus']}" if data.get('bonus') else '') +
                            ('-追加回合' if data.get('additional_turn') else ''))
         od_value = result['od']
         self.od_label.setText(f'{od_value:.2f}%')
-        level = min(3, int(od_value // 100))
-        image_path = ROOT_DIR / 'assets' / 'icons' / 'od' / f'od{level}.webp'
-        pix = QPixmap(str(image_path))
+        estimate = data.get('predicted_od')
+        self.predicted_od_label.setText('→ —' if estimate is None else f'→ {estimate:.2f}%')
+        self.od_label.setStyleSheet('font-weight:700;color:' + ('#dc2626' if od_value < 0 else '#242933') + ';')
+        self.predicted_od_label.setStyleSheet('font-weight:700;color:' +
+                                            ('#dc2626' if estimate is not None and estimate < 0 else '#242933') + ';')
+        level = max(0, min(3, int(od_value // 100)))
+        pix = QPixmap(str(ROOT_DIR / 'assets' / 'icons' / 'od' / f'od{level}.webp'))
         if pix.isNull(): self.od_icon.setText(f'OD{level}')
-        else:
-            self.od_icon.setPixmap(pix.scaled(35, 35,
-                                   Qt.AspectRatioMode.KeepAspectRatio,
-                                   Qt.TransformationMode.SmoothTransformation))
+        else: self.od_icon.setPixmap(pix.scaled(29, 29,
+                            Qt.AspectRatioMode.KeepAspectRatio,
+                            Qt.TransformationMode.SmoothTransformation))
         self.refresh_enemy_info()
-        available = min(3, int(od_value // 100))
+        available = max(0, min(3, int(od_value // 100)))
         for timing, box in (('before', self.before_od), ('after', self.after_od)):
             box.blockSignals(True); box.clear(); box.addItem('不发动', 0)
             for n in range(1, available+1): box.addItem(f'OD{n}', n)
@@ -700,10 +891,8 @@ class BattleTurn(QGroupBox):
                               '（点击两名角色头像交换位置）')
             clear_layout(self.status_rows[position])
             for status in result['members'][slot].get('statuses', []):
-                # 状态图标只根据本地 statuses 文件显示，缺少映射时保留空白。
                 path = self.owner.status_icon(status)
-                if path:
-                    self.status_rows[position].addWidget(icon_label(path, 20))
+                if path: self.status_rows[position].addWidget(icon_label(path, 15))
             action = self.action_boxes[position]
             original = data['actions'][position]
             action.blockSignals(True); action.clear()
@@ -721,12 +910,12 @@ class BattleTurn(QGroupBox):
             action.setCurrentIndex(index if index >= 0 else 0)
             data['actions'][position] = action.currentData()
             action.blockSignals(False)
+        if self in self.owner.turns:
+            self.refresh_turn_controls()
 
     def state(self):
-        if self.stack.currentIndex() == 1:
-            self.save_adjust()
-        else:
-            self.save_combat_state()
+        if self.stack.currentIndex() == 1: self.save_adjust()
+        else: self.save_combat_state()
         answer = copy.deepcopy(self.state_data)
         answer['effective'] = effective_state(self.state_data)
         return answer
@@ -758,8 +947,7 @@ class SimulationTab(QWidget):
         self.turn_layout.addLayout(toolbar)
         self.scroll.setWidget(self.container); outer.addWidget(self.scroll)
         self.setStyleSheet(COMPACT +
-            'QFrame#simulationSegment{border:1px solid #dce2eb;border-radius:8px;background:white}' +
-            'QGroupBox#simulationTurn{background:white;border:1px solid #dce2eb;'
+                        'QGroupBox#simulationTurn{background:white;border:1px solid #dce2eb;'
             'border-radius:9px;margin-top:0;padding:1px}')
 
     @staticmethod
@@ -793,13 +981,15 @@ class SimulationTab(QWidget):
         for turn in self.turns:
             self.turn_layout.removeWidget(turn); turn.deleteLater()
         self.turns.clear()
-        members = [{'sp': 0, 'token': 0, 'ep': 0, 'dp': 100.0, 'statuses': []}
+        members = [{'sp': 0, 'token': 0, 'dp': 100.0, 'statuses': []}
                    for _ in range(6)]
         initial = {
-            'base': {'od': 0.0, 'members': members},
+            'base': {'od': self.session['setup']['initial_od'], 'members': members},
             'adjustments': initial_adjustments(),
             'field': None,
             'enemies': copy.deepcopy(self.session['setup']['enemies']),
+            'enemy_weaknesses': list(self.session['setup']['enemy_weaknesses']),
+            'predicted_od': None,
             'order': list(range(6)),
             'actions': ['normal_attack']*3 + ['none']*3,
             'od_timing': None, 'od_level': 0,
@@ -810,6 +1000,7 @@ class SimulationTab(QWidget):
     def add_turn(self, state):
         turn = BattleTurn(self, len(self.turns) + 1, state)
         self.turns.append(turn); self.turn_layout.addWidget(turn)
+        for item in self.turns: item.refresh_turn_controls()
         return turn
 
     def truncate_after(self, turn):
@@ -819,6 +1010,7 @@ class SimulationTab(QWidget):
             self.turn_layout.removeWidget(later)
             later.setParent(None); later.deleteLater()
         del self.turns[target:]
+        for item in self.turns: item.refresh_turn_controls()
 
     def next_turn(self, turn):
         if not self.turns or turn is not self.turns[-1]:
@@ -844,6 +1036,7 @@ class SimulationTab(QWidget):
         next_snapshot['actions'] = ['normal_attack']*3 + ['none']*3
         next_snapshot['od_timing'] = None; next_snapshot['od_level'] = 0
         next_snapshot['bonus'] = 0; next_snapshot['additional_turn'] = False
+        next_snapshot['predicted_od'] = None
         result = self.add_turn(next_snapshot)
         # 不自动滚动到最末，以免跳过需要检查的动作。
         return result
