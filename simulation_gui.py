@@ -303,21 +303,34 @@ class BattleSetup(QGroupBox):
         enemy_panel = QWidget(); enemy_panel.setFixedWidth(140)
         enemy_col = QVBoxLayout(enemy_panel)
         enemy_col.setContentsMargins(0, 0, 0, 4); enemy_col.setSpacing(2)
+
         enemy_col.addWidget(QLabel('敌人数量'))
         self.enemy_count = combo([(str(n), n) for n in range(1, 4)])
         enemy_col.addWidget(self.enemy_count)
+
         enemy_col.addWidget(QLabel('敌人弱点'))
         self.enemy_weaknesses = []
         weakness_button = QPushButton('设置弱点')
-        weakness_button.setStyleSheet(WHITE_BUTTON)
+        weakness_button.setStyleSheet(BLUE_BUTTON)
         weakness_button.clicked.connect(self.choose_weaknesses)
         self.weakness_button = weakness_button
         enemy_col.addWidget(weakness_button)
-        enemy_col.addWidget(QLabel('开局OD'))
-        self.initial_od = dspin(0, 300, 0)
+
+        od_rate_line = QHBoxLayout()
+        od_rate_line.addWidget(QLabel('OD率 '))
+        self.global_od_rate = dspin(0, 999, 100); self.global_od_rate.setMaximumWidth(90)
+        self.global_od_rate.setSuffix('%')
+        od_rate_line.addWidget(self.global_od_rate, 1)
+        enemy_col.addLayout(od_rate_line)
+
+        initial_od_line = QHBoxLayout()
+        initial_od_line.addWidget(QLabel('开局OD'))
+        self.initial_od = dspin(0, 300, 0); self.initial_od.setMaximumWidth(90)
         self.initial_od.setSuffix('%')
-        enemy_col.addWidget(self.initial_od)
+        initial_od_line.addWidget(self.initial_od, 1)
+        enemy_col.addLayout(initial_od_line)
         enemy_col.addStretch(1)
+
         reset = QPushButton('重置战斗设置')
         reset.setStyleSheet(WHITE_BUTTON)
         reset.clicked.connect(self.reset)
