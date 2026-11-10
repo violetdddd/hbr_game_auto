@@ -1,5 +1,5 @@
 {
-  "0": {"id": 0, "names": {"zh_cn": "无动作", "zh_tw": "無動作", "jp": "行動なし"}, "kind": "system"},
+  "0": {"id": 0, "names": {"zh_cn": "无", "zh_tw": "無", "jp": "なし"}, "kind": "system"},
   "1": {
     "id": 1,
     "names": {"zh_cn": "普通攻击", "zh_tw": "普通攻擊", "jp": "通常攻撃"},
