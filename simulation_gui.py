@@ -1,4 +1,3 @@
-
 """战斗模拟 Tab。仅负责界面、状态快照与手动修正；实际结算由 engine.advance 提供。"""
 from __future__ import annotations
 
@@ -87,36 +86,6 @@ def dspin(low=0, high=9999.99, value=0, width=None):
     if width: box.setFixedWidth(width)
     return box
 
-
-class WeaknessDialog(QDialog):
-    """所有敌人共享弱点，使用类似技能设置的复选弹窗。"""
-    def __init__(self, selected, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle('敌人弱点设置')
-        self.setMinimumWidth(260)
-        layout = QVBoxLayout(self)
-        self.checks = {}
-        for label, value in ELEMENTS[1:]:
-            check = QCheckBox(label)
-            check.setChecked(value in selected)
-            self.checks[value] = check
-            layout.addWidget(check)
-        controls = QHBoxLayout()
-        for title, checked in (('全选', True), ('全不选', False)):
-            button = QPushButton(title)
-            button.clicked.connect(lambda _=False, value=checked:
-                                   [c.setChecked(value) for c in self.checks.values()])
-            controls.addWidget(button)
-        layout.addLayout(controls)
-        save = QPushButton('确定')
-        save.setStyleSheet(BLUE_BUTTON)
-        save.clicked.connect(self.accept)
-        layout.addWidget(save)
-
-    def values(self):
-        return [key for key, check in self.checks.items() if check.isChecked()]
-
-
 class FullPopupCombo(NoWheelComboBox):
     """技能下拉框本体保持紧凑，但弹出菜单保证完整显示所有技能名。"""
     def showPopup(self):
@@ -148,74 +117,33 @@ def clear_layout(layout):
         elif item.layout():
             clear_layout(item.layout())
 
-# 调整面板默认值
-def initial_adjustments():
-    return {'od': 0.0, 'members': [{'sp': 0, 'token': 0} for _ in range(6)]}
+class WeaknessDialog(QDialog):
+    """所有敌人共享弱点，使用类似技能设置的复选弹窗。"""
+    def __init__(self, selected, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle('敌人弱点设置')
+        self.setMinimumWidth(260)
+        layout = QVBoxLayout(self)
+        self.checks = {}
+        for label, value in ELEMENTS[1:]:
+            check = QCheckBox(label)
+            check.setChecked(value in selected)
+            self.checks[value] = check
+            layout.addWidget(check)
+        controls = QHBoxLayout()
+        for title, checked in (('全选', True), ('全不选', False)):
+            button = QPushButton(title)
+            button.clicked.connect(lambda _=False, value=checked:
+                                   [c.setChecked(value) for c in self.checks.values()])
+            controls.addWidget(button)
+        layout.addLayout(controls)
+        save = QPushButton('确定')
+        save.setStyleSheet(BLUE_BUTTON)
+        save.clicked.connect(self.accept)
+        layout.addWidget(save)
 
-
-def ensure_state(source):
-    """兼容先前测试快照，保持基准值与手动增减完全分离。"""
-    data = copy.deepcopy(source)
-    if 'base' not in data:
-        data['base'] = {
-            'od': float(data.pop('od', 0)),
-            'members': copy.deepcopy(data.pop('members', [])),
-        }
-    base = data['base']
-    base.setdefault('od', 0.0)
-    base.setdefault('members', [])
-    while len(base['members']) < 6:
-        base['members'].append({'sp': 0, 'token': 0, 'dp': 100.0, 'statuses': []})
-    for member in base['members']:
-        member.setdefault('sp', 0); member.setdefault('token', 0)
-        member.pop('ep', None); member.setdefault('dp', 100.0)
-        member.setdefault('statuses', [])
-    adjust = data.setdefault('adjustments', initial_adjustments())
-    adjust.setdefault('od', 0.0)
-    adjust.setdefault('members', [])
-    while len(adjust['members']) < 6:
-        adjust['members'].append({'sp': 0, 'token': 0})
-    for delta in adjust['members']:
-        delta.pop('ep', None)
-    data.setdefault('field', None)
-    if 'enemy_weaknesses' not in data:
-        data['enemy_weaknesses'] = list((data.get('enemies') or [{}])[0].get('weakness') or [])
-    data.setdefault('enemies', [{'weakness': [], 'damage_rate': 100.0, 'down_turns': 0}])
-    for enemy in data['enemies']:
-        enemy.pop('weakness', None)
-        enemy.setdefault('damage_rate', 100.0)
-        enemy.setdefault('down', bool(enemy.pop('down_turns', 0)))
-        enemy.pop('broken', None)
-    data.setdefault('order', list(range(6)))
-    data.setdefault('actions', ['normal_attack'] * 3 + ['none'] * 3)
-    data.setdefault('od_timing', None); data.setdefault('od_level', 0)
-    data.setdefault('predicted_od', None)  # Simulation 将计算后的绝对 OD 写入此字段
-    data.setdefault('bonus', 0); data.setdefault('additional_turn', False)
-    return data
-
-
-def effective_state(data):
-    """只读计算：显示值 = simulation 基准 + 当前调整值，重复调用不会累加。"""
-    base = data['base']; adjustments = data['adjustments']
-    members = []
-    for index, member in enumerate(base['members']):
-        result = copy.deepcopy(member)
-        delta = adjustments['members'][index]
-        for key in ('sp', 'token'):
-            result[key] = member.get(key, 0) + delta.get(key, 0)
-        members.append(result)
-    return {
-        'od': base['od'] + adjustments['od'],
-        'members': members,
-        'enemies': copy.deepcopy(data['enemies']),
-        'enemy_weaknesses': list(data['enemy_weaknesses']),
-        'predicted_od': data['predicted_od'],
-        'field': data['field'],
-        'order': list(data['order']),
-        'actions': list(data['actions']),
-        'od_timing': data['od_timing'], 'od_level': data['od_level'],
-        'bonus': data['bonus'], 'additional_turn': data['additional_turn'],
-    }
+    def values(self):
+        return [key for key, check in self.checks.items() if check.isChecked()]
 
 # 技能选择面板
 class SkillSelectionDialog(QDialog):
@@ -244,13 +172,15 @@ class SkillSelectionDialog(QDialog):
             holder = QWidget(); vertical = QVBoxLayout(holder)
             vertical.setAlignment(Qt.AlignmentFlag.AlignTop)
             group = []
+            # 显示技能名（主动技能还有sp消耗），但内部存储simulation_id
             for name, entry in dict(entries).items():
+                simulation_id = int(entry['simulation_id'])
                 label = (catalog.skill_label(name) if category != 'passive' else
                          entry.get('names', {}).get('zh-CN-CN') or
                          entry.get('names', {}).get('zh-CN') or name)
-                check = QCheckBox(label); check.setChecked(name in selection.get(category, []))
+                check = QCheckBox(label); check.setChecked(simulation_id in selection.get(category, []))
                 vertical.addWidget(check); group.append(check)
-                self.checks[category, name] = check
+                self.checks[category, simulation_id] = check
             area.setWidget(holder); layout.addWidget(area)
             select_all.clicked.connect(lambda _=False, checks=group:
                                        [item.setChecked(True) for item in checks])
@@ -277,12 +207,13 @@ class SkillSelectionDialog(QDialog):
             if isinstance(source, dict):
                 for key, item in source.items():
                     if isinstance(item, dict): result[item.get('value', key)] = item
-        return list(result.items())
+        return list(result.items())  # items取的是json中某技能名key，和value（是包含value，simulation_id等key的字典）
 
     def selection(self):
         answer = {'active': [], 'passive': [], 'orb': []}
-        for (category, name), check in self.checks.items():
-            if check.isChecked(): answer[category].append(name)
+        for (category, simulation_id), check in self.checks.items():
+            if check.isChecked():
+                answer[category].append(simulation_id)
         return answer
 
 
@@ -428,7 +359,7 @@ class BattleSetup(QGroupBox):
         orb_names = set(self.catalog.common_global)
         self.skill_selections[index] = {
             'active': [
-                name
+                int(self.catalog.skill_data[name]['simulation_id'])
                 for name in self.catalog.skills_for(selected)
                 if name not in orb_names
             ],
@@ -478,7 +409,7 @@ class BattleSetup(QGroupBox):
     def reset(self):
         self.styles = [None]*6; self.resonances = [None]*6
         self.skill_selections = [{'active': [], 'passive': [], 'orb': []} for _ in range(6)]
-        self.enemy_count.setCurrentIndex(0); self.initial_od.setValue(0)
+        self.enemy_count.setCurrentIndex(0); self.initial_od.setValue(0); self.global_od_rate.setValue(100)
         self.enemy_weaknesses = []
         self.weakness_button.setText('设置弱点')
         self.weakness_button.setToolTip('无弱点')
@@ -493,40 +424,60 @@ class BattleSetup(QGroupBox):
             self._set_level(self.resonance_breaks[i], None)
 
     def state(self):
+        """构造 simulation.initialize() 所需的纯 ID 配置。"""
+        # 风格和共鸣
+        styles = []
+        resonances = []
+        for i, style in enumerate(self.styles):
+            active_ids = list(self.skill_selections[i]['active'])        # 主动技能
+            passive_ids = list(self.skill_selections[i]['passive'])        # 被动技能
+            orb_ids = list(self.skill_selections[i]['orb'])        # 光球技能
+            styles.append({
+                'style_id': self._style_id(style),
+                'break_level': int(self.breaks[i].currentData()),
+                'od_earring': int(self.earrings[i].currentData()),
+                'necklace_sp': int(self.necklaces[i].currentData()),
+                'active_skill_ids': active_ids,
+                'passive_skill_ids': passive_ids,
+                'orb_skill_ids': orb_ids,
+            })
+
+            # 共鸣风格
+            resonance = self.resonances[i]
+
+            if resonance is None:
+                resonances.append(None)
+            else:
+                resonances.append({
+                    'style_id': self._style_id(resonance),
+                    'break_level': int(self.resonance_breaks[i].currentData()),
+                })
+
         return {
-            'initial_od': self.initial_od.value(),
+            'styles': styles,
+            'resonances': resonances,
+            'enemy_count': int(self.enemy_count.currentData() or 1),
             'enemy_weaknesses': list(self.enemy_weaknesses),
-            'enemies': [{'damage_rate': 100, 'down': False}
-                        for _ in range(self.enemy_count.currentData() or 1)],
-            'members': [{
-                'position': i+1, 'style_id': self._style_id(self.styles[i]),
-                'team': style.team if style else None,
-                'character': style.name if style else None,
-                'style': style.title if style else None,
-                'break_level': self.breaks[i].currentData(),
-                'od_earring': self.earrings[i].currentData(),
-                'necklace_sp': self.necklaces[i].currentData(),
-                'enabled_skills': copy.deepcopy(self.skill_selections[i]),
-            } for i, style in enumerate(self.styles)],
-            'resonance_style_ids': [self._style_id(s) for s in self.resonances],
-            'resonance_break_levels': [self.resonance_breaks[i].currentData() if s else None
-                                       for i, s in enumerate(self.resonances)],
+            'initial_od': float(self.initial_od.value()),
+            'global_od_rate': float(self.global_od_rate.value()),
         }
 
     @staticmethod
     def _style_id(style):
         if style is None: return None
         path = SkillSelectionDialog.catalog_data_path(style)
-        if not path.exists(): return None
+        if not path.exists(): raise FileNotFoundError(f'找不到风格数据库：{path}')
         data = json.loads(path.read_text(encoding='utf-8'))
         person = next((v for v in data.values() if isinstance(v, dict) and
                        v.get('english name') == style.english), {})
         entry = next((v for v in person.get('style', {}).values()
-                      if v.get('value') == style.title and
-                      style.sid in [str(k) for k in
-                                    (v.get('id') if isinstance(v.get('id'), list) else [v.get('id')])]), {})
+                      if v.get('value') == style.title), {})
         value = entry.get('simulation_id')
-        return value[0] if isinstance(value, list) and value else value
+        if value is None:
+            raise ValueError(
+                f'风格 {style.localized_title} 缺少 simulation_id'
+            )
+        return value
 
 
 class PortraitWithSP(QWidget):
@@ -573,7 +524,7 @@ class BattleTurn(QGroupBox):
     def __init__(self, owner, number, state):
         super().__init__('')
         self.owner = owner; self.number = number
-        self.state_data = ensure_state(state)
+        self.state_data = copy.deepcopy(state)
         self.select_first = None
         self.setObjectName('simulationTurn')
         self.setFixedHeight(self.HEIGHT)
@@ -611,11 +562,12 @@ class BattleTurn(QGroupBox):
 
         team = QWidget()
         tl = QHBoxLayout(team); tl.setContentsMargins(4, 3, 4, 3); tl.setSpacing(4)
-        self.portraits, self.action_boxes, self.status_rows = [], [], []
+        self.portraits, self.action_boxes, self.status_rows, self.member_resources = [], [], [], []
         for first, last, stretch in ((0, 3, 65), (3, 6, 35)):
             group = QHBoxLayout(); group.setSpacing(2)
             for pos in range(first, last):
                 column = QVBoxLayout(); column.setSpacing(1)
+                # 行动框
                 action = FullPopupCombo()
                 action.setFixedHeight(22)
                 action.setSizeAdjustPolicy(
@@ -626,18 +578,46 @@ class BattleTurn(QGroupBox):
                 action.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
                 action.currentIndexChanged.connect(lambda _=0, i=pos: self.update_action(i))
                 column.addWidget(action)
-                body = QHBoxLayout(); body.setSpacing(1)
-                avatar_button = QPushButton(); avatar_button.setFixedSize(55, 54)
-                avatar_button.setStyleSheet('QPushButton{background:transparent;border:0;padding:0}')
-                portrait = PortraitWithSP(45, avatar_button); portrait.move(2, 1)
-                avatar_button.clicked.connect(lambda _=False, i=pos: self.swap_position(i))
+                # 框下主体部分
+                body = QHBoxLayout()
+                body.setSpacing(1)
+                # 左侧信念
+                faith = QLabel()
+                faith.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                faith.setMinimumWidth(25)
+                faith.setStyleSheet('font-size:10px;font-weight:600;')
+                # 中间头像
+                avatar_button = QPushButton()
+                avatar_button.setFixedSize(55, 54)
+                avatar_button.setStyleSheet(
+                    'QPushButton{background:transparent;border:0;padding:0}'
+                )
+                portrait = PortraitWithSP(45, avatar_button)
+                portrait.move(2, 1)
+                avatar_button.clicked.connect(
+                    lambda _=False, i=pos: self.swap_position(i)
+                )
+                # 右侧 EP
+                ep_label = QLabel()
+                ep_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                ep_label.setMinimumWidth(23)
+                ep_label.setStyleSheet('font-size:10px;font-weight:600;')
+                # 加入信念、头像和EP到主体布局
+                body.addWidget(faith)
                 body.addWidget(avatar_button)
-                statuses = QHBoxLayout(); statuses.setSpacing(1)
-                body.addLayout(statuses)
-                column.addLayout(body); column.addStretch()
+                body.addWidget(ep_label)
+                column.addLayout(body)
+                # 最下方是状态行
+                statuses = QHBoxLayout()
+                statuses.setSpacing(1)
+                column.addLayout(statuses)
+                column.addStretch()
+
                 group.addLayout(column, 1)
                 self.portraits.append((avatar_button, portrait))
-                self.action_boxes.append(action); self.status_rows.append(statuses)
+                self.action_boxes.append(action)
+                self.status_rows.append(statuses)
+                self.member_resources.append((faith, ep_label))
             tl.addLayout(group, stretch)
         root.addWidget(team, 70)
         root.addWidget(self._separator())
@@ -903,8 +883,18 @@ class BattleTurn(QGroupBox):
             self.field_display.addWidget(icon_label(path, 19, FIELD_NAMES.get(field, '场')))
         self.field_display.addStretch(1)
 
+    def effective_state(self, data):
+        """只读计算：显示值 = simulation 基准 + 当前调整值，重复调用不会累加。"""
+        effective = copy.deepcopy(data['base'])
+        adjustments = data['adjustments']
+        for index, member in enumerate(effective['members']):
+            delta = adjustments['members'][index]
+            for key in ('sp', 'token'):
+                member[key] = member.get(key, 0) + delta.get(key, 0)
+        return effective
+    
     def refresh(self):
-        data = self.state_data; result = effective_state(data)
+        data = self.state_data; result = self.effective_state(data)
         self.title.setText(f'T{self.number}' +
                            (f"-bonus{data['bonus']}" if data.get('bonus') else '') +
                            ('-追加回合' if data.get('additional_turn') else ''))
@@ -968,7 +958,6 @@ class BattleTurn(QGroupBox):
         if self.stack.currentIndex() == 1: self.save_adjust()
         else: self.save_combat_state()
         answer = copy.deepcopy(self.state_data)
-        answer['effective'] = effective_state(self.state_data)
         return answer
 
 
@@ -978,8 +967,8 @@ class SimulationTab(QWidget):
         self.catalog = catalog
         self.setup = BattleSetup(catalog, style_dialog_class, round_pixmap)
         self.turns = []; self.session = None
-        self.engine = None  # engine.advance(effective_snapshot, setup, actions)
-        self._status_icons = self._load_status_icons()
+        from simulation import Simulation
+        self.engine = Simulation()
         outer = QVBoxLayout(self); outer.setContentsMargins(7, 7, 7, 5)
         outer.setSpacing(5)
         self.scroll = QScrollArea(); self.scroll.setWidgetResizable(True)
@@ -1001,54 +990,60 @@ class SimulationTab(QWidget):
                         'QGroupBox#simulationTurn{background:white;border:1px solid #dce2eb;'
             'border-radius:9px;margin-top:0;padding:1px}')
 
-    @staticmethod
-    def _load_status_icons():
-        for path in (ROOT_DIR / 'assets' / 'simulation-data' / 'statuses.json',
-                     ROOT_DIR / 'assets' / 'char-data' / 'statuses.json'):
-            if path.is_file():
-                try: return json.loads(path.read_text(encoding='utf-8'))
-                except (OSError, ValueError): return {}
-        return {}
-
-    def status_icon(self, item):
-        if not isinstance(item, (int, str, dict)): return None
-        if isinstance(item, dict):
-            identifier = item.get('status_id', item.get('id'))
-            element = item.get('element') or 'none'
-        else:
-            identifier = item; element = 'none'
-        status = self._status_icons.get(str(identifier), {})
-        if status.get('not_display'): return None
-        file_name = status.get('icon') or status.get('icons', {}).get(element)
-        if not file_name: file_name = status.get('icons', {}).get('none')
-        if not file_name: return None
-        path = ROOT_DIR / 'assets' / 'icons' / 'status' / file_name
-        return path if path.is_file() else None
-
     def start(self):
         if any(style is None for style in self.setup.styles):
             QMessageBox.warning(self, '无法开始战斗', '请先选齐六个风格。'); return
-        self.session = {'setup': self.setup.state()}
+        setup_state = self.setup.state()
+        self.session = {'setup': setup_state}  # 用于存储战斗设置和turn的总体情况
+        # 清除旧回合
         for turn in self.turns:
             self.turn_layout.removeWidget(turn); turn.deleteLater()
         self.turns.clear()
-        members = [{'sp': 0, 'token': 0, 'dp': 100.0, 'statuses': []}
-                   for _ in range(6)]
-        initial = {
-            'base': {'od': self.session['setup']['initial_od'], 'members': members},
-            'adjustments': initial_adjustments(),
-            'field': None,
-            'enemies': copy.deepcopy(self.session['setup']['enemies']),
-            'enemy_weaknesses': list(self.session['setup']['enemy_weaknesses']),
-            'predicted_od': None,
-            'order': list(range(6)),
-            'actions': ['normal_attack']*3 + ['none']*3,
-            'od_timing': None, 'od_level': 0,
-            'bonus': 0, 'additional_turn': False,
-        }
-        self.add_turn(initial)
+        # 初始化战斗
+        initialized_turn = self.engine.first_turn(
+            copy.deepcopy(setup_state)
+        )
+        self.add_turn_from_simulation(initialized_turn)
 
-    def add_turn(self, state):
+    # simulation_state 是 simulation.advance() 或 first_turn() 的返回值。
+    # 直接使用 simulation_state 构造 BattleTurn，避免重复计算。
+    def add_turn_from_simulation(self, simulation_state):
+        """
+        simulation_state = {
+            'members': [{
+            'sp': int, 'token': int, "ep": int, 'dp': float,
+            'statuses': [{
+                "id": int, "name": str, "category": str, "duration_type": str, "remaining": int, "level": int
+            }, ... ],
+            "skills": [{"name": str, "cost_type": str, "cost": int, "id": int, "target_type": str, "user_select": None | [str]}, ... ] 
+            } for _ in range(6)],
+            'order': [int] * 6,
+            'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int}, "user_selected": None | int}] * 6,
+
+            'enemies': [{'damage_rate': float, 'down': bool, "statuses": [int]} for _ in range(3)],
+            'enemy_weaknesses': [str],
+
+            'field': str or None,
+            'od': float,
+            'predicted_od': float or None,
+            'od_timing': str or None,
+            'od_level': int,
+            'bonus': int,
+            'additional_turn': bool
+        }
+        """
+        turn_config = {"base": simulation_state, "adjustments": {"od": 0.0, "members": [{"sp": 0, "token": 0} for _ in range(6)]}}
+        turn = BattleTurn(self, len(self.turns) + 1, turn_config)
+        self.turns.append(turn); self.turn_layout.addWidget(turn)
+        for item in self.turns: item.refresh_turn_controls()
+        return turn
+
+    # 用于从json文件重构战斗状态，直接使用 state 构造 BattleTurn。
+    def add_turn_from_state(self, state):
+        """
+        {"base": simulation_state, 
+        "adjustments": {"od": float, "members": [{"sp": int, "token": int} for _ in range(6)]} }
+        """
         turn = BattleTurn(self, len(self.turns) + 1, state)
         self.turns.append(turn); self.turn_layout.addWidget(turn)
         for item in self.turns: item.refresh_turn_controls()
@@ -1064,31 +1059,9 @@ class SimulationTab(QWidget):
         for item in self.turns: item.refresh_turn_controls()
 
     def next_turn(self, turn):
-        if not self.turns or turn is not self.turns[-1]:
-            QMessageBox.information(self, '回合顺序', '请先点击“回到本回合”清除后续回合。')
-            return
-        current = turn.state()
-        effective = current['effective']
-        if self.engine is None:
-            # 未连接 Simulation 时仅继承当前可见资源作为下一回合基准值。
-            # 这不是 SP/OD 的战斗结算结果。
-            next_snapshot = copy.deepcopy(effective)
-        else:
-            next_snapshot = self.engine.advance(copy.deepcopy(effective),
-                                                copy.deepcopy(self.session['setup']),
-                                                copy.deepcopy(effective['actions']))
-        next_snapshot = ensure_state(next_snapshot)
-        # 下一回合重新建立基准，并把所有手动偏移初始化为0；旧回合的偏移保留在旧回合。
-        next_snapshot['base'] = {
-            'od': next_snapshot.pop('od', next_snapshot['base']['od']),
-            'members': next_snapshot.pop('members', next_snapshot['base']['members']),
-        }
-        next_snapshot['adjustments'] = initial_adjustments()
-        next_snapshot['actions'] = ['normal_attack']*3 + ['none']*3
-        next_snapshot['od_timing'] = None; next_snapshot['od_level'] = 0
-        next_snapshot['bonus'] = 0; next_snapshot['additional_turn'] = False
-        next_snapshot['predicted_od'] = None
-        result = self.add_turn(next_snapshot)
+        last_state = copy.deepcopy(turn.effective_state())
+        simulation_state = self.engine.advance(last_state)
+        result = self.add_turn_from_simulation(simulation_state)
         # 不自动滚动到最末，以免跳过需要检查的动作。
         return result
 
