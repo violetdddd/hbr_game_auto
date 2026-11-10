@@ -1560,7 +1560,7 @@
         "tier": "SS"
       },
       "CODE:Virtual Killer": {
-        "value": "CODE:Virtual Killer", "simulation_id": [490001, 490002],
+        "value": "CODE:Virtual Killer", "simulation_id": 490001,
         "names": {
           "zh-TW": "CODE:Virtual Killer",
           "jp": "CODE:Virtual Killer",
