@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
 )
 
 from paths import ROOT_DIR
+SIMULATION_DIR = ROOT_DIR / 'assets' / 'simulation'
 
 ELEMENTS = [('无', None), ('火', 'fire'), ('冰', 'ice'), ('雷', 'thunder'), ('光', 'light'), ('暗', 'dark')]
 FIELD_OPTIONS = [('无', None), ('稻场', 'rice_field'), ('火场', 'fire'), ('冰场', 'ice'),
@@ -225,8 +226,8 @@ class BattleSetup(QGroupBox):
         self.catalog = catalog
         self.style_dialog_class = style_dialog_class
         self.round_pixmap = round_pixmap
-        self.styles = [None] * 6
-        self.resonances = [None] * 6
+        self.styles = [None] * 6  # 主GUI的Style类
+        self.resonances = [None] * 6  # 主GUI的Style类
         self.skill_selections = [{'active': [], 'passive': [], 'orb': []} for _ in range(6)]
         root = QHBoxLayout(self)
         root.setContentsMargins(4, 4, 4, 4); root.setSpacing(5)
@@ -260,7 +261,7 @@ class BattleSetup(QGroupBox):
         self.initial_od.setSuffix('%')
         initial_od_line.addWidget(self.initial_od, 1)
         enemy_col.addLayout(initial_od_line)
-        enemy_col.addStretch(1)
+        enemy_col.addStretch()
 
         reset = QPushButton('重置战斗设置')
         reset.setStyleSheet(WHITE_BUTTON)
@@ -518,13 +519,17 @@ class PortraitWithSP(QWidget):
 
 
 class BattleTurn(QGroupBox):
-    """固定高度战斗回合。普通与调整模式互相替换，状态数据不重复叠加。"""
+    """
+    单回合 GUI：base 保存确定状态，adjustments 保存手动偏移。成员始终按 slot 排列。
+    update表示更改state_data，refresh表示刷新界面显示。
+    目前combat界面的更改会直接修改state_data，adjust修改则仅在退出时应用到state_data，进入时从state_data来load。
+    """
     HEIGHT = 105
-
     def __init__(self, owner, number, state):
         super().__init__('')
-        self.owner = owner; self.number = number
+        self.owner, self.number = owner, number
         self.state_data = copy.deepcopy(state)
+        self._status_db = self.owner.status_db
         self.select_first = None
         self.setObjectName('simulationTurn')
         self.setFixedHeight(self.HEIGHT)
@@ -545,86 +550,84 @@ class BattleTurn(QGroupBox):
         return divider
 
     def _make_combat_page(self):
-        page = QWidget(); root = QHBoxLayout(page)
-        root.setContentsMargins(0, 0, 0, 0); root.setSpacing(3)
-
+        page = QWidget()
+        root = QHBoxLayout(page); root.setContentsMargins(0, 0, 0, 0); root.setSpacing(3)
         enemy = QWidget()
         el = QVBoxLayout(enemy); el.setContentsMargins(4, 1, 4, 1); el.setSpacing(0)
         self.title = QLabel(); self.title.setStyleSheet('font-weight:700;')
         el.addWidget(self.title)
         self.enemy_icons_row = QVBoxLayout(); self.enemy_icons_row.setSpacing(0)
         el.addLayout(self.enemy_icons_row)
-        self.field_display = QHBoxLayout(); self.field_display.setSpacing(2)
+        self.field_display = QHBoxLayout(); self.field_display.setSpacing(1)
         el.addLayout(self.field_display)
-        el.addStretch(1)
+        el.addStretch()
         root.addWidget(enemy, 20)
         root.addWidget(self._separator())
 
         team = QWidget()
-        tl = QHBoxLayout(team); tl.setContentsMargins(4, 3, 4, 3); tl.setSpacing(4)
-        self.portraits, self.action_boxes, self.status_rows, self.member_resources = [], [], [], []
+        tl = QHBoxLayout(team); tl.setContentsMargins(3, 1, 3, 1); tl.setSpacing(3)
+        self.portraits, self.action_boxes = [], []
+        self.status_rows, self.member_resources = [], []
         for first, last, stretch in ((0, 3, 65), (3, 6, 35)):
             group = QHBoxLayout(); group.setSpacing(2)
-            for pos in range(first, last):
-                column = QVBoxLayout(); column.setSpacing(1)
+            for position in range(first, last):
+                col = QVBoxLayout(); col.setSpacing(1)
                 # 行动框
                 action = FullPopupCombo()
                 action.setFixedHeight(22)
-                action.setSizeAdjustPolicy(
-                    QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
-                )
+                action.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
                 action.setMinimumContentsLength(1)
                 action.setMinimumWidth(0)
                 action.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-                action.currentIndexChanged.connect(lambda _=0, i=pos: self.update_action(i))
-                column.addWidget(action)
+                policy = action.sizePolicy()
+                policy.setRetainSizeWhenHidden(True)
+                action.setSizePolicy(policy)
+                action.currentIndexChanged.connect(lambda _=0, pos=position: self.update_action(pos))
+                col.addWidget(action)
                 # 框下主体部分
                 body = QHBoxLayout()
-                body.setSpacing(1)
-                # 左侧信念
-                faith = QLabel()
-                faith.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                faith.setMinimumWidth(25)
-                faith.setStyleSheet('font-size:10px;font-weight:600;')
-                # 中间头像
-                avatar_button = QPushButton()
-                avatar_button.setFixedSize(55, 54)
-                avatar_button.setStyleSheet(
-                    'QPushButton{background:transparent;border:0;padding:0}'
-                )
-                portrait = PortraitWithSP(45, avatar_button)
+                body.setSpacing(0)
+                # 信念
+                token = QLabel()
+                token.setMaximumWidth(27)
+                token.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                token.setStyleSheet('font-size:10px;font-weight:600;')
+                # ep
+                ep = QLabel()
+                ep.setMaximumWidth(27)
+                ep.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                ep.setStyleSheet('font-size:10px;font-weight:600;')
+                # 头像
+                avatar = QPushButton()
+                avatar.setFixedSize(55, 54)
+                avatar.setStyleSheet('QPushButton{background:transparent;border:0;padding:0}')
+                portrait = PortraitWithSP(45, avatar)
                 portrait.move(2, 1)
-                avatar_button.clicked.connect(
-                    lambda _=False, i=pos: self.swap_position(i)
-                )
-                # 右侧 EP
-                ep_label = QLabel()
-                ep_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                ep_label.setMinimumWidth(23)
-                ep_label.setStyleSheet('font-size:10px;font-weight:600;')
-                # 加入信念、头像和EP到主体布局
-                body.addWidget(faith)
-                body.addWidget(avatar_button)
-                body.addWidget(ep_label)
-                column.addLayout(body)
-                # 最下方是状态行
+                avatar.clicked.connect(lambda _=False, pos=position: self.swap_position(pos))
+                # 顺序为：信念、头像、ep
+                body.addWidget(token)
+                body.addWidget(avatar)
+                body.addWidget(ep)
+                col.addLayout(body)
+                # 三者下方的statuses
                 statuses = QHBoxLayout()
                 statuses.setSpacing(1)
-                column.addLayout(statuses)
-                column.addStretch()
-
-                group.addLayout(column, 1)
-                self.portraits.append((avatar_button, portrait))
+                statuses.setAlignment(Qt.AlignmentFlag.AlignLeft)
+                col.addLayout(statuses)
+                col.addStretch()
+                group.addLayout(col, 1)
+                self.portraits.append((avatar, portrait))
                 self.action_boxes.append(action)
                 self.status_rows.append(statuses)
-                self.member_resources.append((faith, ep_label))
+                self.member_resources.append((token, ep))
             tl.addLayout(group, stretch)
         root.addWidget(team, 70)
         root.addWidget(self._separator())
 
         od = QWidget()
-        ol = QVBoxLayout(od); ol.setContentsMargins(4, 3, 4, 2); ol.setSpacing(1)
+        ol = QVBoxLayout(od); ol.setContentsMargins(4, 2, 4, 2); ol.setSpacing(1)
         top = QHBoxLayout(); top.setSpacing(2)
+        # od显示区
         self.od_icon = QLabel(); self.od_icon.setFixedSize(35, 35)
         top.addWidget(self.od_icon)
         od_values = QVBoxLayout(); od_values.setSpacing(0)
@@ -634,20 +637,24 @@ class BattleTurn(QGroupBox):
         od_values.addWidget(self.predicted_od_label)
         top.addLayout(od_values); top.addStretch()
         ol.addLayout(top)
+        # od发动选择区
         self.before_od = combo([('不发动', 0)])
         self.after_od = combo([('不发动', 0)])
         for title, box in (('前置', self.before_od), ('后置', self.after_od)):
-            line = QHBoxLayout(); line.setSpacing(2)
-            caption = QLabel(title); caption.setFixedWidth(27)
-            line.addWidget(caption); line.addWidget(box, 1)
-            ol.addLayout(line)
+            row = QHBoxLayout()
+            row.setSpacing(2)
+            caption = QLabel(title)
+            caption.setFixedWidth(27)
+            row.addWidget(caption)
+            row.addWidget(box, 1)
+            ol.addLayout(row)
         self.before_od.currentIndexChanged.connect(lambda: self.update_od('before'))
         self.after_od.currentIndexChanged.connect(lambda: self.update_od('after'))
-        ol.addStretch(1)
+        ol.addStretch()
         root.addWidget(od, 10)
         root.addWidget(self._separator())
 
-        # ④ 操作栏：OD 区域只负责显示及发动设置，不再放置按钮。
+        # 操作栏：OD 区域只负责显示及发动设置，不再放置按钮。
         operations = QWidget()
         op = QVBoxLayout(operations)
         op.setContentsMargins(2, 2, 2, 2); op.setSpacing(2)
@@ -661,304 +668,382 @@ class BattleTurn(QGroupBox):
         self.next_button.clicked.connect(lambda: self.owner.next_turn(self))
         self.back_button = QPushButton('回到本回合')
         self.back_button.setFixedHeight(27)
-        self.back_button.setStyleSheet('QPushButton{padding:2px 4px;min-height:0px;}')
+        self.back_button.setStyleSheet(WHITE_BUTTON)
         self.back_button.clicked.connect(lambda: self.owner.truncate_after(self))
         op.addWidget(self.switch_button)
         op.addWidget(self.next_button)
         op.addWidget(self.back_button)
-        op.addStretch(1)
+        op.addStretch()
         root.addWidget(operations, 6)
         self.stack.addWidget(page)
 
     def _make_adjust_page(self):
-        page = QWidget(); root = QHBoxLayout(page)
-        root.setContentsMargins(0, 0, 0, 0); root.setSpacing(3)
-
-        # ① 敌人：敌人数和三名敌人在同一行。
-        enemy_panel = QWidget(); eg = QGridLayout(enemy_panel)
-        eg.setContentsMargins(3, 2, 3, 2); eg.setSpacing(2)
-        self.adjust_enemies = combo([(str(i), i) for i in range(1, 4)])
-        self.adjust_enemies.setFixedWidth(48)
-        eg.addWidget(self.adjust_enemies, 0, 0)
-        self.enemy_edits = []; self.enemy_headers = []
-        for i in range(3):
-            heading = QLabel(f'敌人{i+1}')
-            heading.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            eg.addWidget(heading, 0, i+1)
-            self.enemy_headers.append(heading)
-            down = QCheckBox(); down.setToolTip('倒下')
-            rate = spin(0, 999, 100)
-            eg.addWidget(down, 1, i+1, alignment=Qt.AlignmentFlag.AlignCenter)
-            eg.addWidget(rate, 2, i+1)
+        page = QWidget()
+        root = QHBoxLayout(page); root.setContentsMargins(0, 0, 0, 0); root.setSpacing(3)
+        enemy = QWidget()
+        grid = QGridLayout(enemy); grid.setContentsMargins(3, 2, 3, 2); grid.setSpacing(2)
+        grid.addWidget(QLabel('敌人'), 0, 0)
+        grid.addWidget(QLabel('倒下'), 1, 0)
+        grid.addWidget(QLabel('破坏率'), 2, 0)
+        self.enemy_presence_checks, self.enemy_edits = [], []
+        for position, title in enumerate(('三体左', '单体中', '双体右')):
+            # 选择敌人
+            header = QHBoxLayout(); header.setSpacing(1)
+            header.addWidget(QLabel(title))
+            present = QCheckBox()
+            present.setToolTip('勾选表示此位置存在敌人')
+            present.toggled.connect(self.refresh_enemy_edit_visibility)
+            header.addWidget(present)
+            grid.addLayout(header, 0, position + 1)
+            # 敌人倒下和破坏率编辑
+            down, rate = QCheckBox(), spin(0, 999, 100)
+            down.setToolTip('是否处于倒下回合')
+            grid.addWidget(down, 1, position + 1, alignment=Qt.AlignmentFlag.AlignCenter)
+            grid.addWidget(rate, 2, position + 1)
+            self.enemy_presence_checks.append(present)
             self.enemy_edits.append((down, rate))
-        eg.addWidget(QLabel('倒下'), 1, 0)
-        eg.addWidget(QLabel('破坏率'), 2, 0)
-        root.addWidget(enemy_panel, 25)
+        root.addWidget(enemy, 25)
         root.addWidget(self._separator())
 
-        # ② 角色：DP 与头像横向并列，占据第一行；下面只有 SP 和信念。
-        team_panel = QWidget(); mg = QGridLayout(team_panel)
-        mg.setContentsMargins(3, 2, 3, 2); mg.setSpacing(2)
-        self.member_edits = []; self.member_portraits = []
-        for i in range(6):
-            first_row = QHBoxLayout(); first_row.setSpacing(1)
-            pic = QLabel(); pic.setFixedSize(25, 25)
-            pic.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            first_row.addWidget(pic)
-            self.member_portraits.append(pic)
-            fields = {}
+        # 角色：DP 与头像横向并列，占据第一行；下面只有 SP 和信念。
+        team = QWidget()
+        grid = QGridLayout(team); grid.setContentsMargins(3, 2, 3, 2); grid.setSpacing(2)
+        for row, name in enumerate(('DP', 'SP', '信念')):
+            caption = QLabel(name); caption.setFixedWidth(28)
+            grid.addWidget(caption, row, 0)
+        self.member_edits, self.member_portraits = [], []
+        for position in range(6):
+            top = QHBoxLayout(); top.setSpacing(1)
+            picture = QLabel(); picture.setFixedSize(25, 25); picture.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            top.addWidget(picture)
             dp = dspin(0, 150, 100)
             dp.setSuffix('%'); dp.setFixedHeight(22); dp.setMinimumWidth(46)
             dp.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)
-            first_row.addWidget(dp, 1); fields['dp'] = dp
-            mg.addLayout(first_row, 0, i+1)
-            for row, key in enumerate(('sp', 'token'), 1):
-                widget = spin(-999, 999, 0)
-                widget.setFixedHeight(21); widget.setMinimumWidth(58)
-                mg.addWidget(widget, row, i+1)
-                fields[key] = widget
-            self.member_edits.append(fields)
-        mg.addWidget(QLabel('DP'), 0, 0)
-        for row, label in ((1, 'SP'), (2, '信念')):
-            caption = QLabel(label); caption.setFixedWidth(28)
-            mg.addWidget(caption, row, 0)
-        root.addWidget(team_panel, 65)
+            top.addWidget(dp, 1)
+            grid.addLayout(top, 0, position + 1)
+            controls = {'dp': dp}
+            for row, key in ((1, 'sp'), (2, 'token')):
+                widget = spin(-99, 99, 0); widget.setMinimumWidth(58)
+                grid.addWidget(widget, row, position + 1)
+                controls[key] = widget
+            self.member_edits.append(controls)
+            self.member_portraits.append(picture)
+        root.addWidget(team, 65)
         root.addWidget(self._separator())
 
-        # ③ OD/全局：三行内放入 OD 增减、场地以及返回按钮。
-        od_panel = QWidget(); ol = QVBoxLayout(od_panel)
-        ol.setContentsMargins(3, 2, 3, 2); ol.setSpacing(3)
+        # 调整区：OD±、场地、返回按钮
+        misc = QWidget()
+        layout = QVBoxLayout(misc); layout.setContentsMargins(3, 2, 3, 2); layout.setSpacing(3)
         od_line = QHBoxLayout(); od_line.setSpacing(2)
-        od_line.addWidget(QLabel('OD±'))
-        self.adjust_od = dspin(-999, 999, 0)
+        od_line.addWidget(QLabel('OD'))
+        self.adjust_od = dspin(-500, 500, 0)
         od_line.addWidget(self.adjust_od, 1)
-        ol.addLayout(od_line)
+        layout.addLayout(od_line)
         field_line = QHBoxLayout(); field_line.setSpacing(2)
         field_line.addWidget(QLabel('场地'))
         self.adjust_field = combo(FIELD_OPTIONS)
         field_line.addWidget(self.adjust_field, 1)
-        ol.addLayout(field_line)
-        self.adjust_return = QPushButton('返回')
-        self.adjust_return.setStyleSheet(BLUE_BUTTON)
-        self.adjust_return.setFixedHeight(25)
-        self.adjust_return.clicked.connect(self.toggle_mode)
-        ol.addWidget(self.adjust_return, alignment=Qt.AlignmentFlag.AlignRight)
-        ol.addStretch(1)
-        root.addWidget(od_panel, 7)
+        layout.addLayout(field_line)
+        back = QPushButton('返回')
+        back.setStyleSheet(BLUE_BUTTON)
+        back.clicked.connect(self.toggle_mode)
+        layout.addWidget(back, alignment=Qt.AlignmentFlag.AlignRight)
+        layout.addStretch()
+        root.addWidget(misc, 7)
         self.stack.addWidget(page)
-        self.adjust_enemies.currentIndexChanged.connect(self.update_enemy_edit_visibility)
 
-    def update_enemy_edit_visibility(self):
-        count = self.adjust_enemies.currentData() or 1
-        for i, controls in enumerate(self.enemy_edits):
-            enabled = i < count
-            self.enemy_headers[i].setEnabled(enabled)
-            for widget in controls:
-                widget.setEnabled(enabled)
-                if isinstance(widget, QCheckBox):
-                    widget.setStyleSheet('' if enabled else
-                        'QCheckBox::indicator:disabled{background:#cbd5e1;'
-                        'border:1px solid #94a3b8;border-radius:3px;}')
-                else:
-                    widget.setStyleSheet('' if enabled else
-                        'QSpinBox:disabled{background:#e5e7eb;color:#6b7280;'
-                        'border:1px solid #cbd5e1;}')
+    def refresh_enemy_edit_visibility(self, *_):
+        for present, (down, rate) in zip(self.enemy_presence_checks, self.enemy_edits):
+            active = present.isChecked()
+            down.setEnabled(active)
+            down.setStyleSheet('' if active else
+                               'QCheckBox::indicator:disabled{background:#cbd5e1;'
+                               'border:1px solid #94a3b8;border-radius:3px;}')
+            rate.setEnabled(active)
+            rate.setStyleSheet('' if active else
+                               'QSpinBox:disabled{background:#e5e7eb;color:#6b7280;'
+                               'border:1px solid #cbd5e1;}')
 
+    # 进行target和user_selected的选择
     def update_action(self, position):
-        self.state_data['actions'][position] = self.action_boxes[position].currentData()
+        base = self.state_data['base']
+        slot = base['order'][position]
+        skill_id = self.action_boxes[position].currentData()
+        skill = next((s for s in base['members'][slot]['skills'] if s['id'] == skill_id), None)
+        base['actions'][slot] = {
+            'id': skill['id'],
+            'name': skill['name'],
+            'target': {
+                'type': skill.get('target_type'),
+                'slot': None
+            },
+            'user_selected': None
+        }
 
     def update_od(self, timing):
+        base = self.state_data['base']
         selected = self.before_od if timing == 'before' else self.after_od
         other = self.after_od if timing == 'before' else self.before_od
         if selected.currentData():
-            other.blockSignals(True); other.setCurrentIndex(0); other.blockSignals(False)
-        self.state_data['od_timing'] = timing if selected.currentData() else None
-        self.state_data['od_level'] = selected.currentData() or 0
+            other.blockSignals(True)
+            other.setCurrentIndex(0)
+            other.blockSignals(False)
+        base['od_timing'] = timing if selected.currentData() else None
+        base['od_level'] = selected.currentData() or 0
 
-    def swap_position(self, index):
+    def swap_position(self, position):
         if self.select_first is None:
-            self.select_first = index
-            self.portraits[index][0].setStyleSheet('QPushButton{border:2px solid #2563eb;background:#dbeafe}')
+            self.select_first = position
+            self.portraits[position][0].setStyleSheet(
+                'QPushButton{border:2px solid #2563eb;background:#dbeafe}')  # 选中样式
             return
-        first = self.select_first; self.select_first = None
-        self.portraits[first][0].setStyleSheet('QPushButton{background:transparent;border:0;padding:0}')
-        if first == index: return
-        self.save_combat_state()
-        data = self.state_data
-        data['order'][first], data['order'][index] = data['order'][index], data['order'][first]
-        data['actions'][first], data['actions'][index] = data['actions'][index], data['actions'][first]
+        first, second, self.select_first = self.select_first, position, None
+        self.portraits[first][0].setStyleSheet(
+            'QPushButton{background:transparent;border:0;padding:0}')  # 还原普通样式
+        if first == second or (first >= 3 and second >= 3):  # 后排交换不允许
+            return
+        base = self.state_data['base']
+        # 队伍顺序交换
+        base['order'][first], base['order'][second] = base['order'][second], base['order'][first]
+        # 前后排交换技能重新安排
+        if (first < 3) != (second < 3):
+            for position in (first, second):
+                slot = base['order'][position]
+                skill = base['members'][slot]['skills'][
+                    0 if position < 3 else 1  # 0为前排默认技能，1为后排默认技能
+                ]
+
+                base['actions'][slot] = {
+                    'id': skill['id'],
+                    'name': skill['name'],
+                    'target': {
+                        'type': skill.get('target_type'),
+                        'slot': None
+                    },
+                    'user_selected': None
+                }
+
         self.refresh()
 
-    def save_combat_state(self):
-        for i, box in enumerate(self.action_boxes):
-            self.state_data['actions'][i] = box.currentData()
-
+    # 负责从 state_data 读取值到调整页
     def load_adjust(self):
-        data = self.state_data; adjust = data['adjustments']
+        base = self.state_data['base']
+        adjust = self.state_data['adjustments']
+        # od和场地
         self.adjust_od.setValue(adjust['od'])
-        self.adjust_field.setCurrentIndex(max(0, self.adjust_field.findData(data['field'])))
-        self.adjust_enemies.setCurrentIndex(max(0, len(data['enemies'])-1))
-        for i, (down, rate) in enumerate(self.enemy_edits):
-            enemy = data['enemies'][i] if i < len(data['enemies']) else {
-                'damage_rate': 100.0, 'down': False}
-            down.setChecked(bool(enemy.get('down', enemy.get('down_turns', 0))))
-            rate.setValue(round(enemy.get('damage_rate', 100)))
+        self.adjust_field.setCurrentIndex(max(0, self.adjust_field.findData(base.get('field'))))
+        # 敌人
+        enemies = base.get('enemies')
+        for position, (down, rate) in enumerate(self.enemy_edits):
+            enemy = enemies[position]
+            exists = enemy["exist"]
+            present = self.enemy_presence_checks[position]
+            present.blockSignals(True)
+            present.setChecked(exists)
+            present.blockSignals(False)
+            down.setChecked(enemy['down'] if exists else False)
+            rate.setValue(enemy['damage_rate'] if exists else 100)
+        # 队伍
         for position, controls in enumerate(self.member_edits):
-            slot = data['order'][position]
-            member = data['base']['members'][slot]
+            slot = base['order'][position]
+            member = base['members'][slot]
             delta = adjust['members'][slot]
-            for key in ('sp', 'token'): controls[key].setValue(delta.get(key, 0))
+            for key in ('sp', 'token'):
+                controls[key].setValue(delta.get(key, 0))
             controls['dp'].setValue(member.get('dp', 100.0))
             style = self.owner.setup.styles[slot]
-            pic = self.member_portraits[position]
+            picture = self.member_portraits[position]
             if style:
-                pic.setPixmap(self.owner.setup.round_pixmap(style.image, 25))
-                pic.setToolTip(style.localized_title)
-                pic.setText('')
+                picture.setPixmap(self.owner.setup.round_pixmap(style.image, 25))
+                picture.setToolTip(style.localized_title)
             else:
-                pic.clear(); pic.setText('＋')
-        self.update_enemy_edit_visibility()
+                picture.clear()
+                picture.setText('＋')
 
+    # 负责从调整页读取值到 state_data
     def save_adjust(self):
-        data = self.state_data; adjust = data['adjustments']
+        base = self.state_data['base']
+        adjust = self.state_data['adjustments']
         adjust['od'] = self.adjust_od.value()
-        data['field'] = self.adjust_field.currentData()
-        count = self.adjust_enemies.currentData() or 1
-        old_enemies = data['enemies']
-        new_enemies = []
-        for i, (down, rate) in enumerate(self.enemy_edits[:count]):
-            enemy = copy.deepcopy(old_enemies[i]) if i < len(old_enemies) else {}
-            enemy['down'] = down.isChecked()
-            enemy['damage_rate'] = rate.value()
-            enemy.pop('down_turns', None)
-            new_enemies.append(enemy)
-        data['enemies'] = new_enemies
-        for position, fields in enumerate(self.member_edits):
-            slot = data['order'][position]
-            for key in ('sp', 'token'):
-                adjust['members'][slot][key] = fields[key].value()
-            data['base']['members'][slot]['dp'] = fields['dp'].value()
+        base['field'] = self.adjust_field.currentData()
+        for position, (down, rate) in enumerate(self.enemy_edits):
+            if not self.enemy_presence_checks[position].isChecked():
+                base['enemies'][position]["exist"] = False
+                continue
+            base['enemies'][position]["exist"] = True
+            base['enemies'][position].update(down=down.isChecked(), damage_rate=rate.value())
+            base['enemies'][position].setdefault('statuses', [])
+        for position, controls in enumerate(self.member_edits):
+            slot = base['order'][position]
+            adjust['members'][slot]['sp'] = controls['sp'].value()
+            adjust['members'][slot]['token'] = controls['token'].value()
+            base['members'][slot]['dp'] = controls['dp'].value()
 
     def toggle_mode(self):
         if self.stack.currentIndex() == 0:
-            self.save_combat_state(); self.load_adjust()
+            self.load_adjust()
             self.stack.setCurrentIndex(1)
+            self.refresh_enemy_edit_visibility()
         else:
-            self.save_adjust(); self.stack.setCurrentIndex(0)
+            self.save_adjust()
+            self.stack.setCurrentIndex(0)
             self.refresh()
             self.refresh_turn_controls()
 
     def refresh_turn_controls(self):
-        latest = self.owner.turns and self.owner.turns[-1] is self
-        self.next_button.setVisible(bool(latest))
-        self.back_button.setVisible(not bool(latest))
+        latest = bool(self.owner.turns and self.owner.turns[-1] is self)
+        self.next_button.setVisible(latest)
+        self.back_button.setVisible(not latest)
 
-    def refresh_enemy_info(self):
-        data = self.state_data
+    def _status_icon(self, status):
+        if isinstance(status, dict):
+            status_id, element = status.get('id'), status.get('element', "none")
+        else:
+            return None
+        entry = self._status_db.get(str(status_id))
+        if entry is None:
+            return None
+        category, not_display = entry.get('category'), entry.get('not_display', False)
+        if category == "rule" or not_display:
+            return None
+        file_name = (entry.get('icon') or entry.get('icons').get(element))
+        path = ROOT_DIR / 'assets' / 'icons' / 'status' / file_name
+
+        return path
+
+    def refresh_enemy_info(self, effective):
         clear_layout(self.enemy_icons_row)
-        weak_line = QHBoxLayout(); weak_line.setSpacing(1)
-        weak_line.addWidget(QLabel('敌人弱点：'))
-        weaknesses = data['enemy_weaknesses']
-        for item in weaknesses:
-            path = ROOT_DIR / 'assets' / 'icons' / 'element' / f'{item}.webp'
-            weak_line.addWidget(icon_label(path, 18, ELEMENT_NAMES.get(item, '?')))
-        if not weaknesses: weak_line.addWidget(QLabel('无'))
-        weak_line.addStretch(1)
-        self.enemy_icons_row.addLayout(weak_line)
-        for i, enemy in enumerate(data['enemies'], 1):
-            line = QHBoxLayout(); line.setSpacing(1)
-            line.addWidget(QLabel(f'敌人{i}状态：'))
-            line.addStretch(1)
+        weak = QHBoxLayout()
+        weak.setSpacing(1)
+        weak.addWidget(QLabel('敌人弱点：'))
+        for element in effective.get('enemy_weaknesses', []):
+            path = ROOT_DIR / 'assets' / 'icons' / 'element' / f'{element}.webp'
+            weak.addWidget(icon_label(path, 15, ELEMENT_NAMES.get(element, '?')))
+        if len(effective.get('enemy_weaknesses', [])) == 0:
+            weak.addWidget(QLabel('无'))
+        weak.addStretch()
+        self.enemy_icons_row.addLayout(weak)
+        enemies = effective['enemies']
+        for position, label in enumerate(('左侧敌人：', '中间敌人：', '右侧敌人：')):
+            if enemies[position].get('exist') is not True:
+                continue
+            line = QHBoxLayout()
+            line.setSpacing(1)
+            line.addWidget(QLabel(label))
+            for status in enemies[position].get('statuses', []):
+                path = self._status_icon(status)
+                if path:
+                    line.addWidget(icon_label(path, 15))
+            line.addStretch()
             self.enemy_icons_row.addLayout(line)
         clear_layout(self.field_display)
         self.field_display.addWidget(QLabel('场地：'))
-        field = data.get('field')
+        field = effective.get('field')
         if field is None:
             self.field_display.addWidget(QLabel('无'))
-        elif field == 'rice_field':
-            path = ROOT_DIR / 'assets' / 'icons' / 'status' / 'RiceFieldZone.webp'
-            self.field_display.addWidget(icon_label(path, 19, '稻'))
         else:
-            path = ROOT_DIR / 'assets' / 'icons' / 'status' / f'{field.capitalize()}Zone.webp'
-            self.field_display.addWidget(icon_label(path, 19, FIELD_NAMES.get(field, '场')))
-        self.field_display.addStretch(1)
+            icon = 'RiceFieldZone.webp' if field == 'rice_field' else f'{field.capitalize()}Zone.webp'
+            self.field_display.addWidget(icon_label(
+                ROOT_DIR / 'assets' / 'icons' / 'status' / icon, 15, FIELD_NAMES.get(field, '场')))
+        self.field_display.addStretch()
 
-    def effective_state(self, data):
-        """只读计算：显示值 = simulation 基准 + 当前调整值，重复调用不会累加。"""
-        effective = copy.deepcopy(data['base'])
-        adjustments = data['adjustments']
-        for index, member in enumerate(effective['members']):
-            delta = adjustments['members'][index]
+    def effective_state(self):
+        """只读输出；base 中 members 恒按 slot 0–5 排列。"""
+        effective = copy.deepcopy(self.state_data['base'])
+        adjustments = self.state_data['adjustments']
+        effective['od'] = effective.get('od', 0.0) + adjustments.get('od', 0.0)
+        for slot, member in enumerate(effective['members']):
+            delta = adjustments['members'][slot]
             for key in ('sp', 'token'):
-                member[key] = member.get(key, 0) + delta.get(key, 0)
+                member[key] = int(member.get(key, 0)) + int(delta.get(key, 0))
         return effective
-    
+
     def refresh(self):
-        data = self.state_data; result = self.effective_state(data)
-        self.title.setText(f'T{self.number}' +
-                           (f"-bonus{data['bonus']}" if data.get('bonus') else '') +
-                           ('-追加回合' if data.get('additional_turn') else ''))
-        od_value = result['od']
-        self.od_label.setText(f'{od_value:.2f}%')
-        estimate = data.get('predicted_od')
-        self.predicted_od_label.setText('→ —' if estimate is None else f'→ {estimate:.2f}%')
-        self.od_label.setStyleSheet('font-weight:700;color:' + ('#dc2626' if od_value < 0 else '#242933') + ';')
-        self.predicted_od_label.setStyleSheet('font-weight:700;color:' +
-                                            ('#dc2626' if estimate is not None and estimate < 0 else '#242933') + ';')
-        level = max(0, min(3, int(od_value // 100)))
+        effective = self.effective_state()
+        # label
+        self.title.setText(f'T{effective.get("turn")}' + 
+                           (f"-OD{effective.get('od_level')}" if effective.get('od_level') != 0 else '') +
+                           (f"-bonus{effective.get('bonus')}" if effective.get('bonus') != 0 else '') +
+                           ('-追加回合' if effective.get('additional_turn') else ''))
+        # od
+        od = effective.get('od')
+        self.od_label.setText(f'{od:.2f}%')
+        estimate = effective.get('predicted_od')
+        self.predicted_od_label.setText(f'→ {estimate:.2f}%')
+        self.od_label.setStyleSheet(f"font-weight:700;color:{'#dc2626' if od < 0 else '#242933'}")
+        self.predicted_od_label.setStyleSheet(
+            f"font-weight:700;color:{'#dc2626' if estimate < 0 else '#242933'}")
+        level = max(0, min(3, int(od // 100)))
         pix = QPixmap(str(ROOT_DIR / 'assets' / 'icons' / 'od' / f'od{level}.webp'))
-        if pix.isNull(): self.od_icon.setText(f'OD{level}')
-        else: self.od_icon.setPixmap(pix.scaled(29, 29,
-                            Qt.AspectRatioMode.KeepAspectRatio,
-                            Qt.TransformationMode.SmoothTransformation))
-        self.refresh_enemy_info()
-        available = max(0, min(3, int(od_value // 100)))
+        if pix.isNull():
+            self.od_icon.setText(f'OD{level}')
+        else:
+            self.od_icon.setPixmap(pix.scaled(30, 30, Qt.AspectRatioMode.KeepAspectRatio,
+                                              Qt.TransformationMode.SmoothTransformation))
+        # od发动选择框
+        available = level
         for timing, box in (('before', self.before_od), ('after', self.after_od)):
-            box.blockSignals(True); box.clear(); box.addItem('不发动', 0)
-            for n in range(1, available+1): box.addItem(f'OD{n}', n)
-            if data['od_timing'] == timing:
-                box.setCurrentIndex(max(0, box.findData(data['od_level'])))
+            box.blockSignals(True)
+            box.clear()
+            box.addItem('不发动', 0)
+            for n in range(1, available + 1):
+                box.addItem(f'OD{n}', n)
+            box.setCurrentIndex(max(0, box.findData(
+                effective.get('od_level', 0) if effective.get('od_timing') == timing else 0)))
             box.blockSignals(False)
-        if data['od_level'] > available:
-            data['od_level'] = 0; data['od_timing'] = None
+        # 敌人
+        self.refresh_enemy_info(effective)
+        # 队伍
         for position in range(6):
-            slot = data['order'][position]
+            slot = effective['order'][position]
+            member = effective['members'][slot]
             style = self.owner.setup.styles[slot]
+            # 按slot修改portrait
             button, portrait = self.portraits[position]
             portrait.configure(style.image if style else None,
-                               self.owner.setup.round_pixmap,
-                               result['members'][slot]['sp'])
+                               self.owner.setup.round_pixmap, int(member.get('sp', 0)))
             button.setToolTip((style.localized_title if style else f'角色{slot+1}') +
                               '（点击两名角色头像交换位置）')
+            # 按slot修改token和ep
+            faith, ep = self.member_resources[position]
+            faith.setText(f"信念\n{member['token']}" if position < 3 and member.get('token', 0) > 0 else '')
+            ep.setText(f"EP\n{member['ep']}" if position < 3 and member.get('ep', 0) > 0 else '')
+            # 按slot修改状态图标
             clear_layout(self.status_rows[position])
-            for status in result['members'][slot].get('statuses', []):
-                path = self.owner.status_icon(status)
-                if path: self.status_rows[position].addWidget(icon_label(path, 15))
+            for status in member.get('statuses', []):
+                path = self._status_icon(status)
+                if path:
+                    self.status_rows[position].addWidget(icon_label(path, 15))
+            # 按slot修改可行的所有技能选择
             action = self.action_boxes[position]
-            original = data['actions'][position]
-            action.blockSignals(True); action.clear()
-            if position < 3:
-                action.addItem('普通攻击', 'normal_attack')
-                if style:
-                    selected = self.owner.setup.skill_selections[slot]
-                    for name in dict.fromkeys(selected['active'] + selected['orb']):
-                        entry = self.owner.catalog.skill_data.get(name, {})
-                        action.addItem(self.owner.catalog.skill_label(name),
-                                       entry.get('simulation_id', name))
-            else:
-                action.addItem('无', 'none'); action.addItem('追击', 'pursuit')
-            index = action.findData(original)
-            action.setCurrentIndex(index if index >= 0 else 0)
-            data['actions'][position] = action.currentData()
+            skiills = member.get('skills', [])
+            action.blockSignals(True)
+            action.clear()
+            if len(skiills) == 0:
+                action.setVisible(False)
+            else: 
+                action.setVisible(True)
+                if position < 3:
+                    for i, skill in enumerate(member.get('skills', [])):
+                        if i not in (1, 2):
+                            action.addItem(f"{skill.get('name')}（{skill.get('cost')} {skill.get('cost_type')}）", skill.get('id'))
+                else:
+                    for skill in member.get('skills')[1:3]:
+                        action.addItem(f"{skill.get('name')}", skill.get('id'))
+                # 按当前技能选择安排动作
+                original = effective['actions'][slot]
+                idx = action.findData(original["id"])
+                action.setCurrentIndex(idx if idx >= 0 else 0)
             action.blockSignals(False)
         if self in self.owner.turns:
             self.refresh_turn_controls()
 
     def state(self):
-        if self.stack.currentIndex() == 1: self.save_adjust()
-        else: self.save_combat_state()
-        answer = copy.deepcopy(self.state_data)
-        return answer
+        """导出用于 JSON 恢复的完整状态；不合并 adjustments。"""
+        if self.stack.currentIndex() == 1:
+            self.save_adjust()
+
+        return copy.deepcopy(self.state_data)
 
 
 class SimulationTab(QWidget):
@@ -966,6 +1051,7 @@ class SimulationTab(QWidget):
         super().__init__(parent)
         self.catalog = catalog
         self.setup = BattleSetup(catalog, style_dialog_class, round_pixmap)
+        self.status_db = json.loads((SIMULATION_DIR / 'statuses.json').read_text(encoding='utf-8'))
         self.turns = []; self.session = None
         from simulation import Simulation
         self.engine = Simulation()
@@ -1013,19 +1099,22 @@ class SimulationTab(QWidget):
             'members': [{
             'sp': int, 'token': int, "ep": int, 'dp': float,
             'statuses': [{
-                "id": int, "name": str, "category": str, "duration_type": str, "remaining": int, "level": int
+                "id": int, "duration_type": str, "remaining": int, "level": int, "element": str
             }, ... ],
             "skills": [{"name": str, "cost_type": str, "cost": int, "id": int, "target_type": str, "user_select": None | [str]}, ... ] 
             } for _ in range(6)],
             'order': [int] * 6,
-            'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int}, "user_selected": None | int}] * 6,
+            'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int | None}, "user_selected": None | int}] * 6,
 
-            'enemies': [{'damage_rate': float, 'down': bool, "statuses": [int]} for _ in range(3)],
+            'enemies': [{"exist": bool, "damage_rate": int, 'down': bool, "statuses": [
+            {"id": int, "duration_type": str, "remaining": int, "level": int, "element": str}, ...
+            ]} for _ in range(3)],
             'enemy_weaknesses': [str],
 
             'field': str or None,
+            "turn": int,
             'od': float,
-            'predicted_od': float or None,
+            'predicted_od': float,
             'od_timing': str or None,
             'od_level': int,
             'bonus': int,
@@ -1059,6 +1148,7 @@ class SimulationTab(QWidget):
         for item in self.turns: item.refresh_turn_controls()
 
     def next_turn(self, turn):
+        turn.state()  # 先保存调整面板中尚未提交的修改
         last_state = copy.deepcopy(turn.effective_state())
         simulation_state = self.engine.advance(last_state)
         result = self.add_turn_from_simulation(simulation_state)

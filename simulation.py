@@ -137,6 +137,7 @@ class Skill:
         if record.get('kind') not in ('active', 'system'):
             raise ValueError(f"Skill 只能读取 active/system，收到 {record.get('kind')!r}")
         data = _record_kwargs(cls, record)
+        # 设置cost相关
         cost = data.get('cost') or {}
         if 'yes' in cost and 'no' in cost:
             data['cost_type'] = 'sp'
@@ -227,6 +228,7 @@ class Status:
     id: int
     category: str
     name: str
+    element: Optional[str] = None
     duration_type: Optional[str] = None
     remaining: Optional[int] = None
     level: int = 0
@@ -261,11 +263,18 @@ class Style:
     token: int = 0
     dp: float = 100.0
     statuses: List[Status] = field(default_factory=list)
-    turn_action: Skill = None
+
+    turn_action: Optional[dict] = None
+    basic_skills: List[dict] = field(default_factory=list)
 
     break_level: int = 0
     resonance_style_id: Optional[int] = None
     resonance_break_level: Optional[int] = None
+
+    @staticmethod
+    def generate_default_skills_from_skill(skill: Skill) -> dict:
+        return {"name": skill.names["zh_cn"], "id": skill.id, "cost": 0, "cost_type": "sp",
+                "target_type": "ignore", "user_select": None}
 
     @classmethod
     def from_record(
@@ -280,7 +289,7 @@ class Style:
         skill_records: Optional[Dict[int, JsonDict]] = None,
         resonance_record: Optional[JsonDict] = None,
         resonance_break_level: Optional[int] = None,
-    ) -> 'Style':
+    ) -> Style:
         """装配已选择技能/解锁突破；不会推断 SP/EP/状态的战斗规则。"""
         data = {k: deepcopy(record[k]) for k in
                 ('id', 'names', 'character_names', 'team', 'tier', 'elements', 'role', 'attack_type')}
@@ -339,10 +348,13 @@ class Style:
             )
             if passive.trigger is not None
         ))
-        if instance.role == "admiral":
-            instance.turn_action = Skill.from_record(skill_records[int(2)])
-        else: 
-            instance.turn_action = Skill.from_record(skill_records[int(1)])
+        # 舰长的行动为指挥+无+追击，其他为普攻+无+追击
+        basic_ids = (2 if instance.role == 'admiral' else 1, 0, 3)
+        instance.basic_skills = [
+            cls.generate_default_skills_from_skill(
+                Skill.from_record(skill_records[skill_id])
+            ) for skill_id in basic_ids
+        ]
         return instance
 
 
@@ -361,6 +373,7 @@ class Team:
 
 @dataclass
 class Monster:
+    exist: bool
     position: int  # 0 起始；敌人位置不随回合交换
     statuses: List[Status] = field(default_factory=list)
     down: bool = False
@@ -534,9 +547,10 @@ class Simulation:
                 ),
             ))
 
+        default_enemy_config = {1: (1,), 2: (1,2), 3: (0,1,2)}
         battle = Battle(
             enemy_weaknesses=list(dict.fromkeys(weaknesses)),
-            monsters=[Monster(position=i) for i in range(enemy_count)],
+            monsters=[Monster(position=i, exist=i in default_enemy_config[enemy_count]) for i in range(3)],
             global_od_rate=global_od_rate,
         )
         turn = Turn(
@@ -551,6 +565,127 @@ class Simulation:
         self.initial_config = config
         self.turn = turn
         return turn
+
+    def turn_to_dict(self, turn: Turn) -> dict:
+        """
+        将 Turn 转换为 GUI 可序列化的字典。
+        simulation_state = {
+            'members': [{
+            'sp': int, 'token': int, "ep": int, 'dp': float,
+            'statuses': [{
+                "id": int, "duration_type": str, "remaining": int, "level": int, "element": str
+            }, ... ],
+            "skills": [{"name": str, "cost_type": str, "cost": int, "id": int, "target_type": str, "user_select": None | [str]}, ... ] 
+            } for _ in range(6)],
+            'order': [int] * 6,
+            'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int | None}, "user_selected": None | int}] * 6,
+
+            'enemies': [{"exist": bool, "damage_rate": int, 'down': bool, "statuses": [
+            {"id": int, "duration_type": str, "remaining": int, "level": int, "element": str}, ...
+            ]} for _ in range(3)],
+            'enemy_weaknesses': [str],
+
+            'field': str or None,
+            "turn" : int,
+            'od': float,
+            'predicted_od': float,
+            'od_timing': str or None,
+            'od_level': int,
+            'bonus': int,
+            'additional_turn': bool
+        其中，技能的第0个为默认主动技能，第1个为默认被动技能（无），第2个为追击，普通攻击默认无目标
+        """
+        return asdict(turn)
+
+    def advance(self, last_state) -> dict:
+        """根据当前GUI传回的state计算下一回合的开始的state；不修改传入对象。"""
+        return deepcopy(last_state)  # TODO: 实现战斗结算逻辑
+
+    def first_turn(self, state: dict) -> dict:
+        """测试版：初始化战斗并生成 GUI 所需的首回合状态。"""
+        turn = self.initialize(state)
+
+        members = []
+        actions = []
+
+        # 测试用基础行动
+        for slot, style in enumerate(turn.team.styles):
+            skills = deepcopy(style.basic_skills)  # 3个，默认的顺序为：前排默认技能，无，追击
+            # initialize() 已经装入全部被选择的主动/光球技能
+            for skill in style.active_skills:
+                # 处理target type，GUI仅需要知道是敌人还是友方（是否可选自己）
+                if skill.target == "ally_single":
+                    target_type = "ally"
+                elif skill.target == "ally_all_without_self":
+                    target_type = "ally_without_self"
+                elif skill.target == "single":
+                    target_type = "enemy"
+                else:
+                    target_type = "ignore"
+                # 处理user_select
+                if skill.user_select == None:
+                    user_select = None
+                else:
+                    user_select = [skill.user_select["1"]["description"], skill.user_select["2"]["description"]]
+
+                skills.append({
+                    'name': skill.names.get('zh_cn'),
+                    'id': skill.id,
+                    'cost_type': skill.cost_type,
+                    'cost': skill.now_cost,
+                    'target_type': target_type,
+                    'user_select': user_select,
+                })
+
+            members.append({
+                'sp': style.sp,
+                'ep': style.ep,
+                'token': style.token,
+                'dp': style.dp,
+                'statuses': deepcopy(style.statuses),
+                'skills': skills,
+            })
+
+            # 前三名默认普通攻击，后三名默认无行动
+            default_skill = skills[0 if slot < 3 else 1]
+
+            actions.append({
+                'name': default_skill['name'],
+                'id': default_skill['id'],
+                'target': {
+                    'type': "ignore",
+                    'slot': None,
+                },
+                'user_selected': None,
+            })
+
+        # GUI 中三个敌人位置始终存在，使用 exist 标记实际敌人
+        enemies = [{'exist': False, 'damage_rate': 100, 'down': False, 'statuses': [],} for _ in range(3)]
+
+        for monster in turn.battle.monsters:
+            position = int(monster.position)
+            enemies[position] = {
+                'exist': monster.exist,
+                'damage_rate': monster.damage_rate,
+                'down': monster.down,
+                'statuses': deepcopy(monster.statuses),
+            }
+
+        return {
+        'members': members,
+        'order': list(range(6)),
+        'actions': actions,
+        'enemies': enemies,
+        'enemy_weaknesses': deepcopy(turn.battle.enemy_weaknesses),
+        'field': turn.battle.field,
+        'turn': 1,
+        'od': float(turn.od),
+        'predicted_od': float(turn.od),
+        'od_timing': None,
+        'od_level': 0,
+        'bonus': 0,
+        'additional_turn': False,
+    }
 
 
 __all__ = ['Simulation', 'Skill', 'Passive', 'LimitBreak', 'SupportSkill', 'Style',
