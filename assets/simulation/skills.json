@@ -7184,8 +7184,6 @@
     "names": {"zh_cn": "曙光", "zh_tw": "曙光", "jp": "曙"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "attack_type": "strike",
-    "elements": ["light"],
     "trigger": "on_first_battle_start",
     "effects": [
       {"type": "replace_normal_skill", "target": "self", "attack_type": "strike", "elements": ["light"], "status_id": 151, "duration": {"type": "permanent"}}

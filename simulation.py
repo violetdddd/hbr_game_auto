@@ -92,19 +92,22 @@ def _filter_passive_record(record):
 
     return data
 
-def _index_by_id(records: Dict[str, JsonDict]) -> Dict[int, JsonDict]:
+
+def json_records_to_dict(path: Path) -> Dict[int, JsonDict]:
     """将 JSON 顶层记录按内部 id 建立索引，拒绝重复 id。"""
-    if not isinstance(records, dict):
-        raise ValueError('数据库顶层必须是字典')
-    indexed = {}
-    for value in records.values():
-        if not isinstance(value, dict) or 'id' not in value:
-            raise ValueError('数据库记录缺少 id')
-        key = int(value['id'])
-        if key in indexed:
-            raise ValueError(f'数据库存在重复 ID: {key}')
-        indexed[key] = value
-    return indexed
+    with path.open('r', encoding='utf-8') as handle:
+        records = json.load(handle)
+        if not isinstance(records, dict):
+            raise ValueError('数据库顶层必须是字典')
+        indexed = {}
+        for value in records.values():
+            if not isinstance(value, dict) or 'id' not in value:
+                raise ValueError('数据库记录缺少 id')
+            key = int(value['id'])
+            if key in indexed:
+                raise ValueError(f'数据库存在重复 ID: {key}')
+            indexed[key] = value
+        return indexed
 
 
 @dataclass
@@ -158,11 +161,9 @@ class Passive:
     id: int
     names: JsonDict
     kind: str = 'passive'
-    attack_type: Optional[str] = None
     cases: Any = None
     cost: JsonDict = field(default_factory=dict)
     effects: Union[List[JsonDict], JsonDict] = field(default_factory=list)
-    elements: List[str] = field(default_factory=list)
     trigger: Optional[str] = None
     trigger_condition: Optional[str] = None
     variants: Any = None
@@ -187,21 +188,18 @@ class LimitBreak:
     trigger: str
     trigger_condition: Optional[str] = None
     effects: List[JsonDict] = field(default_factory=list)
-    unlock_level: int = 0
 
-    discard_limit_level: Optional[int] = None
     trigger_limit: Optional[int] = None
     skill_id: Optional[int] = None
     status_id: Optional[List[int]] = None
 
     @classmethod
-    def from_record(cls, record: JsonDict, unlock_level: int) -> Optional['LimitBreak']:
+    def from_record(cls, record: JsonDict) -> Optional['LimitBreak']:
         record = _filter_passive_record(record)
         if record is None:
             return None
 
         data = _record_kwargs(cls, record)
-        data['unlock_level'] = int(unlock_level)
         return cls(**data)
 
 
@@ -256,7 +254,6 @@ class Style:
     # 角色的动态资源与修正，不在这里执行计算。
     od_rate: float = 1.0
     od_earring: int = 15
-    necklace_sp: int = 3
     sp_modify: int = 0
     sp: int = 0
     ep: int = 0
@@ -266,10 +263,6 @@ class Style:
 
     turn_action: Optional[dict] = None
     basic_skills: List[dict] = field(default_factory=list)
-
-    break_level: int = 0
-    resonance_style_id: Optional[int] = None
-    resonance_break_level: Optional[int] = None
 
     @staticmethod
     def generate_default_skills_from_skill(skill: Skill) -> dict:
@@ -291,23 +284,21 @@ class Style:
         resonance_break_level: Optional[int] = None,
     ) -> Style:
         """装配已选择技能/解锁突破；不会推断 SP/EP/状态的战斗规则。"""
-        data = {k: deepcopy(record[k]) for k in
-                ('id', 'names', 'character_names', 'team', 'tier', 'elements', 'role', 'attack_type')}
-        instance = cls(**data, break_level=int(break_level),
-                       od_earring=int(od_earring), necklace_sp=int(necklace_sp))
+        data = {k: deepcopy(record[k]) for k in ('id', 'names', 'character_names', 'team', 'tier', 'elements', 'role', 'attack_type')}
+        instance = cls(**data, od_earring=od_earring)
         # 读入当前突破下解锁的突破被动，跳过已经升级的小被动
         for level, entries in record.get('limit_break', {}).items():
             level = int(level)
-            if level > instance.break_level:
+            if level > break_level:
                 continue
             for entry in entries:
                 discard_level = entry.get('discard_limit_level')
 
-                if (discard_level is not None and instance.break_level >= int(discard_level)):
+                if (discard_level is not None and break_level >= int(discard_level)):
                     continue
 
-                # from_record会过滤掉哪些ignore的effect
-                passive = LimitBreak.from_record(entry, level)
+                # from_record会过滤掉那些ignore的effect
+                passive = LimitBreak.from_record(entry)
 
                 if passive is not None:
                     instance.limit_break_passive.append(passive)
@@ -325,15 +316,12 @@ class Style:
                 instance.skill_passive.append(passive)
         # 读入共鸣被动
         if resonance_record is not None:
-            instance.resonance_style_id = int(resonance_record['id'])
-            instance.resonance_break_level = resonance_break_level
             # 共鸣被动只装备给 SSR 上场风格。
             support = resonance_record.get('support_skill')
             if instance.tier == 'SSR' and support:
                 passive = SupportSkill.from_record(support)
                 if passive is not None:
-                    level = instance.resonance_break_level
-                    if level is None or not 0 <= level <= 4:
+                    if resonance_break_level is None or not 0 <= level <= 4:
                         raise ValueError(f"无效的共鸣突破等级: {level}")
                     for effect in passive.effects:
                         if isinstance(effect.get('value'), list):
@@ -355,20 +343,9 @@ class Style:
                 Skill.from_record(skill_records[skill_id])
             ) for skill_id in basic_ids
         ]
+        # 根据项链更改初始sp
+        instance.sp = necklace_sp
         return instance
-
-
-@dataclass
-class Team:
-    styles: List[Style] = field(default_factory=list)
-
-    def __post_init__(self):
-        if len(self.styles) > 6:
-            raise ValueError('Team 最多允许六个上场风格')
-
-    def by_slot(self, slot: int) -> Style:
-        """slot 为 0 起始的上场顺序，不是 GUI 当前站位。"""
-        return self.styles[slot]
 
 
 @dataclass
@@ -393,8 +370,7 @@ class Battle:
 class Turn:
     """GUI 与 Simulation 交换的战斗快照；结算应另在 Simulation 引擎实现。"""
     battle: Battle
-    team: Team
-    label: JsonDict = field(default_factory=dict)  # 例如 turn/bonus/od_level/additional_turn
+    team: List[Style] = field(default_factory=list)  # 永远按照slot顺序0-5排布
     od: float = 0.0
     od_timing: Optional[str] = None  # None, before, after
     od_level: int = 0
@@ -404,7 +380,7 @@ class Turn:
 
 
 class Simulation:
-    """持有静态数据库与初始化后的 Turn；此阶段不进行战斗结算。"""
+    """持有静态数据库与初始化后的 Turn。"""
 
     def __init__(self):
         self.skills_path = SIMULATION_DIR / 'skills.json'
@@ -413,26 +389,6 @@ class Simulation:
         self.style_records: Dict[int, JsonDict] = {}
         self.turn: Optional[Turn] = None
         self.initial_config: Optional[JsonDict] = None
-
-    @staticmethod
-    def _read_records(path: Path) -> Dict[int, JsonDict]:
-        with path.open('r', encoding='utf-8') as handle:
-            return _index_by_id(json.load(handle))
-
-    @staticmethod
-    def _ids(values, label: str) -> List[int]:
-        if not isinstance(values, list):
-            raise ValueError(f'{label} 必须是 ID 列表')
-        # 去重且保留顺序；不要用技能名称查找数据库
-        result = []
-        seen = set()
-        for value in values:
-            if isinstance(value, bool) or not isinstance(value, int):
-                raise ValueError(f'{label} 必须包含整数 simulation ID，收到 {value!r}')
-            if value not in seen:
-                result.append(value)
-                seen.add(value)
-        return result
 
     def initialize(self, state: dict) -> Turn:
         """从战斗设置和数据库创建初始 Turn，不执行下一回合结算。
@@ -475,8 +431,8 @@ class Simulation:
         global_od_rate = float(config.get('global_od_rate', 100.0))
 
         # 加载两个数据库；只使用记录内部的 id 进行索引。
-        skill_records = self._read_records(self.skills_path)
-        style_records = self._read_records(self.styles_path)
+        skill_records = json_records_to_dict(self.skills_path)
+        style_records = json_records_to_dict(self.styles_path)
 
         # 此处保存style_ids并检测上场和共鸣风格能够匹配到数据库
         # 先校验选中风格是否重复，不限制共鸣与上场属于同一角色。
@@ -507,9 +463,9 @@ class Simulation:
         result_styles = []
         for slot, entry in enumerate(styles_config):
             sid = style_ids[slot]
-            active_ids = self._ids(entry.get('active_skill_ids', []), 'active_skill_ids')
-            orb_ids = self._ids(entry.get('orb_skill_ids', []), 'orb_skill_ids')
-            passive_ids = self._ids(entry.get('passive_skill_ids', []), 'passive_skill_ids')
+            active_ids = entry.get('active_skill_ids', [])
+            orb_ids = entry.get('orb_skill_ids', [])
+            passive_ids = entry.get('passive_skill_ids', [])
             selected_active = list(dict.fromkeys(active_ids + orb_ids))
             # 查询主动技能是否存在
             for skill_id in selected_active:
@@ -555,9 +511,8 @@ class Simulation:
         )
         turn = Turn(
             battle=battle,
-            team=Team(styles=result_styles),
+            team=result_styles,
             od=initial_od,
-            label={'turn': 0, 'bonus': 0, 'od_level': 0, 'additional_turn': False},
         )
         # 只在全部构造成功后提交，避免部分初始化失败污染旧战斗。
         self.skill_records = skill_records
@@ -609,7 +564,7 @@ class Simulation:
         actions = []
 
         # 测试用基础行动
-        for slot, style in enumerate(turn.team.styles):
+        for slot, style in enumerate(turn.team):
             skills = deepcopy(style.basic_skills)  # 3个，默认的顺序为：前排默认技能，无，追击
             # initialize() 已经装入全部被选择的主动/光球技能
             for skill in style.active_skills:
@@ -688,5 +643,4 @@ class Simulation:
     }
 
 
-__all__ = ['Simulation', 'Skill', 'Passive', 'LimitBreak', 'SupportSkill', 'Style',
-           'Team', 'Monster', 'Battle', 'Turn', 'Status']
+__all__ = ['Simulation', 'Skill', 'Passive', 'LimitBreak', 'SupportSkill', 'Style', 'Monster', 'Battle', 'Turn', 'Status']
