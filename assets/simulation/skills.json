@@ -6,6 +6,7 @@
     "kind": "system",
     "cost": {"sp": 0},
     "hit_count": 3,
+    "target": "default",
     "elements": ["none"],
     "effects": [
       {"type": "attack"}
@@ -15,12 +16,14 @@
     "id": 2,
     "names": {"zh_cn": "指挥行动", "zh_tw": "指揮行動", "jp": "指揮行動"},
     "kind": "system",
+    "target": "ally_front",
     "cost": {"sp": 0}
   },
   "3": {
     "id": 3,
     "names": {"zh_cn": "追击", "zh_tw": "追擊", "jp": "追撃"},
     "kind": "system",
+    "target": "default",
     "cost": {"sp": 0}
   },
   "4": {"id": 4, "names": {}, "kind": "reserved"},
