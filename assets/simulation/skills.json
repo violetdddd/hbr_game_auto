@@ -6,7 +6,6 @@
     "kind": "system",
     "cost": {"sp": 0},
     "hit_count": 3,
-    "target": "all",
     "elements": ["none"],
     "effects": [
       {"type": "attack"}
