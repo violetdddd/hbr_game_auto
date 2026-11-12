@@ -761,8 +761,8 @@ class BattleTurn(QGroupBox):
             row.addWidget(caption)
             row.addWidget(box, 1)
             ol.addLayout(row)
-        self.before_od.currentIndexChanged.connect(lambda: self.update_od('before'))
-        self.after_od.currentIndexChanged.connect(lambda: self.update_od('after'))
+        self.before_od.currentIndexChanged.connect(lambda: self.update_and_refresh_od('before'))
+        self.after_od.currentIndexChanged.connect(lambda: self.update_and_refresh_od('after'))
         ol.addStretch()
         root.addWidget(od, 10)
         root.addWidget(self._separator())
@@ -873,6 +873,7 @@ class BattleTurn(QGroupBox):
                 not check.isChecked()
                 or sum(c.isChecked() for c in checks) > 1
             )
+        # 更改样式
         for present, (down, rate) in zip(checks, self.enemy_edits):
             active = present.isChecked()
             down.setEnabled(active)
@@ -883,6 +884,7 @@ class BattleTurn(QGroupBox):
             rate.setStyleSheet('' if active else
                                'QSpinBox:disabled{background:#e5e7eb;color:#6b7280;'
                                'border:1px solid #cbd5e1;}')
+        # 判断目标是否改变，如改变则给出提示框
         re_target_actions = []
         new_target = next(i for i, check in enumerate(checks) if check.isChecked())
         for action in self.state_data["base"]["actions"]:
@@ -948,9 +950,10 @@ class BattleTurn(QGroupBox):
             },
             'user_selected': user_selected
         }
-
+        # 刷新显示
         self.refresh()
 
+    # 用户取消选择时调用，用于恢复上一个选择的技能
     def restore_action(self, position, old_action):
         box = self.action_boxes[position]
 
@@ -958,16 +961,21 @@ class BattleTurn(QGroupBox):
         box.setCurrentIndex(box.findData(old_action['id']))
         box.blockSignals(False)
 
-    def update_od(self, timing):
+    # 更新od值同时调用refresh
+    def update_and_refresh_od(self, timing):
         base = self.state_data['base']
         selected = self.before_od if timing == 'before' else self.after_od
         other = self.after_od if timing == 'before' else self.before_od
+        # 前置和后置od互斥
         if selected.currentData():
             other.blockSignals(True)
             other.setCurrentIndex(0)
             other.blockSignals(False)
+        # 更新state
         base['od_timing'] = timing if selected.currentData() else None
         base['od_level'] = selected.currentData() or 0
+
+        self.refresh()
 
     def swap_position(self, position):
         if self.select_first is None:
@@ -981,7 +989,7 @@ class BattleTurn(QGroupBox):
         if first == second or (first >= 3 and second >= 3):  # 后排交换不允许
             return
         base = self.state_data['base']
-        # 队伍顺序交换
+        # 队伍state顺序交换
         base['order'][first], base['order'][second] = base['order'][second], base['order'][first]
         # 前后排交换技能重新安排
         if (first < 3) != (second < 3):
@@ -1038,7 +1046,7 @@ class BattleTurn(QGroupBox):
                 picture.clear()
                 picture.setText('＋')
 
-    # 负责从调整页读取值到 state_data
+    # 负责从调整页读取值到 state_data，也就是说退出调整面板才总体存储一次adjustment
     def save_adjust(self):
         base = self.state_data['base']
         adjust = self.state_data['adjustments']
@@ -1066,13 +1074,14 @@ class BattleTurn(QGroupBox):
             self.save_adjust()
             self.stack.setCurrentIndex(0)
             self.refresh()
-            self.refresh_turn_controls()
 
+    # 根据是否是当前最后一回合来显示回到本回合或者下一回合
     def refresh_turn_controls(self):
         latest = bool(self.owner.turns and self.owner.turns[-1] is self)
         self.next_button.setVisible(latest)
         self.back_button.setVisible(not latest)
 
+    # 从dict找状态图标路径
     def _status_icon(self, status):
         if isinstance(status, dict):
             status_id, element = status.get('id'), status.get('element', "none")
@@ -1089,8 +1098,10 @@ class BattleTurn(QGroupBox):
 
         return path
 
+    # 敌人弱点和场地的信息显示
     def refresh_enemy_info(self, effective):
         clear_layout(self.enemy_icons_row)
+        # 弱点
         weak = QHBoxLayout()
         weak.setSpacing(1)
         weak.addWidget(QLabel('敌人弱点：'))
@@ -1100,6 +1111,7 @@ class BattleTurn(QGroupBox):
         if len(effective.get('enemy_weaknesses', [])) == 0:
             weak.addWidget(QLabel('无'))
         weak.addStretch()
+        # 敌人具体status信息
         self.enemy_icons_row.addLayout(weak)
         enemies = effective['enemies']
         for position, label in enumerate(('左侧敌人：', '中间敌人：', '右侧敌人：')):
@@ -1114,6 +1126,7 @@ class BattleTurn(QGroupBox):
                     line.addWidget(icon_label(path, 15))
             line.addStretch()
             self.enemy_icons_row.addLayout(line)
+        # 场地信息
         clear_layout(self.field_display)
         self.field_display.addWidget(QLabel('场地：'))
         field = effective.get('field')
@@ -1138,9 +1151,11 @@ class BattleTurn(QGroupBox):
 
     def refresh(self):
         effective = self.effective_state()
-        # label
+        now_timing = effective.get('od_timing')
+        now_od = effective.get('od_level') if now_timing == "before" else 0
+        # label，bonus由simulation决定
         self.title.setText(f'T{effective.get("turn")}' + 
-                           (f"-OD{effective.get('od_level')}" if effective.get('od_level') != 0 else '') +
+                           (f"-OD{now_od}" if now_od != 0 else '') +
                            (f"-bonus{effective.get('bonus')}" if effective.get('bonus') != 0 else '') +
                            ('-追加回合' if effective.get('additional_turn') else ''))
         # od
@@ -1159,7 +1174,7 @@ class BattleTurn(QGroupBox):
             self.od_icon.setPixmap(pix.scaled(30, 30, Qt.AspectRatioMode.KeepAspectRatio,
                                               Qt.TransformationMode.SmoothTransformation))
         # od发动选择框
-        available = level
+        available = level if now_od == 0 or now_timing == "before" else 0
         for timing, box in (('before', self.before_od), ('after', self.after_od)):
             box.blockSignals(True)
             box.clear()
@@ -1167,7 +1182,7 @@ class BattleTurn(QGroupBox):
             for n in range(1, available + 1):
                 box.addItem(f'OD{n}', n)
             box.setCurrentIndex(max(0, box.findData(
-                effective.get('od_level', 0) if effective.get('od_timing') == timing else 0)))
+                effective.get('od_level', 0) if now_timing == timing else 0)))
             box.blockSignals(False)
         # 敌人
         self.refresh_enemy_info(effective)
