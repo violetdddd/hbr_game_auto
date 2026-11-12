@@ -321,11 +321,11 @@ class Style:
             if instance.tier == 'SSR' and support:
                 passive = SupportSkill.from_record(support)
                 if passive is not None:
-                    if resonance_break_level is None or not 0 <= level <= 4:
-                        raise ValueError(f"无效的共鸣突破等级: {level}")
+                    if resonance_break_level is None or not 0 <= resonance_break_level <= 4:
+                        raise ValueError(f"无效的共鸣突破等级: {resonance_break_level}")
                     for effect in passive.effects:
                         if isinstance(effect.get('value'), list):
-                            effect['value'] = effect['value'][level]
+                            effect['value'] = effect['value'][resonance_break_level]
                     instance.support_skill_passive = passive
         instance.passive_triggers = list(dict.fromkeys(
             passive.trigger
@@ -466,7 +466,7 @@ class Simulation:
             active_ids = entry.get('active_skill_ids', [])
             orb_ids = entry.get('orb_skill_ids', [])
             passive_ids = entry.get('passive_skill_ids', [])
-            selected_active = list(dict.fromkeys(active_ids + orb_ids))
+            selected_active = [skill_id for skill_id in dict.fromkeys(active_ids + orb_ids) if skill_id not in (0, 1, 2, 3)]
             # 查询主动技能是否存在
             for skill_id in selected_active:
                 record = skill_records.get(skill_id)
@@ -571,7 +571,7 @@ class Simulation:
                 # 处理target type，GUI仅需要知道是敌人还是友方（是否可选自己）
                 if skill.target == "ally_single":
                     target_type = "ally"
-                elif skill.target == "ally_all_without_self":
+                elif skill.target == "ally_single_without_self":
                     target_type = "ally_without_self"
                 elif skill.target == "single":
                     target_type = "enemy"
@@ -581,7 +581,7 @@ class Simulation:
                 if skill.user_select == None:
                     user_select = None
                 else:
-                    user_select = [skill.user_select["1"]["description"], skill.user_select["2"]["description"]]
+                    user_select = [u["description"] for u in skill.user_select.values()]
 
                 skills.append({
                     'name': skill.names.get('zh_cn'),

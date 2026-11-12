@@ -156,7 +156,7 @@ class SkillSelectionDialog(QDialog):
         self.catalog = catalog
         root = QVBoxLayout(self)
         tabs = QTabWidget(); root.addWidget(tabs)
-        active = [(name, catalog.skill_data.get(name, {})) for name in catalog.skills_for(style)]
+        active = [(name, catalog.skill_data.get(name, {})) for name in catalog.skills_for(style) if name != "指揮行動"]
         passive = self._get_passives(style)
         orb = [(name, catalog.skill_data.get(name, {})) for name in catalog.common_global]
         orb_names = {name for name, _ in orb}
@@ -217,6 +217,66 @@ class SkillSelectionDialog(QDialog):
                 answer[category].append(simulation_id)
         return answer
 
+class TargetSelectionDialog(QDialog):
+    """选择一个技能目标；我方返回角色 slot，敌方返回敌人 position。"""
+    def __init__(self, owner, target_type, source_slot, state, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle('选择技能目标')
+        self.setModal(True)
+        self.selected_slot = None
+
+        layout = QVBoxLayout(self)
+        layout.addWidget(QLabel('请选择一个目标：'))
+
+        targets = QHBoxLayout()
+        targets.setSpacing(8)
+        layout.addLayout(targets)
+        # 我方角色为目标
+        if target_type in ('ally', 'ally_without_self'):
+            for position, slot in enumerate(state['order']):
+                if target_type == 'ally_without_self' and slot == source_slot:
+                    continue
+                style = owner.setup.styles[slot]
+                button = QPushButton()
+                button.setFixedSize(65, 65)
+                button.setIcon(QIcon(owner.setup.round_pixmap(style.image, 58)))
+                button.setIconSize(QSize(58, 58))
+                button.setToolTip(style.localized_title)
+                button.clicked.connect(lambda _=False, s=slot: self.choose(s))
+                targets.addWidget(button)
+        # 敌人单体为目标
+        elif target_type == 'enemy':
+            names = ('左侧敌人', '中间敌人', '右侧敌人')
+            for position, enemy in enumerate(state['enemies']):
+                if not enemy['exist']:
+                    continue
+
+                button = QPushButton(names[position])
+                button.setMinimumSize(105, 40)
+                button.clicked.connect(lambda _=False, p=position: self.choose(p))
+                targets.addWidget(button, position // 3)
+
+    def choose(self, slot):
+        self.selected_slot = slot
+        self.accept()
+
+class UserSelectionDialog(QDialog):
+    """选择技能的一个 user_select 分支。返回从 1 开始的选项编号。"""
+    def __init__(self, options, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle('选择技能效果')
+        self.selected = None
+        layout = QHBoxLayout(self)
+        layout.addWidget(QLabel('请选择技能效果：'))
+        for i, description in enumerate(options, 1):
+            button = QPushButton(description)
+            button.setMinimumSize(105, 40)
+            button.clicked.connect(lambda _=False, index=i: self.choose(index))
+            layout.addWidget(button)
+
+    def choose(self, index):
+        self.selected = index
+        self.accept()
 
 class BattleSetup(QGroupBox):
     """固定高度，敌人初始数据、六名上场风格及独立的共鸣风格。"""
@@ -362,7 +422,7 @@ class BattleSetup(QGroupBox):
             'active': [
                 int(self.catalog.skill_data[name]['simulation_id'])
                 for name in self.catalog.skills_for(selected)
-                if name not in orb_names
+                if name not in orb_names and name != "指揮行動"
             ],
             'passive': [],
             'orb': []
@@ -517,6 +577,56 @@ class PortraitWithSP(QWidget):
         painter.drawText(rect, Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignRight, text)
         painter.end()
 
+class TargetBadge(QWidget):
+    """头像右下角的技能目标标记。"""
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setFixedSize(25, 25)
+        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        self.pixmap = QPixmap()
+        self.text = ''
+        self.hide()
+
+    def configure(self, target, styles, round_pixmap):
+        self.pixmap = QPixmap()
+        self.text = ''
+        kind = target.get('type')
+        slot = target.get('slot')
+        if slot is None:
+            self.hide()
+            return
+        if kind in ('ally', 'ally_without_self'):
+            style = styles[slot]
+            self.pixmap = round_pixmap(style.image, 22)
+        elif kind == 'enemy':
+            self.text = ('左', '中', '右')[slot]
+        else:
+            self.hide()
+            return
+        self.show()
+        self.raise_()
+        self.update()
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        painter.setPen(QPen(QColor('#2563eb'), 2))
+        painter.setBrush(QColor('white'))
+        painter.drawEllipse(1, 1, 22, 22)
+        if not self.pixmap.isNull():
+            painter.drawPixmap(2, 2, self.pixmap)
+        elif self.text:
+            font = painter.font()
+            font.setBold(True)
+            font.setPointSize(11)
+            painter.setFont(font)
+            painter.setPen(QColor('#2563eb'))
+            painter.drawText(
+                self.rect(),
+                Qt.AlignmentFlag.AlignCenter,
+                self.text
+            )
+        painter.end()
 
 class BattleTurn(QGroupBox):
     """
@@ -566,7 +676,7 @@ class BattleTurn(QGroupBox):
 
         team = QWidget()
         tl = QHBoxLayout(team); tl.setContentsMargins(3, 1, 3, 1); tl.setSpacing(3)
-        self.portraits, self.action_boxes = [], []
+        self.portraits, self.target_badges, self.action_boxes = [], [], []
         self.status_rows, self.member_resources = [], []
         for first, last, stretch in ((0, 3, 65), (3, 6, 35)):
             group = QHBoxLayout(); group.setSpacing(2)
@@ -603,6 +713,8 @@ class BattleTurn(QGroupBox):
                 avatar.setStyleSheet('QPushButton{background:transparent;border:0;padding:0}')
                 portrait = PortraitWithSP(45, avatar)
                 portrait.move(2, 1)
+                badge = TargetBadge(avatar)
+                badge.move(31, 29)
                 avatar.clicked.connect(lambda _=False, pos=position: self.swap_position(pos))
                 # 顺序为：信念、头像、ep
                 body.addWidget(token)
@@ -617,6 +729,7 @@ class BattleTurn(QGroupBox):
                 col.addStretch()
                 group.addLayout(col, 1)
                 self.portraits.append((avatar, portrait))
+                self.target_badges.append(badge)
                 self.action_boxes.append(action)
                 self.status_rows.append(statuses)
                 self.member_resources.append((token, ep))
@@ -692,7 +805,7 @@ class BattleTurn(QGroupBox):
             header.addWidget(QLabel(title))
             present = QCheckBox()
             present.setToolTip('勾选表示此位置存在敌人')
-            present.toggled.connect(self.refresh_enemy_edit_visibility)
+            present.toggled.connect(self.edit_and_refresh_enemy)
             header.addWidget(present)
             grid.addLayout(header, 0, position + 1)
             # 敌人倒下和破坏率编辑
@@ -752,8 +865,15 @@ class BattleTurn(QGroupBox):
         root.addWidget(misc, 7)
         self.stack.addWidget(page)
 
-    def refresh_enemy_edit_visibility(self, *_):
-        for present, (down, rate) in zip(self.enemy_presence_checks, self.enemy_edits):
+    def edit_and_refresh_enemy(self, *_):
+        checks = self.enemy_presence_checks
+        # 至少保留一个敌人
+        for check in checks:
+            check.setEnabled(
+                not check.isChecked()
+                or sum(c.isChecked() for c in checks) > 1
+            )
+        for present, (down, rate) in zip(checks, self.enemy_edits):
             active = present.isChecked()
             down.setEnabled(active)
             down.setStyleSheet('' if active else
@@ -763,6 +883,16 @@ class BattleTurn(QGroupBox):
             rate.setStyleSheet('' if active else
                                'QSpinBox:disabled{background:#e5e7eb;color:#6b7280;'
                                'border:1px solid #cbd5e1;}')
+        re_target_actions = []
+        new_target = next(i for i, check in enumerate(checks) if check.isChecked())
+        for action in self.state_data["base"]["actions"]:
+            target = action["target"]
+            if target["type"] == "enemy" and not checks[target["slot"]].isChecked():  # 如果有目标type，那么不应该出现slot为None的情况
+                target["slot"] = new_target
+                re_target_actions.append(action["name"])
+        if re_target_actions:
+            warning = "、".join(re_target_actions)
+            QMessageBox.warning(self,"技能目标调整",f"敌人配置发生变化，以下技能已自动调整目标：{warning}")
 
     # 进行target和user_selected的选择
     def update_action(self, position):
@@ -770,15 +900,63 @@ class BattleTurn(QGroupBox):
         slot = base['order'][position]
         skill_id = self.action_boxes[position].currentData()
         skill = next((s for s in base['members'][slot]['skills'] if s['id'] == skill_id), None)
+        target_type = skill.get('target_type', 'ignore')
+        old_action = base['actions'][slot]
+        target_slot = None
+        user_selected = None
+        # 目标是敌人单体
+        if target_type == 'enemy':
+            enemies = [i for i, enemy in enumerate(base['enemies']) if enemy['exist']]
+            if len(enemies) == 1:
+                target_slot = enemies[0]
+            elif len(enemies) > 1:
+                dialog = TargetSelectionDialog(
+                    self.owner, target_type, slot, base, self
+                )
+                if dialog.exec() == QDialog.DialogCode.Accepted:
+                    target_slot = dialog.selected_slot
+                else:
+                    self.restore_action(position, old_action)  # 恢复之前选择的技能
+                    return
+        # 目标是我方单体
+        elif target_type in ('ally', 'ally_without_self'):
+            dialog = TargetSelectionDialog(
+                self.owner, target_type, slot, base, self
+            )
+            if dialog.exec() == QDialog.DialogCode.Accepted:
+                target_slot = dialog.selected_slot
+            else:
+                self.restore_action(position, old_action)
+                return
+        # 选择 user_select 分支
+        options = skill.get('user_select')
+        if options:
+            dialog = UserSelectionDialog(options, self)
+
+            if dialog.exec() != QDialog.DialogCode.Accepted:
+                self.restore_action(position, old_action)
+                return
+
+            user_selected = dialog.selected
+        # 更新action
         base['actions'][slot] = {
             'id': skill['id'],
             'name': skill['name'],
             'target': {
-                'type': skill.get('target_type'),
-                'slot': None
+                'type': target_type,
+                'slot': target_slot
             },
-            'user_selected': None
+            'user_selected': user_selected
         }
+
+        self.refresh()
+
+    def restore_action(self, position, old_action):
+        box = self.action_boxes[position]
+
+        box.blockSignals(True)
+        box.setCurrentIndex(box.findData(old_action['id']))
+        box.blockSignals(False)
 
     def update_od(self, timing):
         base = self.state_data['base']
@@ -883,7 +1061,7 @@ class BattleTurn(QGroupBox):
         if self.stack.currentIndex() == 0:
             self.load_adjust()
             self.stack.setCurrentIndex(1)
-            self.refresh_enemy_edit_visibility()
+            self.edit_and_refresh_enemy()
         else:
             self.save_adjust()
             self.stack.setCurrentIndex(0)
@@ -1002,6 +1180,8 @@ class BattleTurn(QGroupBox):
             button, portrait = self.portraits[position]
             portrait.configure(style.image if style else None,
                                self.owner.setup.round_pixmap, int(member.get('sp', 0)))
+            target = effective['actions'][slot]['target']
+            self.target_badges[position].configure(target, self.owner.setup.styles, self.owner.setup.round_pixmap)
             button.setToolTip((style.localized_title if style else f'角色{slot+1}') +
                               '（点击两名角色头像交换位置）')
             # 按slot修改token和ep
@@ -1052,6 +1232,7 @@ class SimulationTab(QWidget):
         self.catalog = catalog
         self.setup = BattleSetup(catalog, style_dialog_class, round_pixmap)
         self.status_db = json.loads((SIMULATION_DIR / 'statuses.json').read_text(encoding='utf-8'))
+        self.styles_db = json.loads((SIMULATION_DIR / 'styles.json').read_text(encoding='utf-8'))
         self.turns = []; self.session = None
         from simulation import Simulation
         self.engine = Simulation()
@@ -1080,6 +1261,8 @@ class SimulationTab(QWidget):
         if any(style is None for style in self.setup.styles):
             QMessageBox.warning(self, '无法开始战斗', '请先选齐六个风格。'); return
         setup_state = self.setup.state()
+        if sum(1 for style in setup_state["styles"] if self.styles_db.get(str(style["style_id"]))["role"] == "admiral") > 1:
+            QMessageBox.warning(self, '无法开始战斗', '一个队伍只能有一名舰长。'); return
         self.session = {'setup': setup_state}  # 用于存储战斗设置和turn的总体情况
         # 清除旧回合
         for turn in self.turns:
