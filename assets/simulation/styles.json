@@ -168,9 +168,7 @@
         {"id": 110003, "name": "冰之鸣动", "trigger": "on_first_battle_start", "effects": [{"type": "critical_damage_up", "target": "ally_all", "value": 30, "target_condition": "target.element('ice')", "duration": {"type": "permanent"}, "status_id": 7}]}
       ]
     },
-    "special": [
-      {"type": "elemental_admiral", "names": {"zh_cn": "冰超越量表", "zh_tw": "氷の律動", "jp": "氷の律動"}, "trigger": "on_battle_start", "elements": ["ice"]}
-    ]
+    "special": {"type": "elemental_admiral", "names": {"zh_cn": "冰超越量表", "zh_tw": "氷の律動", "jp": "氷の律動"}, "trigger": "on_battle_start", "elements": ["ice"]}
   },
   "12": {
     "id": 12,
@@ -759,9 +757,7 @@
         {"id": 490006, "name": "编织出的勇气【朝仓可怜 专属】", "trigger": "on_new_turn_start", "effects": [{"type": "resource", "target": "od", "od": 10}]}
       ]
     },
-    "special": [
-      {"type": "form_change", "names": {"zh_cn": "切换形态", "zh_tw": "切换形态", "jp": "フォームチェンジ"}, "trigger": "user_select"}
-    ]
+    "special": {"type": "form_change", "names": {"zh_cn": "切换形态", "zh_tw": "切换形态", "jp": "フォームチェンジ"}, "trigger": "user_select"}
   },
   "490002": {
     "id": 490002,
@@ -780,9 +776,7 @@
         {"id": 490005, "name": "托付给你了【可镰 专属】", "trigger": "on_break_enemy", "effects": [{"type": "resource", "target": "od", "od": 25}]}
       ]
     },
-    "special": [
-      {"type": "form_change", "names": {"zh_cn": "切换形态", "zh_tw": "切换形态", "jp": "フォームチェンジ"}, "trigger": "user_select"}
-    ]
+    "special": {"type": "form_change", "names": {"zh_cn": "切换形态", "zh_tw": "切换形态", "jp": "フォームチェンジ"}, "trigger": "user_select"}
   },
   "50": {
     "id": 50,
@@ -1744,9 +1738,7 @@
         {"id": 1130005, "name": "魔王军的大攻势！", "trigger": "on_new_turn_start", "trigger_condition": "team.count(has(154))>=6", "effects": [{"type": "resource", "target": "od", "od": 100}], "trigger_limit": 1}
       ]
     },
-    "special": [
-      {"type": "demon_cavalry", "names": {"zh_cn": "魔界骑兵启动", "zh_tw": "魔界騎兵启动", "jp": "魔界騎兵启动"}, "trigger": "user_select", "trigger_limit": 3, "effect": [{"type": "fear_for_demon", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 230}, {"type": "attack", "hit": 6, "target": "all"}]}
-    ]
+    "special": {"type": "demon_cavalry", "names": {"zh_cn": "魔界骑兵启动", "zh_tw": "魔界騎兵启动", "jp": "魔界騎兵启动"}, "trigger": "user_select", "trigger_limit": 3, "effects": [{"type": "fear_for_demon", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 230}, {"type": "attack", "hit": 6, "target": "all"}]}
   },
   "114": {
     "id": 114,
@@ -2476,9 +2468,7 @@
         {"id": 1620003, "name": "火之鸣动", "trigger": "on_first_battle_start", "effects": [{"type": "critical_damage_up", "target": "ally_all", "value": 30, "target_condition": "target.element('fire')", "duration": {"type": "permanent"}, "status_id": 7}]}
       ]
     },
-    "special": [
-      {"type": "elemental_admiral", "names": {"zh_cn": "火超越量表", "zh_tw": "火の律動", "jp": "火の律動"}, "trigger": "on_battle_start", "elements": ["fire"]}
-    ]
+    "special": {"type": "elemental_admiral", "names": {"zh_cn": "火超越量表", "zh_tw": "火の律動", "jp": "火の律動"}, "trigger": "on_battle_start", "elements": ["fire"]}
   },
   "163": {
     "id": 163,
@@ -3127,9 +3117,7 @@
         {"id": 2070003, "name": "暗之鸣动", "trigger": "on_first_battle_start", "effects": [{"type": "critical_damage_up", "target": "ally_all", "value": 30, "target_condition": "target.element('dark')", "duration": {"type": "permanent"}, "status_id": 7}]}
       ]
     },
-    "special": [
-      {"type": "elemental_admiral", "names": {"zh_cn": "暗超越量表", "zh_tw": "闇の律動", "jp": "闇の律動"}, "trigger": "on_battle_start", "elements": ["dark"]}
-    ]
+    "special": {"type": "elemental_admiral", "names": {"zh_cn": "暗超越量表", "zh_tw": "闇の律動", "jp": "闇の律動"}, "trigger": "on_battle_start", "elements": ["dark"]}
   },
   "208": {
     "id": 208,
@@ -3749,9 +3737,7 @@
         {"id": 2490004, "name": "光之鸣动[天赋强化]", "trigger": "on_first_battle_start", "effects": [{"type": "critical_damage_up", "target": "ally_all", "value": 30, "target_condition": "target.element('light')", "duration": {"type": "permanent"}, "status_id": 7}]}
       ]
     },
-    "special": [
-      {"type": "elemental_admiral", "names": {"zh_cn": "光超越量表", "zh_tw": "光の律動", "jp": "光の律動"}, "trigger": "on_battle_start", "elements": ["light"]}
-    ]
+    "special": {"type": "elemental_admiral", "names": {"zh_cn": "光超越量表", "zh_tw": "光の律動", "jp": "光の律動"}, "trigger": "on_battle_start", "elements": ["light"]}
   },
   "250": {
     "id": 250,
@@ -5444,11 +5430,7 @@
       "3": [
         {"id": 3640004, "name": "势如破竹[天赋强化]", "trigger": "on_break_enemy", "effects": [{"type": "resource", "target": "od", "od": 25}]}
       ]
-    },
-    "special": [
-      {"type": "overwrite_sp", "target": "self", "sp": 0, "exclude": "use_all", "status_id": 175, "target_condition": "has(228)"},
-      {"type": "team_specific_skill", "names": {"zh_cn": "无念无想", "zh_tw": "無念無想", "jp": "無念無想"}, "trigger": "user_select", "select_elements": ["thunder", "light", "dark"]}
-    ]
+    }
   },
   "365": {
     "id": 365,
@@ -5467,10 +5449,7 @@
         {"id": 3650004, "name": "飞翔", "trigger": "on_additional_turn_start", "effects": [{"type": "resource", "target": "self", "sp": 2}]}
       ]
     },
-    "special": [
-      {"type": "overwrite_sp", "target": "self", "sp": 0, "exclude": "use_all", "status_id": 175, "target_condition": "has(229)"},
-      {"type": "demonic_rage", "names": {"zh_cn": "鬼神化", "zh_tw": "鬼神化", "jp": "鬼神化"}, "trigger": "user_select", "trigger_limit": 3, "effects": [{"type": "gui_shen", "duration": {"type": "ally_turn", "value": 3}, "status_id": 229, "target": "self"}, {"type": "resource", "target": "od", "od": 15}, {"type": "remove_debuff", "target": "self"}, {"type": "revive_dp_rate", "target": "self", "value": 100}, {"type": "funnel", "target": "self", "mode": {"number": 3, "value": 25}, "solo": true, "status_id": 13, "duration": {"type": "ally_turn", "value": 3}}, {"type": "mind_eye", "target": "self", "value": 120, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "status_id": 78}]}
-    ]
+    "special": {"type": "demonic_rage", "names": {"zh_cn": "鬼神化", "zh_tw": "鬼神化", "jp": "鬼神化"}, "trigger": "user_select", "trigger_limit": 3, "effects": [{"type": "gui_shen", "duration": {"type": "ally_turn", "value": 3}, "status_id": 229, "target": "self"}, {"type": "resource", "target": "od", "od": 15}, {"type": "remove_debuff", "target": "self"}, {"type": "revive_dp_rate", "target": "self", "value": 100}, {"type": "funnel", "target": "self", "mode": {"number": 3, "value": 25}, "solo": true, "status_id": 13, "duration": {"type": "ally_turn", "value": 3}}, {"type": "mind_eye", "target": "self", "value": 120, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "status_id": 78}]}
   },
   "366": {
     "id": 366,
@@ -5509,9 +5488,7 @@
         {"id": 3670004, "name": "雷之鸣动", "trigger": "on_first_battle_start", "effects": [{"type": "critical_damage_up", "target": "ally_all", "value": 30, "target_condition": "target.element('thunder')", "duration": {"type": "permanent"}, "status_id": 7}]}
       ]
     },
-    "special": [
-      {"type": "elemental_admiral", "names": {"zh_cn": "雷超越量表", "zh_tw": "雷の律動", "jp": "雷の律動"}, "trigger": "on_battle_start", "elements": ["thunder"]}
-    ]
+    "special": {"type": "elemental_admiral", "names": {"zh_cn": "雷超越量表", "zh_tw": "雷の律動", "jp": "雷の律動"}, "trigger": "on_battle_start", "elements": ["thunder"]}
   },
   "368": {
     "id": 368,
@@ -5695,9 +5672,7 @@
       ]
     },
     "support_skill": {"name": "帕特拉", "kind": "support", "trigger": "on_new_turn_start", "effects": [{"type": "heal_dp_rate", "target": "self", "value": [2, 3, 4, 5, 6]}, {"type": "remove_special_status", "target": "self", "duration": {"type": "one_shot"}, "status": "stun", "status_id": 30}]},
-    "special": [
-      {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.count(during_down_turn()) == enemy.count()", "trigger_limit": 1, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true, "hit": 7}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
-    ]
+    "special": {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.count(during_down_turn()) == enemy.count()", "trigger_limit": 1, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true, "hit": 7}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
   },
   "379": {
     "id": 379,
@@ -5718,9 +5693,7 @@
         {"id": 3790004, "name": "微积分[天赋强化]", "trigger": "on_first_battle_start", "effects": [{"type": "funnel", "target": "self", "mode": {"number": 5, "value": 12}, "duration": {"type": "permanent"}, "solo": true, "status_id": 13}]}
       ]
     },
-    "special": [
-      {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.count(during_down_turn()) == enemy.count()", "trigger_limit": 1, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true, "hit": 7}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
-    ]
+    "special": {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.count(during_down_turn()) == enemy.count()", "trigger_limit": 1, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true, "hit": 7}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
   },
   "380": {
     "id": 380,
@@ -5741,8 +5714,6 @@
         {"id": 3800004, "name": "高级祝福强化[天赋强化]", "trigger": "on_first_battle_start", "effects": [{"type": "resource", "target": "self", "sp": 2}, {"type": "attack_up", "target": "self", "elements": ["light"], "value": 50, "duration": {"type": "permanent"}, "status_id": 1}]}
       ]
     },
-    "special": [
-      {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.count(during_down_turn()) == enemy.count()", "trigger_limit": 1, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true, "hit": 7}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
-    ]
+    "special": {"type": "all_out_attack", "names": {"zh_cn": "总攻击", "zh_tw": "總攻擊", "jp": "総攻撃"}, "trigger": "user_select", "condition": "enemy.count(during_down_turn()) == enemy.count()", "trigger_limit": 1, "shared_across_team": true, "effects": [{"type": "penetration_critical_attack", "target": "all", "ignore_ally_buffs": true, "hit": 7}, {"type": "damage_rate_up", "target": "all", "value": 100, "status_id": 39}], "end_condition": "used_or_enemy_down_end"}
   }
 }
