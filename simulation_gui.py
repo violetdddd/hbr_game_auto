@@ -232,9 +232,11 @@ class TargetSelectionDialog(QDialog):
         targets.setSpacing(8)
         layout.addLayout(targets)
         # 我方角色为目标
-        if target_type in ('ally', 'ally_without_self'):
+        if target_type in ('ally_single', 'ally_single_without_self', "ally_single_front_without_self"):
             for position, slot in enumerate(state['order']):
-                if target_type == 'ally_without_self' and slot == source_slot:
+                if target_type == 'ally_single_without_self' and slot == source_slot:
+                    continue
+                if target_type == 'ally_single_front_without_self' and (position >= 3 or slot == source_slot):
                     continue
                 style = owner.setup.styles[slot]
                 button = QPushButton()
@@ -254,7 +256,7 @@ class TargetSelectionDialog(QDialog):
                 button = QPushButton(names[position])
                 button.setMinimumSize(105, 40)
                 button.clicked.connect(lambda _=False, p=position: self.choose(p))
-                targets.addWidget(button, position // 3)
+                targets.addWidget(button)
 
     def choose(self, slot):
         self.selected_slot = slot
@@ -595,7 +597,7 @@ class TargetBadge(QWidget):
         if slot is None:
             self.hide()
             return
-        if kind in ('ally', 'ally_without_self'):
+        if kind in ('ally_single', 'ally_single_without_self', 'ally_single_front_without_self'):
             style = styles[slot]
             self.pixmap = round_pixmap(style.image, 22)
         elif kind == 'enemy':
@@ -610,12 +612,15 @@ class TargetBadge(QWidget):
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        painter.setPen(QPen(QColor('#2563eb'), 2))
-        painter.setBrush(QColor('white'))
-        painter.drawEllipse(1, 1, 22, 22)
         if not self.pixmap.isNull():
-            painter.drawPixmap(2, 2, self.pixmap)
+            painter.drawPixmap(1, 1, self.pixmap)
+            painter.setPen(QPen(QColor('#2563eb'), 1))
+            painter.setBrush(Qt.BrushStyle.NoBrush)
+            painter.drawEllipse(1, 1, 22, 22)
         elif self.text:
+            painter.setPen(QPen(QColor('#2563eb'), 1))
+            painter.setBrush(QColor('white'))
+            painter.drawEllipse(1, 1, 22, 22)
             font = painter.font()
             font.setBold(True)
             font.setPointSize(11)
@@ -805,7 +810,7 @@ class BattleTurn(QGroupBox):
             header.addWidget(QLabel(title))
             present = QCheckBox()
             present.setToolTip('勾选表示此位置存在敌人')
-            present.toggled.connect(self.edit_and_refresh_enemy)
+            present.toggled.connect(self.refresh_enemy_setting)
             header.addWidget(present)
             grid.addLayout(header, 0, position + 1)
             # 敌人倒下和破坏率编辑
@@ -865,7 +870,34 @@ class BattleTurn(QGroupBox):
         root.addWidget(misc, 7)
         self.stack.addWidget(page)
 
-    def edit_and_refresh_enemy(self, *_):
+    def update_state_from_simulation(self):
+        """
+        GUI传给engine可操作的base相关内容，engine内部增量更新，然后传回来完整的base state
+        gui_add_state = {
+            'order': [int] * 6,
+            'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int | None}, "user_selected": None | int}] * 6,
+            'enemies': [{"exist": bool, "damage_rate": int, 'down': bool, "statuses": [
+            {"id": int, "duration_type": str, "remaining": int, "level": int, "element": str}, ...
+            ]} for _ in range(3)],
+            'field': str or None,
+            'od_timing': str or None,
+            'od_level': int
+        }
+        """
+        base = self.state_data["base"]
+        gui_add_state = {
+            'order': base["order"],
+            'actions': base["actions"],
+            'enemies': base["enemies"],
+            'field': base["field"],
+            'od_timing': base["od_timing"],
+            'od_level': base["od_level"]
+        }
+        simulation_state = copy.deepcopy(self.owner.engine.recalculate(copy.deepcopy(gui_add_state)))
+        for need_update in ("members", "od", "predicted_od", "bonus"):
+            base[need_update] = simulation_state[need_update]
+
+    def refresh_enemy_setting(self, *_):
         checks = self.enemy_presence_checks
         # 至少保留一个敌人
         for check in checks:
@@ -884,17 +916,6 @@ class BattleTurn(QGroupBox):
             rate.setStyleSheet('' if active else
                                'QSpinBox:disabled{background:#e5e7eb;color:#6b7280;'
                                'border:1px solid #cbd5e1;}')
-        # 判断目标是否改变，如改变则给出提示框
-        re_target_actions = []
-        new_target = next(i for i, check in enumerate(checks) if check.isChecked())
-        for action in self.state_data["base"]["actions"]:
-            target = action["target"]
-            if target["type"] == "enemy" and not checks[target["slot"]].isChecked():  # 如果有目标type，那么不应该出现slot为None的情况
-                target["slot"] = new_target
-                re_target_actions.append(action["name"])
-        if re_target_actions:
-            warning = "、".join(re_target_actions)
-            QMessageBox.warning(self,"技能目标调整",f"敌人配置发生变化，以下技能已自动调整目标：{warning}")
 
     # 进行target和user_selected的选择
     def update_action(self, position):
@@ -906,22 +927,17 @@ class BattleTurn(QGroupBox):
         old_action = base['actions'][slot]
         target_slot = None
         user_selected = None
-        # 目标是敌人单体
-        if target_type == 'enemy':
+        target_selected = False
+        # 单体敌人或ignore的情况，不要弹出选择框
+        if target_type == "ignore":
+            target_selected = True
+        elif target_type == 'enemy':
             enemies = [i for i, enemy in enumerate(base['enemies']) if enemy['exist']]
             if len(enemies) == 1:
                 target_slot = enemies[0]
-            elif len(enemies) > 1:
-                dialog = TargetSelectionDialog(
-                    self.owner, target_type, slot, base, self
-                )
-                if dialog.exec() == QDialog.DialogCode.Accepted:
-                    target_slot = dialog.selected_slot
-                else:
-                    self.restore_action(position, old_action)  # 恢复之前选择的技能
-                    return
-        # 目标是我方单体
-        elif target_type in ('ally', 'ally_without_self'):
+                target_selected = True
+        # 敌人多体和我方角色，弹出选择框
+        if not target_selected:
             dialog = TargetSelectionDialog(
                 self.owner, target_type, slot, base, self
             )
@@ -950,6 +966,8 @@ class BattleTurn(QGroupBox):
             },
             'user_selected': user_selected
         }
+
+        # self.update_state_from_simulation()
         # 刷新显示
         self.refresh()
 
@@ -975,6 +993,7 @@ class BattleTurn(QGroupBox):
         base['od_timing'] = timing if selected.currentData() else None
         base['od_level'] = selected.currentData() or 0
 
+        # self.update_state_from_simulation()
         self.refresh()
 
     def swap_position(self, position):
@@ -1009,6 +1028,7 @@ class BattleTurn(QGroupBox):
                     'user_selected': None
                 }
 
+        # self.update_state_from_simulation()
         self.refresh()
 
     # 负责从 state_data 读取值到调整页
@@ -1065,14 +1085,28 @@ class BattleTurn(QGroupBox):
             adjust['members'][slot]['token'] = controls['token'].value()
             base['members'][slot]['dp'] = controls['dp'].value()
 
+        # 判断目标是否改变，如改变则给出提示框
+        checks = self.enemy_presence_checks
+        re_target_actions = []
+        new_target = next(i for i, check in enumerate(checks) if check.isChecked())
+        for action in self.state_data["base"]["actions"]:
+            target = action["target"]
+            if target["type"] == "enemy" and not checks[target["slot"]].isChecked():  # 如果有目标type，那么不应该出现slot为None的情况
+                target["slot"] = new_target
+                re_target_actions.append(action["name"])
+        if re_target_actions:
+            warning = "、".join(re_target_actions)
+            QMessageBox.warning(self,"技能目标调整",f"敌人配置发生变化，以下技能已自动调整目标：{warning}")
+
     def toggle_mode(self):
         if self.stack.currentIndex() == 0:
             self.load_adjust()
             self.stack.setCurrentIndex(1)
-            self.edit_and_refresh_enemy()
+            self.refresh_enemy_setting()
         else:
             self.save_adjust()
             self.stack.setCurrentIndex(0)
+            # self.update_state_from_simulation()
             self.refresh()
 
     # 根据是否是当前最后一回合来显示回到本回合或者下一回合
@@ -1346,7 +1380,6 @@ class SimulationTab(QWidget):
         for item in self.turns: item.refresh_turn_controls()
 
     def next_turn(self, turn):
-        turn.state()  # 先保存调整面板中尚未提交的修改
         last_state = copy.deepcopy(turn.effective_state())
         simulation_state = self.engine.advance(last_state)
         result = self.add_turn_from_simulation(simulation_state)

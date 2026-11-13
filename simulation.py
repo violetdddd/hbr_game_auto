@@ -569,10 +569,8 @@ class Simulation:
             # initialize() 已经装入全部被选择的主动/光球技能
             for skill in style.active_skills:
                 # 处理target type，GUI仅需要知道是敌人还是友方（是否可选自己）
-                if skill.target == "ally_single":
-                    target_type = "ally"
-                elif skill.target == "ally_single_without_self":
-                    target_type = "ally_without_self"
+                if skill.target in ("ally_single", "ally_single_without_self", "ally_single_front_without_self"):
+                    target_type = skill.target
                 elif skill.target == "single":
                     target_type = "enemy"
                 else:
@@ -641,6 +639,34 @@ class Simulation:
         'bonus': 0,
         'additional_turn': False,
     }
+
+    def recalculate(self, gui_add_state):
+        """
+        接受gui传入的state并直接覆盖当前的Turn类对应值：
+        gui_add_state = {
+            'order': [int] * 6,
+            'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int | None}, "user_selected": None | int}] * 6,
+            'enemies': [{"exist": bool, "damage_rate": int, 'down': bool, "statuses": [
+            {"id": int, "duration_type": str, "remaining": int, "level": int, "element": str}, ...
+            ]} for _ in range(3)],
+            'field': str or None,
+            'od_timing': str or None,
+            'od_level': int
+        }
+        重新计算从turn start开始计算后返回可能改变的值
+        simulation_state = {
+            'members': [{
+            'sp': int, 'token': int, "ep": int, 'dp': float,
+            'statuses': [{
+                "id": int, "duration_type": str, "remaining": int, "level": int, "element": str
+            }, ... ],
+            "skills": [{"name": str, "cost_type": str, "cost": int, "id": int, "target_type": str, "user_select": None | [str]}, ... ] 
+            } for _ in range(6)],
+            'od': float,
+            'predicted_od': float,
+            'bonus': int
+        }
+        """
 
 
 __all__ = ['Simulation', 'Skill', 'Passive', 'LimitBreak', 'SupportSkill', 'Style', 'Monster', 'Battle', 'Turn', 'Status']
