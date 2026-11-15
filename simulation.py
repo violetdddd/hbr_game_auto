@@ -15,7 +15,8 @@ from typing import Any, Dict, List, Optional, Union
 
 
 JsonDict = Dict[str, Any]
-SkillId = int
+
+ELEMENTS = ('fire','ice','thunder','light','dark')
 
 IGNORED_PASSIVE_EFFECT_TYPES = [
     "all_status_up_value",
@@ -116,10 +117,10 @@ class Skill:
     id: int
     names: JsonDict
     kind: str
-    cost: JsonDict = field(default_factory=dict)
+    cost: JsonDict = field(default_factory=dict)  # 记录原生cost字段
     cost_type: str = 'sp'
-    default_cost: int = 0
-    now_cost: int = 0
+    default_cost: int = 0  # 记录没改动过的默认最高cost，非sp cost不用管，不会进行检查
+    now_cost: int = 0  # 记录当前触发各种效果后的cost
     used: int = 0
     target: Optional[str] = None
     effects: Union[List[JsonDict], JsonDict] = field(default_factory=list)
@@ -256,15 +257,16 @@ class Style:
 
     # 角色的动态资源与修正，不在这里执行计算。
     special_trigger: str = None  # 是否需要检测破盾以及专属技能（鬼神化、小按钮、总攻击）或机制（超越量表、切换形态）
-    od_rate_extra: float = 0.0  # 光月歌共鸣和鱼大师被动，在battle_start()中储存
+    od_rate_extra: float = 0.0  # 光月歌共鸣和鱼大师被动，在battle_start()中储存, 例如鱼为0.05
     od_earring: int = 15
+    slot: int = 0
     # 每次攻击前根据各种状态动态计算
     sp_modify: int = 0 
     # 每回合的状态
     sp: int = 0
     ep: int = 0
     token: int = 0
-    dp: float = 100.0
+    dp: float = 100.0  # 范围是0-150
     statuses: List[Status] = field(default_factory=list)
     turn_action: Optional[dict] = None
 
@@ -366,8 +368,8 @@ class Monster:
 class Battle:
     enemy_weaknesses: List[str] = field(default_factory=list)
     monsters: List[Monster] = field(default_factory=list)
-    field: Optional[str] = None
-    territory: Optional[str] = None
+    field: Optional[str] = None  # 无、元素、稻场、其他
+    territory: Optional[int] = None
     global_od_rate: float = 100.0
     super_scale: dict = field(default_factory=lambda: {"element": None, "value": 0})  # 超越量表
 
@@ -377,13 +379,193 @@ class Turn:
     """GUI 与 Simulation 交换的战斗快照；结算应另在 Simulation 引擎实现。"""
     battle: Battle
     team: List[Style] = field(default_factory=list)  # 永远按照slot顺序0-5排布
-    od: float = 0.0
+    turn_num: int = 0  # 记录当前第几回合
+    actions: List[Dict] = field(default_factory=list)  # 记录当前回合的行动
+    od: float = 0.0  # 百分比下保留2位小数
     od_timing: Optional[str] = None  # None, before, after
     od_level: int = 0
     additional_turn: bool = False
     bonus: int = 0
     order: List[int] = field(default_factory=lambda: list(range(6)))
 
+@dataclass
+class Context:
+    turn: Turn
+    subject: Style | Monster | None
+
+class Conditions:
+    @staticmethod
+    def front(ctx: Context):
+        return ctx.subject.slot in ctx.turn.order[:3]
+
+    @staticmethod
+    def has(ctx: Context, status_id: int):
+        return any(status.id == status_id for status in ctx.subject.statuses)
+
+    @staticmethod
+    def dp_rate(ctx: Context):
+        return ctx.subject.dp / 100
+
+    @staticmethod
+    def element(ctx: Context, need_element: str):
+        return need_element in ctx.subject.elements
+
+    @staticmethod
+    def used(ctx: Context, skill_id: int):
+        for skill in ctx.subject.active_skills:
+            if skill.id == skill_id:
+                return skill.used
+        return 0
+
+    @staticmethod
+    def level(ctx: Context, status_id: int):
+        for status in ctx.subject.statuses:
+            if status.id == status_id:
+                return status.level
+        return 0
+
+    @staticmethod
+    def weak(ctx: Context, need_element: str):
+        return need_element in ctx.turn.battle.enemy_weaknesses
+    
+    @staticmethod
+    def sp(ctx: Context):
+        return ctx.subject.sp
+
+    @staticmethod
+    def zone(ctx: Context, need_element_s: str):
+        if need_element_s == "elements":
+            return ctx.turn.battle.field in ELEMENTS
+        elif need_element_s == "none":
+            return not ctx.turn.battle.field
+        elif need_element_s in ELEMENTS:
+            return ctx.turn.battle.field == need_element_s
+
+    @staticmethod
+    def during_down_turn(ctx: Context):
+        return ctx.subject.down
+
+    @staticmethod
+    def token(ctx: Context):
+        return ctx.subject.token
+
+    @staticmethod
+    def character(ctx: Context, need_eng_name: str):
+        return ctx.subject.character_names.get("en") == need_eng_name
+    
+    @staticmethod
+    def in_od(ctx: Context):
+        return ctx.turn.od_level != 0
+    
+    @staticmethod
+    def turn(ctx: Context):
+        return ctx.turn.turn_num
+    
+    @staticmethod
+    def skill_sp(ctx: Context):
+        slot = ctx.subject.slot
+        action_skill_id = ctx.turn.actions[slot].get("id")
+        for skill in ctx.subject.active_skills:
+            if skill.id == action_skill_id:
+                return skill.now_cost
+        raise ValueError("程序不应该运行到这里，请检查数据库字段")
+
+    @staticmethod
+    def normal_attack(ctx: Context):
+        slot = ctx.subject.slot
+        action_skill_id = ctx.turn.actions[slot].get("id")
+        return action_skill_id == 1
+
+    @staticmethod
+    def is_team(ctx: Context, need_team: str):
+        return ctx.subject.team == need_team
+
+    @staticmethod
+    def damage_rate(ctx: Context):
+        return ctx.subject.damage_rate
+
+    @staticmethod
+    def mark_level(ctx: Context, need_element: str):
+        for style in ctx.turn.team:
+            for status in style.statuses:
+                if status.id == 166 and status.element == need_element:
+                    return status.level
+        return 0
+
+    @staticmethod
+    def od(ctx: Context):
+        return ctx.turn.od
+
+    @staticmethod
+    def role(ctx: Context, need_role: str):
+        return ctx.subject.role == need_role
+
+    @staticmethod
+    def ep(ctx: Context):
+        return ctx.subject.ep
+
+    # 温泉通行木牌，特殊情况在后续函数中解析 
+    # @staticmethod
+    # def has_skill(ctx: Context, skill_id: int):
+
+    @staticmethod
+    def territory_is(ctx: Context, territory_id: int):
+        return ctx.turn.battle.territory == territory_id
+
+# AST语法树解析
+import ast
+import operator
+from dataclasses import replace
+OPS = {
+    ast.Eq: operator.eq,
+    ast.NotEq: operator.ne,
+    ast.Lt: operator.lt,
+    ast.LtE: operator.le,
+    ast.Gt: operator.gt,
+    ast.GtE: operator.ge,
+}
+def check(expr, ctx):
+    def run(node, ctx):
+        if isinstance(node, ast.Constant):
+            return node.value
+
+        if isinstance(node, ast.BoolOp):
+            values = (run(x, ctx) for x in node.values)
+            return all(values) if isinstance(node.op, ast.And) else any(values)
+
+        if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.Not):
+            return not run(node.operand, ctx)
+
+        if isinstance(node, ast.Compare):
+            left = run(node.left, ctx)
+            for op, right_node in zip(node.ops, node.comparators):
+                right = run(right_node, ctx)
+                if not OPS[type(op)](left, right):
+                    return False
+                left = right
+            return True
+
+        if isinstance(node, ast.Call):
+            name = ast.unparse(node.func)
+
+            if name in ('team.count', 'enemy.count'):
+                group = ctx.turn.team if name == 'team.count' else ctx.turn.battle.monsters
+                group = [x for x in group if getattr(x, 'exist', True)]
+
+                if not node.args:
+                    return len(group)
+
+                return sum(
+                    bool(run(node.args[0], replace(ctx, subject=x)))
+                    for x in group
+                )
+
+            func = getattr(Conditions, name.replace('target.', ''))
+            return func(ctx, *(run(arg, ctx) for arg in node.args))
+
+        raise ValueError(f'不支持的条件语法：{ast.dump(node)}')
+
+    return bool(run(ast.parse(expr, mode='eval').body, ctx))
 
 class Simulation:
     """持有静态数据库与初始化后的 Turn。"""
@@ -527,7 +709,7 @@ class Simulation:
                 style_records[int(resonance['style_id'])]
                 if resonance is not None else None
             )
-            result_styles.append(Style.from_record(
+            style = Style.from_record(
                 style_records[sid],
                 break_level=int(entry.get('break_level', 0)),
                 od_earring=int(entry.get('od_earring', 15)),
@@ -540,7 +722,9 @@ class Simulation:
                     int(resonance.get('break_level', 0))
                     if resonance is not None else None
                 ),
-            ))
+            )
+            style.slot = slot
+            result_styles.append(style)
 
         default_enemy_config = {1: (1,), 2: (1,2), 3: (0,1,2)}
         battle = Battle(

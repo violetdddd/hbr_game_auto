@@ -1141,11 +1141,11 @@
     "kind": "passive",
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
-    "trigger_condition": "team.member('31C') >= 2",
+    "trigger_condition": "team.count(is_team('31C')) >= 2",
     "effects": {
       "cases": [
         {
-          "when": "team.member('31C') == 2",
+          "when": "team.count(is_team('31C')) == 2",
           "effects": [
             {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}, "value": 5},
             {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}, "value": 5}
@@ -1153,7 +1153,7 @@
           "description": "2名31C队员"
         },
         {
-          "when": "team.member('31C') == 3",
+          "when": "team.count(is_team('31C')) == 3",
           "effects": [
             {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}, "value": 10},
             {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}, "value": 10}
@@ -1161,7 +1161,7 @@
           "description": "3名31C队员"
         },
         {
-          "when": "team.member('31C') == 4",
+          "when": "team.count(is_team('31C')) == 4",
           "effects": [
             {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}, "value": 15},
             {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}, "value": 15}
@@ -1169,7 +1169,7 @@
           "description": "4名31C队员"
         },
         {
-          "when": "team.member('31C') == 5",
+          "when": "team.count(is_team('31C')) == 5",
           "effects": [
             {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}, "value": 20},
             {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}, "value": 20}
@@ -1177,7 +1177,7 @@
           "description": "5名31C队员"
         },
         {
-          "when": "team.member('31C') == 6",
+          "when": "team.count(is_team('31C')) == 6",
           "effects": [
             {"type": "power_up_value", "target": "self", "status_id": 81, "duration": {"type": "permanent"}, "value": 25},
             {"type": "toughness_up_value", "target": "self", "status_id": 87, "duration": {"type": "permanent"}, "value": 25}
@@ -1306,7 +1306,7 @@
   "97": {
     "id": 97,
     "names": {"zh_cn": "绝对零度+", "zh_tw": "絕對零度+", "jp": "絶対零度+"},
-    "conditions": {"effects": "team.member('31C') >= 3"},
+    "conditions": {"effects": "team.count(is_team('31C')) >= 3"},
     "kind": "active",
     "ex_skill": true,
     "cost": {"sp": 14},
@@ -1671,7 +1671,7 @@
   "120": {
     "id": 120,
     "names": {"zh_cn": "明星之路", "zh_tw": "星路", "jp": "スターダムロード"},
-    "conditions": {"cost": "charging()"},
+    "conditions": {"cost": "has(25)"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 0},
@@ -1686,7 +1686,7 @@
   "121": {
     "id": 121,
     "names": {"zh_cn": "护身倒法", "zh_tw": "護身倒法", "jp": "ブレイクフォール"},
-    "conditions": {"effects": "charging()"},
+    "conditions": {"effects": "has(25)"},
     "kind": "active",
     "cost": {"sp": 9},
     "target": "ally_all",
@@ -1754,7 +1754,7 @@
   "125": {
     "id": 125,
     "names": {"zh_cn": "超新星演员", "zh_tw": "超新星動作演員", "jp": "アクターズ・スーパーノヴァ"},
-    "conditions": {"effects": "charging()"},
+    "conditions": {"effects": "has(25)"},
     "kind": "active",
     "ex_skill": true,
     "cost": {"sp": 15},
@@ -3390,7 +3390,7 @@
   "225": {
     "id": 225,
     "names": {"zh_cn": "女仆剑刺", "zh_tw": "劍擊女僕", "jp": "メイド・イン・パンクチュア"},
-    "conditions": {"cost": "has(20)", "effects": "charging()"},
+    "conditions": {"cost": "has(20)", "effects": "has(25)"},
     "kind": "active",
     "ex_skill": true,
     "cost": {
@@ -4236,7 +4236,7 @@
   "265": {
     "id": 265,
     "names": {"zh_cn": "夜风暴", "zh_tw": "夜晚的強風", "jp": "夜嵐"},
-    "conditions": {"effects": "charging()"},
+    "conditions": {"effects": "has(25)"},
     "kind": "active",
     "ex_skill": true,
     "cost": {"sp": 13},
@@ -4252,7 +4252,7 @@
   "266": {
     "id": 266,
     "names": {"zh_cn": "夜风暴+", "zh_tw": "夜晚的強風+", "jp": "夜嵐+"},
-    "conditions": {"cost": "used(266)==0", "effects": "charging()"},
+    "conditions": {"cost": "used(266)==0", "effects": "has(25)"},
     "kind": "active",
     "ex_skill": true,
     "cost": {
@@ -4287,7 +4287,7 @@
   "267": {
     "id": 267,
     "names": {"zh_cn": "优雅整肃", "zh_tw": "優雅嚴明", "jp": "唯雅粛正"},
-    "conditions": {"effects": "charging()"},
+    "conditions": {"effects": "has(25)"},
     "kind": "active",
     "ex_skill": true,
     "cost": {"sp": 18},
@@ -4305,7 +4305,7 @@
   "268": {
     "id": 268,
     "names": {"zh_cn": "疾如风", "zh_tw": "疾如風", "jp": "疾きこと風の如し"},
-    "conditions": {"effects": "charging()"},
+    "conditions": {"effects": "has(25)"},
     "kind": "active",
     "ex_skill": true,
     "cost": {"sp": -1, "mode": "use_all"},
@@ -4554,8 +4554,8 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "all_status_up_value", "target": "ally_all", "status_id": 95, "target_condition": "target.is_member('31E')", "duration": {"type": "permanent"}, "value": 10},
-      {"type": "resource", "target": "ally_all", "target_condition": "target.is_member('31E')", "duration": {"type": "permanent"}, "sp_modify": -1}
+      {"type": "all_status_up_value", "target": "ally_all", "status_id": 95, "target_condition": "target.is_team('31E')", "duration": {"type": "permanent"}, "value": 10},
+      {"type": "resource", "target": "ally_all", "target_condition": "target.is_team('31E')", "duration": {"type": "permanent"}, "sp_modify": -1}
     ]
   },
   "287": {
@@ -4565,7 +4565,7 @@
     "cost": {"sp": 0},
     "trigger": "on_first_battle_start",
     "effects": [
-      {"type": "attack_up", "target": "ally_all", "status_id": 1, "target_condition": "target.is_member('31E')", "duration": {"type": "permanent"}}
+      {"type": "attack_up", "target": "ally_all", "status_id": 1, "target_condition": "target.is_team('31E')", "duration": {"type": "permanent"}}
     ]
   },
   "288": {
@@ -4809,7 +4809,7 @@
   "306": {
     "id": 306,
     "names": {"zh_cn": "魔炎闪狱门+", "zh_tw": "魔炎閃獄門+", "jp": "魔炎閃獄門+"},
-    "conditions": {"cost": "team.member('31E') >= 3"},
+    "conditions": {"cost": "team.count(is_team('31E')) >= 3"},
     "kind": "active",
     "ex_skill": true,
     "cost": {
@@ -5405,7 +5405,7 @@
   "348": {
     "id": 348,
     "names": {"zh_cn": "王之激励", "zh_tw": "王之激勵", "jp": "王の激励"},
-    "conditions": {"effects": "charging()"},
+    "conditions": {"effects": "has(25)"},
     "kind": "active",
     "cost": {"resource": "ct", "ct": 3},
     "target": "ally_all",
@@ -5425,7 +5425,7 @@
   "349": {
     "id": 349,
     "names": {"zh_cn": "虚空风暴", "zh_tw": "虛空風暴", "jp": "ヴォイドストーム"},
-    "conditions": {"effects": "charging()"},
+    "conditions": {"effects": "has(25)"},
     "kind": "active",
     "ex_skill": true,
     "cost": {"sp": 13},
@@ -5441,7 +5441,7 @@
   "350": {
     "id": 350,
     "names": {"zh_cn": "虚空风暴+", "zh_tw": "虛空風暴+", "jp": "ヴォイドストーム+"},
-    "conditions": {"effects": "charging()"},
+    "conditions": {"effects": "has(25)"},
     "kind": "active",
     "ex_skill": true,
     "cost": {"sp": 11},
@@ -5710,7 +5710,7 @@
     "target": "ally_single",
     "effects": [
       {"type": "resource", "target": "ally_single", "sp": 3},
-      {"type": "resource", "target": "ally_single", "target_condition": "target.is_member('31A')", "sp": 3}
+      {"type": "resource", "target": "ally_single", "target_condition": "target.is_team('31A')", "sp": 3}
     ]
   },
   "368": {
@@ -5844,7 +5844,7 @@
   "378": {
     "id": 378,
     "names": {"zh_cn": "极限冲击+", "zh_tw": "極限衝擊+", "jp": "リミット・インパクト+"},
-    "conditions": {"cost": "team.member('31A') >= 3"},
+    "conditions": {"cost": "team.count(is_team('31A')) >= 3"},
     "kind": "active",
     "ex_skill": true,
     "cost": {
@@ -6236,7 +6236,7 @@
   "404": {
     "id": 404,
     "names": {"zh_cn": "霸道妄执我突迈进", "zh_tw": "霸道妄執我突邁進", "jp": "覇道妄執我突邁進"},
-    "conditions": {"effects": "charging()"},
+    "conditions": {"effects": "has(25)"},
     "kind": "active",
     "ex_skill": true,
     "cost": {"sp": 14},
@@ -6267,7 +6267,7 @@
   "405": {
     "id": 405,
     "names": {"zh_cn": "霸道妄执我突迈进+", "zh_tw": "霸道妄執我突邁進+", "jp": "覇道妄執我突邁進+"},
-    "conditions": {"effects": "charging()"},
+    "conditions": {"effects": "has(25)"},
     "kind": "active",
     "ex_skill": true,
     "cost": {"sp": 14},
@@ -6327,7 +6327,7 @@
   "407": {
     "id": 407,
     "names": {"zh_cn": "黑蝶霹雳制裁", "zh_tw": "黑蝶霹靂制裁", "jp": "黒蝶霹靂制裁"},
-    "conditions": {"cost": "charging()"},
+    "conditions": {"cost": "has(25)"},
     "kind": "active",
     "ex_skill": true,
     "cost": {
@@ -6617,7 +6617,7 @@
     "cost": {"sp": 0},
     "trigger": "on_battle_start",
     "effects": [
-      {"type": "resource", "target": "ally_all", "target_condition": "target.is_member('31C')", "sp": 1}
+      {"type": "resource", "target": "ally_all", "target_condition": "target.is_team('31C')", "sp": 1}
     ]
   },
   "423": {
@@ -6753,7 +6753,7 @@
   "433": {
     "id": 433,
     "names": {"zh_cn": "钻石之尘+", "zh_tw": "鑽石塵+", "jp": "ダイヤモンド・ダスト+"},
-    "conditions": {"effects": "team.member('31C') >= 3"},
+    "conditions": {"effects": "team.count(is_team('31C')) >= 3"},
     "kind": "active",
     "ex_skill": true,
     "cost": {"sp": 12},
@@ -8245,7 +8245,7 @@
   "527": {
     "id": 527,
     "names": {"zh_cn": "纯爱热忱+", "zh_tw": "純愛野心+", "jp": "純愛アンビシャス+"},
-    "conditions": {"cost": "team.member('31E') >= 3"},
+    "conditions": {"cost": "team.count(is_team('31E')) >= 3"},
     "kind": "active",
     "ex_skill": true,
     "cost": {
@@ -8497,7 +8497,7 @@
   "546": {
     "id": 546,
     "names": {"zh_cn": "星火燎原+", "zh_tw": "星火燎原+", "jp": "星火燎原+"},
-    "conditions": {"effects": "team.member('31A') >= 3"},
+    "conditions": {"effects": "team.count(is_team('31A')) >= 3"},
     "kind": "active",
     "ex_skill": true,
     "cost": {"sp": 14},
@@ -8886,7 +8886,7 @@
   "564": {
     "id": 564,
     "names": {"zh_cn": "爱心爆破+", "zh_tw": "暖心轟炸機+", "jp": "ハートフル・ボマー+"},
-    "conditions": {"cost": "team.member('31D') >= 3"},
+    "conditions": {"cost": "team.count(is_team('31D')) >= 3"},
     "kind": "active",
     "ex_skill": true,
     "cost": {
@@ -9088,7 +9088,7 @@
   "577": {
     "id": 577,
     "names": {"zh_cn": "星煌交响曲", "zh_tw": "星輝的交響曲", "jp": "星煌のシンフォニア"},
-    "conditions": {"effects": "charging()"},
+    "conditions": {"effects": "has(25)"},
     "kind": "active",
     "ex_skill": true,
     "cost": {"sp": 12},
@@ -9143,7 +9143,7 @@
   "578": {
     "id": 578,
     "names": {"zh_cn": "泡幻柔情", "zh_tw": "泡幻柔情", "jp": "泡沫アフェトゥオーソ"},
-    "conditions": {"effects": "territory.has(204)"},
+    "conditions": {"effects": "territory_is(204)"},
     "kind": "active",
     "ex_skill": true,
     "cost": {"sp": 0},

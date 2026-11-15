@@ -21,8 +21,8 @@ KELIAN_DIR = ROOT_DIR / "assets" / "char-images" / "31A" / "Karen_Asakura"
 
 
 ELEMENTS = [('无', None), ('火', 'fire'), ('冰', 'ice'), ('雷', 'thunder'), ('光', 'light'), ('暗', 'dark')]
-FIELD_OPTIONS = [('无', None), ('稻场', 'rice_field'), ('火场', 'fire'), ('冰场', 'ice'),
-                 ('雷场', 'thunder'), ('光场', 'light'), ('暗场', 'dark')]
+FIELD_OPTIONS = [('无', None), ('火场', 'fire'), ('冰场', 'ice'),
+                 ('雷场', 'thunder'), ('光场', 'light'), ('暗场', 'dark'), ('稻场', 'rice_field'), ("其他", "others")]
 ELEMENT_NAMES = dict((value, label) for label, value in ELEMENTS)
 FIELD_NAMES = dict((value, label) for label, value in FIELD_OPTIONS)
 BLUE_BUTTON = ('QPushButton{background:#2563eb;color:white;border:1px solid #1d4ed8;'
@@ -1262,6 +1262,8 @@ class BattleTurn(QGroupBox):
         field = effective.get('field')
         if field is None:
             self.field_display.addWidget(QLabel('无'))
+        elif field == "others": 
+            self.field_display.addWidget(QLabel('其他'))
         else:
             icon = 'RiceFieldZone.webp' if field == 'rice_field' else f'{field.capitalize()}Zone.webp'
             self.field_display.addWidget(icon_label(
