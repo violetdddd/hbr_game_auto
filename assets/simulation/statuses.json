@@ -1,4 +1,9 @@
 {
+  "6": {
+    "name": "sp_modify",
+    "zh_cn": "sp消耗修正",
+    "category": "rule"
+  },
   "14": {
     "name": "zone",
     "zh_cn": "场地效果",
@@ -130,7 +135,8 @@
     "zh_cn": "连击珠", 
     "category": "buff", 
     "stack_group": "funnel",
-    "icon": "Funnel.webp"
+    "icon": "Funnel.webp",
+    "special": true
   },
   "25": {"name": "buff_charge", "zh_cn": "充能", "category": "buff", "removable": true, "forced_one": true, "icon": "Charge.png"},
   "54": {"name": "give_attack_buff_up", "zh_cn": "攻击增益强化", "category": "buff", "stack_group": "give_attack_buff_up", "removable": true, "icon": "GiveAttackBuffUp.png"},
@@ -153,16 +159,8 @@
   "143": {"name": "diva", "zh_cn": "歌姬", "category": "buff", "stack_group": "diva", "removable": true, "icon": "Diva.png"},
   "144": {"name": "shredding", "zh_cn": "速弹", "category": "buff", "removable": true, "icon": "Shredding.png"},
   "154": {"name": "b_i_yamawaki_servant", "zh_cn": "山胁仆从", "category": "buff", "forced_one": true, "icon": "BIYamawakiServant.png"},
-  "160": {
-    "name": "high_boost",
-    "zh_cn": "高阶增强",
-    "category": "buff",
-    "removable": true,
-    "forced_one": true,
-    "sp_modify": 2,
-    "icon": "HighBoost.png"
-  },
-  "166": {"name": "element_mark", "zh_cn": "属性印记", "category": "buff", "removable": true, "forced_one": true, "has_level": true, "icons": {
+  "160": {"name": "high_boost", "zh_cn": "高阶增强", "category": "buff", "removable": true, "forced_one": true, "icon": "HighBoost.png"},
+  "166": {"name": "element_mark", "zh_cn": "属性印记", "category": "buff", "removable": true, "forced_one": true, "has_level": true, "special": true, "icons": {
     "dark": "DarkMark.png",
     "fire": "FireMark.png",
     "ice": "IceMark.png",
@@ -171,7 +169,7 @@
   }},
   "171": {"name": "curry", "zh_cn": "咖喱", "category": "buff", "removable": true, "forced_one": true, "icon": "Curry.png"},
   "172": {"name": "shchi", "zh_cn": "白菜汤", "category": "buff", "removable": true, "forced_one": true, "icon": "Shchi.png"},
-  "174": {"name": "motivation", "zh_cn": "干劲", "category": "buff", "forced_one": true, "has_level": true, "icon": "Motivation.webp"},
+  "174": {"name": "motivation", "zh_cn": "干劲", "category": "buff", "forced_one": true, "has_level": true, "icon": "Motivation.webp", "special": true},
   "179": {"name": "mocktail", "zh_cn": "鸡尾酒", "category": "buff", "removable": true, "forced_one": true, "icon": "Mocktail.png"},
   "190": {"name": "steak", "zh_cn": "牛排", "category": "buff", "removable": true, "forced_one": true, "icon": "Steak.webp"},
   "191": {"name": "gelato", "zh_cn": "意式冰淇淋", "category": "buff", "removable": true, "forced_one": true, "icon": "Gelato.webp"},
@@ -181,7 +179,8 @@
     "category": "buff",
     "removable": true,
     "forced_one": true,
-    "icon": "Sprightly.webp"
+    "icon": "Sprightly.webp",
+    "special": true
   },
   "202": {"name": "dim_sum", "zh_cn": "点心", "category": "buff", "removable": true, "forced_one": true, "icon": "DimSum.webp"},
   "208": {"name": "revenge", "zh_cn": "复仇", "category": "buff", "forced_one": true, "has_level": true, "icon": "Revenge.webp"},
@@ -222,10 +221,10 @@
   "58": {"name": "misfortune", "zh_cn": "灾厄", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "icon": "Misfortune.png"},
   "136": {"name": "hacking", "zh_cn": "骇入破解", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "icon": "Hacking.png"},
   "145": {"name": "negative_mind", "zh_cn": "消极状态", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "icon": "NegativeMind.png"},
-  "177": {"name": "talisman", "zh_cn": "灵符", "category": "debuff", "forced_one": true, "has_level": true, "icon": "Talisman.png"},
+  "177": {"name": "talisman", "zh_cn": "灵符", "category": "debuff", "forced_one": true, "has_level": true, "icon": "Talisman.png", "special": true},
   "193": {"name": "disaster", "zh_cn": "祸", "category": "debuff", "debuff_guard": true, "forced_one": true, "has_level": true, "icon": "Disaster.webp"},
   "201": {"name": "undermine", "zh_cn": "蚀", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "icon": "Undermine.webp"},
-  "214": {"name": "infantilized", "zh_cn": "返婴状态", "category": "debuff", "forced_one": true, "has_level": true, "icon": "Infantilized.webp"},
+  "214": {"name": "infantilized", "zh_cn": "返婴状态", "category": "debuff", "forced_one": true, "has_level": true, "icon": "Infantilized.webp", "special": true},
   "218": {
     "name": "venom",
     "zh_cn": "猛毒",
@@ -235,9 +234,10 @@
     "forced_one": true,
     "hit": 3,
     "has_level": true,
-    "icon": "Venom.webp"
+    "icon": "Venom.webp",
+    "special": true
   },
-  "223": {"name": "inscription", "zh_cn": "诅咒刻印", "category": "debuff", "has_level": true, "icon": "Inscription.webp"},
+  "223": {"name": "inscription", "zh_cn": "诅咒刻印", "category": "debuff", "has_level": true, "icon": "Inscription.webp", "special": true},
   "230": {"name": "fear_for_demon", "zh_cn": "对魔王的恐惧", "category": "debuff", "icon": "FearOfDevil.webp"},
 
   "48": {"name": "skill_limit_count_up", "zh_cn": "技能使用次数上限提升", "category": "rule", "removable": true, "not_display": true},

@@ -4555,7 +4555,7 @@
     "trigger": "on_first_battle_start",
     "effects": [
       {"type": "all_status_up_value", "target": "ally_all", "status_id": 95, "target_condition": "target.is_team('31E')", "duration": {"type": "permanent"}, "value": 10},
-      {"type": "resource", "target": "ally_all", "target_condition": "target.is_team('31E')", "duration": {"type": "permanent"}, "sp_modify": -1}
+      {"type": "sp_modify", "status_id": 6, "target": "ally_all", "target_condition": "target.is_team('31E')", "duration": {"type": "permanent"}, "value": -1}
     ]
   },
   "287": {
@@ -5312,7 +5312,7 @@
     "trigger": "on_first_battle_start",
     "effects": [
       {"type": "all_status_up_value", "target": "ally_all", "status_id": 95, "target_condition": "character('Kanata_Maruyama') or character('Miko_Tenne') or character('Yayoi_Bungo') or character('Hisame_Ogasahara') or character('Yotsuha_Ohshima') or character('Vritika_Balakrishnan')", "duration": {"type": "permanent"}, "value": 10},
-      {"type": "resource", "target": "ally_all", "target_condition": "character('Kanata_Maruyama') or character('Miko_Tenne') or character('Yayoi_Bungo') or character('Hisame_Ogasahara') or character('Yotsuha_Ohshima') or character('Vritika_Balakrishnan')", "duration": {"type": "permanent"}, "sp_modify": -1}
+      {"type": "sp_modify", "status_id": 6, "target": "ally_all", "target_condition": "character('Kanata_Maruyama') or character('Miko_Tenne') or character('Yayoi_Bungo') or character('Hisame_Ogasahara') or character('Yotsuha_Ohshima') or character('Vritika_Balakrishnan')", "duration": {"type": "permanent"}, "value": -1}
     ]
   },
   "341": {
@@ -7374,6 +7374,7 @@
     "trigger": "on_first_battle_start",
     "effects": [
       {"type": "high_boost", "target": "ally_all", "status_id": 160, "duration": {"type": "permanent"}},
+      {"type": "sp_modify", "target": "ally_all", "status_id": 6, "duration": {"type": "permanent"}, "value": 2},
       {"type": "sp_limit_overwrite", "target": "ally_all", "status_id": 140, "duration": {"type": "permanent"}, "value": 30}
     ]
   },
