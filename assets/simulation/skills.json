@@ -7374,7 +7374,7 @@
     "trigger": "on_first_battle_start",
     "effects": [
       {"type": "high_boost", "target": "ally_all", "status_id": 160, "duration": {"type": "permanent"}},
-      {"type": "sp_limit_overwrite", "target": "ally_all", "status_id": 140, "duration": {"type": "permanent"}, "limit": 30}
+      {"type": "sp_limit_overwrite", "target": "ally_all", "status_id": 140, "duration": {"type": "permanent"}, "value": 30}
     ]
   },
   "466": {

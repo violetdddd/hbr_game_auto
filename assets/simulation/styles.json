@@ -178,7 +178,7 @@
     "limit_break": {
       "0": [
         {"id": 120001, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]},
-        {"id": 120002, "name": "好转", "trigger": "before_new_turn_start", "trigger_condition": "sp()<=0", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
+        {"id": 120002, "name": "好转", "trigger": "on_new_turn_start", "trigger_condition": "sp()<=0", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "1": [
         {"id": 120003, "name": "1MORE", "trigger": "on_attack_weak", "effects": [{"type": "additional_turn", "target": "self", "target_condition": "not has(20)"}]}
@@ -487,7 +487,7 @@
     "team": "31A", "tier": "A", "attack_type": "stab", "elements": [], "role": "buffer",
     "limit_break": {
       "5": [
-        {"id": 320001, "name": "良机", "trigger": "before_new_turn_start", "trigger_condition": "sp()<=3 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
+        {"id": 320001, "name": "良机", "trigger": "on_new_turn_start", "trigger_condition": "sp()<=3 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ]
     }
   },
@@ -1369,7 +1369,7 @@
     "team": "31B", "tier": "S", "attack_type": "stab", "elements": ["fire"], "role": "buffer",
     "limit_break": {
       "3": [
-        {"id": 900001, "name": "良机", "trigger": "before_new_turn_start", "trigger_condition": "sp()<=3 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
+        {"id": 900001, "name": "良机", "trigger": "on_new_turn_start", "trigger_condition": "sp()<=3 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "10": [
         {"id": 900002, "name": "火之慧眼", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "critical_rate_up", "target": "ally_front", "elements": ["fire"], "value": 20, "duration": {"type": "ally_turn", "value": 1}, "status_id": 5}]}
@@ -1942,7 +1942,7 @@
     "team": "31C", "tier": "A", "attack_type": "stab", "elements": [], "role": "breaker",
     "limit_break": {
       "5": [
-        {"id": 1290001, "name": "良机", "trigger": "before_new_turn_start", "trigger_condition": "sp()<=3 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
+        {"id": 1290001, "name": "良机", "trigger": "on_new_turn_start", "trigger_condition": "sp()<=3 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ]
     }
   },
@@ -2912,7 +2912,7 @@
     "team": "30G", "tier": "A", "attack_type": "slash", "elements": [], "role": "blaster",
     "limit_break": {
       "5": [
-        {"id": 1940001, "name": "良机", "trigger": "before_new_turn_start", "trigger_condition": "sp()<=3 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
+        {"id": 1940001, "name": "良机", "trigger": "on_new_turn_start", "trigger_condition": "sp()<=3 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ]
     }
   },
@@ -3377,7 +3377,7 @@
         {"id": 2270001, "name": "友爱", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "heal_dp_rate", "target": "ally_sub", "value": 10}]}
       ],
       "10": [
-        {"id": 2270002, "name": "良机", "trigger": "before_new_turn_start", "trigger_condition": "sp()<=3 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
+        {"id": 2270002, "name": "良机", "trigger": "on_new_turn_start", "trigger_condition": "sp()<=3 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ]
     }
   },
@@ -3906,7 +3906,7 @@
     "team": "31E", "tier": "S", "attack_type": "stab", "elements": [], "role": "buffer",
     "limit_break": {
       "3": [
-        {"id": 2630001, "name": "良机", "trigger": "before_new_turn_start", "trigger_condition": "sp()<=3 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
+        {"id": 2630001, "name": "良机", "trigger": "on_new_turn_start", "trigger_condition": "sp()<=3 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "10": [
         {"id": 2630002, "name": "火之意志", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "attack_up", "target": "ally_front", "elements": ["fire"], "value": 12, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
@@ -4197,7 +4197,7 @@
     "team": "31F", "tier": "A", "attack_type": "stab", "elements": [], "role": "healer",
     "limit_break": {
       "5": [
-        {"id": 2820001, "name": "良机", "trigger": "before_new_turn_start", "trigger_condition": "sp()<=3 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
+        {"id": 2820001, "name": "良机", "trigger": "on_new_turn_start", "trigger_condition": "sp()<=3 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ]
     }
   },
@@ -4248,7 +4248,7 @@
     "team": "31F", "tier": "S", "attack_type": "stab", "elements": [], "role": "buffer",
     "limit_break": {
       "3": [
-        {"id": 2860001, "name": "良机", "trigger": "before_new_turn_start", "trigger_condition": "sp()<=3 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
+        {"id": 2860001, "name": "良机", "trigger": "on_new_turn_start", "trigger_condition": "sp()<=3 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "10": [
         {"id": 2860002, "name": "薰风", "trigger": "on_action_start", "trigger_condition": "front()", "effects": [{"type": "give_heal_up", "target": "self", "value": 10, "duration": {"type": "ally_turn", "value": 1}, "status_id": 52}]}
@@ -4764,7 +4764,7 @@
         {"id": 3220001, "name": "勇气", "trigger": "on_action_start", "trigger_condition": "dp_rate()>=0.5 and front()", "effects": [{"type": "attack_up", "target": "self", "value": 15, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
       ],
       "10": [
-        {"id": 3220002, "name": "良机", "trigger": "before_new_turn_start", "trigger_condition": "sp()<=3 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
+        {"id": 3220002, "name": "良机", "trigger": "on_new_turn_start", "trigger_condition": "sp()<=3 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ]
     }
   },
@@ -4829,7 +4829,7 @@
     "team": "31X", "tier": "A", "attack_type": "slash", "elements": [], "role": "buffer",
     "limit_break": {
       "5": [
-        {"id": 3260001, "name": "良机", "trigger": "before_new_turn_start", "trigger_condition": "sp()<=3 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
+        {"id": 3260001, "name": "良机", "trigger": "on_new_turn_start", "trigger_condition": "sp()<=3 and front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ]
     }
   },
@@ -5607,7 +5607,7 @@
     "team": "31AB", "tier": "SSR", "attack_type": "slash", "elements": ["ice"], "role": "buffer",
     "limit_break": {
       "0": [
-        {"id": 3760001, "name": "好转", "trigger": "before_new_turn_start", "trigger_condition": "sp()<=0", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
+        {"id": 3760001, "name": "好转", "trigger": "on_new_turn_start", "trigger_condition": "sp()<=0", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "1": [
         {"id": 3760002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
