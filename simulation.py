@@ -230,6 +230,7 @@ class Status:
     duration_type: Optional[str] = None
     remaining: Optional[int] = None
     level: int = 0
+    source: Optional[int] = None
 
 @dataclass
 class Style:
@@ -368,7 +369,7 @@ class Battle:
     field: Optional[str] = None
     territory: Optional[str] = None
     global_od_rate: float = 100.0
-    super_scale = {"element": None, "value": 0}  # 超越量表
+    super_scale: dict = field(default_factory=lambda: {"element": None, "value": 0})  # 超越量表
 
 
 @dataclass
@@ -421,7 +422,7 @@ class Simulation:
             'od_level': int,
             'bonus': int,
             'additional_turn': bool,
-            "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form": 0}
+            "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form_change": 0}
         其中，技能的第0个为默认主动技能，第1个为默认被动技能（无），第2个为追击，普通攻击默认无目标
         """
         return asdict(turn)
@@ -666,13 +667,14 @@ class Simulation:
         'od_level': 0,
         'bonus': 0,
         'additional_turn': False,
-        "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form": 0}
+        "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form_change": 0}
     }
 
-    def recalculate(self, gui_add_state):
+    def recalculate(self, gui_add_state, turn_number):
         """
         接受gui传入的state并直接覆盖当前的Turn类对应值：
         gui_add_state = {
+            "member_status": [{"id": int, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None}] * 6,
             'order': [int] * 6,
             'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int | None}, "user_selected": None | int, "on_break": False}] * 6,
             'enemies': [{"exist": bool, "damage_rate": int, 'down': bool, "statuses": [
@@ -681,7 +683,7 @@ class Simulation:
             'field': str or None,
             'od_timing': str or None,
             'od_level': int,
-            "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form": 0}
+            "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form_change": 0}
         }
         重新计算从turn start开始计算后返回可能改变的值
         simulation_state = {

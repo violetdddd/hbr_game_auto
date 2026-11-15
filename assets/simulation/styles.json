@@ -737,46 +737,28 @@
       ]
     }
   },
-  "490001": {
-    "id": 490001,
-    "link": 490002,
+  "49": {
+    "id": 49,
     "names": {"zh_cn": "CODE:Virtual Killer", "zh_tw": "CODE:Virtual Killer", "jp": "CODE:Virtual Killer"},
     "character_names": {"zh_cn": "朝仓 可怜", "zh_tw": "朝倉 可憐", "jp": "朝倉 可憐", "en": "Karen_Asakura"},
     "team": "31A", "tier": "SSR", "attack_type": "slash", "elements": [], "role": "blaster",
     "limit_break": {
       "0": [
-        {"id": 490001, "name": "与伙伴一起【朝仓可怜 专属】", "trigger": "on_new_turn_start", "effects": [{"type": "resource", "target": "ally_all_without_self", "sp": 1}]}
-      ],
-      "1": [
-        {"id": 490003, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
-      ],
-      "3": [
-        {"id": 490004, "name": "屹立于战场【朝仓可怜 专属】", "trigger": "on_action_start", "effects": [{"type": "attack_up", "target": "ally_all", "value": 25, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]}
-      ],
-      "4": [
-        {"id": 490006, "name": "编织出的勇气【朝仓可怜 专属】", "trigger": "on_new_turn_start", "effects": [{"type": "resource", "target": "od", "od": 10}]}
-      ]
-    },
-    "special": {"type": "form_change", "names": {"zh_cn": "切换形态", "zh_tw": "切换形态", "jp": "フォームチェンジ"}, "trigger": "user_select"}
-  },
-  "490002": {
-    "id": 490002,
-    "link": 490001,
-    "names": {"zh_cn": "CODE:Virtual Killer", "zh_tw": "CODE:Virtual Killer", "jp": "CODE:Virtual Killer"},
-    "character_names": {"zh_cn": "朝仓 可怜", "zh_tw": "朝倉 可憐", "jp": "朝倉 可憐", "en": "Karen_Asakura"},
-    "team": "31A", "tier": "SSR", "attack_type": "slash", "elements": [], "role": "blaster",
-    "limit_break": {
-      "0": [
+        {"id": 490001, "name": "与伙伴一起【朝仓可怜 专属】", "trigger": "on_new_turn_start", "effects": [{"type": "resource", "target": "ally_all_without_self", "sp": 1}]},
         {"id": 490002, "name": "无差别杀人魔【可镰 专属】", "trigger": "on_action_start", "effects": [{"type": "ignore_e_shield_element", "target": "self", "duration": {"type": "ally_turn", "value": 1}, "status_id": 169}]}
       ],
       "1": [
         {"id": 490003, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
+        {"id": 490004, "name": "屹立于战场【朝仓可怜 专属】", "trigger": "on_action_start", "effects": [{"type": "attack_up", "target": "ally_all", "value": 25, "duration": {"type": "ally_turn", "value": 1}, "status_id": 1}]},
         {"id": 490005, "name": "托付给你了【可镰 专属】", "trigger": "on_break_enemy", "effects": [{"type": "resource", "target": "od", "od": 25}]}
+      ],
+      "4": [
+        {"id": 490006, "name": "编织出的勇气【朝仓可怜 专属】", "trigger": "on_new_turn_start", "effects": [{"type": "resource", "target": "od", "od": 10}]}
       ]
     },
-    "special": {"type": "form_change", "names": {"zh_cn": "切换形态", "zh_tw": "切换形态", "jp": "フォームチェンジ"}, "trigger": "user_select"}
+    "special": {"type": "kelian_form_change", "names": {"zh_cn": "切换形态", "zh_tw": "切换形态", "jp": "フォームチェンジ"}, "trigger": "user_select"}
   },
   "50": {
     "id": 50,

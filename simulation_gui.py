@@ -17,6 +17,8 @@ from PySide6.QtWidgets import (
 from paths import ROOT_DIR
 SIMULATION_DIR = ROOT_DIR / 'assets' / 'simulation'
 ICON_DIR = ROOT_DIR / 'assets' / 'icons'
+KELIAN_DIR = ROOT_DIR / "assets" / "char-images" / "31A" / "Karen_Asakura"
+
 
 ELEMENTS = [('无', None), ('火', 'fire'), ('冰', 'ice'), ('雷', 'thunder'), ('光', 'light'), ('暗', 'dark')]
 FIELD_OPTIONS = [('无', None), ('稻场', 'rice_field'), ('火场', 'fire'), ('冰场', 'ice'),
@@ -287,7 +289,7 @@ class SpecialActionDialog(QDialog):
         'demonic_rage': '鬼神化',
         'all_out_attack': '总攻击',
         'demon_cavalry': '魔界骑兵启动',
-        "kelian_form": "可怜形态"
+        "kelian_form_change": "可怜形态"  # 0为可怜，1为可镰
     }
     def __init__(self, on_break, special_trigger, special_count=0, parent=None):
         super().__init__(parent)
@@ -309,9 +311,12 @@ class SpecialActionDialog(QDialog):
             name = self.SPECIAL_NAMES.get(special_trigger, special_trigger)
             row.addWidget(QLabel(name))
             maximum = 3 if special_trigger == 'demon_cavalry' else 1
-            self.special_combo = combo([
-                ("不发动" if i == 0 else f"发动{i}次", i) for i in range(maximum + 1)
-            ])
+            if special_trigger != "kelian_form_change":
+                self.special_combo = combo([
+                    ("不发动" if i == 0 else f"发动{i}次", i) for i in range(maximum + 1)
+                ])
+            else:
+                self.special_combo = combo([("杀戮如游戏", 0), ("杀戮如呼吸", 1)])
 
             self.special_combo.setCurrentIndex(
                 max(0, self.special_combo.findData(special_count))
@@ -943,12 +948,12 @@ class BattleTurn(QGroupBox):
             'field': str or None,
             'od_timing': str or None,
             'od_level': int,
-            "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form": 0}
+            "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form_change": 0}
         }
         """
         base = self.state_data["base"]
         gui_add_state = {
-            "member_status": base["members"]["statuses"],
+            "member_status": [member["statuses"] for member in base["members"]],
             'order': base["order"],
             'actions': base["actions"],
             'enemies': base["enemies"],
@@ -957,7 +962,7 @@ class BattleTurn(QGroupBox):
             'od_level': base["od_level"],
             "special_actions": base["special_actions"]
         }
-        simulation_state = copy.deepcopy(self.owner.engine.recalculate(copy.deepcopy(gui_add_state)))
+        simulation_state = copy.deepcopy(self.owner.engine.recalculate(copy.deepcopy(gui_add_state), self.number))
         for need_update in ("members", "od", "predicted_od", "bonus", "super_scale"):
             base[need_update] = simulation_state[need_update]
 
@@ -1336,7 +1341,13 @@ class BattleTurn(QGroupBox):
             style = self.owner.setup.styles[slot]
             # 按slot修改portrait
             button, portrait = self.portraits[position]
-            portrait.configure(style.image if style else None,
+            if not style:
+                style_image = None
+            elif style.title == "CODE:Virtual Killer":
+                style_image = style.image if effective["special_actions"]["kelian_form_change"] == 0 else KELIAN_DIR / '009-2.webp'
+            else:
+                style_image = style.image
+            portrait.configure(style_image if style else None,
                                self.owner.setup.round_pixmap, int(member.get('sp', 0)))
             target = effective['actions'][slot]['target']
             self.target_badges[position].configure(target, self.owner.setup.styles, self.owner.setup.round_pixmap)
@@ -1459,7 +1470,7 @@ class SimulationTab(QWidget):
             'od_level': int,
             'bonus': int,
             'additional_turn': bool,
-            "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form": 0}
+            "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form_change": 0}
         }
         """
         turn_config = {"base": simulation_state, "adjustments": {"od": 0.0, "members": [{"sp": 0, "token": 0} for _ in range(6)]}}
