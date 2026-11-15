@@ -250,19 +250,22 @@ class Style:
     active_skills: List[Skill] = field(default_factory=list)
     # 保存所有可能的triggers，后续advance可以先检查该风格有没有trigger，若有再按顺序遍历limit_break_passive，skill_passive，support_skill_passive
     passive_triggers: List[str] = field(default_factory=list)
+    # 提前计算默认的技能，普攻/指挥，无，追击
+    basic_skills: List[dict] = field(default_factory=list)
 
     # 角色的动态资源与修正，不在这里执行计算。
-    od_rate: float = 1.0
+    special_trigger: str = None  # 是否需要检测破盾以及专属技能（鬼神化、小按钮、总攻击）或机制（超越量表、切换形态）
+    od_rate_extra: float = 0.0  # 光月歌共鸣和鱼大师被动，在battle_start()中储存
     od_earring: int = 15
-    sp_modify: int = 0
+    # 每次攻击前根据各种状态动态计算
+    sp_modify: int = 0 
+    # 每回合的状态
     sp: int = 0
     ep: int = 0
     token: int = 0
     dp: float = 100.0
     statuses: List[Status] = field(default_factory=list)
-
     turn_action: Optional[dict] = None
-    basic_skills: List[dict] = field(default_factory=list)
 
     @staticmethod
     def generate_default_skills_from_skill(skill: Skill) -> dict:
@@ -286,6 +289,10 @@ class Style:
         """装配已选择技能/解锁突破；不会推断 SP/EP/状态的战斗规则。"""
         data = {k: deepcopy(record[k]) for k in ('id', 'names', 'character_names', 'team', 'tier', 'elements', 'role', 'attack_type')}
         instance = cls(**data, od_earring=od_earring)
+        # 检测char独特的技能/机制
+        special = record.get("special")
+        if special:
+            instance.special_trigger = special.get("type")
         # 读入当前突破下解锁的突破被动，跳过已经升级的小被动
         for level, entries in record.get('limit_break', {}).items():
             level = int(level)
@@ -293,13 +300,10 @@ class Style:
                 continue
             for entry in entries:
                 discard_level = entry.get('discard_limit_level')
-
                 if (discard_level is not None and break_level >= int(discard_level)):
                     continue
-
                 # from_record会过滤掉那些ignore的effect
                 passive = LimitBreak.from_record(entry)
-
                 if passive is not None:
                     instance.limit_break_passive.append(passive)
         # 读入主动技能
@@ -364,6 +368,7 @@ class Battle:
     field: Optional[str] = None
     territory: Optional[str] = None
     global_od_rate: float = 100.0
+    super_scale = {"element": None, "value": 0}  # 超越量表
 
 
 @dataclass
@@ -387,8 +392,39 @@ class Simulation:
         self.styles_path = SIMULATION_DIR / 'styles.json'
         self.skill_records: Dict[int, JsonDict] = {}
         self.style_records: Dict[int, JsonDict] = {}
-        self.turn: Optional[Turn] = None
+        self.turns: List[Turn] = []
         self.initial_config: Optional[JsonDict] = None
+
+    def turn_to_dict(self, turn: Turn) -> dict:
+        """
+        将 Turn 转换为 GUI 可序列化的字典。
+        simulation_state = {
+            'members': [{
+            'sp': int, 'token': int, "ep": int, 'dp': float, "special_trigger": str | None,
+            'statuses': [{
+                "id": int, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None
+            }, ... ],
+            "skills": [{"name": str, "cost_type": str, "cost": int, "id": int, "target_type": str, "user_select": None | [str]}, ... ] 
+            } for _ in range(6)],
+            'order': [int] * 6,
+            'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int | None}, "user_selected": None | int, "on_break": False}] * 6,
+            'enemies': [{"exist": bool, "damage_rate": int, 'down': bool, "statuses": [
+            {"id": int, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None}, ...
+            ]} for _ in range(3)],
+            'enemy_weaknesses': [str],
+            "super_scale" = {"element": None, "value": 0},
+            'field': str or None,
+            "turn" : int,
+            'od': float,
+            'predicted_od': float,
+            'od_timing': str or None,
+            'od_level': int,
+            'bonus': int,
+            'additional_turn': bool,
+            "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form": 0}
+        其中，技能的第0个为默认主动技能，第1个为默认被动技能（无），第2个为追击，普通攻击默认无目标
+        """
+        return asdict(turn)
 
     def initialize(self, state: dict) -> Turn:
         """从战斗设置和数据库创建初始 Turn，不执行下一回合结算。
@@ -458,6 +494,8 @@ class Simulation:
             raise ValueError('共鸣风格不能重复')
         if set(style_ids).intersection(resonance_ids):
             raise ValueError('共鸣不能与任意上场风格重复')
+        if sum(1 for sid in style_ids if style_records.get(sid)["role"] == "admiral") > 1:
+            raise ValueError('上场的admiral风格不能多于一个')
 
         # 解析每一个上场风格的技能和共鸣风格的id，传入Style.from_record进行进一步解析
         result_styles = []
@@ -518,39 +556,14 @@ class Simulation:
         self.skill_records = skill_records
         self.style_records = style_records
         self.initial_config = config
-        self.turn = turn
+        self.turns = [turn]
         return turn
 
-    def turn_to_dict(self, turn: Turn) -> dict:
+    def battle_start(self):
         """
-        将 Turn 转换为 GUI 可序列化的字典。
-        simulation_state = {
-            'members': [{
-            'sp': int, 'token': int, "ep": int, 'dp': float,
-            'statuses': [{
-                "id": int, "duration_type": str, "remaining": int, "level": int, "element": str
-            }, ... ],
-            "skills": [{"name": str, "cost_type": str, "cost": int, "id": int, "target_type": str, "user_select": None | [str]}, ... ] 
-            } for _ in range(6)],
-            'order': [int] * 6,
-            'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int | None}, "user_selected": None | int}] * 6,
-
-            'enemies': [{"exist": bool, "damage_rate": int, 'down': bool, "statuses": [
-            {"id": int, "duration_type": str, "remaining": int, "level": int, "element": str}, ...
-            ]} for _ in range(3)],
-            'enemy_weaknesses': [str],
-
-            'field': str or None,
-            "turn" : int,
-            'od': float,
-            'predicted_od': float,
-            'od_timing': str or None,
-            'od_level': int,
-            'bonus': int,
-            'additional_turn': bool
-        其中，技能的第0个为默认主动技能，第1个为默认被动技能（无），第2个为追击，普通攻击默认无目标
+        战斗开场要处理的被动等
         """
-        return asdict(turn)
+        pass
 
     def advance(self, last_state) -> dict:
         """根据当前GUI传回的state计算下一回合的开始的state；不修改传入对象。"""
@@ -562,6 +575,7 @@ class Simulation:
 
         members = []
         actions = []
+        super_element = None
 
         # 测试用基础行动
         for slot, style in enumerate(turn.team):
@@ -590,13 +604,18 @@ class Simulation:
                     'user_select': user_select,
                 })
 
+            special_trigger = style.special_trigger
+            if special_trigger == "elemental_admiral":
+                super_element = style.elements[0]
+
             members.append({
                 'sp': style.sp,
                 'ep': style.ep,
                 'token': style.token,
                 'dp': style.dp,
-                'statuses': deepcopy(style.statuses),
+                'statuses': [],
                 'skills': skills,
+                "special_trigger": special_trigger
             })
 
             # 前三名默认普通攻击，后三名默认无行动
@@ -610,6 +629,7 @@ class Simulation:
                     'slot': None,
                 },
                 'user_selected': None,
+                "on_break": False
             })
 
         # GUI 中三个敌人位置始终存在，使用 exist 标记实际敌人
@@ -624,20 +644,29 @@ class Simulation:
                 'statuses': deepcopy(monster.statuses),
             }
 
+        # 超越量表
+        super_scale = 0
+        if super_element:
+            for style in turn.team:
+                if super_element in style.elements:
+                    super_scale += 15
+
         return {
         'members': members,
         'order': list(range(6)),
         'actions': actions,
         'enemies': enemies,
         'enemy_weaknesses': deepcopy(turn.battle.enemy_weaknesses),
+        "super_scale": {"element": super_element, "value": super_scale},
         'field': turn.battle.field,
         'turn': 1,
         'od': float(turn.od),
-        'predicted_od': float(turn.od),
+        'predicted_od': float(turn.od)+100,
         'od_timing': None,
         'od_level': 0,
         'bonus': 0,
         'additional_turn': False,
+        "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form": 0}
     }
 
     def recalculate(self, gui_add_state):
@@ -645,26 +674,28 @@ class Simulation:
         接受gui传入的state并直接覆盖当前的Turn类对应值：
         gui_add_state = {
             'order': [int] * 6,
-            'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int | None}, "user_selected": None | int}] * 6,
+            'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int | None}, "user_selected": None | int, "on_break": False}] * 6,
             'enemies': [{"exist": bool, "damage_rate": int, 'down': bool, "statuses": [
-            {"id": int, "duration_type": str, "remaining": int, "level": int, "element": str}, ...
+            {"id": int, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None}, ...
             ]} for _ in range(3)],
             'field': str or None,
             'od_timing': str or None,
-            'od_level': int
+            'od_level': int,
+            "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form": 0}
         }
         重新计算从turn start开始计算后返回可能改变的值
         simulation_state = {
             'members': [{
-            'sp': int, 'token': int, "ep": int, 'dp': float,
+            'sp': int, 'token': int, "ep": int, 'dp': float, "special_trigger": str | None,
             'statuses': [{
-                "id": int, "duration_type": str, "remaining": int, "level": int, "element": str
+                "id": int, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None
             }, ... ],
             "skills": [{"name": str, "cost_type": str, "cost": int, "id": int, "target_type": str, "user_select": None | [str]}, ... ] 
             } for _ in range(6)],
             'od': float,
             'predicted_od': float,
             'bonus': int
+            "super_scale": {"element": None, "value": 0},
         }
         """
 
