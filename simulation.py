@@ -361,6 +361,8 @@ class Style:
                     for effect in passive.effects:
                         if isinstance(effect.get('value'), list):
                             effect['value'] = effect['value'][resonance_break_level]
+                        if isinstance(effect.get('od'), list):
+                            effect['od'] = effect['od'][resonance_break_level]
                     instance.support_skill_passive = passive
         instance.passive_triggers = list(dict.fromkeys(
             passive.trigger
@@ -1225,12 +1227,19 @@ class Simulation:
         turn = self.initialize(state)
         self.battle_start(turn)
 
-        # 开场先加2sp
+        # 开场先加3sp
         for style in turn.team:
-            self.add_sp(style, {"sp": 2})
+            self.add_sp(style, {"sp": 3})
         # 再结算on_new_turn_start
         self.trigger_passives(turn, "on_new_turn_start")
         self.resolve_od(turn)
+        # 特殊属性印记状态，为前排角色提供额外1sp
+        for style in turn.team[:3]:
+            for status in style.statuses:
+                if status.id == 166 and status.level == 6:
+                    self.add_sp(style, {"sp": 1})
+                    break
+        
 
         # 生成gui所需字典
         members = self.calculate_member_skills(turn)
