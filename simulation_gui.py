@@ -101,15 +101,28 @@ class FullPopupCombo(NoWheelComboBox):
 
 # 一般的图标显示
 def icon_label(path, size=23, fallback=''):
-    label = QLabel(); label.setFixedSize(size, size)
+    label = QLabel()
+    label.setFixedSize(size, size)
     label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
     pixmap = QPixmap(str(path))
     if not pixmap.isNull():
-        label.setPixmap(pixmap.scaled(size, size, Qt.AspectRatioMode.KeepAspectRatio,
-                                     Qt.TransformationMode.SmoothTransformation))
+        ratio = label.devicePixelRatioF()
+        pixel_size = round(size * ratio)
+
+        pixmap = pixmap.scaled(
+            pixel_size, pixel_size,
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation
+        )
+        pixmap.setDevicePixelRatio(ratio)
+
+        label.setPixmap(pixmap)
+        label.setScaledContents(False)
     else:
         label.setText(fallback)
         label.setToolTip(f'图片不存在：{path}')
+
     return label
 
 # 清理一整个layout
@@ -1363,8 +1376,8 @@ class BattleTurn(QGroupBox):
             clear_layout(self.status_rows[position])
             for status in member.get('statuses', []):
                 path = self._status_icon(status)
-                if path:
-                    self.status_rows[position].addWidget(icon_label(path, 15))
+                if path and position <= 2:
+                    self.status_rows[position].addWidget(icon_label(path, 21))
             # 按slot修改可行的所有技能选择
             action = self.action_boxes[position]
             skiills = member.get('skills', [])
@@ -1453,7 +1466,7 @@ class SimulationTab(QWidget):
             'members': [{
             'sp': int, 'token': int, "ep": int, 'dp': float, "special_trigger": str | None,
             'statuses': [{
-                "id": int, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None
+                "id": int, "name": str, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None
             }, ... ],
             "skills": [{"name": str, "cost_type": str, "cost": int, "id": int, "target_type": str, "user_select": None | [str]}, ... ] 
             } for _ in range(6)],

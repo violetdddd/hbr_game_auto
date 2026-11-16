@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 from copy import deepcopy
 from dataclasses import asdict, dataclass, field, fields
+import dataclasses
 from typing import Any, Dict, List, Optional, Union
 
 
@@ -18,31 +19,47 @@ JsonDict = Dict[str, Any]
 
 ELEMENTS = ('fire','ice','thunder','light','dark')
 
-IGNORED_PASSIVE_EFFECT_TYPES = [
-    "all_status_up_value",
-    "attack_up_per_token",
-    "border_ref_p_down_by_admiral",
-    "break_guard",
-    "critical_rate_up",
-    "damage_rate_up",
-    "damage_rate_up_per_token",
-    "debuff_guard",
-    "defense_up",
-    "defense_up_per_token",
-    "give_defense_debuff_up",
-    "give_heal_up",
-    "heal_dp_rate",
-    "invincible",
-    "makeup",
-    "power_up_value",
-    "revive_dp_rate",
-    "stun_random",
-    "toughness_up_value",
-    "toughness_up_value_per_revenge_level",
-    "remove_special_status",
-    "skill_limit_count_up",
-    "break_down_turn_up"
-]
+PASSIVE_EFFECT_TYPES_NEEDED = {
+    # 资源
+    "resource",
+    "token",
+    "token_up_per_attack_enemy",
+    "over_drive_rate_up",
+    "reduce_consume_overdrive",
+    # SP / EP
+    "overwrite_sp",
+    "sp_limit_overwrite",
+    "ep_limit_overwrite",
+    "sp_modify",
+    # 行动
+    "additional_turn",
+    "double_action_extra_skill",
+    "double_attack_skill",
+    "sprightly",
+    # 影响后续条件判断的状态和场地
+    "element_mark",
+    "motivation",
+    "zone",
+    "mocktail",
+    "talisman",
+    "inscription",
+    "rice_field_zone",
+    "morale",
+    "funnel",
+    "buff_charge",
+    "give_debuff_turn_up",
+    "shadow_clone",
+    "negative_mind",
+    "infantilized",
+    "high_boost",
+    "arrow_cherry_blossoms",
+    "dodge",
+    "disaster",
+    "provoke",
+    "misfortune",
+    "cover",
+    "revenge"
+}
 
 from paths import ROOT_DIR
 SIMULATION_DIR = ROOT_DIR / 'assets' / 'simulation'
@@ -59,7 +76,7 @@ def _filter_passive_effects(effects):
         return [
             deepcopy(effect)
             for effect in effects
-            if effect.get('type') not in IGNORED_PASSIVE_EFFECT_TYPES
+            if effect.get('type') in PASSIVE_EFFECT_TYPES_NEEDED
         ]
 
     if isinstance(effects, dict):
@@ -94,21 +111,27 @@ def _filter_passive_record(record):
     return data
 
 
-def json_records_to_dict(path: Path) -> Dict[int, JsonDict]:
+def json_records_to_dict(path: Path, has_id=True) -> Dict[int, JsonDict]:
     """将 JSON 顶层记录按内部 id 建立索引，拒绝重复 id。"""
     with path.open('r', encoding='utf-8') as handle:
         records = json.load(handle)
         if not isinstance(records, dict):
             raise ValueError('数据库顶层必须是字典')
-        indexed = {}
-        for value in records.values():
-            if not isinstance(value, dict) or 'id' not in value:
-                raise ValueError('数据库记录缺少 id')
-            key = int(value['id'])
-            if key in indexed:
-                raise ValueError(f'数据库存在重复 ID: {key}')
-            indexed[key] = value
-        return indexed
+        if has_id:
+            indexed = {}
+            for value in records.values():
+                if not isinstance(value, dict) or 'id' not in value:
+                    raise ValueError('数据库记录缺少 id')
+                key = int(value['id'])
+                if key in indexed:
+                    raise ValueError(f'数据库存在重复 ID: {key}')
+                indexed[key] = value
+            return indexed
+        else:
+            indexed = {}
+            for key, value in records.items():
+                indexed[int(key)] = value
+            return indexed
 
 
 @dataclass
@@ -189,7 +212,7 @@ class LimitBreak:
     trigger: str
     trigger_condition: Optional[str] = None
     effects: List[JsonDict] = field(default_factory=list)
-
+    trigger_times: int = 0
     trigger_limit: Optional[int] = None
     skill_id: Optional[int] = None
     status_id: Optional[List[int]] = None
@@ -230,8 +253,12 @@ class Status:
     element: Optional[str] = None
     duration_type: Optional[str] = None
     remaining: Optional[int] = None
-    level: int = 0
+    level: Optional[int] = None
     source: Optional[int] = None
+    data: dict = field(default_factory=dict)  # 通用字段，储存特殊的status
+
+    def to_dict(self):
+        return {"id": self.id, "name": self.name, "duration_type": self.duration_type, "remaining": self.remaining, "level": self.level, "element": self.element, "source": self.source}
 
 @dataclass
 class Style:
@@ -264,11 +291,12 @@ class Style:
     sp_modify: int = 0 
     # 每回合的状态
     sp: int = 0
+    sp_limit: int = 20
     ep: int = 0
+    ep_limit: int = 10
     token: int = 0
     dp: float = 100.0  # 范围是0-150
     statuses: List[Status] = field(default_factory=list)
-    turn_action: Optional[dict] = None
 
     @staticmethod
     def generate_default_skills_from_skill(skill: Skill) -> dict:
@@ -366,22 +394,24 @@ class Monster:
 
 @dataclass
 class Battle:
-    enemy_weaknesses: List[str] = field(default_factory=list)
-    monsters: List[Monster] = field(default_factory=list)
-    field: Optional[str] = None  # 无、元素、稻场、其他
+    enemy_weaknesses: List[str] = dataclasses.field(default_factory=list)
+    monsters: List[Monster] = dataclasses.field(default_factory=list)
+    field: dict = dataclasses.field(default_factory=lambda: {"value": None, "left_turn": -1})  # 无、元素、稻场、其他
     territory: Optional[int] = None
     global_od_rate: float = 100.0
-    super_scale: dict = field(default_factory=lambda: {"element": None, "value": 0})  # 超越量表
-
+    super_scale: dict = dataclasses.field(default_factory=lambda: {"element": None, "value": 0})  # 超越量表
+    od_consume: int = 100
 
 @dataclass
 class Turn:
     """GUI 与 Simulation 交换的战斗快照；结算应另在 Simulation 引擎实现。"""
     battle: Battle
     team: List[Style] = field(default_factory=list)  # 永远按照slot顺序0-5排布
-    turn_num: int = 0  # 记录当前第几回合
+    turn_num: int = 1  # 记录当前第几回合
     actions: List[Dict] = field(default_factory=list)  # 记录当前回合的行动
     od: float = 0.0  # 百分比下保留2位小数
+    predicted_od: float = 0.0  # 百分比下保留2位小数，用于真正返回预测od值
+    stage_tmp_od: float = 0.0  # 百分比下保留2位小数，用于给apply_effect暂存
     od_timing: Optional[str] = None  # None, before, after
     od_level: int = 0
     additional_turn: bool = False
@@ -435,11 +465,11 @@ class Conditions:
     @staticmethod
     def zone(ctx: Context, need_element_s: str):
         if need_element_s == "elements":
-            return ctx.turn.battle.field in ELEMENTS
+            return ctx.turn.battle.field["value"] in ELEMENTS
         elif need_element_s == "none":
-            return not ctx.turn.battle.field
+            return not ctx.turn.battle.field["value"]
         elif need_element_s in ELEMENTS:
-            return ctx.turn.battle.field == need_element_s
+            return ctx.turn.battle.field["value"] == need_element_s
 
     @staticmethod
     def during_down_turn(ctx: Context):
@@ -525,6 +555,7 @@ OPS = {
     ast.GtE: operator.ge,
 }
 def check(expr, ctx):
+    """检测数据库语句函数是否为真"""
     def run(node, ctx):
         if isinstance(node, ast.Constant):
             return node.value
@@ -567,14 +598,45 @@ def check(expr, ctx):
 
     return bool(run(ast.parse(expr, mode='eval').body, ctx))
 
+# 按顺序遍历风格被动
+def iter_passives(style: Style):
+    yield from style.limit_break_passive
+    yield from style.skill_passive
+    if style.support_skill_passive is not None:
+        yield style.support_skill_passive
+
+# 获得target的列表
+def resolve_targets(turn: Turn, owner: Style, target_type: str):
+    front = [turn.team[i] for i in turn.order[:3]]
+    sub = [turn.team[i] for i in turn.order[3:]]
+    groups = {  # 采用lambda表达式，这样仅在实际选择了该lambda分支才运行
+        "self": lambda: [owner],
+        "ally_all": lambda: turn.team,
+        "ally_front": lambda: front,
+        "ally_sub": lambda: sub,
+        "ally_all_without_self": lambda: [
+            x for x in turn.team if x is not owner
+        ],
+        "ally_front_without_self": lambda: [
+            x for x in front if x is not owner
+        ],
+        "all": lambda: [
+            x for x in turn.battle.monsters if x.exist
+        ],
+    }
+    if target_type not in groups:
+        raise ValueError(f"未知角色目标: {target_type}")
+    return groups[target_type]()
+
 class Simulation:
     """持有静态数据库与初始化后的 Turn。"""
-
     def __init__(self):
         self.skills_path = SIMULATION_DIR / 'skills.json'
         self.styles_path = SIMULATION_DIR / 'styles.json'
+        self.statuses_path = SIMULATION_DIR / 'statuses.json'
         self.skill_records: Dict[int, JsonDict] = {}
         self.style_records: Dict[int, JsonDict] = {}
+        self.status_records: Dict[int, JsonDict] = {}
         self.turns: List[Turn] = []
         self.initial_config: Optional[JsonDict] = None
 
@@ -585,14 +647,14 @@ class Simulation:
             'members': [{
             'sp': int, 'token': int, "ep": int, 'dp': float, "special_trigger": str | None,
             'statuses': [{
-                "id": int, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None
+                "id": int, "name": str, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None
             }, ... ],
             "skills": [{"name": str, "cost_type": str, "cost": int, "id": int, "target_type": str, "user_select": None | [str]}, ... ] 
             } for _ in range(6)],
             'order': [int] * 6,
             'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int | None}, "user_selected": None | int, "on_break": False}] * 6,
             'enemies': [{"exist": bool, "damage_rate": int, 'down': bool, "statuses": [
-            {"id": int, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None}, ...
+            {"id": int, "name": str, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None}, ...
             ]} for _ in range(3)],
             'enemy_weaknesses': [str],
             "super_scale" = {"element": None, "value": 0},
@@ -649,9 +711,10 @@ class Simulation:
         initial_od = float(config.get('initial_od', 0.0))
         global_od_rate = float(config.get('global_od_rate', 100.0))
 
-        # 加载两个数据库；只使用记录内部的 id 进行索引。
+        # 加载3个数据库；只使用记录内部的 id 进行索引。
         skill_records = json_records_to_dict(self.skills_path)
         style_records = json_records_to_dict(self.styles_path)
+        status_records = json_records_to_dict(self.statuses_path, has_id=False)
 
         # 此处保存style_ids并检测上场和共鸣风格能够匹配到数据库
         # 先校验选中风格是否重复，不限制共鸣与上场属于同一角色。
@@ -740,15 +803,323 @@ class Simulation:
         # 只在全部构造成功后提交，避免部分初始化失败污染旧战斗。
         self.skill_records = skill_records
         self.style_records = style_records
+        self.status_records = status_records
         self.initial_config = config
         self.turns = [turn]
         return turn
 
-    def battle_start(self):
+    # 实际应用的被动触发函数，给出在某个时间节点的触发str即可
+    def trigger_passives(self, turn: Turn, trigger: str):
+        order = deepcopy(turn.order)
+        order[0], order[1] = order[1], order[0]  # 触发顺序是position的1，0，2，3，4，5
+        for slot in order:
+            style = turn.team[slot]
+            if trigger in style.passive_triggers:
+                for passive in iter_passives(style):
+                    # 判断trigger时机
+                    if passive.trigger != trigger:
+                        continue
+                    # 判断trigger condition是否满足
+                    ctx = Context(turn=turn, subject=style)
+                    if (passive.trigger_condition and not check(passive.trigger_condition, ctx)):
+                        continue
+                    # 检查触发次数
+                    if isinstance(passive, LimitBreak) and passive.trigger_limit is not None:
+                        if passive.trigger_times >= passive.trigger_limit:
+                            continue
+                        else:
+                            passive.trigger_times += 1
+                    # 解析是否有case等结构，返回实际生效的effect列表
+                    effects = self.resolve_passive_effects(passive, ctx)
+                    # 对每个effect判断和应用效果
+                    for effect in effects:
+                        self.apply_effect(turn, style, effect)
+
+    # 解析passive的结构，提取实际生效的effect列表
+    def resolve_passive_effects(self, passive, ctx):
+        effects = passive.effects
+        # 普通list结构
+        if isinstance(effects, list):
+            return effects
+        # cases结构
+        if "cases" in effects:
+            for case in effects["cases"]:
+                if check(case["when"], ctx):
+                    return case["effects"]
+            return []
+        # 未知结构
+        raise ValueError(f"未知被动效果结构: {effects}")
+
+    def apply_effect(self, turn: Turn, owner: Style, effect: dict, source=None):
+        effect_type = effect["type"]
+        target_type = effect.get("target", "self")
+
+        # 全局目标单独处理；其余统一解析为 Style / Monster 列表
+        if target_type in ("od", "field"):
+            targets = []
+        else:
+            targets = resolve_targets(turn, owner, target_type)
+            # 每个目标分别判断 target_condition
+            condition = effect.get("target_condition")
+            if condition:
+                targets = [
+                    target for target in targets
+                    if check(condition, Context(turn=turn, subject=target))
+                ]
+
+        # 创建 / 更新状态
+        def add_status(target, *, level=None, max_level=None, unique=False):
+            status_id = effect.get("status_id")
+            if status_id is None:
+                raise ValueError(f"{effect_type} 缺少 status_id")
+            status_information = self.status_records.get(status_id)
+            duration = effect.get("duration", {})
+            duration_type = duration.get("type")
+            remaining = duration.get("value")
+            # 属性印记相同属性不叠加层数直接跳过，不同属性可以正常添加状态
+            if status_id == 166:
+                same_element = next(
+                    (s for s in target.statuses if s.id == status_id and s.element == (effect.get("elements") or [None])[0]),
+                    None
+                )
+                if same_element: return same_element
+            # 叠层或者无法存在多个的statuses，不产生新status直接return
+            if unique or (level is not None and status_id != 166):
+                old = next(
+                    (s for s in target.statuses if s.id == status_id),
+                    None
+                )
+                # 不重复添加
+                if unique and old is not None:
+                    return old
+                # 叠加层数
+                elif level is not None and old is not None:
+                    level += old.level
+                    if max_level is not None:
+                        level = min(level, max_level)
+                    old.level = level
+                    return old
+            # 新上的status
+            status = Status(
+                id=status_id,
+                category=status_information.get("category"),
+                name=status_information.get("zh_cn"),
+                element=(effect.get("elements") or [None])[0],
+                duration_type=duration_type,
+                remaining=remaining,
+                level=level,
+                source=source,
+                data=deepcopy(effect),
+            )
+            target.statuses.append(status)
+            return status
+
+        match effect_type:
+            # ==================== 资源 ====================
+            case "resource":
+                # random 暂不随机化：默认触发
+                if target_type == "od":
+                    value = effect.get("od", 0)
+                    if isinstance(value, list):
+                        raise ValueError("OD 数值尚未按共鸣等级展开")
+                    turn.stage_tmp_od += value
+                else:
+                    for target in targets:
+                        if "sp" in effect:
+                            limit = effect.get("limit", target.sp_limit)
+                            target.sp = min(target.sp + effect["sp"], limit)
+
+                        if "ep" in effect:
+                            target.ep = max(0, min(target.ep + effect["ep"], target.ep_limit))
+            case "token":
+                for target in targets:
+                    target.token = max(0, min(target.token + effect.get("level", 0), 10))
+            case "token_up_per_attack_enemy":
+                # 根据攻击命中的敌人数增加 Token
+                for target in targets:
+                    action = turn.actions[target.slot]
+                    target_type = action["target"]["type"]
+                    if target_type == "single" or action["id"] == 1:
+                        token_added = 1
+                    elif target_type == "all":
+                        token_added = sum(1 for monster in turn.battle.monsters if monster.exist)
+                    else:
+                        token_added = 0
+                    target.token = max(0, min(target.token + token_added * effect.get("value", 1), 10))
+            case "over_drive_rate_up":
+                for target in targets:
+                    target.od_rate_extra += effect["value"] / 100
+            case "reduce_consume_overdrive":
+                turn.battle.od_consume = max(0, turn.battle.od_consume - effect["value"])
+
+            # ==================== SP / EP 修正 ====================
+            case "overwrite_sp":
+                # 记录技能费用覆盖规则，不立即修改 now_cost
+                # TODO: 计算技能费用时判断 condition 并读取 skill_id、sp
+                for target in targets:
+                    add_status(target)
+            case "sp_limit_overwrite":
+                value = effect.get("value", 20)
+                for target in targets:
+                    target.sp_limit = value
+                    # 暂时没有向下调整的和非永久的sp_limit，SP 已有值不强制降低
+                    # add_status(target)
+            case "ep_limit_overwrite":
+                for target in targets:
+                    target.ep_limit = effect["value"]
+                    add_status(target)
+            case "sp_modify":
+                for target in targets:
+                    add_status(target)  # advance中根据这些status决定style的sp_modify数值
+
+            # ==================== 特殊状态 ====================
+            case "additional_turn":
+                # TODO: 在下一阶段检查追加回合状态并安排额外行动
+                for target in targets:
+                    add_status(target, unique=True)
+            case "double_action_extra_skill":
+                # EX 技能双动，在执行 EX 技能时消费
+                for target in targets:
+                    add_status(target, unique=True)
+            case "double_attack_skill":
+                # 攻击双动
+                # TODO: 在行动结算时处理
+                for target in targets:
+                    add_status(target, unique=True)
+            # 以下三个在替换基础技能时特殊处理
+            # case "replace_normal_skill":
+            # case "replace_pursuit":
+            # case "always_persuit_sp8":
+            case "sprightly":
+                for target in targets:
+                    add_status(target)
+            case "give_debuff_turn_up":
+                # 不建议直接永久修改 active_skills 内的数据库效果
+                # 改为注册修正状态，施加 Debuff 时增加 enemy_turn
+                # TODO: 在 Debuff 实际施加时：
+                # duration += 所有生效的 give_debuff_turn_up.value
+                for target in targets:
+                    add_status(target)
+            case "element_mark":
+                # 对应属性的队员人数决定层数，最大6层
+                element = (effect.get("elements") or [None])[0]
+                level = sum(element in style.elements for style in turn.team)
+                for target in targets:
+                    add_status(target, level=level, max_level=6)
+            case "zone":
+                element = (effect.get("elements") or [None])[0]
+                duration = effect.get("duration", {})
+                turn.battle.field["value"] = element
+                turn.battle.field["left_turn"] = (
+                    duration.get("value", -1)  # 没有value则为permanent，填-1认为永久
+                )
+            case "rice_field_zone":
+                turn.battle.field["value"] = "rice_field"
+                turn.battle.field["left_turn"] = -1
+            case "funnel":
+                # mode = {"value": int, "number": int}
+                # 原始参数保存在 Status.data 中
+                for target in targets:
+                    add_status(target)
+
+            # ==================== 普通状态 ====================
+            case "motivation":
+                for target in targets:
+                    add_status(target, level=effect.get("level", 1), max_level=5,)
+            case "mocktail":
+                for target in targets:
+                    add_status(target, unique=True)
+            case "talisman":
+                for target in targets:
+                    add_status(target, level=effect.get("level", 0))
+            case "inscription":
+                for target in targets:
+                    add_status(target, level=effect.get("level", 0))
+            case "morale":  # 这里共鸣会写value，但其他时候会写level
+                for target in targets:
+                    add_status(target, level=effect.get("level", effect.get("value", 1)), max_level=10,)
+            case "buff_charge":
+                for target in targets:
+                    add_status(target, unique=True)
+            case "shadow_clone":  # 不追踪该状态，因此暂时认为unique
+                for target in targets:
+                    add_status(target, unique=True)
+            case "negative_mind":
+                for target in targets:
+                    add_status(target, unique=True)
+            case "infantilized":
+                for target in targets:
+                    add_status(target, level=effect.get("level", 1), max_level=20,)
+            case "high_boost":
+                for target in targets:
+                    add_status(target, unique=True)
+            case "arrow_cherry_blossoms":
+                for target in targets:
+                    add_status(target, unique=True)
+            case "dodge":  # 不追踪该状态，因此暂时认为unique
+                for target in targets:
+                    add_status(target, unique=True)
+            case "disaster":
+                for target in targets:
+                    add_status(target, level=effect.get("level", 1), max_level=10,)
+            case "provoke":
+                for target in targets:
+                    add_status(target)
+            case "misfortune":
+                for target in targets:
+                    add_status(target, unique=True)
+            case "cover":
+                for target in targets:
+                    add_status(target)
+            case "revenge":
+                for target in targets:
+                    add_status(target, level=effect.get("level", 0), max_level=10,)
+
+            # ==================== 未知类型 ====================
+            case _:
+                raise NotImplementedError(
+                    f"未实现的被动效果类型: {effect_type}"
+                )
+
+    def battle_start(self, turn: Turn):
         """
-        战斗开场要处理的被动等
+        战斗开场要处理的被动等，刚进场时slot和position一致
+        on battle start, on first battle start
+        补齐超越量表和默认的action
         """
-        pass
+        actions = []
+        super_element = None
+        super_scale = 0
+        # 前三名默认普通攻击，后三名默认无行动
+        for style in turn.team:
+            # 选取默认行动
+            default_skill = style.basic_skills[0 if style.slot < 3 else 1]
+            actions.append({
+                'name': default_skill['name'],
+                'id': default_skill['id'],
+                'target': {
+                    'type': "ignore",
+                    'slot': None,
+                },
+                'user_selected': None,
+                "on_break": False
+            })
+            # 检测超越量表
+            special_trigger = style.special_trigger
+            if special_trigger == "elemental_admiral":
+                super_element = style.elements[0]
+        # 超越量表开局数值计算
+        if super_element:
+            for style in turn.team:
+                if super_element in style.elements:
+                    super_scale += 15
+        turn.actions = actions
+        turn.battle.super_scale["element"] = super_element
+        turn.battle.super_scale["value"] = super_scale
+        # 先结算on_battle_start
+        self.trigger_passives(turn, "on_battle_start")
+        # 再结算on_first_battle_start
+        self.trigger_passives(turn, "on_first_battle_start")
 
     def advance(self, last_state) -> dict:
         """根据当前GUI传回的state计算下一回合的开始的state；不修改传入对象。"""
@@ -757,11 +1128,10 @@ class Simulation:
     def first_turn(self, state: dict) -> dict:
         """测试版：初始化战斗并生成 GUI 所需的首回合状态。"""
         turn = self.initialize(state)
+        self.battle_start(turn)
 
         members = []
-        actions = []
-        super_element = None
-
+        
         # 测试用基础行动
         for slot, style in enumerate(turn.team):
             skills = deepcopy(style.basic_skills)  # 3个，默认的顺序为：前排默认技能，无，追击
@@ -789,39 +1159,21 @@ class Simulation:
                     'user_select': user_select,
                 })
 
-            special_trigger = style.special_trigger
-            if special_trigger == "elemental_admiral":
-                super_element = style.elements[0]
-
             members.append({
                 'sp': style.sp,
                 'ep': style.ep,
                 'token': style.token,
                 'dp': style.dp,
-                'statuses': [],
+                'statuses': [status.to_dict() for status in style.statuses],
                 'skills': skills,
-                "special_trigger": special_trigger
-            })
-
-            # 前三名默认普通攻击，后三名默认无行动
-            default_skill = skills[0 if slot < 3 else 1]
-
-            actions.append({
-                'name': default_skill['name'],
-                'id': default_skill['id'],
-                'target': {
-                    'type': "ignore",
-                    'slot': None,
-                },
-                'user_selected': None,
-                "on_break": False
+                "special_trigger": style.special_trigger
             })
 
         # GUI 中三个敌人位置始终存在，使用 exist 标记实际敌人
         enemies = [{'exist': False, 'damage_rate': 100, 'down': False, 'statuses': [],} for _ in range(3)]
 
         for monster in turn.battle.monsters:
-            position = int(monster.position)
+            position = monster.position
             enemies[position] = {
                 'exist': monster.exist,
                 'damage_rate': monster.damage_rate,
@@ -829,22 +1181,15 @@ class Simulation:
                 'statuses': deepcopy(monster.statuses),
             }
 
-        # 超越量表
-        super_scale = 0
-        if super_element:
-            for style in turn.team:
-                if super_element in style.elements:
-                    super_scale += 15
-
         return {
         'members': members,
         'order': list(range(6)),
-        'actions': actions,
+        'actions': turn.actions,
         'enemies': enemies,
         'enemy_weaknesses': deepcopy(turn.battle.enemy_weaknesses),
-        "super_scale": {"element": super_element, "value": super_scale},
-        'field': turn.battle.field,
-        'turn': 1,
+        "super_scale": deepcopy(turn.battle.super_scale),
+        'field': turn.battle.field["value"],
+        'turn': turn.turn_num,
         'od': float(turn.od),
         'predicted_od': float(turn.od)+100,
         'od_timing': None,
@@ -858,11 +1203,11 @@ class Simulation:
         """
         接受gui传入的state并直接覆盖当前的Turn类对应值：
         gui_add_state = {
-            "member_status": [{"id": int, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None}] * 6,
+            "member_status": [{"id": int, "name": str, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None}] * 6,
             'order': [int] * 6,
             'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int | None}, "user_selected": None | int, "on_break": False}] * 6,
             'enemies': [{"exist": bool, "damage_rate": int, 'down': bool, "statuses": [
-            {"id": int, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None}, ...
+            {"id": int, "name": str, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None}, ...
             ]} for _ in range(3)],
             'field': str or None,
             'od_timing': str or None,
@@ -874,7 +1219,7 @@ class Simulation:
             'members': [{
             'sp': int, 'token': int, "ep": int, 'dp': float, "special_trigger": str | None,
             'statuses': [{
-                "id": int, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None
+                "id": int, "name": str, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None
             }, ... ],
             "skills": [{"name": str, "cost_type": str, "cost": int, "id": int, "target_type": str, "user_select": None | [str]}, ... ] 
             } for _ in range(6)],
