@@ -12,6 +12,7 @@ from pathlib import Path
 from copy import deepcopy
 from dataclasses import asdict, dataclass, field, fields
 import dataclasses
+import math
 from typing import Any, Dict, List, Optional, Union
 
 
@@ -58,7 +59,8 @@ PASSIVE_EFFECT_TYPES_NEEDED = {
     "provoke",
     "misfortune",
     "cover",
-    "revenge"
+    "revenge",
+    "zone_up_eternal_plus_15"
 }
 
 from paths import ROOT_DIR
@@ -255,10 +257,8 @@ class Status:
     remaining: Optional[int] = None
     level: Optional[int] = None
     source: Optional[int] = None
+    used: bool = False
     data: dict = field(default_factory=dict)  # 通用字段，储存特殊的status
-
-    def to_dict(self):
-        return {"id": self.id, "name": self.name, "duration_type": self.duration_type, "remaining": self.remaining, "level": self.level, "element": self.element, "source": self.source}
 
 @dataclass
 class Style:
@@ -808,6 +808,11 @@ class Simulation:
         self.turns = [turn]
         return turn
 
+    # sp回复
+    def add_sp(self, target: Style, effect: dict):
+        limit = effect.get("limit", target.sp_limit)
+        target.sp = min(target.sp + effect["sp"], limit)
+
     # 实际应用的被动触发函数，给出在某个时间节点的触发str即可
     def trigger_passives(self, turn: Turn, trigger: str):
         order = deepcopy(turn.order)
@@ -926,8 +931,7 @@ class Simulation:
                 else:
                     for target in targets:
                         if "sp" in effect:
-                            limit = effect.get("limit", target.sp_limit)
-                            target.sp = min(target.sp + effect["sp"], limit)
+                            self.add_sp(target, effect)
 
                         if "ep" in effect:
                             target.ep = max(0, min(target.ep + effect["ep"], target.ep_limit))
@@ -994,10 +998,11 @@ class Simulation:
                 for target in targets:
                     add_status(target)
             case "give_debuff_turn_up":
-                # 不建议直接永久修改 active_skills 内的数据库效果
-                # 改为注册修正状态，施加 Debuff 时增加 enemy_turn
-                # TODO: 在 Debuff 实际施加时：
-                # duration += 所有生效的 give_debuff_turn_up.value
+                # 注册修正状态，TODO: 在 Debuff 实际施加时：duration += 所有生效的 give_debuff_turn_up.value
+                for target in targets:
+                    add_status(target)
+            case "zone_up_eternal_plus_15":
+                # 注册修正状态，TODO: 施加 zone 时变为永久
                 for target in targets:
                     add_status(target)
             case "element_mark":
@@ -1081,6 +1086,94 @@ class Simulation:
                     f"未实现的被动效果类型: {effect_type}"
                 )
 
+    def resolve_od(self, turn: Turn, direct=True):
+        """将apply effect后的stage_tmp_od加回正式od，回合开始的效果还需加到od上，否则仅加预测od"""
+        if direct:
+            turn.od += turn.stage_tmp_od
+        turn.predicted_od += turn.stage_tmp_od
+        turn.stage_tmp_od = 0
+
+    def calculate_member_skills(self, turn: Turn):
+        members = []
+        for style in turn.team:
+            # 疲劳状态没有任何skills
+            if any(status.id == 33 for status in style.statuses):
+                skills = []
+            else:
+                skills = deepcopy(style.basic_skills)  # 3个，默认的顺序为：前排默认技能，无，追击
+                # initialize() 已经装入全部被选择的主动/光球技能
+                for skill in style.active_skills:
+                    # 处理target type，GUI仅需要知道是敌人还是友方（是否可选自己）
+                    if skill.target in ("ally_single", "ally_single_without_self", "ally_single_front_without_self"):
+                        target_type = skill.target
+                    elif skill.target == "single":
+                        target_type = "enemy"
+                    else:
+                        target_type = "ignore"
+                    # 处理user_select
+                    if skill.user_select == None:
+                        user_select = None
+                    else:
+                        user_select = [u["description"] for u in skill.user_select.values()]
+                    # 处理cost
+                    # 先检查condition，目前cost里面不应该检查target.
+                    cost_condition = skill.conditions.get("cost")
+                    if cost_condition and check(cost_condition, Context(turn, style)):
+                        skill.now_cost = skill.cost.get("yes").get(skill.cost_type)
+                    # 然后检查 overwrite_sp
+                    for status in style.statuses:
+                        if status.id == 175 and status.data.get("skill_id") == skill.id:
+                            condition = status.data.get("condition")
+                            if not condition or check(condition, Context(turn, style)):
+                                skill.now_cost = status.data.get("sp")
+                    # 检查沉浸和鬼神化
+                    if any(status.id == 228 or status.id == 229 for status in style.statuses) and skill.cost_type == "sp":
+                        skill.now_cost = 0
+                    # 检查轻快状态
+                    spri = [status for status in style.statuses if status.id == 194]
+                    if spri:
+                        value_max = max(status.data.get("value") for status in spri)
+                        if skill.id != 336 and skill.cost_type == "sp" and skill.now_cost == skill.default_cost:
+                            skill.now_cost == math.ceil(skill.default_cost * (1-value_max))
+                            for status in spri:  # 标记轻快状态被使用
+                                if status.data.get("value") == value_max:
+                                    status.used = True
+                                    break
+                    # 最后检查sp_modify
+                    sp_modify_list = [status for status in style.statuses if status.id == 6]
+                    if sp_modify_list and skill.cost_type == "sp":
+                        sp_add = sp_minus = 0
+                        for sp_modify in sp_modify_list:
+                            condition = sp_modify.data.get("condition")
+                            if not condition or check(condition, Context(turn, style)):
+                                modify = sp_modify.data.get("value")
+                                if modify > 0:
+                                    sp_add = max(sp_add, modify)
+                                elif modify < 0:
+                                    sp_minus = min(sp_minus, modify)
+                        skill.now_cost = skill.now_cost + sp_add + sp_minus
+                        
+                    skills.append({
+                        'name': skill.names.get('zh_cn'),
+                        'id': skill.id,
+                        'cost_type': skill.cost_type,
+                        'cost': skill.now_cost,
+                        'target_type': target_type,
+                        'user_select': user_select,
+                    })
+
+            members.append({
+                'sp': style.sp,
+                'ep': style.ep,
+                'token': style.token,
+                'dp': style.dp,
+                'statuses': [asdict(status) for status in style.statuses],
+                'skills': skills,
+                "special_trigger": style.special_trigger
+            })
+
+        return members
+
     def battle_start(self, turn: Turn):
         """
         战斗开场要处理的被动等，刚进场时slot和position一致
@@ -1118,56 +1211,29 @@ class Simulation:
         turn.battle.super_scale["value"] = super_scale
         # 先结算on_battle_start
         self.trigger_passives(turn, "on_battle_start")
+        self.resolve_od(turn)
         # 再结算on_first_battle_start
         self.trigger_passives(turn, "on_first_battle_start")
+        self.resolve_od(turn)
 
     def advance(self, last_state) -> dict:
         """根据当前GUI传回的state计算下一回合的开始的state；不修改传入对象。"""
         return deepcopy(last_state)  # TODO: 实现战斗结算逻辑
 
     def first_turn(self, state: dict) -> dict:
-        """测试版：初始化战斗并生成 GUI 所需的首回合状态。"""
+        """初始化战斗并生成 GUI 所需的首回合状态。"""
         turn = self.initialize(state)
         self.battle_start(turn)
 
-        members = []
-        
-        # 测试用基础行动
-        for slot, style in enumerate(turn.team):
-            skills = deepcopy(style.basic_skills)  # 3个，默认的顺序为：前排默认技能，无，追击
-            # initialize() 已经装入全部被选择的主动/光球技能
-            for skill in style.active_skills:
-                # 处理target type，GUI仅需要知道是敌人还是友方（是否可选自己）
-                if skill.target in ("ally_single", "ally_single_without_self", "ally_single_front_without_self"):
-                    target_type = skill.target
-                elif skill.target == "single":
-                    target_type = "enemy"
-                else:
-                    target_type = "ignore"
-                # 处理user_select
-                if skill.user_select == None:
-                    user_select = None
-                else:
-                    user_select = [u["description"] for u in skill.user_select.values()]
+        # 开场先加2sp
+        for style in turn.team:
+            self.add_sp(style, {"sp": 2})
+        # 再结算on_new_turn_start
+        self.trigger_passives(turn, "on_new_turn_start")
+        self.resolve_od(turn)
 
-                skills.append({
-                    'name': skill.names.get('zh_cn'),
-                    'id': skill.id,
-                    'cost_type': skill.cost_type,
-                    'cost': skill.now_cost,
-                    'target_type': target_type,
-                    'user_select': user_select,
-                })
-
-            members.append({
-                'sp': style.sp,
-                'ep': style.ep,
-                'token': style.token,
-                'dp': style.dp,
-                'statuses': [status.to_dict() for status in style.statuses],
-                'skills': skills,
-                "special_trigger": style.special_trigger
-            })
+        # 生成gui所需字典
+        members = self.calculate_member_skills(turn)
 
         # GUI 中三个敌人位置始终存在，使用 exist 标记实际敌人
         enemies = [{'exist': False, 'damage_rate': 100, 'down': False, 'statuses': [],} for _ in range(3)]
@@ -1178,7 +1244,7 @@ class Simulation:
                 'exist': monster.exist,
                 'damage_rate': monster.damage_rate,
                 'down': monster.down,
-                'statuses': deepcopy(monster.statuses),
+                'statuses': [asdict(status) for status in monster.statuses],
             }
 
         return {
