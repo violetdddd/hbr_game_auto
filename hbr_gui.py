@@ -179,20 +179,27 @@ class Catalog:
                      s.english == english and s.sid == str(sid)), None)
 
 def round_pixmap(path, size=76):
-    out = QPixmap(size, size)
+    ratio = 2
+    pixel_size = size * ratio
+    out = QPixmap(pixel_size, pixel_size)
     out.fill(Qt.GlobalColor.transparent)
     if path and Path(path).exists():
         src = QPixmap(str(path))
         if not src.isNull():
-            src = src.scaled(size, size, Qt.AspectRatioMode.KeepAspectRatioByExpanding,
-                             Qt.TransformationMode.SmoothTransformation)
-            p = QPainter(out)
-            p.setRenderHint(QPainter.RenderHint.Antialiasing)
+            src = src.scaled(
+                pixel_size, pixel_size,
+                Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+                Qt.TransformationMode.SmoothTransformation
+            )
+            painter = QPainter(out)
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+            painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
             mask = QPainterPath()
-            mask.addEllipse(0, 0, size, size)
-            p.setClipPath(mask)
-            p.drawPixmap(0, 0, src)
-            p.end()
+            mask.addEllipse(0, 0, pixel_size, pixel_size)
+            painter.setClipPath(mask)
+            painter.drawPixmap(0, 0, src)
+            painter.end()
+    out.setDevicePixelRatio(ratio)
     return out
 
 TEAM_ORDER = ['31A', '31B', '31C', '31D', '31E', '31F',
