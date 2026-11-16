@@ -129,7 +129,7 @@
         {"id": 90002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "3": [
-        {"id": 90003, "name": "绝唱", "trigger": "on_first_battle_start", "effects": [{"type": "sp_modify", "status_id": 6, "target": "self", "target_condition": "has(143)", "duration": {"type": "permanent"}, "value": -2}]}
+        {"id": 90003, "name": "绝唱", "trigger": "on_first_battle_start", "effects": [{"type": "sp_modify", "status_id": 6, "target": "self", "condition": "has(143)", "duration": {"type": "permanent"}, "value": -2}]}
       ]
     },
     "support_skill": {"name": "Beat Down, Rise Up", "kind": "support", "trigger": "on_battle_start", "effects": [{"type": "heal_dp_rate", "target": "self", "value": [110, 120, 130, 140, 150]}]}
@@ -5431,7 +5431,14 @@
         {"id": 3650004, "name": "飞翔", "trigger": "on_additional_turn_start", "effects": [{"type": "resource", "target": "self", "sp": 2}]}
       ]
     },
-    "special": {"type": "demonic_rage", "names": {"zh_cn": "鬼神化", "zh_tw": "鬼神化", "jp": "鬼神化"}, "trigger": "user_select", "trigger_limit": 3, "effects": [{"type": "gui_shen", "duration": {"type": "ally_turn", "value": 3}, "status_id": 229, "target": "self"}, {"type": "resource", "target": "od", "od": 15}, {"type": "remove_debuff", "target": "self"}, {"type": "revive_dp_rate", "target": "self", "value": 100}, {"type": "funnel", "target": "self", "mode": {"number": 3, "value": 25}, "solo": true, "status_id": 13, "duration": {"type": "ally_turn", "value": 3}}, {"type": "mind_eye", "target": "self", "value": 120, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "status_id": 78}]}
+    "special": {"type": "demonic_rage", "names": {"zh_cn": "鬼神化", "zh_tw": "鬼神化", "jp": "鬼神化"}, "trigger": "user_select", "trigger_limit": 3, "effects": [
+      {"type": "gui_shen", "duration": {"type": "ally_turn", "value": 3}, "status_id": 229, "target": "self"}, 
+      {"type": "resource", "target": "od", "od": 15}, 
+      {"type": "remove_debuff", "target": "self"}, 
+      {"type": "revive_dp_rate", "target": "self", "value": 100}, 
+      {"type": "funnel", "target": "self", "mode": {"number": 3, "value": 25}, "solo": true, "status_id": 13, "duration": {"type": "ally_turn", "value": 3}}, 
+      {"type": "mind_eye", "target": "self", "value": 120, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "status_id": 78}
+      ]}
   },
   "366": {
     "id": 366,

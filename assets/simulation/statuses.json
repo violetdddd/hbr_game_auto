@@ -215,7 +215,8 @@
     "category": "debuff",
     "removable": true,
     "debuff_guard": true,
-    "icon": "Recoil.png"
+    "icon": "Recoil.png",
+    "special": true
   },
   "57": {"name": "cover", "zh_cn": "掩护", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "icon": "Cover.png"},
   "58": {"name": "misfortune", "zh_cn": "灾厄", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "icon": "Misfortune.png"},

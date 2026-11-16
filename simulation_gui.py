@@ -1389,9 +1389,11 @@ class BattleTurn(QGroupBox):
                 action.setVisible(True)
                 if position < 3:
                     for i, skill in enumerate(member.get('skills', [])):
-                        if i not in (1, 2):
+                        if i == 0:  # 默认行动
+                            action.addItem(f"{skill.get('name')}", skill.get('id'))
+                        elif i not in (1, 2):  # 排除无和追击
                             action.addItem(f"{skill.get('name')}（{skill.get('cost')} {skill.get('cost_type')}）", skill.get('id'))
-                else:
+                else:  # 后排只有无和追击
                     for skill in member.get('skills')[1:3]:
                         action.addItem(f"{skill.get('name')}", skill.get('id'))
                 # 按当前技能选择安排动作
