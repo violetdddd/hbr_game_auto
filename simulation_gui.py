@@ -961,7 +961,8 @@ class BattleTurn(QGroupBox):
             'field': str or None,
             'od_timing': str or None,
             'od_level': int,
-            "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form_change": 0}
+            "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form_change": 0},
+            "adjustments": {xxx}
         }
         """
         base = self.state_data["base"]
@@ -973,7 +974,8 @@ class BattleTurn(QGroupBox):
             'field': base["field"],
             'od_timing': base["od_timing"],
             'od_level': base["od_level"],
-            "special_actions": base["special_actions"]
+            "special_actions": base["special_actions"],
+            "adjustments": self.state_data["adjustments"]
         }
         simulation_state = copy.deepcopy(self.owner.engine.recalculate(copy.deepcopy(gui_add_state), self.number))
         for need_update in ("members", "od", "predicted_od", "bonus", "super_scale"):
@@ -1293,14 +1295,8 @@ class BattleTurn(QGroupBox):
 
     def effective_state(self):
         """只读输出；base 中 members 恒按 slot 0–5 排列。"""
+        # 应用adjustments逻辑放在simulation中，并且在recalculation中更新
         effective = copy.deepcopy(self.state_data['base'])
-        adjustments = self.state_data['adjustments']
-        effective['od'] = effective.get('od', 0.0) + adjustments.get('od', 0.0)
-        effective['predicted_od'] = effective.get('predicted_od', 0.0) + adjustments.get('od', 0.0)
-        for slot, member in enumerate(effective['members']):
-            delta = adjustments['members'][slot]
-            for key in ('sp', 'token'):
-                member[key] = int(member.get(key, 0)) + int(delta.get(key, 0))
         return effective
 
     def refresh(self):
@@ -1473,7 +1469,7 @@ class SimulationTab(QWidget):
             "skills": [{"name": str, "cost_type": str, "cost": int, "id": int, "target_type": str, "user_select": None | [str]}, ... ] 
             } for _ in range(6)],
             'order': [int] * 6,
-            'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int | None}, "user_selected": None | int, "on_break": False}] * 6,
+            'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int | None}, "user_selected": None | int, "on_break": False} | None] * 6,
             'enemies': [{"exist": bool, "damage_rate": int, 'down': bool, "statuses": [
             {"id": int, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None}, ...
             ]} for _ in range(3)],
