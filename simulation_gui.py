@@ -304,8 +304,10 @@ class SpecialActionDialog(QDialog):
         'demon_cavalry': '魔界骑兵启动',
         "kelian_form_change": "可怜形态"  # 0为可怜，1为可镰
     }
-    def __init__(self, on_break, special_trigger, special_count=[0,0], parent=None):
+    def __init__(self, on_break, special_trigger, special_count=None, parent=None):
         super().__init__(parent)
+        if special_count == None:
+            special_count = [0,0]
         self.setWindowTitle('特殊行动设置')
         self.setMinimumWidth(240)
 
@@ -332,7 +334,7 @@ class SpecialActionDialog(QDialog):
                 row.addWidget(kelian_combo)
                 layout.addLayout(row)
             else:
-                for i, timing in enumerate("（前置OD前发动）", "（前置OD后发动）"):
+                for i, timing in enumerate(["（前置OD前发动）", "（前置OD后发动）"]):
                     row = QHBoxLayout()
                     name = self.SPECIAL_NAMES.get(special_trigger)
                     row.addWidget(QLabel(name+timing))

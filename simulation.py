@@ -1341,6 +1341,8 @@ class Simulation:
             sp_added = sp_added_dict[turn.od_level]
             for style in turn.team:
                 add_sp(style, {"sp": sp_added, "limit": 99})
+            turn.od -= turn.battle.od_consume * turn.od_level
+            turn.predicted_od -= turn.battle.od_consume * turn.od_level
             self.trigger_passives(turn, "on_overdrive_start")
 
         # 回合开始默认行动
@@ -1444,15 +1446,8 @@ class Simulation:
         在recalculate中调用，位于action start之后，只结算actions的消耗、od增长（predict）
         临时应用effect中的连击珠效果
         after_ex_use
-        on_use_specific_skill
         on_sp_up_by_nonself_active_skill
-        on_attack_weak
-        on_relieve_enemy_buff(_attack)
-        on_use_specific_status_skill
-        on_active_zone
-        on_pursuit
-        on_use_od_cost_skill
-        after_action
+        on_relieve_enemy_buff
         """
         tmp_turn = deepcopy(turn)
         turn.stage_tmp_od = 0
@@ -1671,7 +1666,13 @@ class Simulation:
         在应用完actions之后调用，把该清除掉的status进行清除
         同时把predict od存到od中
         """
-        pass
+        # 清除掉所有标记为trash的status
+        for style in turn.team:
+            for status in style.statuses:
+                if status.trash:
+                    style.statuses.remove(status)
+        # 把predict od存到od中
+        turn.od = turn.predicted_od
 
     def new_turn_label_refresh(self, turn: Turn):
         """
