@@ -304,7 +304,7 @@ class SpecialActionDialog(QDialog):
         'demon_cavalry': '魔界骑兵启动',
         "kelian_form_change": "可怜形态"  # 0为可怜，1为可镰
     }
-    def __init__(self, on_break, special_trigger, special_count=0, parent=None):
+    def __init__(self, on_break, special_trigger, special_count=[0,0], parent=None):
         super().__init__(parent)
         self.setWindowTitle('特殊行动设置')
         self.setMinimumWidth(240)
@@ -317,26 +317,33 @@ class SpecialActionDialog(QDialog):
         self.break_check.setChecked(bool(on_break))
         layout.addWidget(self.break_check)
 
-        # 特殊技能发动次数
-        self.special_combo = None
+        # 特殊技能发动次数 before/after
+        self.special_combos = []
         if special_trigger in self.SPECIAL_NAMES:
-            row = QHBoxLayout()
-            name = self.SPECIAL_NAMES.get(special_trigger, special_trigger)
-            row.addWidget(QLabel(name))
-            maximum = 3 if special_trigger == 'demon_cavalry' else 1
-            if special_trigger != "kelian_form_change":
-                self.special_combo = combo([
-                    ("不发动" if i == 0 else f"发动{i}次", i) for i in range(maximum + 1)
-                ])
+            if special_trigger == "kelian_form_change":
+                row = QHBoxLayout()
+                name = self.SPECIAL_NAMES.get("kelian_form_change")
+                row.addWidget(QLabel(name))
+                kelian_combo = combo([("杀戮如游戏", 0), ("杀戮如呼吸", 1)])
+                self.special_combos.append(kelian_combo)
+                kelian_combo.setCurrentIndex(
+                    max(0, self.special_combos[0].findData(special_count[0]))
+                )
+                row.addWidget(kelian_combo)
+                layout.addLayout(row)
             else:
-                self.special_combo = combo([("杀戮如游戏", 0), ("杀戮如呼吸", 1)])
-
-            self.special_combo.setCurrentIndex(
-                max(0, self.special_combo.findData(special_count))
-            )
-
-            row.addWidget(self.special_combo)
-            layout.addLayout(row)
+                for i, timing in enumerate("（前置OD前发动）", "（前置OD后发动）"):
+                    row = QHBoxLayout()
+                    name = self.SPECIAL_NAMES.get(special_trigger)
+                    row.addWidget(QLabel(name+timing))
+                    maximum = 3 if special_trigger == 'demon_cavalry' else 1
+                    special_combo = combo([("不发动" if i == 0 else f"发动{i}次", i) for i in range(maximum + 1)])
+                    self.special_combos.append(special_combo)
+                    special_combo.setCurrentIndex(
+                        max(0, self.special_combos[i].findData(special_count[i]))
+                    )
+                    row.addWidget(special_combo)
+                    layout.addLayout(row)
 
         # 确定
         confirm = QPushButton('确定')
@@ -345,12 +352,12 @@ class SpecialActionDialog(QDialog):
         layout.addWidget(confirm)
 
     def values(self):
+        special_count = []
+        for combo in self.special_combos:
+            special_count.append(combo.currentData())
         return {
             'on_break': self.break_check.isChecked(),
-            'special_count': (
-                self.special_combo.currentData()
-                if self.special_combo is not None else None
-            )
+            'special_count': special_count  # 空列表/长度为1的列表（可镰）/长度为2的列表（waki/总攻击/司令）
         }
 
 class BattleSetup(QGroupBox):
@@ -961,13 +968,15 @@ class BattleTurn(QGroupBox):
             'field': str or None,
             'od_timing': str or None,
             'od_level': int,
-            "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form_change": 0},
-            "adjustments": {xxx}
+            "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form_change": 0}, before/after
+            "adjustments": {xxx},
+            dp
         }
         """
         base = self.state_data["base"]
         gui_add_state = {
             "member_status": [member["statuses"] for member in base["members"]],
+            "member_dp": [member["dp"] for member in base["members"]],
             'order': base["order"],
             'actions': base["actions"],
             'enemies': base["enemies"],
@@ -977,9 +986,7 @@ class BattleTurn(QGroupBox):
             "special_actions": base["special_actions"],
             "adjustments": self.state_data["adjustments"]
         }
-        simulation_state = copy.deepcopy(self.owner.engine.recalculate(copy.deepcopy(gui_add_state), self.number))
-        for need_update in ("members", "od", "predicted_od", "bonus", "super_scale"):
-            base[need_update] = simulation_state[need_update]
+        self.state_data = self.owner.engine.recalculate(gui_add_state, self.number)
 
     def edit_special_action(self, position):
         base = self.state_data['base']
@@ -991,7 +998,7 @@ class BattleTurn(QGroupBox):
         dialog = SpecialActionDialog(
             on_break=action.get('on_break', False),
             special_trigger=special_trigger,
-            special_count=special_actions.get(special_trigger, 0),
+            special_count=[special_actions.get(special_trigger, 0), special_actions.get(special_trigger+"_after", 0)],
             parent=self
         )
         # 取消则不更改任何内容
@@ -1002,7 +1009,9 @@ class BattleTurn(QGroupBox):
         action['on_break'] = values['on_break']
         # 保存特殊技能发动次数
         if special_trigger in SpecialActionDialog.SPECIAL_NAMES:
-            special_actions[special_trigger] = values['special_count']
+            special_actions[special_trigger] = values['special_count'][0]
+            if len(values['special_count']) == 2:
+                special_actions[special_trigger+"_after"] = values['special_count'][1]
         # self.update_state_from_simulation()
         self.refresh()
 
@@ -1301,13 +1310,18 @@ class BattleTurn(QGroupBox):
 
     def refresh(self):
         effective = self.effective_state()
+        additional_turn = effective.get("additional_turn")
         now_timing = effective.get('od_timing')
-        now_od = effective.get('od_level') if now_timing == "before" else 0
+        bonus = effective.get('bonus')
+        # 只有后置od的bonus0时now_od不是od_level而是0
+        now_od = 0 if now_timing == "after" and bonus == 0 else effective.get("od_level")
         od = effective.get('od'); estimate = effective.get('predicted_od')
         level = max(0, min(3, int(od // 100)))
         # od发动选择框
-        available_before = level
-        available_after = max(0, min(3, int(estimate // 100)))
+        # 前置od发动条件是当前刚刚开启前置od，或者当前处于od外的非附加回合中
+        available_before = level if (now_timing == "before" and bonus == 1) or (now_od == 0 and not additional_turn) else 0
+        # 后置od发动条件是当前刚刚开启前置od，或者当前处于od外
+        available_after = max(0, min(3, int(estimate // 100))) if (now_timing == "before" and bonus == 1) or now_od == 0 else 0
         for timing, box, available in (('before', self.before_od, available_before), ('after', self.after_od, available_after)):
             box.blockSignals(True)
             box.clear()
@@ -1316,7 +1330,7 @@ class BattleTurn(QGroupBox):
                 box.addItem(f'OD{n}', n)
             selected_level = effective.get('od_level', 0) if now_timing == timing else 0
             index = box.findData(selected_level)
-            # 防止用户先发动od再减少od值导致无法发动，稍稍修改state
+            # 防止用户先发动od再减少od值导致无法发动，稍稍修改state，此处应废弃并在simulation中解决
             if index == -1:
                 index = 0
                 base = self.state_data['base']
@@ -1329,8 +1343,8 @@ class BattleTurn(QGroupBox):
         # label，bonus由simulation决定
         self.title.setText(f'T{effective.get("turn")}' + 
                            (f"-OD{now_od}" if now_od != 0 else '') +
-                           (f"-bonus{effective.get('bonus')}" if effective.get('bonus') != 0 else '') +
-                           ('-追加回合' if effective.get('additional_turn') else ''))
+                           (f"-bonus{bonus}" if bonus != 0 else '') +
+                           ('-追加回合' if additional_turn else ''))
         # od
         self.od_label.setText(f'{od:.2f}%')
         self.predicted_od_label.setText(f'→ {estimate:.2f}%')
@@ -1483,7 +1497,7 @@ class SimulationTab(QWidget):
             'od_level': int,
             'bonus': int,
             'additional_turn': bool,
-            "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form_change": 0}
+            "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form_change": 0} before/after
         }
         """
         turn_config = {"base": simulation_state, "adjustments": {"od": 0.0, "members": [{"sp": 0, "token": 0} for _ in range(6)]}}
@@ -1514,7 +1528,7 @@ class SimulationTab(QWidget):
 
     def next_turn(self, turn):
         last_state = copy.deepcopy(turn.effective_state())
-        simulation_state = self.engine.advance(last_state)
+        simulation_state = self.engine.advance()
         result = self.add_turn_from_simulation(simulation_state)
         # 不自动滚动到最末，以免跳过需要检查的动作。
         return result
