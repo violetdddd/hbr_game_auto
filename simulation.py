@@ -1462,6 +1462,29 @@ class Simulation:
             turn.predicted_od += turn.stage_tmp_od
         turn.stage_tmp_od = 0
 
+    def consume_enemy_turn(self, turn: Turn):
+        for enemy in turn.battle.monsters:
+            for status in enemy.statuses:
+                if status.duration_type == "enemy_turn":
+                    status.remaining -= 1
+                    if status.remaining <= 0:
+                        status.trash = True
+        for style in turn.team:
+            for status in style.statuses:
+                if status.duration_type == "enemy_turn":
+                    status.remaining -= 1
+                    if status.remaining <= 0:
+                        status.trash = True
+        # 清除掉所有标记为trash的status
+        for style in turn.team:
+            for status in style.statuses[::-1]:
+                if status.trash and status.duration_type == "enemy_turn":
+                    style.statuses.remove(status)
+        for enemy in turn.battle.monsters:
+            for status in enemy.statuses[::-1]:
+                if status.trash and status.duration_type == "enemy_turn":
+                    enemy.statuses.remove(status)
+
     def battle_start(self, turn: Turn):
         """
         战斗开场要处理的被动等，刚进场时slot和position一致
@@ -1728,7 +1751,6 @@ class Simulation:
                     elif effect.get("type") == "over_drive_point_up_by_token":
                         direct = effect.get("value") * skill.now_cost
                 funnel = calculate_funnel(tmp_style)
-                print(hit, funnel)
                 turn.stage_tmp_od += calculate_od(hit, funnel, enemy_count, direct, style.od_earring, style.od_rate_extra)
         # after_ex_use
         # on_sp_up_by_nonself_active_skill
@@ -1801,11 +1823,29 @@ class Simulation:
         在应用完actions之后调用，把该清除掉的status进行清除
         同时把predict od存到od中
         """
+        # 消耗status我方回合数
+        for style in turn.team:
+            # 附加回合不在行动中的不消耗
+            if turn.additional_turn and not has_status_id(style, 20, True):
+                continue
+            for status in style.statuses:
+                if status.duration_type == "ally_turn":
+                    status.remaining -= 1
+                    if status.remaining <= 0:
+                        status.trash = True
+        # 消耗场地我方回合数
+        if turn.battle.field["left_turn"] != -1:
+            turn.battle.field["left_turn"] -= 1
+            if turn.battle.field["left_turn"] == 0:
+                turn.battle.field["left_turn"] = -1
+                turn.battle.field["value"] = None
+
         # 清除掉所有标记为trash的status
         for style in turn.team:
             for status in style.statuses[::-1]:
                 if status.trash:
                     style.statuses.remove(status)
+
         # 把predict od存到od中，保持两者一致
         turn.od = min(turn.predicted_od, 300)
         turn.predicted_od = min(turn.predicted_od, 300)
@@ -1813,6 +1853,7 @@ class Simulation:
     def new_turn_label_refresh(self, turn: Turn):
         """
         根据上一回合的GUI给的label得到本回合的label，调用位于GUI的任何改动之前，返回当前是否为新回合
+        消耗duration为敌方回合数的buff
         additional_turn
         od_timing
         od_level
@@ -1845,11 +1886,13 @@ class Simulation:
                     if turn.od_timing == "after":
                         turn.turn_num += 1
                         new_turn = True
+                        self.consume_enemy_turn(turn)
                     turn.od_timing = None
             # 上回合不在od内
             else:
                 turn.turn_num += 1
                 new_turn = True
+                self.consume_enemy_turn(turn)
         return new_turn
 
     def first_turn(self, state: dict) -> dict:
@@ -1948,6 +1991,7 @@ class Simulation:
 
         # 此处应用special_actions的前置od前
         for special_trigger in ("demonic_rage", "all_out_attack", "demon_cavalry"):
+            turn.special_actions = gui_add_state["special_actions"]
             times = turn.special_actions[special_trigger]
             if times:
                 match special_trigger:
@@ -1979,6 +2023,7 @@ class Simulation:
 
         # 此处应用special_actions的前置od后
         for special_trigger in ("demonic_rage_after", "all_out_attack_after", "demon_cavalry_after"):
+            turn.special_actions = gui_add_state["special_actions"]
             times = turn.special_actions[special_trigger]
             if times:
                 match special_trigger:
