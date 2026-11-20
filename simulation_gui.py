@@ -1242,6 +1242,8 @@ class BattleTurn(QGroupBox):
     def _status_icon(self, status):
         if isinstance(status, dict):
             status_id, element = status.get('id'), status.get('element', "none")
+            if element == None:
+                element = "none"
         else:
             return None
         entry = self._status_db.get(str(status_id))

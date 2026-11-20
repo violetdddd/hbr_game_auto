@@ -780,8 +780,21 @@ def is_attack_skill(skill: Skill) -> bool:
 def find_skill_by_id(style: Style, skill_id: int) -> Skill:
     return next(skill for skill in style.active_skills if skill.id == skill_id)
 
+# 计算敌人数量
 def monster_num(turn: Turn) -> int:
     return sum(monster.exist for monster in turn.battle.monsters)
+
+# 计算敌人是否有buff
+def monster_has_buff(turn: Turn, position=None):
+    def one_monster_has_buff(monster: Monster):
+        return any(status.category == "buff" for status in monster.statuses)
+    if position:
+        return one_monster_has_buff(turn.battle.monsters[position])
+    else:
+        for monster in turn.battle.monsters:
+            if monster.exist and one_monster_has_buff(monster):
+                return True
+        return False
 
 class Simulation:
     """持有静态数据库与初始化后的 Turn。进行实际的模拟并实现与gui的dict state传递接口"""
@@ -1030,32 +1043,48 @@ class Simulation:
         self.turns = []
         return turn
 
+    # 判断一个技能是否有某个effect
+    def skill_has_effect_with(self, skill: Skill, action: dict, ctx: Context, *, effect_key: str=None, effect_type: str=None):
+        effects = self.resolve_active_effects(skill, action, ctx)
+        if effect_key:
+            return any(effect.get(effect_key) for effect in effects)
+        if effect_type:
+            return any(effect.get("type") == effect_type for effect in effects)
+
     # 实际应用的被动触发函数，给出在某个时间节点的触发str即可
     def trigger_passives(self, turn: Turn, trigger: str):
         order = deepcopy(turn.order)
         order[0], order[1] = order[1], order[0]  # 触发顺序是position的1，0，2，3，4，5
         for slot in order:
             style = turn.team[slot]
-            if trigger in style.passive_triggers:
-                for passive in iter_passives(style):
-                    # 判断trigger时机
-                    if passive.trigger != trigger:
+            self.trigger_style_passives(turn, style, trigger)
+
+    # 触发一个角色的被动
+    def trigger_style_passives(self, turn: Turn, style: Style, trigger: str, only_od=False, without_od=False):
+        if trigger in style.passive_triggers:
+            for passive in iter_passives(style):
+                # 判断trigger时机
+                if passive.trigger != trigger:
+                    continue
+                # 判断trigger condition是否满足
+                ctx = Context(turn=turn, subject=style)
+                if (passive.trigger_condition and not check(passive.trigger_condition, ctx)):
+                    continue
+                # 检查触发次数
+                if isinstance(passive, LimitBreak) and passive.trigger_limit is not None:
+                    if passive.trigger_times >= passive.trigger_limit:
                         continue
-                    # 判断trigger condition是否满足
-                    ctx = Context(turn=turn, subject=style)
-                    if (passive.trigger_condition and not check(passive.trigger_condition, ctx)):
+                    else:
+                        passive.trigger_times += 1
+                # 解析是否有case等结构，返回实际生效的effect列表
+                effects = self.resolve_passive_effects(passive, ctx)
+                # 对每个effect判断和应用效果
+                for effect in effects:
+                    if only_od and effect.get("target") != "od":
                         continue
-                    # 检查触发次数
-                    if isinstance(passive, LimitBreak) and passive.trigger_limit is not None:
-                        if passive.trigger_times >= passive.trigger_limit:
-                            continue
-                        else:
-                            passive.trigger_times += 1
-                    # 解析是否有case等结构，返回实际生效的effect列表
-                    effects = self.resolve_passive_effects(passive, ctx)
-                    # 对每个effect判断和应用效果
-                    for effect in effects:
-                        self.apply_effect(turn, style, effect)
+                    if without_od and effect.get("target") == "od":
+                        continue
+                    self.apply_effect(turn, style, effect)
 
     # 实际应用的主动技能触发函数，过滤掉od相关的内容，在shortcut里做
     def trigger_active_actions(self, style: Style, skill: Skill, action: dict, ctx: Context):
@@ -1752,9 +1781,24 @@ class Simulation:
                         direct = effect.get("value") * skill.now_cost
                 funnel = calculate_funnel(tmp_style)
                 turn.stage_tmp_od += calculate_od(hit, funnel, enemy_count, direct, style.od_earring, style.od_rate_extra)
-        # after_ex_use
-        # on_sp_up_by_nonself_active_skill
-        # on_relieve_enemy_buff
+
+                # 结算和od相关的被动效果
+                if skill.ex_skill:
+                    self.trigger_style_passives(turn, style, "after_ex_use", only_od=True)
+                if action.get("on_break"):
+                    self.trigger_style_passives(turn, style, "on_break_enemy", only_od=True)
+                if self.skill_has_effect_with(skill, action, ctx, effect_type="remove_buff") and monster_has_buff(turn, action["target"]["slot"]):
+                    self.trigger_style_passives(turn, style, "on_relieve_enemy_buff", only_od=True)
+                # 有恢复sp的主动技能
+                if self.skill_has_effect_with(skill, action, ctx, effect_key="sp"):
+                    effects = self.resolve_active_effects(skill, action, ctx)
+                    for effect in effects:
+                        if effect.get("sp"):  # 对于恢复sp的主动技能
+                            targets = resolve_targets(turn, style, effect.get("target"), effect)
+                            for target in targets:
+                                if target != style:  # 每一个非自身target触发被动
+                                    self.trigger_style_passives(turn, target, "on_sp_up_by_nonself_active_skill", only_od=True)
+
         self.resolve_tmp_od(turn, direct=False)
 
     def apply_member_actions(self, turn: Turn):
@@ -1817,6 +1861,23 @@ class Simulation:
                     if skill.conditions.get("effects").startswith("target."):
                         ctx = Context(turn, turn.battle.monsters[action.get("target").get("slot")])
                 self.trigger_active_actions(style, skill, action, ctx)
+
+                # 结算非od的被动效果
+                if skill.ex_skill:
+                    self.trigger_style_passives(turn, style, "after_ex_use", without_od=True)
+                if action.get("on_break"):
+                    self.trigger_style_passives(turn, style, "on_break_enemy", without_od=True)
+                if self.skill_has_effect_with(skill, action, ctx, effect_type="remove_buff") and monster_has_buff(turn, action["target"]["slot"]):
+                    self.trigger_style_passives(turn, style, "on_relieve_enemy_buff", without_od=True)
+                # 有恢复sp的主动技能
+                if self.skill_has_effect_with(skill, action, ctx, effect_key="sp"):
+                    effects = self.resolve_active_effects(skill, action, ctx)
+                    for effect in effects:
+                        if effect.get("sp"):  # 对于恢复sp的主动技能
+                            targets = resolve_targets(turn, style, effect.get("target"), effect)
+                            for target in targets:
+                                if target != style:  # 每一个非自身target触发被动
+                                    self.trigger_style_passives(turn, target, "on_sp_up_by_nonself_active_skill", without_od=True)
 
     def resolve_turn_end_status(self, turn: Turn):
         """
@@ -2003,8 +2064,7 @@ class Simulation:
                         turn.od = min(turn.od + od_added, 300)
                         turn.predicted_od = min(turn.predicted_od + od_added, 300)
                     case "demon_cavalry":
-                        waki = next(style for style in turn.team if style.id == 113)
-                        od_added = calculate_od(6, 0, monster_num(turn), 0, waki.od_earring, waki.od_rate_extra)
+                        od_added = monster_num(turn) * 6 * 2.5
                         turn.od = min(turn.od + od_added, 300)
                         turn.predicted_od = min(turn.predicted_od + od_added, 300)
 
@@ -2033,8 +2093,7 @@ class Simulation:
                         od_added = monster_num(turn) * 7 * 2.5
                         turn.predicted_od = min(turn.predicted_od + od_added, 300)
                     case "demon_cavalry_after":
-                        waki = next(style for style in turn.team if style.id == 113)
-                        od_added = calculate_od(6, 0, monster_num(turn), 0, waki.od_earring, waki.od_rate_extra)
+                        od_added = monster_num(turn) * 6 * 2.5
                         turn.predicted_od = min(turn.predicted_od + od_added, 300)
 
         # member数据计算后存储在Turn中
