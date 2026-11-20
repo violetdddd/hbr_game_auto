@@ -870,7 +870,7 @@ class BattleTurn(QGroupBox):
         self.next_button = QPushButton('下一回合')
         self.next_button.setStyleSheet(BLUE_BUTTON)
         self.next_button.setFixedHeight(26)
-        self.next_button.clicked.connect(lambda: self.owner.next_turn(self))
+        self.next_button.clicked.connect(lambda: self.owner.next_turn())
         self.back_button = QPushButton('回到本回合')
         self.back_button.setFixedHeight(27)
         self.back_button.setStyleSheet(WHITE_BUTTON)
@@ -988,7 +988,7 @@ class BattleTurn(QGroupBox):
             "special_actions": base["special_actions"],
             "adjustments": self.state_data["adjustments"]
         }
-        self.state_data = self.owner.engine.recalculate(gui_add_state, self.number)
+        self.state_data["base"] = self.owner.engine.recalculate(copy.deepcopy(gui_add_state), self.number)
 
     def edit_special_action(self, position):
         base = self.state_data['base']
@@ -997,10 +997,11 @@ class BattleTurn(QGroupBox):
         special_trigger = base['members'][slot].get('special_trigger')
         special_actions = base.get('special_actions')
         # 创建对话框，读取当前状态
+        special_count = None if special_trigger == None else [special_actions.get(special_trigger, 0), special_actions.get(special_trigger+"_after", 0)]
         dialog = SpecialActionDialog(
             on_break=action.get('on_break', False),
             special_trigger=special_trigger,
-            special_count=[special_actions.get(special_trigger, 0), special_actions.get(special_trigger+"_after", 0)],
+            special_count=special_count,
             parent=self
         )
         # 取消则不更改任何内容
@@ -1014,7 +1015,7 @@ class BattleTurn(QGroupBox):
             special_actions[special_trigger] = values['special_count'][0]
             if len(values['special_count']) == 2:
                 special_actions[special_trigger+"_after"] = values['special_count'][1]
-        # self.update_state_from_simulation()
+        self.update_state_from_simulation()
         self.refresh()
 
     def refresh_enemy_setting(self, *_):
@@ -1088,7 +1089,7 @@ class BattleTurn(QGroupBox):
             'on_break': False
         }
 
-        # self.update_state_from_simulation()
+        self.update_state_from_simulation()
         # 刷新显示
         self.refresh()
 
@@ -1114,7 +1115,7 @@ class BattleTurn(QGroupBox):
         base['od_timing'] = timing if selected.currentData() else None
         base['od_level'] = selected.currentData() or 0
 
-        # self.update_state_from_simulation()
+        self.update_state_from_simulation()
         self.refresh()
 
     def swap_position(self, position):
@@ -1150,7 +1151,7 @@ class BattleTurn(QGroupBox):
                     'on_break': False
                 }
 
-        # self.update_state_from_simulation()
+        self.update_state_from_simulation()
         self.refresh()
 
     # 负责从 state_data 读取值到调整页
@@ -1228,7 +1229,7 @@ class BattleTurn(QGroupBox):
         else:
             self.save_adjust()
             self.stack.setCurrentIndex(0)
-            # self.update_state_from_simulation()
+            self.update_state_from_simulation()
             self.refresh()
 
     # 根据是否是当前最后一回合来显示回到本回合或者下一回合
@@ -1321,25 +1322,18 @@ class BattleTurn(QGroupBox):
         level = max(0, min(3, int(od // 100)))
         # od发动选择框
         # 前置od发动条件是当前刚刚开启前置od，或者当前处于od外的非附加回合中
-        available_before = level if (now_timing == "before" and bonus == 1) or (now_od == 0 and not additional_turn) else 0
+        available_before = 3 if (now_timing == "before" and bonus == 1) or (now_od == 0 and not additional_turn) else 0
         # 后置od发动条件是当前刚刚开启前置od，或者当前处于od外
-        available_after = max(0, min(3, int(estimate // 100))) if (now_timing == "before" and bonus == 1) or now_od == 0 else 0
+        available_after = 3 if (now_timing == "before" and bonus == 1) or now_od == 0 else 0
         for timing, box, available in (('before', self.before_od, available_before), ('after', self.after_od, available_after)):
             box.blockSignals(True)
             box.clear()
             box.addItem('不发动', 0)
+            # 不做任何检查，只要可以发动od就允许发动任意等级的od
             for n in range(1, available + 1):
                 box.addItem(f'OD{n}', n)
             selected_level = effective.get('od_level', 0) if now_timing == timing else 0
             index = box.findData(selected_level)
-            # 防止用户先发动od再减少od值导致无法发动，稍稍修改state，此处应废弃并在simulation中解决
-            if index == -1:
-                index = 0
-                base = self.state_data['base']
-                base['od_timing'] = None
-                now_timing = None
-                base['od_level'] = 0 
-                now_od = 0 
             box.setCurrentIndex(index)
             box.blockSignals(False)
         # label，bonus由simulation决定
@@ -1376,7 +1370,8 @@ class BattleTurn(QGroupBox):
                 style_image = style.image
             portrait.configure(style_image if style else None,
                                self.owner.setup.round_pixmap, int(member.get('sp', 0)))
-            target = effective['actions'][slot]['target']
+            effect_action = effective['actions'][slot]
+            target = effect_action['target'] if effect_action else {}
             self.target_badges[position].configure(target, self.owner.setup.styles, self.owner.setup.round_pixmap)
             button.setToolTip((style.localized_title if style else f'角色{slot+1}') +
                               '（点击两名角色头像交换位置）')
@@ -1397,7 +1392,7 @@ class BattleTurn(QGroupBox):
             action.clear()
             if len(skiills) == 0:
                 action.setVisible(False)
-            else: 
+            else:  # 此时理论上action一定不是None
                 action.setVisible(True)
                 if position < 3:
                     for i, skill in enumerate(member.get('skills', [])):
@@ -1409,8 +1404,7 @@ class BattleTurn(QGroupBox):
                     for skill in member.get('skills')[1:3]:
                         action.addItem(f"{skill.get('name')}", skill.get('id'))
                 # 按当前技能选择安排动作
-                original = effective['actions'][slot]
-                idx = action.findData(original["id"])
+                idx = action.findData(effect_action["id"])
                 action.setCurrentIndex(idx if idx >= 0 else 0)
             action.blockSignals(False)
         if self in self.owner.turns:
@@ -1527,9 +1521,9 @@ class SimulationTab(QWidget):
             later.setParent(None); later.deleteLater()
         del self.turns[target:]
         for item in self.turns: item.refresh_turn_controls()
+        self.engine.truncate_after(target)
 
-    def next_turn(self, turn):
-        last_state = copy.deepcopy(turn.effective_state())
+    def next_turn(self):
         simulation_state = self.engine.advance()
         result = self.add_turn_from_simulation(simulation_state)
         # 不自动滚动到最末，以免跳过需要检查的动作。

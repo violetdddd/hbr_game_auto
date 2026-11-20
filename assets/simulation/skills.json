@@ -188,11 +188,11 @@
     "effects": {
       "yes": [
         {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"]},
-        {"type": "remove_buff", "target": "all"}
+        {"type": "remove_buff", "target": "all", "number": 2}
       ],
       "no": [
         {"type": "attack", "target": "all", "attack_type": "strike", "elements": ["fire"]},
-        {"type": "remove_buff", "target": "all"}
+        {"type": "remove_buff", "target": "all", "number": 2}
       ]
     }
   },
@@ -700,7 +700,7 @@
     "hit_count": 1,
     "target": "single",
     "effects": [
-      {"type": "remove_buff", "target": "single"},
+      {"type": "remove_buff", "target": "single", "number": 1},
       {"type": "attack_down", "target": "single", "status_id": 2, "duration": {"type": "enemy_turn", "value": 1}}
     ]
   },
@@ -832,7 +832,7 @@
     "cost": {"sp": 4},
     "target": "self",
     "effects": [
-      {"type": "remove_debuff", "target": "self"},
+      {"type": "remove_debuff", "target": "self", "number": 1},
       {"type": "heal_dp", "target": "self"}
     ]
   },
@@ -1692,14 +1692,14 @@
     "target": "ally_all",
     "effects": {
       "yes": [
-        {"type": "remove_debuff", "target": "ally_all"},
+        {"type": "remove_debuff", "target": "ally_all", "number": 1},
         {
           "type": "debuff_guard",
           "target": "ally_front",
           "status_id": 110
         }
       ],
-      "no": [{"type": "remove_debuff", "target": "ally_all"}]
+      "no": [{"type": "remove_debuff", "target": "ally_all", "number": 1}]
     }
   },
   "122": {
@@ -2764,8 +2764,8 @@
     "target": "ally_single",
     "effects": [
       {"type": "heal_dp", "target": "ally_single"},
-      {"type": "remove_debuff", "target": "ally_single", "target_condition": "element('dark')==0"},
-      {"type": "remove_debuff", "target": "ally_single", "target_condition": "element('dark')==1"}
+      {"type": "remove_debuff", "target": "ally_single", "target_condition": "element('dark')==0", "number": 1},
+      {"type": "remove_debuff", "target": "ally_single", "target_condition": "element('dark')==1", "number": -1}
     ]
   },
   "194": {
@@ -3338,8 +3338,8 @@
     "target": "ally_all",
     "effects": [
       {"type": "heal_dp", "target": "ally_all"},
-      {"type": "remove_debuff", "target": "ally_all", "target_condition": "element('light')==0"},
-      {"type": "remove_debuff", "target": "ally_all", "target_condition": "element('light')==1"}
+      {"type": "remove_debuff", "target": "ally_all", "target_condition": "element('light')==0", "number": 1},
+      {"type": "remove_debuff", "target": "ally_all", "target_condition": "element('light')==1", "number": -1}
     ]
   },
   "222": {
@@ -4472,7 +4472,7 @@
     "target": "single",
     "attack_type": "stab",
     "effects": [
-      {"type": "remove_buff", "target": "single"},
+      {"type": "remove_buff", "target": "single", "number": 3},
       {"type": "penetration_critical_attack", "target": "single", "attack_type": "stab"}
     ]
   },
@@ -4533,8 +4533,8 @@
     "effects": [
       {"type": "resource", "target": "ally_all_without_self", "sp": 2},
       {"type": "tea", "target": "ally_all", "status_id": 213, "duration": {"type": "permanent"}},
-      {"type": "remove_debuff", "target": "ally_all"},
-      {"type": "remove_buff", "target": "all"}
+      {"type": "remove_debuff", "target": "ally_all", "number": 2},
+      {"type": "remove_buff", "target": "all", "number": 2}
     ]
   },
   "285": {
@@ -5226,7 +5226,7 @@
     "target": "ally_single",
     "effects": [
       {"type": "resource", "target": "ally_single", "sp": 3},
-      {"type": "remove_debuff", "target": "ally_single"}
+      {"type": "remove_debuff", "target": "ally_single", "number": 1}
     ]
   },
   "335": {
@@ -5464,11 +5464,11 @@
           "duration": {"type": "use", "value": 1}
         },
         {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
-        {"type": "remove_buff", "target": "single"}
+        {"type": "remove_buff", "target": "single", "number": 3}
       ],
       "no": [
         {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["dark"]},
-        {"type": "remove_buff", "target": "single"}
+        {"type": "remove_buff", "target": "single", "number": 3}
       ]
     }
   },
@@ -6973,7 +6973,7 @@
     "cost": {"resource": "od", "od": 100},
     "target": "ally_all",
     "effects": [
-      {"type": "remove_debuff", "target": "ally_all"}
+      {"type": "remove_debuff", "target": "ally_all", "number": -1}
     ]
   },
   "440": {
@@ -7622,7 +7622,7 @@
     "attack_type": "strike",
     "elements": ["thunder"],
     "effects": [
-      {"type": "remove_debuff", "target": "ally_all"},
+      {"type": "remove_debuff", "target": "ally_all", "number": -1},
       {"type": "token_attack", "target": "all", "attack_type": "strike", "elements": ["thunder"]}
     ]
   },
@@ -8842,28 +8842,28 @@
     "user_select": {
       "1": {
         "effects": [
-          {"type": "remove_debuff", "target": "ally_single"},
+          {"type": "remove_debuff", "target": "ally_single", "number": 1},
           {"type": "regeneration_dp", "target": "ally_single", "status_id": 34, "duration": {"type": "enemy_turn", "value": 6}}
         ],
         "description": "DP持续恢复5回合"
       },
       "2": {
         "effects": [
-          {"type": "remove_debuff", "target": "ally_single"},
+          {"type": "remove_debuff", "target": "ally_single", "number": 1},
           {"type": "regeneration_dp", "target": "ally_single", "status_id": 34, "duration": {"type": "enemy_turn", "value": 5}}
         ],
         "description": "DP持续恢复4回合"
       },
       "3": {
         "effects": [
-          {"type": "remove_debuff", "target": "ally_single"},
+          {"type": "remove_debuff", "target": "ally_single", "number": 1},
           {"type": "regeneration_dp", "target": "ally_single", "status_id": 34, "duration": {"type": "enemy_turn", "value": 4}}
         ],
         "description": "DP持续恢复3回合"
       },
       "4": {
         "effects": [
-          {"type": "remove_debuff", "target": "ally_single"},
+          {"type": "remove_debuff", "target": "ally_single", "number": 1},
           {"type": "regeneration_dp", "target": "ally_single", "status_id": 34, "duration": {"type": "enemy_turn", "value": 3}}
         ],
         "description": "DP持续恢复2回合"
@@ -8923,7 +8923,7 @@
     "user_select": {
       "1": {
         "effects": [
-          {"type": "remove_debuff", "target": "ally_all"},
+          {"type": "remove_debuff", "target": "ally_all", "number": 3},
           {"type": "heal_dp", "target": "ally_all"},
           {"type": "mind_eye", "target": "ally_all", "status_id": 78, "duration": {"type": "on_attack_weak", "value": 1}},
           {"type": "attack_up", "target": "ally_all", "status_id": 1, "duration": {"type": "use", "value": 1}}
@@ -8932,7 +8932,7 @@
       },
       "2": {
         "effects": [
-          {"type": "remove_debuff", "target": "ally_all"},
+          {"type": "remove_debuff", "target": "ally_all", "number": 3},
           {"type": "heal_dp", "target": "ally_all"}
         ],
         "description": "没有解除己方减益"
@@ -9860,7 +9860,7 @@
           "when": "used(628) == 1",
           "effects": [
             {"type": "defense_up", "target": "ally_front", "status_id": 4, "duration": {"type": "enemy_turn", "value": 3}},
-            {"type": "remove_debuff", "target": "ally_front"}
+            {"type": "remove_debuff", "target": "ally_front", "number": 1}
           ],
           "description": "第2次使用"
         },
@@ -9868,7 +9868,7 @@
           "when": "used(628) == 2",
           "effects": [
             {"type": "defense_up", "target": "ally_front", "status_id": 4, "duration": {"type": "enemy_turn", "value": 3}},
-            {"type": "remove_debuff", "target": "ally_front"},
+            {"type": "remove_debuff", "target": "ally_front", "number": 2},
             {"type": "attack_up", "target": "ally_front", "status_id": 1, "duration": {"type": "ally_turn", "value": 3}, "solo": true}
           ],
           "description": "第3次使用"
@@ -9877,7 +9877,7 @@
           "when": "used(628) >= 3",
           "effects": [
             {"type": "defense_up", "target": "ally_front", "status_id": 4, "duration": {"type": "enemy_turn", "value": 3}},
-            {"type": "remove_debuff", "target": "ally_front"},
+            {"type": "remove_debuff", "target": "ally_front", "number": 3},
             {"type": "attack_up", "target": "ally_front", "status_id": 1, "duration": {"type": "ally_turn", "value": 3}, "solo": true},
             {"type": "mind_eye", "target": "ally_front", "status_id": 78, "duration": {"type": "ally_turn", "value": 3}, "solo": true}
           ],
@@ -10771,11 +10771,11 @@
     "effects": {
       "yes": [
         {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["thunder"]},
-        {"type": "remove_buff", "target": "all"}
+        {"type": "remove_buff", "target": "all", "number": 3}
       ],
       "no": [
         {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["thunder"]},
-        {"type": "remove_buff", "target": "all"}
+        {"type": "remove_buff", "target": "all", "number": 3}
       ]
     }
   },
@@ -11111,7 +11111,7 @@
     "elements": ["dark"],
     "effects": [
       {"type": "zone", "target": "field", "elements": ["dark"], "status_id": 14, "duration": {"type": "ally_turn", "value": 8}},
-      {"type": "remove_buff", "target": "all"},
+      {"type": "remove_buff", "target": "all", "number": 3},
       {"type": "attack", "target": "all", "attack_type": "stab", "elements": ["dark"]}
     ]
   },
@@ -11695,7 +11695,7 @@
     "cost": {"sp": 4},
     "target": "self",
     "effects": [
-      {"type": "remove_debuff", "target": "self", "value": 1},
+      {"type": "remove_debuff", "target": "self", "number": 1},
       {"type": "debuff_guard", "target": "self", "status_id": 110, "target_condition": "dp_rate()<=0.5"}
     ]
   }

@@ -60,18 +60,72 @@ PASSIVE_EFFECT_TYPES_NEEDED = {
     "misfortune",
     "cover",
     "revenge",
-    "zone_up_eternal_plus_15"
+    "zone_up_eternal_plus_15",
+    "b_i_yamawaki_servant"
 }
 
-ATTACK_EFFECT_TYPES = {
-    "attack",
-    "penetration_critical_attack",
-    "attack_by_sp",
-    "attack_by_own_dp_rate",
-    "token_attack",
-    "damage_rate_change_attack_skill",
-    "fixed_hp_damage_rate_attack",
-    "inscription_attack",
+ACTIVE_EFFECT_TYPES_NEEDED = {
+    # 资源
+    "resource",
+    "token",
+    "heal_sp_by_token",
+    "specify_sp",
+    # rule
+    "additional_turn",
+    "zone",
+    "summers_end_territory",
+    "remove_summers_end_territory",
+    "revive_territory",
+    # 特殊技能效果
+    "remove_buff",
+    "remove_debuff",
+    "immersion",
+    # 特殊状态
+    "provoke",
+    "cover",
+    "dodge",
+    "sprightly",
+    "shadow_clone",
+    "revenge",
+    "double_action_extra_skill",
+    "shredding",
+    "recoil",
+    "b_i_yamawaki_servant",
+    "curry",
+    "dim_sum",
+    "gelato",
+    "shchi",
+    "steak",
+    "tea",
+    "diva",
+    "mocktail",
+    # buff
+    "attack_up",
+    "attack_up_by_token",
+    "attack_up_include_normal",
+    "attack_up_range_by_all_damage_rate",
+    "critical_damage_up",
+    "mind_eye",
+    "give_attack_buff_up",
+    "give_debuff_up",
+    "funnel",
+    "buff_charge",
+    "morale",
+    "motivation",
+    "fighting_spirit",
+    "eternal_oath",
+    "arrow_cherry_blossoms",
+    # debuff
+    "fragile",
+    "defense_down",
+    "resist_down",
+    "resist_down_overwrite",
+    "misfortune",
+    "undermine",
+    "venom",
+    "disaster",
+    "infantilized",
+    "hacking",
 }
 
 from paths import ROOT_DIR
@@ -174,7 +228,7 @@ class Skill:
 
     @classmethod
     def from_record(cls, record: JsonDict) -> 'Skill':
-        if record.get('kind') not in ('active', 'system'):
+        if record.get('kind') not in ('active', 'system', 'accessory'):
             raise ValueError(f"Skill 只能读取 active/system，收到 {record.get('kind')!r}")
         data = _record_kwargs(cls, record)
         # 设置cost相关
@@ -628,7 +682,7 @@ def iter_passives(style: Style):
         yield style.support_skill_passive
 
 # 获得target的列表
-def resolve_targets(turn: Turn, owner: Style, target_type: str):
+def resolve_targets(turn: Turn, owner: Style, target_type: str, effect=None) -> list[Style | Monster]:
     front = [turn.team[i] for i in turn.order[:3]]
     sub = [turn.team[i] for i in turn.order[3:]]
     groups = {  # 采用lambda表达式，这样仅在实际选择了该lambda分支才运行
@@ -645,6 +699,18 @@ def resolve_targets(turn: Turn, owner: Style, target_type: str):
         "all": lambda: [
             x for x in turn.battle.monsters if x.exist
         ],
+        "single": lambda: [
+            effect.get("effect_target")
+        ],
+        "ally_single": lambda: [
+            effect.get("effect_target")
+        ],
+        "ally_single_without_self": lambda: [
+            effect.get("effect_target")
+        ],
+        "ally_single_front_without_self": lambda: [
+            effect.get("effect_target")
+        ]
     }
     if target_type not in groups:
         raise ValueError(f"未知角色目标: {target_type}")
@@ -661,7 +727,7 @@ def calculate_funnel(style: Style):
     # 遍历并存取伤害和连击珠数量
     for status in funnels:
         value = status.data.get("mode").get("value")
-        number = status.data.get("mode").get("value")
+        number = status.data.get("mode").get("number")
         damage = value * number
         duration_type = status.duration_type
         if duration_type == "use":
@@ -682,7 +748,7 @@ def calculate_funnel(style: Style):
         return numbers["passive"] + numbers["stack1"] + numbers["stack2"]
 
 # 根据行动的参数计算od增加数值
-def calculate_od(hit, funnel, enemy, direct, earring: int, extra_rate: float):
+def calculate_od(hit, funnel, enemy, direct, earring: int, extra_rate: float) -> float:
     if earring != 0:  # 10,12,15
         if hit != 0:
             od_rate_100 = 105 + (earring-5) / 9 * (hit - 1) + extra_rate
@@ -697,11 +763,14 @@ def calculate_od(hit, funnel, enemy, direct, earring: int, extra_rate: float):
 # sp回复
 def add_sp(target: Style, effect: dict):
     limit = effect.get("limit", target.sp_limit)
-    target.sp = min(target.sp + effect["sp"], limit)
+    target.sp = max(min(target.sp + effect["sp"], limit), target.sp)
 
 # 判断style是否有某status
-def has_status_id(style: Style, status_id: int) -> bool:
-    return any(status.id == status_id for status in style.statuses)
+def has_status_id(style: Style, status_id: int, allow_trash: bool = False) -> bool:
+    if allow_trash:
+        return any(status.id == status_id for status in style.statuses)
+    else:
+        return any(status.id == status_id and not status.trash for status in style.statuses)
 
 # 判断某技能是否是攻击技能
 def is_attack_skill(skill: Skill) -> bool:
@@ -710,6 +779,9 @@ def is_attack_skill(skill: Skill) -> bool:
 # 通过skill_id寻找某风格的非默认技能
 def find_skill_by_id(style: Style, skill_id: int) -> Skill:
     return next(skill for skill in style.active_skills if skill.id == skill_id)
+
+def monster_num(turn: Turn) -> int:
+    return sum(monster.exist for monster in turn.battle.monsters)
 
 class Simulation:
     """持有静态数据库与初始化后的 Turn。进行实际的模拟并实现与gui的dict state传递接口"""
@@ -803,7 +875,7 @@ class Simulation:
                 'statuses': [asdict(status) for status in monster.statuses],
             })
 
-        return {
+        return deepcopy({
         'members': members,
         'order': turn.order,
         'actions': turn.actions,
@@ -819,7 +891,7 @@ class Simulation:
         'bonus': turn.bonus,
         'additional_turn': turn.additional_turn,
         "special_actions": turn.special_actions
-        }
+        })
 
     def initialize(self, state: dict) -> Turn:
         """从战斗设置和数据库创建初始 Turn，不执行下一回合结算。
@@ -906,8 +978,8 @@ class Simulation:
                 record = skill_records.get(skill_id)
                 if record is None:
                     raise ValueError(f'slot {slot} 的主动技能 ID {skill_id} 不存在')
-                if record.get('kind') not in ('active', 'system'):
-                    raise ValueError(f'技能 {skill_id} 不是 active/system')
+                if record.get('kind') not in ('active', 'system', "accessory"):
+                    raise ValueError(f'技能 {skill_id} 不是 active/system/accessory')
             # 查询被动技能是否存在
             for skill_id in passive_ids:
                 record = skill_records.get(skill_id)
@@ -955,6 +1027,7 @@ class Simulation:
         self.style_records = style_records
         self.status_records = status_records
         self.initial_config = config
+        self.turns = []
         return turn
 
     # 实际应用的被动触发函数，给出在某个时间节点的触发str即可
@@ -984,6 +1057,18 @@ class Simulation:
                     for effect in effects:
                         self.apply_effect(turn, style, effect)
 
+    # 实际应用的主动技能触发函数，过滤掉od相关的内容，在shortcut里做
+    def trigger_active_actions(self, style: Style, skill: Skill, action: dict, ctx: Context):
+        # 解析是否有case等结构，过滤不模拟的effect，返回实际生效的effect列表
+        turn = ctx.turn
+        effects = self.resolve_active_effects(skill, action, ctx)
+        effects = [effect for effect in effects if effect.get("target") != "od"]
+        # 应用效果
+        for effect in effects:
+            self.apply_effect(turn, style, effect, source=skill.names.get("zh_cn"))
+        # 增加使用次数
+        skill.used += 1
+
     # 解析passive的结构，提取实际生效的effect列表
     def resolve_passive_effects(self, passive, ctx):
         effects = passive.effects
@@ -999,32 +1084,53 @@ class Simulation:
         # 未知结构
         raise ValueError(f"未知被动效果结构: {effects}")
 
-    def resolve_active_effects(self, skill: Skill, action: dict | None, ctx: Context):
+    def resolve_active_effects(self, skill: Skill, action: dict, ctx: Context):
         # 破盾的技能
         if skill.on_break:
             if action.get("on_break"):
-                return skill.on_break.get("yes").get("effects")
+                before_filter = skill.on_break.get("yes").get("effects")
             else:
-                return skill.on_break.get("no").get("effects")
+                before_filter = skill.on_break.get("no").get("effects")
         # 用户选择的技能
-        if skill.user_select:
-            return skill.user_select.get(str(action.get("user_select"))).get("effects")
+        elif skill.user_select:
+            selected = str(action.get("user_selected"))
+            before_filter = skill.user_select.get(selected).get("effects")
+            # 小螃蟹的原皮大招hit count在此处变化，因此od shortcut需要调用本函数进行动态hit count赋值
+            if skill.user_select.get(selected).get("hit_count"):
+                skill.hit_count = skill.user_select.get(selected).get("hit_count")
         # conditions技能
-        if skill.conditions and skill.conditions.get("effects"):
+        elif skill.conditions and skill.conditions.get("effects"):
             if check(skill.conditions.get("effects"), ctx):
-                return skill.effects.get("yes")
+                before_filter = skill.effects.get("yes")
             else:
-                return skill.effects.get("no")
+                before_filter = skill.effects.get("no")
         # cases技能
-        if skill.cases and "effects" in skill.cases:
+        elif skill.cases and "effects" in skill.cases:
             for case in skill.effects["cases"]:
                 if check(case["when"], ctx):
-                    return case["effects"]
-            return []
-        if isinstance(skill.effects, list):
-            return skill.effects
+                    before_filter = case["effects"]
+            before_filter = []
+        elif isinstance(skill.effects, list):
+            before_filter = skill.effects
         # 未知结构
-        raise ValueError(f"未知主动技能效果结构: {skill.effects}")
+        else:
+            raise ValueError(f"未知主动技能效果结构: {skill.effects}")
+        after_filter = [effect for effect in before_filter if effect.get("type") in ACTIVE_EFFECT_TYPES_NEEDED]
+        # 对每个effect确定单体的target
+        turn = ctx.turn
+        for effect in after_filter:
+            effect_target = None
+            target_dict = action.get("target")
+            if target_dict.get("type") == "enemy":
+                effect_target = turn.battle.monsters[target_dict.get("slot")]
+            elif target_dict.get("type") != "ignore":  # 我方单体角色
+                effect_target = turn.team[target_dict.get("slot")]
+            effect["effect_target"] = effect_target
+            # 特殊技能额外信息加入effect
+            if effect.get("type") == "heal_sp_by_token":
+                effect["sp"] = effect.get("sp") * skill.now_cost
+        return after_filter
+        
     
     # 实际解析并应用effect的函数
     def apply_effect(self, turn: Turn, owner: Style, effect: dict, source=None):
@@ -1035,7 +1141,7 @@ class Simulation:
         if target_type in ("od", "field"):
             targets = []
         else:
-            targets = resolve_targets(turn, owner, target_type)
+            targets = resolve_targets(turn, owner, target_type, effect)
             # 每个目标分别判断 target_condition
             condition = effect.get("target_condition")
             if condition:
@@ -1161,9 +1267,9 @@ class Simulation:
 
             # ==================== 特殊状态 ====================
             case "additional_turn":
-                # TODO: 在下一阶段检查追加回合状态并安排额外行动
+                # 在下一阶段检查追加回合状态并安排额外行动
                 for target in targets:
-                    add_status(target, unique=True)
+                    add_status(target)
             case "double_action_extra_skill":
                 # EX 技能双动，在执行 EX 技能时消费
                 for target in targets:
@@ -1263,6 +1369,84 @@ class Simulation:
                 for target in targets:
                     add_status(target, level=effect.get("level", 0), max_level=10,)
 
+            # ==================== 主动技能区 ====================
+            # 资源
+            case "heal_sp_by_token":
+                for target in targets:
+                    add_sp(target, effect)
+                
+            case "specify_sp":
+                for target in targets:
+                    add_status(target)
+            # rule
+            case "summers_end_territory":
+                turn.battle.territory = 204
+                
+            case "remove_summers_end_territory":
+                turn.battle.territory = None
+                
+            case "revive_territory":
+                turn.battle.territory = 157
+
+            # 特殊技能效果
+            case "remove_buff":
+                for target in targets:
+                    removes = 0
+                    for status in target.statuses:
+                        if status.category == "buff":
+                            status.trash = True
+                            removes += 1
+                        if removes >= effect.get("number", 1):
+                            break
+                
+            case "remove_debuff":
+                for target in targets:
+                    removes = 0
+                    limit = effect.get("number", 1) if effect.get("number", 1) > 0 else None
+                    for status in target.statuses:
+                        if status.category == "debuff":
+                            status.trash = True
+                            removes += 1
+                        if limit and removes >= limit:
+                            break
+                
+            case "immersion":
+                for target in targets:
+                    add_status(target)
+
+            # 特殊状态
+            case "shredding" | "diva":
+                for target in targets:
+                    add_status(target)
+                
+            case "recoil" | "b_i_yamawaki_servant" | "curry" | "dim_sum" | "gelato" | "shchi" | "steak" | "tea":
+                for target in targets:
+                    add_status(target, unique=True)
+                
+            # buff
+            case "attack_up" | "attack_up_include_normal" | "critical_damage_up" | \
+                 "mind_eye" | "give_attack_buff_up" | "give_debuff_up":
+                for target in targets:
+                    add_status(target)
+                
+            case "eternal_oath" | "attack_up_by_token" | "attack_up_range_by_all_damage_rate" | "fighting_spirit":
+                for target in targets:
+                    add_status(target, unique=True)
+
+            # debuff
+            case "resist_down_overwrite":
+                element = effect.get("elements")[0]
+                if element not in turn.battle.enemy_weaknesses:
+                    turn.battle.enemy_weaknesses.append(element)
+                    
+            case "fragile" | "defense_down" | "resist_down" | "undermine" | "hacking":
+                for target in targets:
+                    add_status(target)
+
+            case "venom":
+                for target in targets:
+                    add_status(target, level=effect.get("level", 1), max_level=10)
+
             # ==================== 未知类型 ====================
             case _:
                 raise NotImplementedError(
@@ -1272,8 +1456,10 @@ class Simulation:
     def resolve_tmp_od(self, turn: Turn, direct=True):
         """将apply effect后的stage_tmp_od加回正式od，回合开始的效果还需加到od上，否则仅加预测od"""
         if direct:
-            turn.od += turn.stage_tmp_od
-        turn.predicted_od += turn.stage_tmp_od
+            turn.od = min(turn.stage_tmp_od + turn.od, 300)
+            turn.predicted_od  = min(turn.stage_tmp_od + turn.predicted_od, 300)
+        else:
+            turn.predicted_od += turn.stage_tmp_od
         turn.stage_tmp_od = 0
 
     def battle_start(self, turn: Turn):
@@ -1331,6 +1517,10 @@ class Simulation:
                     if status.id == 166 and status.level == 6:
                         add_sp(style, {"sp": 1})
                         break
+            # 晚夏之阵特殊状态，全体sp+1
+            if turn.battle.territory == 204:
+                for style in turn.team:
+                    add_sp(style, {"sp": 1})
         # 附加回合
         elif turn.additional_turn:
             self.trigger_passives(turn, "on_additional_turn_start")
@@ -1346,17 +1536,17 @@ class Simulation:
             self.trigger_passives(turn, "on_overdrive_start")
 
         # 回合开始默认行动
-        actions = []
+        actions = [None] * 6
         # 前三名默认普通攻击，后三名默认无行动
         for position, slot in enumerate(turn.order):
             style = turn.team[slot]
             # 选取默认行动
             default_skill = style.basic_skills[0 if position < 3 else 1]
             if has_status_id(style, 33) or \
-            turn.additional_turn and not has_status_id(style, 22) and position < 3:
-                actions.append(None)
+            turn.additional_turn and not has_status_id(style, 20, True) and position < 3:
+                actions[slot] = None
             else:
-                actions.append({
+                actions[slot] = {
                     'name': default_skill['name'],
                     'id': default_skill['id'],
                     'target': {
@@ -1365,7 +1555,7 @@ class Simulation:
                     },
                     'user_selected': None,
                     "on_break": False
-                })
+                }
         turn.actions = actions
 
     def calculate_member_skills(self, turn: Turn):
@@ -1375,7 +1565,7 @@ class Simulation:
             if has_status_id(style, 33):
                 style.skills = []
             # 处于附加回合但是前排没有附加回合状态没有skills
-            elif turn.additional_turn and not has_status_id(style, 20) and style.slot in turn.order[:3]:
+            elif turn.additional_turn and not has_status_id(style, 20, True) and style.slot in turn.order[:3]:
                 style.skills = []
             # 能够正常使用skills的角色
             else:
@@ -1383,7 +1573,7 @@ class Simulation:
                 # initialize() 已经装入全部被选择的主动/光球技能
                 for skill in style.active_skills:
                     # 处理cost，先刷新cost数值，每次调用完全重新计算
-                    skill.now_cost == skill.default_cost
+                    skill.now_cost = skill.default_cost
                     # 对所有cost_type先检查condition，目前cost里面不应该检查"target."
                     cost_condition = skill.conditions.get("cost")
                     if cost_condition:
@@ -1424,7 +1614,7 @@ class Simulation:
                                         sp_add = max(sp_add, modify)
                                     elif modify < 0:
                                         sp_minus = min(sp_minus, modify)
-                            skill.now_cost = skill.now_cost + sp_add + sp_minus
+                            skill.now_cost = max(skill.now_cost + sp_add + sp_minus, 0)
                     # 消耗od的技能有一个是cases
                     elif skill.cost_type == "od":
                         if skill.cases and "cost" in skill.cases:
@@ -1448,6 +1638,7 @@ class Simulation:
         after_ex_use
         on_sp_up_by_nonself_active_skill
         on_relieve_enemy_buff
+        on_break_enemy
         """
         tmp_turn = deepcopy(turn)
         turn.stage_tmp_od = 0
@@ -1462,7 +1653,7 @@ class Simulation:
             if super_scale_value + scale_add >= 100:
                 turn.stage_tmp_od += 100  # 不改变超越量表数值
         # 应用每个角色的技能，消耗对应资源，增加连击珠，并计算技能的od增量
-        skill_ids = [action.get("id") for action in turn.actions]
+        skill_ids = [action.get("id") if action is not None else None for action in turn.actions]
         # 判断技能应用顺序
         action_type = []  # 1为非攻击技能/无行动，2为攻击技能，3为后排
         for i, slot in enumerate(turn.order):
@@ -1478,11 +1669,6 @@ class Simulation:
                     action_type.append(1)
                 else:  # 一般的skill
                     skill = find_skill_by_id(style, skill_id)
-                    ctx = Context(turn, style)
-                    if skill.conditions and skill.conditions.get("effects"):  # 这里有可能是target.作为起始
-                        expr = skill.conditions.get("effects")
-                        if expr.startswith("target."):
-                            ctx = Context(turn, turn.battle.monsters[action.get("target").get("slot")])
                     if is_attack_skill(skill):
                         action_type.append(2)
                     else:
@@ -1514,12 +1700,13 @@ class Simulation:
                         raise NotImplementedError(
                             f"不存在的技能消耗资源类型: {skill.cost_type}"
                         )
-                # 进行技能effect相关od计算，先获取所有实际发动的effects
-                ctx = Context(turn, style)
+                # 进行技能effect相关od计算，使用tmp turn和style
+                tmp_style = tmp_turn.team[slot]  # 和style的status是完全一致的
+                ctx = Context(tmp_turn, tmp_style)
                 if skill.conditions and skill.conditions.get("effects"):  # 这里有可能是target.作为起始
                     expr = skill.conditions.get("effects")
                     if expr.startswith("target."):
-                        ctx = Context(turn, turn.battle.monsters[action.get("target").get("slot")])
+                        ctx = Context(tmp_turn, tmp_turn.battle.monsters[action.get("target").get("slot")])
                 effects = self.resolve_active_effects(skill, action, ctx)
                 hit = direct = enemy_count = 0
                 # 先判断是否是攻击性技能并存储hit数
@@ -1528,9 +1715,8 @@ class Simulation:
                     if skill.target == "single":
                         enemy_count = 1
                     elif skill.target == "all":
-                        enemy_count = sum(monster.exist for monster in turn.battle.monsters)
+                        enemy_count = monster_num(turn)
                 # 再判断具体效果
-                tmp_style = tmp_turn.team[slot]
                 for effect in effects:
                     # 临时应用连击珠效果
                     if effect.get("type") == "funnel":
@@ -1542,6 +1728,7 @@ class Simulation:
                     elif effect.get("type") == "over_drive_point_up_by_token":
                         direct = effect.get("value") * skill.now_cost
                 funnel = calculate_funnel(tmp_style)
+                print(hit, funnel)
                 turn.stage_tmp_od += calculate_od(hit, funnel, enemy_count, direct, style.od_earring, style.od_rate_extra)
         # after_ex_use
         # on_sp_up_by_nonself_active_skill
@@ -1562,9 +1749,7 @@ class Simulation:
         on_use_od_cost_skill
         after_action
         """
-        tmp_turn = deepcopy(turn)
-        turn.stage_tmp_od = 0
-        # 判断超越量表
+        # 修改超越量表
         super_scale_element = turn.battle.super_scale.get("element")
         super_scale_value = turn.battle.super_scale.get("value")
         if super_scale_element and super_scale_value < 100:
@@ -1572,10 +1757,9 @@ class Simulation:
             for style in turn.team[:3]:
                 if super_scale_element in style.elements and turn.actions[style.slot]:
                     scale_add += 4
-            if super_scale_value + scale_add >= 100:
-                turn.stage_tmp_od += 100  # 不改变超越量表数值
-        # 应用每个角色的技能，消耗对应资源，增加连击珠，并计算技能的od增量
-        skill_ids = [action.get("id") for action in turn.actions]
+            turn.battle.super_scale["value"] = min(super_scale_value + scale_add, 100)
+        # 应用每个角色的技能effect
+        skill_ids = [action.get("id") if action is not None else None for action in turn.actions]
         # 判断技能应用顺序
         action_type = []  # 1为非攻击技能/无行动，2为攻击技能，3为后排
         for i, slot in enumerate(turn.order):
@@ -1591,75 +1775,26 @@ class Simulation:
                     action_type.append(1)
                 else:  # 一般的skill
                     skill = find_skill_by_id(style, skill_id)
-                    ctx = Context(turn, style)
-                    if skill.conditions and skill.conditions.get("effects"):  # 这里有可能是target.作为起始
-                        expr = skill.conditions.get("effects")
-                        if expr.startswith("target."):
-                            ctx = Context(turn, turn.battle.monsters[action.get("target").get("slot")])
                     if is_attack_skill(skill):
                         action_type.append(2)
                     else:
                         action_type.append(1)
-        # 应用每个角色的技能，消耗对应资源，增加连击珠，并计算技能的od增量
+        # 应用每个角色的技能
         for slot in [x for _, x in sorted(zip(action_type, turn.order))]:
             skill_id, style, action = skill_ids[slot], turn.team[slot], turn.actions[slot]
-            if not skill_id or skill_id in (0,2):  # 没有行动或指挥行动
+            if not skill_id or skill_id in (1, 3):  # 没有行动
                 continue
-            elif skill_id == 1:  # 普通攻击
-                turn.stage_tmp_od += calculate_od(3, 0, 1, 0, 0, style.od_rate_extra)
-            elif skill_id == 3:  # 追击
-                turn.stage_tmp_od += calculate_od(style.hit, 0, 1, 0, 0, style.od_rate_extra)
+            elif skill_id == 2:  # 指挥行动
+                effect = {"type": "attack_up_include_normal", "target": "ally_front", "status_id": 32, "duration": {"type": "ally_turn", "value": 1}}
+                self.apply_effect(turn, style, effect, "指挥行动")
             else:  # 一般的skill
                 skill = find_skill_by_id(style, skill_id)
-                # 先消耗资源
-                match skill.cost_type:
-                    case "sp":
-                        style.sp -= skill.now_cost
-                    case "token":
-                        style.token -= skill.now_cost
-                    case "ep":
-                        style.ep -= skill.now_cost
-                    case "od":
-                        turn.stage_tmp_od -= skill.now_cost
-                    case "ct":
-                        pass
-                    case _:
-                        raise NotImplementedError(
-                            f"不存在的技能消耗资源类型: {skill.cost_type}"
-                        )
-                # 进行技能effect相关od计算，先获取所有实际发动的effects
+                # 进行技能effect相关结算
                 ctx = Context(turn, style)
                 if skill.conditions and skill.conditions.get("effects"):  # 这里有可能是target.作为起始
-                    expr = skill.conditions.get("effects")
-                    if expr.startswith("target."):
+                    if skill.conditions.get("effects").startswith("target."):
                         ctx = Context(turn, turn.battle.monsters[action.get("target").get("slot")])
-                effects = self.resolve_active_effects(skill, action, ctx)
-                hit = direct = enemy_count = 0
-                # 先判断是否是攻击性技能并存储hit数
-                if is_attack_skill(skill):
-                    hit = skill.hit_count
-                    if skill.target == "single":
-                        enemy_count = 1
-                    elif skill.target == "all":
-                        enemy_count = sum(monster.exist for monster in turn.battle.monsters)
-                # 再判断具体效果
-                tmp_style = tmp_turn.team[slot]
-                for effect in effects:
-                    # 临时应用连击珠效果
-                    if effect.get("type") == "funnel":
-                        self.apply_effect(tmp_turn, tmp_style, effect)
-                    # 解析od相关，存储直充od数值
-                    elif effect.get("type") == "resource" and effect.get("target") == "od":
-                        direct = effect.get("od")
-                    # 目前有唯一一个消耗全部token获得od的技能，暂时按照可以吃od加深算
-                    elif effect.get("type") == "over_drive_point_up_by_token":
-                        direct = effect.get("value") * skill.now_cost
-                funnel = calculate_funnel(tmp_style)
-                turn.stage_tmp_od += calculate_od(hit, funnel, enemy_count, direct, style.od_earring, style.od_rate_extra)
-        # after_ex_use
-        # on_sp_up_by_nonself_active_skill
-        # on_relieve_enemy_buff
-        self.resolve_tmp_od(turn, direct=False)
+                self.trigger_active_actions(style, skill, action, ctx)
 
     def resolve_turn_end_status(self, turn: Turn):
         """
@@ -1668,11 +1803,12 @@ class Simulation:
         """
         # 清除掉所有标记为trash的status
         for style in turn.team:
-            for status in style.statuses:
+            for status in style.statuses[::-1]:
                 if status.trash:
                     style.statuses.remove(status)
-        # 把predict od存到od中
-        turn.od = turn.predicted_od
+        # 把predict od存到od中，保持两者一致
+        turn.od = min(turn.predicted_od, 300)
+        turn.predicted_od = min(turn.predicted_od, 300)
 
     def new_turn_label_refresh(self, turn: Turn):
         """
@@ -1686,9 +1822,13 @@ class Simulation:
         new_turn = False
         # 追加回合
         if any(has_status_id(style, 20) for style in turn.team):
-            turn.additional_turn == True
+            turn.additional_turn = True
+            for style in turn.team:
+                for status in style.statuses:
+                    if status.id == 20 and not status.trash:
+                        status.trash = True
         else:
-            turn.additional_turn == False
+            turn.additional_turn = False
         # 如果当前是追加回合，那么所有回合相关label都不应该变化
         if turn.additional_turn:
             pass
@@ -1720,6 +1860,7 @@ class Simulation:
         # 在这里添加用于recalculate的第0个turn和自身
         place_holder = deepcopy(turn)
         place_holder.turn_num = 0
+        place_holder.actions = [None] * 6
         self.turns.extend([place_holder, turn])
 
         # 第一回合不需要resolve上一回合的行动effect以及状态消耗等，直接回合开始
@@ -1736,7 +1877,7 @@ class Simulation:
 
         return self.turn_to_dict(turn)
 
-    def recalculate(self, gui_add_state, turn_number) -> dict:
+    def recalculate(self, gui_add_state, turn_number: int) -> dict:
         """
         接受gui传入的state并直接覆盖当前的Turn类对应值：
         gui_add_state = {
@@ -1751,16 +1892,9 @@ class Simulation:
             'od_timing': str or None,
             'od_level': int,
             "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form_change": 0}, before/after
-            "adjustments": self.state_data["adjustments"]
+            "adjustments": {"od": 0.0, "members": [{"sp": 0, "token": 0} for _ in range(6)]}
         }
         重新计算从上回合开始计算后返回新state给GUI
-        using last turn information:
-            turn start related
-        apply adjustments
-        calculate skills
-        using actions:
-            calculate od and consume cost
-        return new state
         on_overdrive_start  前置OD
         after_ex_use
         on_use_specific_skill
@@ -1776,10 +1910,9 @@ class Simulation:
         # 如果recalculate的不是最后一个turn，那gui就应该递归进行下一个turn的recalculate
         # turn number从1开始，根据其新增内容和上一Turn的内容重新计算
         turn = deepcopy(self.turns[turn_number-1])
-        self.turns[turn_number] = turn
 
         # 结算上一个turn的实际actions
-        # self.apply_member_actions(turn)
+        self.apply_member_actions(turn)
 
         # 结算action之后的效果，回合结束清除状态
         self.resolve_turn_end_status(turn)
@@ -1788,40 +1921,96 @@ class Simulation:
         new_turn = self.new_turn_label_refresh(turn)
 
         # 应用回合开始时需要的gui修改覆盖状态
-        if gui_add_state:
-            for position, monster in enumerate(turn.battle.monsters):
-                replace_monster = gui_add_state["enemies"][position]
-                monster.exist = replace_monster["exist"]
-                monster.damage_rate = replace_monster["damage_rate"]
-                monster.down = replace_monster["down"]
-                monster.statuses = [Status(**s) for s in replace_monster["statuses"]]
-            turn.battle.field = gui_add_state["field"]
+        for position, monster in enumerate(turn.battle.monsters):
+            replace_monster = gui_add_state["enemies"][position]
+            monster.exist = replace_monster["exist"]
+            monster.damage_rate = replace_monster["damage_rate"]
+            monster.down = replace_monster["down"]
+            monster.statuses = [Status(**s) for s in replace_monster["statuses"]]
+        if turn.battle.field["value"] != gui_add_state["field"]:
+            turn.battle.field["value"] = gui_add_state["field"]
+            turn.battle.field["left_turn"] = -1
         # 此处应用special_actions的可镰
+        
         # 此处更新member_dp
+        for slot, style in enumerate(turn.team):
+            style.dp = gui_add_state["member_dp"][slot]
 
         # 新回合开始的被动和机制触发
         self.turn_start(turn, new_turn)
 
         # 此处更新adjustments
+        for slot, style in enumerate(turn.team):
+            style.sp += gui_add_state["adjustments"]["members"][slot]["sp"]
+            style.token += gui_add_state["adjustments"]["members"][slot]["token"]
+        turn.od = min(gui_add_state["adjustments"]["od"] + turn.od, 300)
+        turn.predicted_od = min(gui_add_state["adjustments"]["od"] + turn.predicted_od, 300)
 
         # 此处应用special_actions的前置od前
+        for special_trigger in ("demonic_rage", "all_out_attack", "demon_cavalry"):
+            times = turn.special_actions[special_trigger]
+            if times:
+                match special_trigger:
+                    case "demonic_rage":
+                        turn.od = min(turn.od + 15, 300)
+                        turn.predicted_od = min(turn.predicted_od + 15, 300)
+                    case "all_out_attack":
+                        od_added = monster_num(turn) * 7 * 2.5
+                        turn.od = min(turn.od + od_added, 300)
+                        turn.predicted_od = min(turn.predicted_od + od_added, 300)
+                    case "demon_cavalry":
+                        waki = next(style for style in turn.team if style.id == 113)
+                        od_added = calculate_od(6, 0, monster_num(turn), 0, waki.od_earring, waki.od_rate_extra)
+                        turn.od = min(turn.od + od_added, 300)
+                        turn.predicted_od = min(turn.predicted_od + od_added, 300)
 
         # 此处开前置od
+        pre_od_timing = turn.od_timing
+        turn.od_level = gui_add_state["od_level"]
+        turn.od_timing = gui_add_state["od_timing"]
+        if turn.od_timing == "before" and pre_od_timing == None:
+            sp_added_dict = {1: 5, 2: 12, 3: 20}
+            sp_added = sp_added_dict[turn.od_level]
+            for style in turn.team:
+                add_sp(style, {"sp": sp_added, "limit": 99})
+            turn.od -= turn.battle.od_consume * turn.od_level
+            turn.predicted_od -= turn.battle.od_consume * turn.od_level
+            self.trigger_passives(turn, "on_overdrive_start")  # 暂时没有跟od相关的效果
 
         # 此处应用special_actions的前置od后
+        for special_trigger in ("demonic_rage_after", "all_out_attack_after", "demon_cavalry_after"):
+            times = turn.special_actions[special_trigger]
+            if times:
+                match special_trigger:
+                    case "demonic_rage_after":
+                        turn.predicted_od = min(turn.predicted_od + 15, 300)
+                    case "all_out_attack_after":
+                        od_added = monster_num(turn) * 7 * 2.5
+                        turn.predicted_od = min(turn.predicted_od + od_added, 300)
+                    case "demon_cavalry_after":
+                        waki = next(style for style in turn.team if style.id == 113)
+                        od_added = calculate_od(6, 0, monster_num(turn), 0, waki.od_earring, waki.od_rate_extra)
+                        turn.predicted_od = min(turn.predicted_od + od_added, 300)
 
         # member数据计算后存储在Turn中
         self.calculate_member_skills(turn)
 
         # 此处应用order，actions
+        turn.order = gui_add_state["order"]
+        turn.actions = gui_add_state["actions"]
 
         # 结算on_action_start被动
         self.trigger_passives(turn, "on_action_start")
 
         # 此处应用member_status，本质上是对当前某些无法model的status duration进行trash标记
         # 在下一次advance时通过resolve_turn_end_status清除该状态
+        # for slot, style in enumerate(turn.team):
+        #     style.statuses = [Status(**s) for s in gui_add_state["member_status"][slot]]
 
         self.apply_actions_od_shortcut(turn)
+
+        # 只有整个计算成功，才提交
+        self.turns[turn_number] = turn
 
         # 返回给GUI
         return self.turn_to_dict(turn)    
@@ -1841,7 +2030,7 @@ class Simulation:
         self.turns.append(turn)
 
         # 结算上一个turn的实际actions
-        # self.apply_member_actions(turn)
+        self.apply_member_actions(turn)
 
         # 此处结算回合结束清除状态
         self.resolve_turn_end_status(turn)
@@ -1855,7 +2044,7 @@ class Simulation:
         # member数据计算后存储在Turn中
         self.calculate_member_skills(turn)
 
-        # 结算on_action_start被动
+        # 结算on_action_start被动，暂时没有和od相关的效果
         self.trigger_passives(turn, "on_action_start")
 
         # 运行turn_start给出的default行动，更新od等资源
@@ -1863,5 +2052,8 @@ class Simulation:
 
         # 返回给GUI
         return self.turn_to_dict(turn)
+    
+    def truncate_after(self, turn_index):
+        del self.turns[turn_index+1:]
 
 __all__ = ['Simulation', 'Skill', 'Passive', 'LimitBreak', 'SupportSkill', 'Style', 'Monster', 'Battle', 'Turn', 'Status']
