@@ -211,8 +211,9 @@ class SkillSelectionDialog(QDialog):
     def catalog_data_path(style):
         return ROOT_DIR / 'assets' / 'char-data' / (style.team + '.json')
 
-    def _get_passives(self, style):
-        path = self.catalog_data_path(style)
+    @staticmethod
+    def _get_passives(style):
+        path = SkillSelectionDialog.catalog_data_path(style)
         if not path.is_file(): return []
         data = json.loads(path.read_text(encoding='utf-8'))
         person = next((item for item in data.values()
@@ -508,8 +509,14 @@ class BattleSetup(QGroupBox):
                 for name in self.catalog.skills_for(selected)
                 if name not in orb_names and name != "指揮行動"
             ],
-            'passive': [],
-            'orb': []
+            'passive': [
+                int(entry["simulation_id"])
+                for _, entry in SkillSelectionDialog._get_passives(selected)
+            ],
+            'orb': [
+                int(self.catalog.skill_data[name]["simulation_id"])
+                for name in self.catalog.common_global
+            ]
         }
         self._set_avatar(index)
         self._set_level(self.breaks[index], selected)

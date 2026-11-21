@@ -41,36 +41,40 @@
   target.has()/target.element()/target.weak() 等显式前缀函数读取当前目标。
   target 为 all、ally_all、ally_front 等多目标时，target_condition 逐目标独立判断。
   team.count(predicate)、enemy.count(predicate) 的内部谓词分别以当前遍历的队员、敌人为上下文。
-  顶层 conditions.effects 使用 target.xxx() 时，若是多目标技能，不能不加说明地当作一个固定目标；第八项以外的实际歧义见回复说明。
+  顶层 conditions.effects 使用 target.xxx() 时，若是多目标技能，不能不加说明地当作一个固定目标。
 
 缺少追踪信息的处理：
-  不储存我方 DP 和敌方破坏率。
-  dp_rate() 相关被动默认不触发；主动技能的相关结果由 user_select 确定。
-  敌方破盾、倒地由 GUI 明确输入；不依靠伤害自动推算。
+  "储存我方 DP 和敌方破坏率，破盾。"
+  敌方破盾、倒地由 GUI 明确输入，技能使用on_break的字段确定effect；不依靠伤害自动推算。
   自伤与 DP 回复数值暂不计算。
 
+GUI输入我方DP和敌方破坏率（最终手段，究极刺激，旺盛），随机被动默认触发（佳音、福运、随性声援）
+各种被动的触发顺序：每回合的＋2最前，然后是突破、被动、共鸣、然后buff，并且是先2号再1号再3号
+battle start，first battle，new turn
+理莎和tama的特殊debuff暂时不显示等级
+
 随机与特别约定：
-  佳音默认获得 3 SP；野生直觉默认获得攻击增益；福运默认获得 10 OD。
+  野生直觉默认获得攻击增益。
   random 字段依然留在原数据库，但当前 simulation 不据此随机决定以上结果。
-  最终手段默认不触发。
-  究极刺激、旺盛、引以为傲的浮空摩托默认触发。
-  回响（skill_id=9999）暂不触发。
-  特别组合的 attack_up 默认 value=30。
+  引以为傲的浮空摩托默认触发。
   debuff_guard 暂不模拟、不需要 duration，因为不追踪敌方向我方附加的 Debuff。
 
 Duration：
   permanent：持续存在直到移除或战斗重置。
   use、use_debuff、use_buff、use_any、use_ex、use_immersion_ex：按相应技能使用事件消耗。
   ally_turn、enemy_turn：按相应回合边界递减，而不是每名角色行动一次递减。
-  on_attacked、on_attack_weak、ally_dp_broken：由对应事件决定次数消耗；目前可以按模拟范围暂不处理。
+  on_attack_weak：由对应事件决定次数消耗
+  on_attacked 目前暂不处理，gui可以手动清除buff。
   od_end：OD 结束移除。
-  one_shot：使用或触发一次后结束。
+  one_shot：使用或触发一次后结束。目前没有需要模拟的effect使用这种duration
 
 状态与增益：
   give_debuff_up、give_attack_buff_up 分别使用 use_debuff、use_buff，不占用攻击 use 次数。
   funnel.mode.value 与 funnel.mode.number 分别代表连击珠数值与数量。
-  solo: true 不等于持续时间或叠加层数。
+  solo: true 优先发动，此时不消耗use。
   状态叠加时考虑 status_id、elements、stack_group、持续时间等因素。
+
+被动的处理：除od等影响排轴的资源类型外，不追踪attack_up等仅影响伤害的buff和debuff，以及dp回复相关内容
 
 攻击与资源：
   attack、token_attack、penetration_critical_attack、attack_by_sp、attack_by_own_dp_rate、damage_rate_change_attack_skill、fixed_hp_damage_rate_attack、inscription_attack 等统一生成攻击事件，伤害数值暂不模拟。
@@ -79,12 +83,12 @@ Duration：
   heal_sp_by_token(limit)、over_drive_point_up_by_token、specify_sp、overwrite_sp、sp_limit_overwrite 需按各自独立的含义处理。
 
 场地机制：
-  zone(field) 与 territory 分开储存和更新。
+  zone(field) 与 territory 分开储存和更新，二者可以互相共存，但多个场或域不能共存，是覆盖关系。
   zone、zone_up_eternal_plus_15、rice_field_zone、summers_end_territory、launch_summers_end_territory、revive_territory 属于相关机制。
 
 其他特殊机制：
   replace_normal_skill、replace_pursuit 会改变可执行的动作。
-  ignore_e_shield_element、element_mark、motivation、venom、sprightly、high_boost、inscription、immersion、gui_shen 等需要由 simulation 解释。
+  ignore_e_shield_element忽略、element_mark、motivation、sprightly、high_boost、inscription、immersion、gui_shen 等需要由 simulation 解释。
   recoil（33）：禁止行动。
   resist_down_overwrite（108）：修改怪物弱点。
   double_action_extra_skill（125）：下一 EX 执行两次。
@@ -103,34 +107,34 @@ Duration：
   on_action_start: 241
   on_battle_start: 128
   on_first_battle_start: 128
-  on_enemy_turn_start: 37
-  on_battle_win: 25
-  on_break_enemy: 19
+  on_enemy_turn_start: 37  # 实际不影响排轴，默认不发动
+  on_battle_win: 25       # 默认不发动
+  on_break_enemy: 19      # GUi指定发动
   after_ex_use: 18
   on_additional_turn_start: 17
   on_overdrive_start: 13
-  before_new_turn_start: 12
-  on_kill_enemy: 11
+  on_kill_enemy: 11       # 默认不发动
   on_use_specific_skill: 9
   on_sp_up_by_nonself_active_skill: 8
-  user_select: 7
+  user_select: 7          # 以GUI小按钮形式发动
   on_attack_weak: 5
-  on_attacked: 5
-  on_relieve_enemy_buff: 4
+  on_attacked: 5          # 默认不发动，涉及到od、sp用户手动调整
+  on_relieve_enemy_buff: 4          # 侦探等可以给敌方上buff，敌人行动的buff需要用户手动调整
+  after_action: 5
   on_use_specific_status_skill: 2
-  after_new_turn_start: 1
   on_active_zone: 1
-  on_heal_dp: 1
-  on_persuit: 1
+  on_heal_dp: 1           # 默认不发动，token数用户手动调整
+  on_pursuit: 1
   on_relieve_enemy_buff_attack: 1
   on_use_od_cost_skill: 1
+  ally_dp_broken: 2  # 实际和on_new_turn_start一同发动
 
 四、全部 Duration 类型（按次数降序）
   ally_turn: 470
   enemy_turn: 352
   permanent: 278
   use: 205
-  on_attacked: 14
+  on_attacked: 14         # 默认不消耗，涉及到od、sp用户手动调整，buff可以手动清除
   on_attack_weak: 13
   od_end: 12
   one_shot: 7
@@ -139,7 +143,6 @@ Duration：
   use_immersion_ex: 3
   use_any: 2
   use_buff: 2
-  ally_dp_broken: 1
 
 五、全部 Effect 类型（按次数降序；不含特殊风格顶层 type）
   resource: 518
@@ -233,7 +236,7 @@ Duration：
   steak: 2
   undermine: 2
   zone_up: 2
-  always_persuit_sp8: 1
+  always_pursuit_sp8: 1
   attack_up_by_token: 1
   attack_up_range_by_all_damage_rate: 1
   babied: 1
@@ -254,7 +257,7 @@ Duration：
   makeup: 1
   negative_mind: 1
   over_drive_point_up_by_token: 1
-  play_with_tama: 1
+  fear_for_demon 1
   reduce_consume_overdrive: 1
   remove_summers_end_territory: 1
   replace_normal_skill: 1
@@ -347,7 +350,6 @@ Duration：
 【condition】 条件条目 8；函数调用合计 16
   enemy.count(): 8
   during_down_turn(): 4
-  removed_debuffs(): 2
   has(): 1
   zone(): 1
 
@@ -362,5 +364,5 @@ Duration：
 
 十一、暂不模拟与需要手动选择的行为
   不模拟：DP 受伤/回复量/自伤，敌方直接攻击造成的 debuff，debuff_guard，伤害数值，随机眩晕/混乱/封印，破坏率，力/体/运等属性数值，击杀和破盾的自动推定。
-  必须由 GUI 或用户显式提供：敌人是否处于倒地、技能是否破盾、主动技能 dp_rate() 分支、需要 user_select 的随机结果、OD 启动档位、技能目标与角色前后排等。
+  必须由 GUI 或用户显式提供：敌人是否处于倒地、技能是否破盾、我方角色dp、需要 user_select 的结果、OD 启动档位、技能目标与角色前后排等。
   必须保留：触发事件来源、状态层数、次数及持续时间、EX 使用次数、技能使用次数、SP/OD/Token/EP、队伍构成和属性、Zone/Territory、额外回合状态。

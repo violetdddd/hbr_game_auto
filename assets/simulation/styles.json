@@ -2295,10 +2295,10 @@
         {"id": 1520002, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}
       ],
       "2": [
-        {"id": 1520003, "name": "治疗疫苗(小)", "trigger": "on_use_specific_status_skill", "status_id": [2, 218], "effects": [{"type": "resource", "target": "ally_all", "sp": 1}], "discard_limit_level": 3}
+        {"id": 1520003, "name": "治疗疫苗(小)", "trigger": "on_use_specific_status_skill", "status_id": [3, 218], "effects": [{"type": "resource", "target": "ally_all", "sp": 1}], "discard_limit_level": 3}
       ],
       "3": [
-        {"id": 1520004, "name": "治疗疫苗[天赋强化]", "trigger": "on_use_specific_status_skill", "status_id": [2, 218], "effects": [{"type": "resource", "target": "ally_all", "sp": 2}, {"type": "remove_debuff", "target": "ally_all", "value": 1}]}
+        {"id": 1520004, "name": "治疗疫苗[天赋强化]", "trigger": "on_use_specific_status_skill", "status_id": [3, 218], "effects": [{"type": "resource", "target": "ally_all", "sp": 2}, {"type": "remove_debuff", "target": "ally_all", "value": 1}]}
       ]
     }
   },

@@ -256,7 +256,6 @@
   "27": {"name": "attack_up_per_token", "zh_cn": "每层Token攻击提升", "category": "buff", "stack_group": "attack_up", "removable": true, "not_display": true},
   "28": {"name": "defense_up_per_token", "zh_cn": "每层Token防御提升", "category": "buff", "stack_group": "defense_up", "removable": true, "not_display": true},
   "30": {"name": "virus", "zh_cn": "病毒", "category": "debuff", "removable": true, "debuff_guard": true, "not_display": true},
-  "32": {"name": "attack_up_include_normal", "zh_cn": "攻击力提升（含普通攻击）", "category": "buff", "stack_group": "attack_up", "removable": true, "not_display": true},
   "34": {"name": "regeneration_dp", "zh_cn": "DP持续回复", "category": "buff", "removable": true, "not_display": true},
   "39": {"name": "damage_rate_up", "zh_cn": "破坏率提升", "category": "buff", "stack_group": "damage_rate_up", "removable": true, "not_display": true},
   "42": {"name": "heal_down", "zh_cn": "回复量降低", "category": "debuff", "stack_group": "heal_down", "removable": true, "debuff_guard": true, "not_display": true},
