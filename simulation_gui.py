@@ -1137,26 +1137,45 @@ class BattleTurn(QGroupBox):
         if first == second or (first >= 3 and second >= 3):  # 后排交换不允许
             return
         base = self.state_data['base']
+
+        # 追加回合
+        if base["additional_turn"]:
+            first_slot = base["order"][first]
+            second_slot = base["order"][second]
+            # 只有本次追加回合允许行动的角色可以互换
+            available_slots = {
+                slot
+                for slot in base["order"][:3]
+                if base["actions"][slot] is not None
+            }
+            if (first_slot not in available_slots or second_slot not in available_slots):
+                return
+
         # 队伍state顺序交换
         base['order'][first], base['order'][second] = base['order'][second], base['order'][first]
         # 前后排交换技能重新安排
         if (first < 3) != (second < 3):
             for position in (first, second):
                 slot = base['order'][position]
-                skill = base['members'][slot]['skills'][
-                    0 if position < 3 else 1  # 0为前排默认技能，1为后排默认技能
-                ]
+                # 可以行动
+                if base['members'][slot]['skills']:
+                    skill = base['members'][slot]['skills'][
+                        0 if position < 3 else 1  # 0为前排默认技能，1为后排默认技能
+                    ]
 
-                base['actions'][slot] = {
-                    'id': skill['id'],
-                    'name': skill['name'],
-                    'target': {
-                        'type': skill.get('target_type'),
-                        'slot': None
-                    },
-                    'user_selected': None,
-                    'on_break': False
-                }
+                    base['actions'][slot] = {
+                        'id': skill['id'],
+                        'name': skill['name'],
+                        'target': {
+                            'type': skill.get('target_type'),
+                            'slot': None
+                        },
+                        'user_selected': None,
+                        'on_break': False
+                    }
+                # recoil时无法行动
+                else:
+                    base['actions'][slot] = None
 
         self.update_state_from_simulation()
         self.refresh()

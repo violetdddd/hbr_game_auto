@@ -1246,7 +1246,7 @@ class Simulation:
             duration = effect.get("duration", {})
             duration_type = duration.get("type")
             remaining = duration.get("value")
-            # 应用debuff回合延长
+            # 应用debuff回合延长，暂时默认1回合延长
             if has_status_id(owner, 135) and duration_type == "enemy_turn" and self.status_records.get(status_id).get("category") == "debuff":
                 remaining += 1
             # 属性印记相同属性不叠加层数直接跳过，不同属性可以正常添加状态
@@ -1505,6 +1505,14 @@ class Simulation:
                 for target in targets:
                     add_status(target, unique=True)
 
+            case "fear_for_demon":
+                for target in targets:
+                    add_status(target, unique=True)
+
+            case "gui_shen":
+                for target in targets:
+                    add_status(target, unique=True)
+
             # 特殊状态
             case "shredding" | "diva":
                 for target in targets:
@@ -1677,6 +1685,29 @@ class Simulation:
             if not any(status.id == 7 and status.duration_type == "ally_turn" for status in style.statuses):
                 critical_damage_ups = get_use_buff(style, 7, "use")
                 consume_use_turn_buff(critical_damage_ups, skill.elements[0] if skill.elements else None)
+
+    def using_demon_cavalry(self, turn: Turn, times: int, before_od=True):
+        od_added = monster_num(turn) * 6 * 2.5 * times
+        if before_od:
+            turn.od = min(turn.od + od_added, 300)
+        turn.predicted_od = min(turn.predicted_od + od_added, 300)
+        waki = next(style for style in turn.team if style.id == 113)
+        effect = {"type": "fear_for_demon", "target": "all", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 230}
+        self.apply_effect(turn, waki, effect, source="魔界骑兵启动！")
+
+    def using_demonic_rage(self, turn: Turn, before_od=True):
+        if before_od:
+            turn.od = min(turn.od + 15, 300)
+        turn.predicted_od = min(turn.predicted_od + 15, 300)
+        effects = [
+            {"type": "gui_shen", "duration": {"type": "ally_turn", "value": 3}, "status_id": 229, "target": "self"}, 
+            {"type": "remove_debuff", "target": "self", "number": -1}, 
+            {"type": "funnel", "target": "self", "mode": {"number": 3, "value": 25}, "solo": True, "status_id": 13, "duration": {"type": "ally_turn", "value": 3}}, 
+            {"type": "mind_eye", "target": "self", "value": 120, "duration": {"type": "ally_turn", "value": 3}, "solo": True, "status_id": 78}
+        ]
+        siling = next(style for style in turn.team if style.id == 365)
+        for effect in effects:
+            self.apply_effect(turn, siling, effect, source="鬼神化")
 
     def battle_start(self, turn: Turn):
         """
@@ -2106,6 +2137,10 @@ class Simulation:
                     status.remaining -= 1
                     if status.remaining <= 0:
                         status.trash = True
+            for status in style.statuses:
+                if status.id == 229 and status.trash:
+                    self.apply_effect(turn, style, {"type": "recoil", "status_id": 33, "target": "self", "duration": {"type": "ally_turn", "value": 1}}, "鬼神化副作用")
+                    break
         # 消耗场地我方回合数
         if turn.battle.field["left_turn"] != -1:
             turn.battle.field["left_turn"] -= 1
@@ -2122,6 +2157,13 @@ class Simulation:
         # 把predict od存到od中，保持两者一致
         turn.od = min(turn.predicted_od, 300)
         turn.predicted_od = min(turn.predicted_od, 300)
+
+        # 特殊actions还原
+        for special in turn.special_actions:
+            if special == "kelian_form_change":
+                continue
+            turn.special_actions[special] = 0
+
 
     def new_turn_label_refresh(self, turn: Turn):
         """
@@ -2272,16 +2314,13 @@ class Simulation:
             if times:
                 match special_trigger:
                     case "demonic_rage":
-                        turn.od = min(turn.od + 15, 300)
-                        turn.predicted_od = min(turn.predicted_od + 15, 300)
+                        self.using_demonic_rage(turn, before_od=True)
                     case "all_out_attack":
                         od_added = monster_num(turn) * 7 * 2.5
                         turn.od = min(turn.od + od_added, 300)
                         turn.predicted_od = min(turn.predicted_od + od_added, 300)
                     case "demon_cavalry":
-                        od_added = monster_num(turn) * 6 * 2.5 * times
-                        turn.od = min(turn.od + od_added, 300)
-                        turn.predicted_od = min(turn.predicted_od + od_added, 300)
+                        self.using_demon_cavalry(turn, times, before_od=True)
 
         # 此处开前置od
         pre_od_timing = turn.od_timing
@@ -2303,13 +2342,12 @@ class Simulation:
             if times:
                 match special_trigger:
                     case "demonic_rage_after":
-                        turn.predicted_od = min(turn.predicted_od + 15, 300)
+                        self.using_demonic_rage(turn, before_od=False)
                     case "all_out_attack_after":
                         od_added = monster_num(turn) * 7 * 2.5
                         turn.predicted_od = min(turn.predicted_od + od_added, 300)
                     case "demon_cavalry_after":
-                        od_added = monster_num(turn) * 6 * 2.5 * times
-                        turn.predicted_od = min(turn.predicted_od + od_added, 300)
+                        self.using_demon_cavalry(turn, times, before_od=False)
 
         # member数据计算后存储在Turn中
         self.calculate_member_skills(turn)

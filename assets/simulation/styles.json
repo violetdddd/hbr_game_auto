@@ -1720,7 +1720,7 @@
         {"id": 1130005, "name": "魔王军的大攻势！", "trigger": "on_new_turn_start", "trigger_condition": "team.count(has(154))>=6", "effects": [{"type": "resource", "target": "od", "od": 100}], "trigger_limit": 1}
       ]
     },
-    "special": {"type": "demon_cavalry", "names": {"zh_cn": "魔界骑兵启动", "zh_tw": "魔界騎兵启动", "jp": "魔界騎兵启动"}, "trigger": "user_select", "trigger_limit": 3, "effects": [{"type": "fear_for_demon", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 230}, {"type": "attack", "hit": 6, "target": "all"}]}
+    "special": {"type": "demon_cavalry", "names": {"zh_cn": "魔界骑兵启动", "zh_tw": "魔界騎兵启动", "jp": "魔界騎兵启动"}, "trigger": "user_select", "trigger_limit": 3, "effects": [{"type": "fear_for_demon", "target": "all", "duration": {"type": "enemy_turn", "value": 1}, "status_id": 230}, {"type": "attack", "hit": 6, "target": "all"}]}
   },
   "114": {
     "id": 114,
@@ -5434,7 +5434,7 @@
     "special": {"type": "demonic_rage", "names": {"zh_cn": "鬼神化", "zh_tw": "鬼神化", "jp": "鬼神化"}, "trigger": "user_select", "trigger_limit": 3, "effects": [
       {"type": "gui_shen", "duration": {"type": "ally_turn", "value": 3}, "status_id": 229, "target": "self"}, 
       {"type": "resource", "target": "od", "od": 15}, 
-      {"type": "remove_debuff", "target": "self"}, 
+      {"type": "remove_debuff", "target": "self", "number": -1}, 
       {"type": "revive_dp_rate", "target": "self", "value": 100}, 
       {"type": "funnel", "target": "self", "mode": {"number": 3, "value": 25}, "solo": true, "status_id": 13, "duration": {"type": "ally_turn", "value": 3}}, 
       {"type": "mind_eye", "target": "self", "value": 120, "duration": {"type": "ally_turn", "value": 3}, "solo": true, "status_id": 78}
