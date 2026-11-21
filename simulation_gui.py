@@ -1434,7 +1434,8 @@ class SimulationTab(QWidget):
         self.setup = BattleSetup(catalog, style_dialog_class, round_pixmap)
         self.status_db = json.loads((SIMULATION_DIR / 'statuses.json').read_text(encoding='utf-8'))
         self.styles_db = json.loads((SIMULATION_DIR / 'styles.json').read_text(encoding='utf-8'))
-        self.turns = []; self.session = None
+        self.turns: list[BattleTurn] = []
+        self.session = None
         from simulation import Simulation
         self.engine = Simulation()
         outer = QVBoxLayout(self); outer.setContentsMargins(7, 7, 7, 5)
