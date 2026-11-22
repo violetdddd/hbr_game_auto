@@ -159,7 +159,7 @@
       "yes": {
         "effects": [
           {"type": "attack", "target": "single", "attack_type": "strike", "elements": ["ice"]},
-          {"type": "resource", "target": "od", "od": 150}
+          {"type": "resource", "target": "od", "od": 150, "need_break": true}
         ],
         "description": "破盾（od上升150%）"
       },
@@ -2856,7 +2856,7 @@
         "effects": [
           {"type": "ignore_e_shield_element", "target": "self", "status_id": 169, "duration": {"type": "ally_turn", "value": 1}},
           {"type": "penetration_critical_attack", "target": "single", "attack_type": "strike"},
-          {"type": "resource", "target": "od", "od": 100}
+          {"type": "resource", "target": "od", "od": 100, "need_break": true}
         ],
         "description": "破盾（od上升100%）"
       },
@@ -3420,7 +3420,7 @@
       "yes": {
         "effects": [
           {"type": "attack", "target": "single", "attack_type": "stab", "elements": ["thunder"]},
-          {"type": "resource", "target": "ally_all", "sp": 8}
+          {"type": "resource", "target": "ally_all", "sp": 8, "need_break": true}
         ],
         "description": "破盾（全体友方回复8sp）"
       },
@@ -11013,7 +11013,7 @@
       "yes": {
         "effects": [
           {"type": "attack", "target": "all", "attack_type": "stab"},
-          {"type": "resource", "target": "ally_front", "sp": 5}
+          {"type": "resource", "target": "ally_front", "sp": 5, "need_break": true}
         ],
         "description": "破盾（前锋回复5sp）"
       },
@@ -11039,7 +11039,7 @@
         "effects": [
           {"type": "funnel", "target": "self", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}},
           {"type": "attack", "target": "all", "attack_type": "stab"},
-          {"type": "resource", "target": "ally_front", "sp": 5}
+          {"type": "resource", "target": "ally_front", "sp": 5, "need_break": true}
         ],
         "description": "破盾（前锋回复5sp）"
       },

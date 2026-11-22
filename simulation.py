@@ -99,6 +99,7 @@ ACTIVE_EFFECT_TYPES_NEEDED = {
     "tea",
     "diva",
     "mocktail",
+    "super_break_down",
     # buff
     "attack_up",
     "attack_up_by_token",
@@ -739,7 +740,7 @@ def calculate_funnel(style: Style, consume=False):
         return mode["value"] * mode["number"]
     # 为连击珠排序，取前2，切片操作少于2个不会报错
     use_funnels = sorted(
-        (s for s in funnels if s.duration_type == "use"),
+        (s for s in funnels if s.duration_type == "use" and not s.trash),
         key=damage,
         reverse=True
     )[:2]
@@ -778,7 +779,7 @@ def calculate_funnel(style: Style, consume=False):
 def calculate_od(hit, funnel, enemy, direct, earring: int, extra_rate: float) -> float:
     if earring != 0:  # 10,12,15
         if hit != 0:
-            od_rate_100 = 105 + (earring-5) / 9 * (hit - 1) + extra_rate
+            od_rate_100 = 105 + (earring-5) / 9 * min(hit - 1, 9) + extra_rate
         else:
             od_rate_100 = 105 + extra_rate
     else:
@@ -1144,7 +1145,7 @@ class Simulation:
                 continue
             self.apply_effect(turn, style, effect)
 
-    def trigger_active_actions(self, style: Style, skill: Skill, action: dict, ctx: Context):
+    def trigger_active_actions(self, style: Style, skill: Skill, action: dict, ctx: Context, second=False):
         """实际应用的主动技能触发函数，过滤掉od相关的内容，在shortcut里做"""
         # 解析是否有case等结构，过滤不模拟的effect，返回实际生效的effect列表
         turn = ctx.turn
@@ -1152,6 +1153,8 @@ class Simulation:
         effects = [effect for effect in effects if effect.get("target") != "od"]
         # 应用效果
         for effect in effects:
+            if second and effect.get("need_break"):  # 双动不触发破盾相关buff
+                continue
             self.apply_effect(turn, style, effect, source=skill.names.get("zh_cn"))
         # 增加使用次数
         skill.used += 1
@@ -1514,9 +1517,14 @@ class Simulation:
                     add_status(target, unique=True)
 
             # 特殊状态
-            case "shredding" | "diva":
+            case "shredding" | "diva" :
                 for target in targets:
                     add_status(target)
+
+            case "super_break_down":
+                for target in targets:
+                    if target.down:
+                        add_status(target)
                 
             case "recoil" | "b_i_yamawaki_servant" | "curry" | "dim_sum" | "gelato" | "shchi" | "steak" | "tea":
                 for target in targets:
@@ -1608,7 +1616,7 @@ class Simulation:
             # 非元素一定都要消耗
             consumed_normal = 0
             for status in statuses:
-                if status.element == None:
+                if status.element == None and not status.trash:
                     status.trash = True
                     consumed_normal += 1
                     if consumed_normal == 2:
@@ -1618,7 +1626,7 @@ class Simulation:
             # 有元素的技能则消耗对应元素属性的buff
             consumed_element = 0
             for status in statuses:
-                if status.element == element:
+                if status.element == element and not status.trash:
                     status.trash = True
                     consumed_element += 1
                     if consumed_element == 2:
@@ -1640,7 +1648,7 @@ class Simulation:
         if buff_num:
             remove_buff = 0
             for status in style.statuses:
-                if status.id == 54:
+                if status.id == 54 and not status.trash:
                     remove_buff += 1
                     status.trash = True
                 if remove_buff == buff_num:
@@ -1650,14 +1658,14 @@ class Simulation:
         if debuff_num:
             remove_debuff = 0  # 减益加深
             for status in style.statuses:
-                if status.id == 118:
+                if status.id == 118 and not status.trash:
                     remove_debuff += 1
                     status.trash = True
                 if remove_debuff == debuff_num:
                     break
             remove_debuff = 0  # 樱花箭
             for status in style.statuses:
-                if status.id == 120:
+                if status.id == 120 and not status.trash:
                     remove_debuff += 1
                     status.trash = True
                 if remove_debuff == debuff_num:
@@ -1667,7 +1675,7 @@ class Simulation:
         if attack_skill:
             # 消耗充能
             for status in style.statuses:
-                if status.id == 25:
+                if status.id == 25 and not status.trash:
                     status.trash = True
                     break
             # 消耗连击珠
@@ -1708,6 +1716,21 @@ class Simulation:
         siling = next(style for style in turn.team if style.id == 365)
         for effect in effects:
             self.apply_effect(turn, siling, effect, source="鬼神化")
+
+    def od_up_through_action(self, turn: Turn, tmp_turn: Turn, tmp_style: Style, effects, skill: Skill, attack_skill, hit, enemy_count, second=False):
+        direct = 0
+        for effect in effects:
+            # 临时应用连击珠效果
+            if effect.get("type") == "funnel":
+                self.apply_effect(tmp_turn, tmp_style, effect)
+            # 解析od相关，存储直充od数值
+            elif effect.get("type") == "resource" and effect.get("target") == "od":
+                direct = 0 if second and effect.get("need_break") else effect.get("od")  # 需要破盾的第二次不发动
+            # 目前有唯一一个消耗全部token获得od的技能，暂时按照可以吃od加深算
+            elif effect.get("type") == "over_drive_point_up_by_token":
+                direct = effect.get("value") * skill.now_cost
+        funnel = calculate_funnel(tmp_style, consume=True) if attack_skill else 0
+        turn.stage_tmp_od += calculate_od(hit, funnel, enemy_count, direct, tmp_style.od_earring, tmp_style.od_rate_extra)
 
     def battle_start(self, turn: Turn):
         """
@@ -1786,6 +1809,9 @@ class Simulation:
             turn.od -= turn.battle.od_consume * turn.od_level
             turn.predicted_od -= turn.battle.od_consume * turn.od_level
             self.trigger_passives(turn, "on_overdrive_start")
+
+        # 我方所有回合都要触发的被动
+        self.trigger_passives(turn, "on_ally_turn_start")
 
         # 回合开始默认行动
         actions = [None] * 6
@@ -1971,33 +1997,33 @@ class Simulation:
                     if expr.startswith("target."):
                         ctx = Context(tmp_turn, tmp_turn.battle.monsters[action.get("target").get("slot")])
                 effects = self.resolve_active_effects(skill, action, ctx)
-                hit = direct = enemy_count = 0
+                hit = enemy_count = 0
                 # 先判断是否是攻击性技能并存储hit数
-                if is_attack_skill(skill):
+                attack_skill = is_attack_skill(skill)
+                if attack_skill:
                     hit = skill.hit_count
                     if skill.target == "single":
                         enemy_count = 1
                     elif skill.target == "all":
                         enemy_count = monster_num(turn)
                 # 再判断具体效果
-                for effect in effects:
-                    # 临时应用连击珠效果
-                    if effect.get("type") == "funnel":
-                        self.apply_effect(tmp_turn, tmp_style, effect)
-                    # 解析od相关，存储直充od数值
-                    elif effect.get("type") == "resource" and effect.get("target") == "od":
-                        direct = effect.get("od")
-                    # 目前有唯一一个消耗全部token获得od的技能，暂时按照可以吃od加深算
-                    elif effect.get("type") == "over_drive_point_up_by_token":
-                        direct = effect.get("value") * skill.now_cost
-                funnel = calculate_funnel(tmp_style)
-                turn.stage_tmp_od += calculate_od(hit, funnel, enemy_count, direct, style.od_earring, style.od_rate_extra)
+                self.od_up_through_action(turn, tmp_turn, tmp_style, effects, skill, attack_skill, hit, enemy_count)
+                # 白虎的攻击双动，不会和技能双动同时存在
+                if has_status_id(style, 227) and attack_skill:
+                    self.od_up_through_action(turn, tmp_turn, tmp_style, effects, skill, attack_skill, hit, enemy_count, second=True)
+                # ex技能双动
+                elif has_status_id(style, 125) and skill.ex_skill:
+                    self.od_up_through_action(turn, tmp_turn, tmp_style, effects, skill, attack_skill, hit, enemy_count, second=True)
 
-                # 结算和od相关的被动效果
+                # 结算和od相关的被动效果，白虎的ex双动不会引发od相关被动因此暂不考虑
                 if skill.ex_skill:
                     self.trigger_style_passives(turn, style, "after_ex_use", only_od=True)
+                    if has_status_id(style, 125):  
+                        self.trigger_style_passives(turn, style, "after_ex_use", only_od=True)
+                # 破盾被动认为只发动一次
                 if action.get("on_break"):
                     self.trigger_style_passives(turn, style, "on_break_enemy", only_od=True)
+                # 清除buff被动认为只发动一次
                 if self.skill_has_effect_with(skill, action, ctx, effect_type="remove_buff") and monster_has_buff(turn, action["target"]["slot"]):
                     self.trigger_style_passives(turn, style, "on_relieve_enemy_buff", only_od=True)
                 # 有恢复sp的主动技能
@@ -2005,6 +2031,12 @@ class Simulation:
                     effects = self.resolve_active_effects(skill, action, ctx)
                     for effect in effects:
                         if effect.get("sp"):  # 对于恢复sp的主动技能
+                            targets = resolve_targets(turn, style, effect.get("target"), effect)
+                            for target in targets:
+                                if target != style:  # 每一个非自身target触发被动
+                                    self.trigger_style_passives(turn, target, "on_sp_up_by_nonself_active_skill", only_od=True)
+                        # 对于非破盾时恢复sp的ex双动技能
+                        if effect.get("sp") and has_status_id(style, 125) and skill.ex_skill and not effect.get("need_break"):
                             targets = resolve_targets(turn, style, effect.get("target"), effect)
                             for target in targets:
                                 if target != style:  # 每一个非自身target触发被动
@@ -2081,6 +2113,20 @@ class Simulation:
                 relieve_buff = monster_has_buff(turn, action["target"]["slot"])
                 # 正式结算effects
                 self.trigger_active_actions(style, skill, action, ctx)
+                # 确定buff的消耗
+                self.consume_buff_by_use(skill, style, ctx, action)
+                # 白虎的攻击双动，不会和ex技能双动同时存在
+                if has_status_id(style, 227) and attack_skill:
+                    # 正式结算effects
+                    self.trigger_active_actions(style, skill, action, ctx)
+                    # 确定buff的消耗
+                    self.consume_buff_by_use(skill, style, ctx, action)
+                # ex技能双动
+                elif has_status_id(style, 125, allow_trash=True) and skill.ex_skill:
+                    # 正式结算effects
+                    self.trigger_active_actions(style, skill, action, ctx)
+                    # 确定buff的消耗
+                    self.consume_buff_by_use(skill, style, ctx, action)
 
                 # 结算非od的被动效果
                 if skill.cost_type == "od":
@@ -2116,8 +2162,21 @@ class Simulation:
                                 if target != style:  # 每一个非自身target触发被动
                                     self.trigger_style_passives(turn, target, "on_sp_up_by_nonself_active_skill", without_od=True)
 
-                # 确定buff的消耗
-                self.consume_buff_by_use(skill, style, ctx, action)
+                # ex技能双动可能触发2次after_ex_use和on_sp_up_by_nonself_active_skill
+                if has_status_id(style, 125, allow_trash=True) and skill.ex_skill:
+                    self.trigger_style_passives(turn, style, "after_ex_use", without_od=True)
+                    # 有恢复sp的主动技能
+                    if self.skill_has_effect_with(skill, action, ctx, effect_key="sp"):
+                        effects = self.resolve_active_effects(skill, action, ctx)
+                        for effect in effects:
+                            if effect.get("sp") and not effect.get("need_break"):  # 对于恢复sp的主动技能
+                                targets = resolve_targets(turn, style, effect.get("target"), effect)
+                                for target in targets:
+                                    if target != style:  # 每一个非自身target触发被动
+                                        self.trigger_style_passives(turn, target, "on_sp_up_by_nonself_active_skill", without_od=True)
+                # 白虎攻击技能双动可能触发2次after_ex_use
+                elif has_status_id(style, 227) and attack_skill:
+                    self.trigger_style_passives(turn, style, "after_ex_use", without_od=True)
 
         # token增加
         self.trigger_passives(turn, "after_action")
@@ -2285,7 +2344,11 @@ class Simulation:
             monster.exist = replace_monster["exist"]
             monster.damage_rate = replace_monster["damage_rate"]
             monster.down = replace_monster["down"]
-            monster.statuses = [Status(**s) for s in replace_monster["statuses"]]
+            for status in monster.statuses:
+                if status.id == 170 and not monster.down:
+                    monster.statuses.remove(status)
+                    break
+            # monster.statuses = [Status(**s) for s in replace_monster["statuses"]]
         if turn.battle.field["value"] != gui_add_state["field"]:
             turn.battle.field["value"] = gui_add_state["field"]
             turn.battle.field["left_turn"] = -1
@@ -2329,6 +2392,7 @@ class Simulation:
         if turn.od_timing == "before" and pre_od_timing == None:
             sp_added_dict = {1: 5, 2: 12, 3: 20}
             sp_added = sp_added_dict[turn.od_level]
+            turn.bonus = 1
             for style in turn.team:
                 add_sp(style, {"sp": sp_added, "limit": 99})
             turn.od -= turn.battle.od_consume * turn.od_level

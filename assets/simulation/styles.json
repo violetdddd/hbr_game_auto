@@ -1590,7 +1590,7 @@
     "limit_break": {
       "0": [
         {"id": 1050001, "name": "獅子奮迅", "trigger": "after_ex_use", "effects": [{"type": "resource", "target": "ally_all_without_self", "sp": 2, "limit": 30}]},
-        {"id": 1050002, "name": "猛袭模式", "trigger": "on_battle_start", "effects": [{"type": "double_attack_skill", "target": "self", "target_condition": "dp_rate()>=1.0", "duration": {"type": "permanent"}, "status_id": 227}]}
+        {"id": 1050002, "name": "猛袭模式", "trigger": "on_ally_turn_start", "effects": [{"type": "double_attack_skill", "target": "self", "target_condition": "dp_rate()>=1.0", "duration": {"type": "ally_turn", "value": 1}, "status_id": 227}]}
       ],
       "1": [
         {"id": 1050003, "name": "闪光", "trigger": "on_new_turn_start", "trigger_condition": "front()", "effects": [{"type": "resource", "target": "self", "sp": 1}]}

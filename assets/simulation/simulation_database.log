@@ -127,6 +127,7 @@ Duration：
   on_pursuit: 1
   on_relieve_enemy_buff_attack: 1
   on_use_od_cost_skill: 1
+  on_ally_turn_start: 1  # 白虎这种需要每次行动之前都判断一次的，放在turn start()函数中运行
   ally_dp_broken: 2  # 实际和on_new_turn_start一同发动
 
 四、全部 Duration 类型（按次数降序）

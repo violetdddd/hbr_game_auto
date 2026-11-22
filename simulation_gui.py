@@ -1004,25 +1004,26 @@ class BattleTurn(QGroupBox):
         special_trigger = base['members'][slot].get('special_trigger')
         special_actions = base.get('special_actions')
         # 创建对话框，读取当前状态
-        special_count = None if special_trigger == None else [special_actions.get(special_trigger, 0), special_actions.get(special_trigger+"_after", 0)]
-        dialog = SpecialActionDialog(
-            on_break=action.get('on_break', False),
-            special_trigger=special_trigger,
-            special_count=special_count,
-            parent=self
-        )
-        # 取消则不更改任何内容
-        if dialog.exec() != QDialog.DialogCode.Accepted:
-            return
-        values = dialog.values()
-        # 保存角色的 on_break
-        action['on_break'] = values['on_break']
-        # 保存特殊技能发动次数
-        if special_trigger in SpecialActionDialog.SPECIAL_NAMES:
-            special_actions[special_trigger] = values['special_count'][0]
-            if len(values['special_count']) == 2:
-                special_actions[special_trigger+"_after"] = values['special_count'][1]
-        self.update_state_from_simulation()
+        if action != None:
+            special_count = None if special_trigger == None else [special_actions.get(special_trigger, 0), special_actions.get(special_trigger+"_after", 0)]
+            dialog = SpecialActionDialog(
+                on_break=action.get('on_break', False),
+                special_trigger=special_trigger,
+                special_count=special_count,
+                parent=self
+            )
+            # 取消则不更改任何内容
+            if dialog.exec() != QDialog.DialogCode.Accepted:
+                return
+            values = dialog.values()
+            # 保存角色的 on_break
+            action['on_break'] = values['on_break']
+            # 保存特殊技能发动次数
+            if special_trigger in SpecialActionDialog.SPECIAL_NAMES:
+                special_actions[special_trigger] = values['special_count'][0]
+                if len(values['special_count']) == 2:
+                    special_actions[special_trigger+"_after"] = values['special_count'][1]
+            self.update_state_from_simulation()
         self.refresh()
 
     def refresh_enemy_setting(self, *_):
