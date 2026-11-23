@@ -242,6 +242,14 @@ class Skill:
     parent_id: Optional[int] = None
     user_select: Any = None
 
+    def selection_target_type(self):
+        # GUI只区分需要手动选择的目标
+        if self.target in ("ally_single", "ally_single_without_self", "ally_single_front_without_self"):
+            return self.target
+        if self.target == "single":
+            return "enemy"
+        return "ignore"
+
     @classmethod
     def from_record(cls, record: JsonDict) -> 'Skill':
         if record.get('kind') not in ('active', 'system', 'accessory'):
@@ -910,12 +918,7 @@ class Simulation:
                 skills = deepcopy(style.basic_skills)  # 3个，默认的顺序为：前排默认技能，无，追击
                 for skill in style.skills:
                     # 处理target type，GUI仅需要知道是敌人还是友方（是否可选自己）
-                    if skill.target in ("ally_single", "ally_single_without_self", "ally_single_front_without_self"):
-                        target_type = skill.target
-                    elif skill.target == "single":
-                        target_type = "enemy"
-                    else:
-                        target_type = "ignore"
+                    target_type = skill.selection_target_type()
                     # 处理user_select
                     if skill.user_select == None:
                         user_select = None
@@ -1328,8 +1331,8 @@ class Simulation:
                 # 根据攻击命中的敌人数增加 Token
                 for target in targets:  # 其实就是self
                     action = turn.actions[target.slot]
-                    # 无行动
-                    if not action:
+                    # 无行动或追击等
+                    if not action or action["id"] in (0, 2, 3, 4):
                         token_added = 0
                     # 普通攻击
                     elif action["id"] == 1:
@@ -1774,6 +1777,56 @@ class Simulation:
                 return True
         return simei_ex
 
+    def action_legalization(self, turn: Turn):
+        """合法化turn.actions，允许recalculate的action和初始化的[None]*6"""
+        # actions按slot存放，前后排按本回合的order判断
+        for position, slot in enumerate(turn.order):
+            style = turn.team[slot]
+            front = position < 3
+            if has_status_id(style, 33) or \
+            turn.additional_turn and front and not has_status_id(style, 20, True):
+                turn.actions[slot] = None
+                continue
+
+            action = turn.actions[slot]
+            skill_id = action.get("id") if action else None
+            # 基础技能已经包含指挥、曙光普攻和暗四妹自动追击的替换，这里根据基础技能和站位选择默认技能
+            basic_skills = style.basic_skills[:1] if front else style.basic_skills[1:3]
+            basic_skill = next((skill for skill in basic_skills if skill["id"] == skill_id), None)
+            # 当前选择的action就是基础技能
+            if basic_skill is not None:
+                action["name"] = basic_skill["name"]
+                action["target"] = {"type": "ignore", "slot": None}
+                action["user_selected"] = None
+                continue
+
+            # 使用本回合已选择的技能，例如可怜/可镰形态变化后旧技能可能失效
+            if front and action:
+                skill = next((skill for skill in style.skills if skill.id == skill_id), None)
+                if skill is not None:
+                    target_type = skill.selection_target_type()
+                    target = action.get("target") or {}
+                    target_slot = target.get("slot")
+                    target_valid = target_type in ("ignore", "ally_single", "ally_single_without_self")
+                    if target_type == "enemy":
+                        target_valid = type(target_slot) is int and target_slot in range(len(turn.battle.monsters)) and \
+                            turn.battle.monsters[target_slot].exist
+                    elif target_type == "ally_single_front_without_self":
+                        target_valid = type(target_slot) is int and target_slot in turn.order[:3] and target_slot != slot
+                    selected = action.get("user_selected")
+                    if target_valid and (not skill.user_select or selected in skill.user_select):
+                        continue
+
+            # 无法保留旧行动时，恢复当前站位的默认行动
+            default_skill = basic_skills[0]
+            turn.actions[slot] = {
+                "name": default_skill["name"],
+                "id": default_skill["id"],
+                "target": {"type": "ignore", "slot": None},
+                "user_selected": None,
+                "on_break": False
+            }
+
     def battle_start(self, turn: Turn):
         """
         战斗开场要处理的被动等，刚进场时slot和position一致
@@ -1855,28 +1908,9 @@ class Simulation:
         # 我方所有回合都要触发的被动
         self.trigger_passives(turn, "on_ally_turn_start")
 
-        # 回合开始默认行动
-        actions = [None] * 6
-        # 前三名默认普通攻击，后三名默认无行动
-        for position, slot in enumerate(turn.order):
-            style = turn.team[slot]
-            # 选取默认行动
-            default_skill = style.basic_skills[0 if position < 3 else 1]
-            if has_status_id(style, 33) or \
-            turn.additional_turn and not has_status_id(style, 20, True) and position < 3:
-                actions[slot] = None
-            else:
-                actions[slot] = {
-                    'name': default_skill['name'],
-                    'id': default_skill['id'],
-                    'target': {
-                        'type': "ignore",
-                        'slot': None,
-                    },
-                    'user_selected': None,
-                    "on_break": False
-                }
-        turn.actions = actions
+        # 回合开始按站位补齐默认行动
+        turn.actions = [None] * 6
+        self.action_legalization(turn)
 
     def calculate_member_skills(self, turn: Turn):
         """给出所有队员可以使用的非默认技能以及使用的cost，存储在style.skills中，不修改其余数据"""
@@ -2489,12 +2523,14 @@ class Simulation:
                     case "demon_cavalry_after":
                         self.using_demon_cavalry(turn, times, before_od=False)
 
-        # member数据计算后存储在Turn中
+        # 附加回合则必须遵守和上一回合相同的order
+        if not turn.additional_turn:
+            turn.order = gui_add_state["order"]
+        # 按当前站位计算技能，再检查GUI传入的行动
         self.calculate_member_skills(turn)
-
-        # 此处应用order，actions
-        turn.order = gui_add_state["order"]
         turn.actions = gui_add_state["actions"]
+        # 检查actions是否合法，不合法则转换为对应的默认action
+        self.action_legalization(turn)
 
         # 结算on_action_start被动
         self.trigger_passives(turn, "on_action_start")

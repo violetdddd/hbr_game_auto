@@ -161,7 +161,7 @@
   "154": {"name": "b_i_yamawaki_servant", "zh_cn": "山胁仆从", "category": "buff", "forced_one": true, "icon": "BIYamawakiServant.png"},
   "160": {"name": "high_boost", "zh_cn": "高阶增强", "category": "buff", "removable": true, "forced_one": true, "icon": "HighBoost.png"},
   "166": {"name": "element_mark", "zh_cn": "属性印记", "category": "buff", "removable": true, "forced_one": true, "has_level": true, "special": true, "icons": {
-    "dark": "DarkMark.png",
+    "dark": "DarkMark.webp",
     "fire": "FireMark.png",
     "ice": "IceMark.png",
     "thunder": "ThunderMark.png",

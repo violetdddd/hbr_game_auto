@@ -852,10 +852,11 @@ class BattleTurn(QGroupBox):
         # od发动选择区
         self.before_od = combo([('不发动', 0)])
         self.after_od = combo([('不发动', 0)])
-        for title, box in (('前置', self.before_od), ('后置', self.after_od)):
+        self.before_od_caption = QLabel('前置')
+        self.after_od_caption = QLabel('后置')
+        for caption, box in ((self.before_od_caption, self.before_od), (self.after_od_caption, self.after_od)):
             row = QHBoxLayout()
             row.setSpacing(2)
-            caption = QLabel(title)
             caption.setFixedWidth(27)
             row.addWidget(caption)
             row.addWidget(box, 1)
@@ -964,38 +965,27 @@ class BattleTurn(QGroupBox):
         root.addWidget(misc, 7)
         self.stack.addWidget(page)
 
-    def update_state_from_simulation(self):
-        """
-        GUI传给engine可操作的base相关内容，engine内部增量更新，然后传回来完整的base state
-        gui_add_state = {
-            "member_status": [{"id": int, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None}] * 6,
-            'order': [int] * 6,
-            'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int | None}, "user_selected": None | int, "on_break": False}] * 6,
-            'enemies': [{"exist": bool, "damage_rate": int, 'down': bool, "statuses": [
-            {"id": int, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None}, ...
-            ]} for _ in range(3)],
-            'field': str or None,
-            'od_timing': str or None,
-            'od_level': int,
-            "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form_change": 0}, before/after
-            "adjustments": {xxx},
-            dp
-        }
-        """
+    def simulation_input(self):
+        """GUI传给engine可操作的base相关内容，engine内部增量更新"""
         base = self.state_data["base"]
-        gui_add_state = {
-            "member_status": [member["statuses"] for member in base["members"]],
-            "member_dp": [member["dp"] for member in base["members"]],
-            'order': base["order"],
-            'actions': base["actions"],
-            'enemies': base["enemies"],
-            'field': base["field"],
-            'od_timing': base["od_timing"],
-            'od_level': base["od_level"],
+        return {
+            "member_status": [m["statuses"] for m in base["members"]],
+            "member_dp": [m["dp"] for m in base["members"]],
+            "order": base["order"],
+            "actions": base["actions"],
+            "enemies": base["enemies"],
+            "field": base["field"],
+            "od_timing": base["od_timing"],
+            "od_level": base["od_level"],
             "special_actions": base["special_actions"],
             "adjustments": self.state_data["adjustments"]
         }
-        self.state_data["base"] = self.owner.engine.recalculate(copy.deepcopy(gui_add_state), self.number)
+
+    def update_state_from_simulation(self):
+        """
+        调用simulationTab的相关函数，GUI传给engine可操作的base相关内容，engine内部增量更新，然后传回来完整的base state
+        """
+        self.owner.sync_from_turn(self)
 
     def edit_special_action(self, position):
         base = self.state_data['base']
@@ -1354,7 +1344,15 @@ class BattleTurn(QGroupBox):
         available_before = 3 if (now_timing == "before" and bonus == 1) or (now_od == 0 and not additional_turn) else 0
         # 后置od发动条件是当前刚刚开启前置od，或者当前处于od外
         available_after = 3 if (now_timing == "before" and bonus == 1) or now_od == 0 else 0
-        for timing, box, available in (('before', self.before_od, available_before), ('after', self.after_od, available_after)):
+        for timing, caption, box, available in (('before', self.before_od_caption, self.before_od, available_before), ('after', self.after_od_caption, self.after_od, available_after)):
+            if available:
+                caption.setVisible(True)
+                box.setVisible(True)
+
+            else:
+                caption.setVisible(False)
+                box.setVisible(False)
+                continue
             box.blockSignals(True)
             box.clear()
             box.addItem('不发动', 0)
@@ -1552,6 +1550,37 @@ class SimulationTab(QWidget):
         del self.turns[target:]
         for item in self.turns: item.refresh_turn_controls()
         self.engine.truncate_after(target)
+
+    def sync_from_turn(self, start_turn):
+        """
+        某一个turn出现调整的时候调用本函数进行后续所有turn的刷新和同步
+        gui_add_state = {
+            "member_status": [{"id": int, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None}] * 6,
+            "member_dp": [m["dp"] for m in base["members"]],
+            'order': [int] * 6,
+            'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int | None}, "user_selected": None | int, "on_break": False}] * 6,
+            'enemies': [{"exist": bool, "damage_rate": int, 'down': bool, "statuses": [
+            {"id": int, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None}, ...
+            ]} for _ in range(3)],
+            'field': str or None,
+            'od_timing': str or None,
+            'od_level': int,
+            "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form_change": 0}, before/after
+            "adjustments": {xxx},
+        }
+        """
+        start_index = self.turns.index(start_turn)
+        # 从某个turn开始调用recalculate
+        for i in range(start_index, len(self.turns)):
+            turn = self.turns[i]
+            result = self.engine.recalculate(
+                turn.simulation_input(),
+                turn.number
+            )
+            turn.state_data["base"] = result
+        # 全部更新state_data完毕之后刷新显示
+        for turn in self.turns[start_index:]:
+            turn.refresh()
 
     def next_turn(self):
         simulation_state = self.engine.advance()
