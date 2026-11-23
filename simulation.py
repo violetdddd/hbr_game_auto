@@ -506,7 +506,7 @@ class Battle:
     monsters: List[Monster] = dataclasses.field(default_factory=list)
     field: dict = dataclasses.field(default_factory=lambda: {"value": None, "left_turn": -1})  # 无、元素、稻场、其他
     territory: Optional[int] = None
-    global_od_rate: int = 100
+    default_hit: float = 2.5
     super_scale: dict = dataclasses.field(default_factory=lambda: {"element": None, "value": 0})  # 超越量表
     od_consume: int = 100
 
@@ -796,7 +796,7 @@ def calculate_funnel(style: Style, consume=False):
     )
 
 # 根据行动的参数计算od增加数值
-def calculate_od(hit, funnel, enemy, direct, earring: int, extra_rate: float, global_od_rate: int) -> float:
+def calculate_od(hit, funnel, enemy, direct, earring: int, extra_rate: float, default_hit: float) -> float:
     if earring != 0:  # 10,12,15
         if hit != 0:
             od_rate_100 = 105 + (earring-5) / 9 * min(hit - 1, 9) + extra_rate
@@ -804,8 +804,7 @@ def calculate_od(hit, funnel, enemy, direct, earring: int, extra_rate: float, gl
             od_rate_100 = 105 + extra_rate
     else:
         od_rate_100 = 100 + extra_rate
-    hit_default = math.floor(2.5 * global_od_rate) / 100  # 2位小数
-    per_hit_od = math.floor(od_rate_100 * hit_default) / 100  # 2位小数
+    per_hit_od = math.floor(od_rate_100 * default_hit) / 100  # 2位小数
     direct_od = math.floor(od_rate_100 * direct) / 100  # 2位小数
     return direct_od if hit == 0 else per_hit_od * (hit + funnel) * enemy + direct_od 
 
@@ -1095,7 +1094,7 @@ class Simulation:
         battle = Battle(
             enemy_weaknesses=list(dict.fromkeys(weaknesses)),
             monsters=[Monster(position=i, exist=i in default_enemy_config[enemy_count]) for i in range(3)],
-            global_od_rate=global_od_rate,
+            default_hit=math.floor(2.5 * global_od_rate) / 100  # 2位小数
         )
         turn = Turn(
             battle=battle,
@@ -1714,7 +1713,7 @@ class Simulation:
                 consume_use_turn_buff(critical_damage_ups, skill.elements[0] if skill.elements else None)
 
     def using_demon_cavalry(self, turn: Turn, times: int, before_od=True):
-        od_added = monster_num(turn) * 6 * 2.5 * times
+        od_added = monster_num(turn) * 6 * turn.battle.default_hit * times
         if before_od:
             turn.od = min(turn.od + od_added, 300)
         turn.predicted_od = min(turn.predicted_od + od_added, 300)
@@ -1749,7 +1748,7 @@ class Simulation:
             elif effect.get("type") == "over_drive_point_up_by_token":
                 direct = effect.get("value") * skill.now_cost
         funnel = calculate_funnel(tmp_style, consume=True) if attack_skill else 0
-        turn.stage_tmp_od += calculate_od(hit, funnel, enemy_count, direct, tmp_style.od_earring, tmp_style.od_rate_extra, turn.battle.global_od_rate)
+        turn.stage_tmp_od += calculate_od(hit, funnel, enemy_count, direct, tmp_style.od_earring, tmp_style.od_rate_extra, turn.battle.default_hit)
 
     def resolve_simei_pursuit(self, simei_style: Style, turn: Turn, simei_ex: bool, attack_skill: bool, skill: Skill, only_od=True):
         """完成四妹的自动追击的od计算或buff计算，目前认为不会触发任何其他被动"""
@@ -1757,7 +1756,7 @@ class Simulation:
             simei_skill = find_skill_by_id(simei_style, 4)
             if simei_ex or simei_style.sp < simei_skill.now_cost:  # 本回合已经发动过或者sp不够发动不出来大招
                 if only_od:  # 计算od
-                    turn.stage_tmp_od += calculate_od(simei_style.hit, 0, 1, 0, 0, simei_style.od_rate_extra, turn.battle.global_od_rate)
+                    turn.stage_tmp_od += calculate_od(simei_style.hit, 0, 1, 0, 0, simei_style.od_rate_extra, turn.battle.default_hit)
                 # 仅追击则不给任何buff，仅触发被动
                 else:
                     self.trigger_style_passives(turn, simei_style, "on_pursuit", without_od=True)
@@ -1766,7 +1765,7 @@ class Simulation:
                 if only_od:  # 计算od
                     hit = simei_skill.hit_count
                     funnel = calculate_funnel(simei_style)
-                    turn.stage_tmp_od += calculate_od(hit, funnel, 1, 0, simei_style.od_earring, simei_style.od_rate_extra, turn.battle.global_od_rate)
+                    turn.stage_tmp_od += calculate_od(hit, funnel, 1, 0, simei_style.od_earring, simei_style.od_rate_extra, turn.battle.default_hit)
                 else:  # 计算buff
                     effects = [deepcopy(effect) for effect in simei_skill.effects if effect.get("type") in ACTIVE_EFFECT_TYPES_NEEDED]
                     for effect in effects:
@@ -1913,7 +1912,7 @@ class Simulation:
                 for style in turn.team:
                     add_sp(style, {"sp": 1})
             # 猛毒触发
-            venom_od = sum(enemy.exist and has_status_id(enemy, 218) for enemy in turn.battle.monsters) * 3 * 2.5
+            venom_od = sum(enemy.exist and has_status_id(enemy, 218) for enemy in turn.battle.monsters) * 3 * turn.battle.default_hit
             turn.od = min(turn.od + venom_od, 300)
             turn.predicted_od = min(turn.predicted_od + venom_od, 300)
         # 附加回合
@@ -2080,9 +2079,9 @@ class Simulation:
             if not skill_id or skill_id in (0,2,4):  # 没有行动或指挥行动或四妹自动追击
                 continue
             elif skill_id == 1:  # 普通攻击
-                turn.stage_tmp_od += calculate_od(3, 0, 1, 0, 0, style.od_rate_extra, turn.battle.global_od_rate)
+                turn.stage_tmp_od += calculate_od(3, 0, 1, 0, 0, style.od_rate_extra, turn.battle.default_hit)
             elif skill_id == 3:  # 追击
-                turn.stage_tmp_od += calculate_od(style.hit, 0, 1, 0, 0, style.od_rate_extra, turn.battle.global_od_rate)
+                turn.stage_tmp_od += calculate_od(style.hit, 0, 1, 0, 0, style.od_rate_extra, turn.battle.default_hit)
             else:  # 一般的skill
                 skill = find_skill_by_id(style, skill_id)
                 # 先消耗资源
@@ -2515,7 +2514,7 @@ class Simulation:
                     case "demonic_rage":
                         self.using_demonic_rage(turn, before_od=True)
                     case "all_out_attack":
-                        od_added = monster_num(turn) * 7 * 2.5
+                        od_added = monster_num(turn) * 7 * turn.battle.default_hit
                         turn.od = min(turn.od + od_added, 300)
                         turn.predicted_od = min(turn.predicted_od + od_added, 300)
                     case "demon_cavalry":
@@ -2544,7 +2543,7 @@ class Simulation:
                     case "demonic_rage_after":
                         self.using_demonic_rage(turn, before_od=False)
                     case "all_out_attack_after":
-                        od_added = monster_num(turn) * 7 * 2.5
+                        od_added = monster_num(turn) * 7 * turn.battle.default_hit
                         turn.predicted_od = min(turn.predicted_od + od_added, 300)
                     case "demon_cavalry_after":
                         self.using_demon_cavalry(turn, times, before_od=False)

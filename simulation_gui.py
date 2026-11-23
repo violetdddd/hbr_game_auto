@@ -1643,10 +1643,7 @@ class BattleTurn(QGroupBox):
             self.refresh_turn_controls()
 
     def state(self):
-        """导出用于 JSON 恢复的完整状态；不合并 adjustments。"""
-        if self.stack.currentIndex() == 1:
-            self.save_adjust()
-
+        """导出已提交的回合状态，保留独立的 adjustments。"""
         return copy.deepcopy(self.state_data)
 
 
