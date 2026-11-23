@@ -402,7 +402,7 @@ class BattleSetup(QGroupBox):
 
         initial_od_line = QHBoxLayout()
         initial_od_line.addWidget(QLabel('开局OD'))
-        self.initial_od = dspin(0, 300, 0); self.initial_od.setMaximumWidth(90)
+        self.initial_od = dspin(-300, 300, 0); self.initial_od.setMaximumWidth(90)
         self.initial_od.setSuffix('%')
         initial_od_line.addWidget(self.initial_od, 1)
         enemy_col.addLayout(initial_od_line)
@@ -1147,7 +1147,7 @@ class BattleTurn(QGroupBox):
             available_slots = {
                 slot
                 for slot in base["order"][:3]
-                if base["actions"][slot] is not None
+                if any(status.get("id") == 20 for status in base["members"][slot]["statuses"])
             }
             if (first_slot not in available_slots or second_slot not in available_slots):
                 return
@@ -1425,7 +1425,7 @@ class BattleTurn(QGroupBox):
                 action.setVisible(True)
                 if position < 3:
                     for i, skill in enumerate(member.get('skills', [])):
-                        if i == 0:  # 默认行动
+                        if i == 0:  # 默认普通攻击行动
                             action.addItem(f"{skill.get('name')}", skill.get('id'))
                         elif i not in (1, 2):  # 排除无和追击
                             action.addItem(f"{skill.get('name')}（{skill.get('cost')} {skill.get('cost_type')}）", skill.get('id'))

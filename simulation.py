@@ -61,7 +61,10 @@ PASSIVE_EFFECT_TYPES_NEEDED = {
     "cover",
     "revenge",
     "zone_up_eternal_plus_15",
-    "b_i_yamawaki_servant"
+    "b_i_yamawaki_servant",
+    # 特殊替换，需要存入被动，但trigger名同effect需要手动触发
+    "replace_normal_skill",
+    "replace_pursuit"
 }
 
 ACTIVE_EFFECT_TYPES_NEEDED = {
@@ -423,6 +426,8 @@ class Style:
         # 读入主动技能
         skill_records = skill_records or {}
         for skill_id in active_skill_ids or []:
+            if skill_id == 737:
+                continue
             raw = skill_records[int(skill_id)]
             instance.active_skills.append(Skill.from_record(raw))
         # 由于在from_record中剔除了不需要模拟的ignore的effect，若被动有分支结构，可能导致某个分支的effect = []，后续要注意
@@ -457,7 +462,17 @@ class Style:
             if passive.trigger is not None
         ))
         # 舰长的行动为指挥+无+追击，其他为普攻+无+追击
-        basic_ids = (2 if instance.role == 'admiral' else 1, 0, 3)
+        basic_ids = [2 if instance.role == 'admiral' else 1, 0, 3]
+        # 两个追击/普攻替换技能
+        if "replace_pursuit" in instance.passive_triggers:  # 暗四妹是普攻+自动追击+无
+            basic_ids[2] = 0
+            basic_ids[1] = 4
+            raw = skill_records[int(7280001)]
+            instance.active_skills.append(Skill.from_record(raw))
+        elif "replace_normal_skill" in instance.passive_triggers:
+            basic_ids[0] = 4520001
+            raw = skill_records[int(4520001)]
+            instance.active_skills.append(Skill.from_record(raw))
         instance.basic_skills = [
             cls.generate_default_skills_from_skill(
                 Skill.from_record(skill_records[skill_id])
@@ -584,10 +599,7 @@ class Conditions:
     def skill_sp(ctx: Context):
         slot = ctx.subject.slot
         action_skill_id = ctx.turn.actions[slot].get("id")
-        for skill in ctx.subject.active_skills:
-            if skill.id == action_skill_id:
-                return skill.now_cost
-        raise ValueError("程序不应该运行到这里，请检查数据库字段")
+        return find_skill_by_id(ctx.subject, action_skill_id).now_cost
 
     @staticmethod
     def normal_attack(ctx: Context):
@@ -806,6 +818,8 @@ def is_attack_skill(skill: Skill) -> bool:
 
 # 通过skill_id寻找某风格的非默认技能
 def find_skill_by_id(style: Style, skill_id: int) -> Skill:
+    if skill_id == 4:
+        skill_id = 7280001
     return next(skill for skill in style.active_skills if skill.id == skill_id)
 
 # 计算敌人数量
@@ -1083,6 +1097,7 @@ class Simulation:
             battle=battle,
             team=result_styles,
             od=initial_od,
+            predicted_od=initial_od
         )
         # 只在全部构造成功后提交，避免部分初始化失败污染旧战斗。
         self.skill_records = skill_records
@@ -1732,6 +1747,33 @@ class Simulation:
         funnel = calculate_funnel(tmp_style, consume=True) if attack_skill else 0
         turn.stage_tmp_od += calculate_od(hit, funnel, enemy_count, direct, tmp_style.od_earring, tmp_style.od_rate_extra)
 
+    def resolve_simei_pursuit(self, simei_style: Style, turn: Turn, simei_ex: bool, attack_skill: bool, skill: Skill, only_od=True):
+        """完成四妹的自动追击的od计算或buff计算，目前认为不会触发任何其他被动"""
+        if simei_style and attack_skill and skill.now_cost <= 8 and skill.cost_type == "sp":
+            simei_skill = find_skill_by_id(simei_style, 4)
+            if simei_ex or simei_style.sp < simei_skill.now_cost:  # 本回合已经发动过或者sp不够发动不出来大招
+                if only_od:  # 计算od
+                    turn.stage_tmp_od += calculate_od(simei_style.hit, 0, 1, 0, 0, simei_style.od_rate_extra)
+                # 仅追击则不给任何buff，仅触发被动
+                else:
+                    self.trigger_style_passives(turn, simei_style, "on_pursuit", without_od=True)
+                return simei_ex
+            else:
+                if only_od:  # 计算od
+                    hit = simei_skill.hit_count
+                    funnel = calculate_funnel(simei_style)
+                    turn.stage_tmp_od += calculate_od(hit, funnel, 1, 0, simei_style.od_earring, simei_style.od_rate_extra)
+                else:  # 计算buff
+                    effects = [deepcopy(effect) for effect in simei_skill.effects if effect.get("type") in ACTIVE_EFFECT_TYPES_NEEDED]
+                    for effect in effects:
+                        self.apply_effect(turn, simei_style, effect, source="猫咪喷射打靶")
+                    # 增加使用次数
+                    simei_skill.used += 1
+                    # 触发被动
+                    self.trigger_style_passives(turn, simei_style, "on_pursuit", without_od=True)
+                return True
+        return simei_ex
+
     def battle_start(self, turn: Turn):
         """
         战斗开场要处理的被动等，刚进场时slot和position一致
@@ -1850,6 +1892,10 @@ class Simulation:
                 style.skills = []
                 # initialize() 已经装入全部被选择的主动/光球技能
                 for skill in style.active_skills:
+                    # 普攻技能替换
+                    if skill.id == 4520001:
+                        continue
+                    # 可镰不同形态的技能安排
                     if style.id == 49:
                         if turn.special_actions["kelian_form_change"] == 0 and skill.id == 319:
                             continue
@@ -1916,7 +1962,10 @@ class Simulation:
                     if has_status_id(style, 228) and is_attack_skill(skill):
                         status = next(status for status in style.statuses if status.id == 228)
                         skill.elements = [status.element]
-                        
+
+                    # 追击替换不实际加入到可以选择的skill列表当中
+                    if skill.id == 7280001:
+                        continue
                     style.skills.append(skill)
 
     def apply_actions_od_shortcut(self, turn: Turn):
@@ -1943,14 +1992,18 @@ class Simulation:
                 turn.stage_tmp_od += 100  # 不改变超越量表数值
         # 应用每个角色的技能，消耗对应资源，增加连击珠，并计算技能的od增量
         skill_ids = [action.get("id") if action is not None else None for action in turn.actions]
-        # 判断技能应用顺序
+        # 判断技能应用顺序，同时记录是否有四妹自动追击存在
         action_type = []  # 1为非攻击技能/无行动，2为攻击技能，3为后排
+        simei_style = None
+        simei_ex = False
         for i, slot in enumerate(turn.order):
             skill_id, style, action = skill_ids[slot], turn.team[slot], turn.actions[slot]
             if not skill_id:
                 action_type.append(1)
             elif i > 2:
                 action_type.append(3)
+                if skill_id == 4:
+                    simei_style = style
             else:
                 if skill_id == 1:  # 普通行动
                     action_type.append(2)
@@ -1965,7 +2018,7 @@ class Simulation:
         # 应用每个角色的技能，消耗对应资源，增加连击珠，并计算技能的od增量
         for slot in [x for _, x in sorted(zip(action_type, turn.order))]:
             skill_id, style, action = skill_ids[slot], turn.team[slot], turn.actions[slot]
-            if not skill_id or skill_id in (0,2):  # 没有行动或指挥行动
+            if not skill_id or skill_id in (0,2,4):  # 没有行动或指挥行动或四妹自动追击
                 continue
             elif skill_id == 1:  # 普通攻击
                 turn.stage_tmp_od += calculate_od(3, 0, 1, 0, 0, style.od_rate_extra)
@@ -2008,12 +2061,15 @@ class Simulation:
                         enemy_count = monster_num(turn)
                 # 再判断具体效果
                 self.od_up_through_action(turn, tmp_turn, tmp_style, effects, skill, attack_skill, hit, enemy_count)
+                simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill, True)  # 四妹追击
                 # 白虎的攻击双动，不会和技能双动同时存在
                 if has_status_id(style, 227) and attack_skill:
                     self.od_up_through_action(turn, tmp_turn, tmp_style, effects, skill, attack_skill, hit, enemy_count, second=True)
+                    simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill, True)  # 四妹追击
                 # ex技能双动
                 elif has_status_id(style, 125) and skill.ex_skill:
                     self.od_up_through_action(turn, tmp_turn, tmp_style, effects, skill, attack_skill, hit, enemy_count, second=True)
+                    simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill, True)  # 四妹追击
 
                 # 结算和od相关的被动效果，白虎的ex双动不会引发od相关被动因此暂不考虑
                 if skill.ex_skill:
@@ -2069,7 +2125,9 @@ class Simulation:
             turn.battle.super_scale["value"] = min(super_scale_value + scale_add, 100)
         # 应用每个角色的技能effect
         skill_ids = [action.get("id") if action is not None else None for action in turn.actions]
-        # 判断技能应用顺序
+        # 判断技能应用顺序和四妹是否自动追击
+        simei_style = simei_action = None
+        simei_ex = False
         action_type = []  # 1为非攻击技能/无行动，2为攻击技能，3为后排
         for i, slot in enumerate(turn.order):
             skill_id, style, action = skill_ids[slot], turn.team[slot], turn.actions[slot]
@@ -2077,6 +2135,9 @@ class Simulation:
                 action_type.append(1)
             elif i > 2:
                 action_type.append(3)
+                if skill_id == 4:
+                    simei_style = style
+                    simei_action = action
             else:
                 if skill_id == 1:  # 普通行动
                     action_type.append(2)
@@ -2091,8 +2152,10 @@ class Simulation:
         # 应用每个角色的技能
         for slot in [x for _, x in sorted(zip(action_type, turn.order))]:
             skill_id, style, action = skill_ids[slot], turn.team[slot], turn.actions[slot]
-            if not skill_id or skill_id in (1, 3):  # 没有行动
+            if not skill_id or skill_id in (1, 3):  # 没有行动、普攻、追击
                 fresh_sprightly(style)
+                continue
+            elif skill_id == 4:  # 四妹自动追击，在最后未使用ex时fresh_sprightly
                 continue
             elif skill_id == 2:  # 指挥行动
                 effect = {"type": "attack_up_include_normal", "target": "ally_front", "status_id": 211, "duration": {"type": "ally_turn", "value": 1}}
@@ -2115,18 +2178,21 @@ class Simulation:
                 self.trigger_active_actions(style, skill, action, ctx)
                 # 确定buff的消耗
                 self.consume_buff_by_use(skill, style, ctx, action)
+                simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill, False)  # 四妹追击
                 # 白虎的攻击双动，不会和ex技能双动同时存在
                 if has_status_id(style, 227) and attack_skill:
                     # 正式结算effects
-                    self.trigger_active_actions(style, skill, action, ctx)
+                    self.trigger_active_actions(style, skill, action, ctx, second=True)
                     # 确定buff的消耗
                     self.consume_buff_by_use(skill, style, ctx, action)
+                    simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill, False)  # 四妹追击
                 # ex技能双动
                 elif has_status_id(style, 125, allow_trash=True) and skill.ex_skill:
                     # 正式结算effects
-                    self.trigger_active_actions(style, skill, action, ctx)
+                    self.trigger_active_actions(style, skill, action, ctx, second=True)
                     # 确定buff的消耗
                     self.consume_buff_by_use(skill, style, ctx, action)
+                    simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill, False)  # 四妹追击
 
                 # 结算非od的被动效果
                 if skill.cost_type == "od":
@@ -2165,7 +2231,7 @@ class Simulation:
                 # ex技能双动可能触发2次after_ex_use和on_sp_up_by_nonself_active_skill
                 if has_status_id(style, 125, allow_trash=True) and skill.ex_skill:
                     self.trigger_style_passives(turn, style, "after_ex_use", without_od=True)
-                    # 有恢复sp的主动技能
+                    # 有恢复sp的主动技能（resource和heal_sp_by_token）
                     if self.skill_has_effect_with(skill, action, ctx, effect_key="sp"):
                         effects = self.resolve_active_effects(skill, action, ctx)
                         for effect in effects:
@@ -2175,11 +2241,21 @@ class Simulation:
                                     if target != style:  # 每一个非自身target触发被动
                                         self.trigger_style_passives(turn, target, "on_sp_up_by_nonself_active_skill", without_od=True)
                 # 白虎攻击技能双动可能触发2次after_ex_use
-                elif has_status_id(style, 227) and attack_skill:
+                elif has_status_id(style, 227) and attack_skill and skill.ex_skill:
                     self.trigger_style_passives(turn, style, "after_ex_use", without_od=True)
 
         # token增加
         self.trigger_passives(turn, "after_action")
+        # 四妹的buff清除和sp消耗
+        if simei_style:
+            if not simei_ex:  # 实际没有使用ex技能
+                fresh_sprightly(simei_style)
+            else:  # 实际使用了ex技能，则扣费和buff消耗
+                simei_skill = find_skill_by_id(simei_style, 4)
+                ctx = Context(turn, simei_style)
+                simei_style.sp -= simei_skill.now_cost
+                self.consume_buff_by_use(simei_skill, simei_style, ctx, simei_action)
+
 
     def resolve_turn_end_status(self, turn: Turn):
         """

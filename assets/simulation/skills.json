@@ -26,7 +26,13 @@
     "target": "default",
     "cost": {"sp": 0}
   },
-  "4": {"id": 4, "names": {}, "kind": "reserved"},
+  "4": {
+    "id": 4,
+    "names": {"zh_cn": "自动追击", "zh_tw": "追擊", "jp": "追撃"},
+    "kind": "system",
+    "target": "default",
+    "cost": {"sp": 0}
+  },
   "5": {"id": 5, "names": {}, "kind": "reserved"},
   "6": {"id": 6, "names": {}, "kind": "reserved"},
   "7": {"id": 7, "names": {}, "kind": "reserved"},
@@ -7184,7 +7190,7 @@
     "names": {"zh_cn": "曙光", "zh_tw": "曙光", "jp": "曙"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_first_battle_start",
+    "trigger": "replace_normal_skill",
     "effects": [
       {"type": "replace_normal_skill", "target": "self", "attack_type": "strike", "elements": ["light"], "status_id": 151, "duration": {"type": "permanent"}}
     ],
@@ -7192,7 +7198,7 @@
   },
   "4520001": {
     "id": 4520001,
-    "names": {"zh_cn": "曙光", "zh_tw": "曙光", "jp": "曙"},
+    "names": {"zh_cn": "曙光（普通攻击）", "zh_tw": "曙光", "jp": "曙"},
     "kind": "active",
     "parent_id": 452,
     "cost": {"sp": 0},
@@ -11464,7 +11470,7 @@
     "names": {"zh_cn": "温泉通行木牌", "zh_tw": "溫泉通行木牌", "jp": "温泉手形"},
     "kind": "passive",
     "cost": {"sp": 0},
-    "trigger": "on_first_battle_start",
+    "trigger": "replace_pursuit",
     "effects": [
       {"type": "replace_pursuit", "target": "self", "status_id": 158, "target_condition": "has_skill(737)", "duration": {"type": "permanent"}}
     ],
