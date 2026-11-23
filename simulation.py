@@ -2439,14 +2439,15 @@ class Simulation:
         # turn number从1开始，根据其新增内容和上一Turn的内容重新计算
         turn = deepcopy(self.turns[turn_number-1])
 
-        # 结算上一个turn的实际actions
-        self.apply_member_actions(turn)
-
-        # 结算action之后的效果，回合结束清除状态
-        self.resolve_turn_end_status(turn)
-
-        # resolve新的回合label
-        new_turn = self.new_turn_label_refresh(turn)
+        if turn_number == 1:
+            # 第0个turn是开场快照，首回合没有上一回合的行动或状态消耗
+            turn.turn_num = 1
+            new_turn = True
+        else:
+            # 结算上一回合的行动、状态，再更新回合label
+            self.apply_member_actions(turn)
+            self.resolve_turn_end_status(turn)
+            new_turn = self.new_turn_label_refresh(turn)
 
         # 应用回合开始时需要的gui修改覆盖状态
         for position, monster in enumerate(turn.battle.monsters):
@@ -2546,7 +2547,10 @@ class Simulation:
         result = self.turn_to_dict(turn)
 
         # 只有整个计算成功，才提交
-        self.turns[turn_number] = turn
+        if turn_number == len(self.turns):
+            self.turns.append(turn)
+        else:
+            self.turns[turn_number] = turn
 
         # 返回给GUI
         return result

@@ -255,7 +255,7 @@ class TargetSelectionDialog(QDialog):
                     continue
                 if target_type == 'ally_single_front_without_self' and (position >= 3 or slot == source_slot):
                     continue
-                style = owner.setup.styles[slot]
+                style = owner.styles[slot]
                 button = QPushButton()
                 button.setFixedSize(65, 65)
                 button.setIcon(QIcon(owner.setup.round_pixmap(style.image, 58)))
@@ -965,9 +965,11 @@ class BattleTurn(QGroupBox):
         root.addWidget(misc, 7)
         self.stack.addWidget(page)
 
-    def simulation_input(self):
+    def simulation_input(self, state_data=None):
         """GUI传给engine可操作的base相关内容，engine内部增量更新"""
-        base = self.state_data["base"]
+        if state_data is None:
+            state_data = self.state_data
+        base = state_data["base"]
         return {
             "member_status": [m["statuses"] for m in base["members"]],
             "member_dp": [m["dp"] for m in base["members"]],
@@ -978,7 +980,7 @@ class BattleTurn(QGroupBox):
             "od_timing": base["od_timing"],
             "od_level": base["od_level"],
             "special_actions": base["special_actions"],
-            "adjustments": self.state_data["adjustments"]
+            "adjustments": state_data["adjustments"]
         }
 
     def update_state_from_simulation(self):
@@ -1207,9 +1209,11 @@ class BattleTurn(QGroupBox):
                 picture.setText('＋')
 
     # 负责从调整页读取值到 state_data，也就是说退出调整面板才总体存储一次adjustment
-    def save_adjust(self):
-        base = self.state_data['base']
-        adjust = self.state_data['adjustments']
+    def save_adjust(self, state_data=None):
+        if state_data is None:
+            state_data = self.state_data
+        base = state_data['base']
+        adjust = state_data['adjustments']
         adjust['od'] = self.adjust_od.value()
         base['field'] = self.adjust_field.currentData()
         for position, (down, rate) in enumerate(self.enemy_edits):
@@ -1229,7 +1233,9 @@ class BattleTurn(QGroupBox):
         checks = self.enemy_presence_checks
         re_target_actions = []
         new_target = next(i for i, check in enumerate(checks) if check.isChecked())
-        for action in self.state_data["base"]["actions"]:
+        for action in base["actions"]:
+            if action is None:
+                continue
             target = action["target"]
             if target["type"] == "enemy" and not checks[target["slot"]].isChecked():  # 如果有目标type，那么不应该出现slot为None的情况
                 target["slot"] = new_target
@@ -1468,40 +1474,93 @@ class SimulationTab(QWidget):
         self.turn_layout.addWidget(self.setup)
         toolbar = QHBoxLayout()
         start = QPushButton('开始战斗'); start.setStyleSheet(BLUE_BUTTON)
-        apply_setup = QPushButton('应用设定修改'); apply_setup.setStyleSheet(BLUE_BUTTON)
-        export = QPushButton('导出模拟数据'); export.setStyleSheet(BLUE_BUTTON)
-        import_button = QPushButton('导入模拟数据'); import_button.setStyleSheet(BLUE_BUTTON)
+        self.apply_setup = QPushButton('应用设定修改'); self.apply_setup.setStyleSheet(BLUE_BUTTON)
+        self.apply_setup.setEnabled(False)
 
         start.clicked.connect(self.start)
-        # apply_setup.clicked.connect(self.apply_setup_changes)
-        export.clicked.connect(self.export_state)
-        # import_button.clicked.connect(self.import_state)
+        self.apply_setup.clicked.connect(self.apply_setup_changes)
         export = QPushButton('导出模拟数据')
         export.clicked.connect(self.export_state)
-        toolbar.addStretch(); toolbar.addWidget(start); toolbar.addWidget(export)
+        toolbar.addStretch(); toolbar.addWidget(start); toolbar.addWidget(self.apply_setup); toolbar.addWidget(export)
         self.turn_layout.addLayout(toolbar)
         self.scroll.setWidget(self.container); outer.addWidget(self.scroll)
         self.setStyleSheet(COMPACT +
                         'QGroupBox#simulationTurn{background:white;border:1px solid #dce2eb;'
             'border-radius:9px;margin-top:0;padding:1px}')
 
-    def start(self):
+    def read_setup(self, warning_title):
         if any(style is None for style in self.setup.styles):
-            QMessageBox.warning(self, '无法开始战斗', '请先选齐六个风格。'); return
+            QMessageBox.warning(self, warning_title, '请先选齐六个风格。'); return
         setup_state = self.setup.state()
         if sum(1 for style in setup_state["styles"] if self.styles_db.get(str(style["style_id"]))["role"] == "admiral") > 1:
-            QMessageBox.warning(self, '无法开始战斗', '一个队伍只能有一名舰长。'); return
+            QMessageBox.warning(self, warning_title, '一个队伍只能有一名舰长。'); return
+        return setup_state
+
+    def start(self):
+        setup_state = self.read_setup('无法开始战斗')
+        if setup_state is None:
+            return
+        engine = type(self.engine)()
+        try:
+            initialized_turn = engine.first_turn(setup_state)
+        except Exception as error:
+            QMessageBox.warning(self, '无法开始战斗', str(error)); return
+        self.engine = engine
         self.session = {'setup': setup_state}  # 用于存储战斗设置和turn的总体情况
         self.styles = copy.deepcopy(self.setup.styles)
         # 清除旧回合
         for turn in self.turns:
             self.turn_layout.removeWidget(turn); turn.deleteLater()
         self.turns.clear()
-        # 初始化战斗
-        initialized_turn = self.engine.first_turn(
-            copy.deepcopy(setup_state)
-        )
         self.add_turn_from_simulation(initialized_turn)
+        self.apply_setup.setEnabled(True)
+
+    def apply_setup_changes(self):
+        if self.session is None:
+            return
+        setup_state = self.read_setup('无法应用设定修改')
+        if setup_state is None:
+            return
+
+        # 从新设定的开场快照开始，按原有回合顺序重算
+        engine = type(self.engine)()
+        states = []
+        try:
+            engine.first_turn(setup_state)
+            special_triggers = {style.special_trigger for style in engine.turns[0].team}
+            for turn in self.turns:
+                state = copy.deepcopy(turn.state_data)
+                if turn.stack.currentIndex() == 1:
+                    turn.save_adjust(state)
+                gui_add_state = turn.simulation_input(state)
+
+                # 敌人出场位置随新设定继承，保留回合内手动更改的出场配置
+                previous = self.engine.turns[turn.number - 1].battle.monsters
+                enemies = gui_add_state["enemies"]
+                if all(enemy["exist"] == monster.exist for enemy, monster in zip(enemies, previous)):
+                    for enemy, monster in zip(enemies, engine.turns[turn.number - 1].battle.monsters):
+                        enemy["exist"] = monster.exist
+
+                # 换队后清除已经没有对应角色的专属行动
+                for trigger in gui_add_state["special_actions"]:
+                    if trigger.removesuffix("_after") not in special_triggers:
+                        gui_add_state["special_actions"][trigger] = 0
+
+                state["base"] = engine.recalculate(gui_add_state, turn.number)
+                states.append(state)
+        except Exception as error:
+            QMessageBox.warning(self, '无法应用设定修改', str(error)); return
+
+        # 整条轴都重算成功后再替换已生效的设定和回合数据
+        self.engine = engine
+        self.session['setup'] = setup_state
+        self.styles = copy.deepcopy(self.setup.styles)
+        for turn, state in zip(self.turns, states):
+            turn.state_data = state
+            if turn.stack.currentIndex() == 1:
+                turn.load_adjust()
+                turn.refresh_enemy_setting()
+            turn.refresh()
 
     # simulation_state 是 simulation.advance() 或 first_turn() 的返回值。
     # 直接使用 simulation_state 构造 BattleTurn，避免重复计算。
