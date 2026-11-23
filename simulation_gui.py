@@ -1197,7 +1197,7 @@ class BattleTurn(QGroupBox):
             for key in ('sp', 'token'):
                 controls[key].setValue(delta.get(key, 0))
             controls['dp'].setValue(member.get('dp', 100.0))
-            style = self.owner.setup.styles[slot]
+            style = self.owner.styles[slot]
             picture = self.member_portraits[position]
             if style:
                 picture.setPixmap(self.owner.setup.round_pixmap(style.image, 25))
@@ -1386,7 +1386,7 @@ class BattleTurn(QGroupBox):
         for position in range(6):
             slot = effective['order'][position]
             member = effective['members'][slot]
-            style = self.owner.setup.styles[slot]
+            style = self.owner.styles[slot]
             # 按slot修改portrait
             button, portrait = self.portraits[position]
             if not style:
@@ -1399,7 +1399,7 @@ class BattleTurn(QGroupBox):
                                self.owner.setup.round_pixmap, int(member.get('sp', 0)))
             effect_action = effective['actions'][slot]
             target = effect_action['target'] if effect_action else {}
-            self.target_badges[position].configure(target, self.owner.setup.styles, self.owner.setup.round_pixmap)
+            self.target_badges[position].configure(target, self.owner.styles, self.owner.setup.round_pixmap)
             button.setToolTip((style.localized_title if style else f'角色{slot+1}') +
                               '（点击两名角色头像交换位置）')
             # 按slot修改token和ep
@@ -1450,6 +1450,7 @@ class SimulationTab(QWidget):
         super().__init__(parent)
         self.catalog = catalog
         self.setup = BattleSetup(catalog, style_dialog_class, round_pixmap)
+        self.styles = [None] * 6  # 主GUI的Style类
         self.status_db = json.loads((SIMULATION_DIR / 'statuses.json').read_text(encoding='utf-8'))
         self.styles_db = json.loads((SIMULATION_DIR / 'styles.json').read_text(encoding='utf-8'))
         self.turns: list[BattleTurn] = []
@@ -1467,7 +1468,14 @@ class SimulationTab(QWidget):
         self.turn_layout.addWidget(self.setup)
         toolbar = QHBoxLayout()
         start = QPushButton('开始战斗'); start.setStyleSheet(BLUE_BUTTON)
+        apply_setup = QPushButton('应用设定修改'); apply_setup.setStyleSheet(BLUE_BUTTON)
+        export = QPushButton('导出模拟数据'); export.setStyleSheet(BLUE_BUTTON)
+        import_button = QPushButton('导入模拟数据'); import_button.setStyleSheet(BLUE_BUTTON)
+
         start.clicked.connect(self.start)
+        # apply_setup.clicked.connect(self.apply_setup_changes)
+        export.clicked.connect(self.export_state)
+        # import_button.clicked.connect(self.import_state)
         export = QPushButton('导出模拟数据')
         export.clicked.connect(self.export_state)
         toolbar.addStretch(); toolbar.addWidget(start); toolbar.addWidget(export)
@@ -1484,6 +1492,7 @@ class SimulationTab(QWidget):
         if sum(1 for style in setup_state["styles"] if self.styles_db.get(str(style["style_id"]))["role"] == "admiral") > 1:
             QMessageBox.warning(self, '无法开始战斗', '一个队伍只能有一名舰长。'); return
         self.session = {'setup': setup_state}  # 用于存储战斗设置和turn的总体情况
+        self.styles = copy.deepcopy(self.setup.styles)
         # 清除旧回合
         for turn in self.turns:
             self.turn_layout.removeWidget(turn); turn.deleteLater()
