@@ -466,14 +466,21 @@ class BattleSetup(QGroupBox):
     def choose_weaknesses(self):
         dialog = WeaknessDialog(self.enemy_weaknesses, self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.enemy_weaknesses = dialog.values()
-            names = '、'.join(ELEMENT_NAMES[x] for x in self.enemy_weaknesses) or '无'
-            self.weakness_button.setText('弱点：' + names)
-            self.weakness_button.setToolTip(names)
+            self.set_weaknesses(dialog.values())
+
+    def set_weaknesses(self, weaknesses):
+        self.enemy_weaknesses = list(weaknesses)
+        names = '、'.join(ELEMENT_NAMES[x] for x in self.enemy_weaknesses) or '无'
+        self.weakness_button.setText('弱点：' + names)
+        self.weakness_button.setToolTip(names)
+
+    @staticmethod
+    def _max_level(style):
+        return {'A': 20, 'S': 10, 'SS': 4, 'SSR': 4}.get(style.tier, 4) if style else 4
 
     @staticmethod
     def _set_level(box, style):
-        maximum = {'A': 20, 'S': 10, 'SS': 4, 'SSR': 4}.get(style.tier, 4) if style else 4
+        maximum = BattleSetup._max_level(style)
         box.clear()
         for n in range(maximum + 1):
             box.addItem(str(n), n)
@@ -613,6 +620,69 @@ class BattleSetup(QGroupBox):
             'initial_od': float(self.initial_od.value()),
             'global_od_rate': float(self.global_od_rate.value()),
         }
+
+    def resolve_styles(self, setup):
+        # 导出文件只保存simulation_id，导入时还原GUI使用的风格对象
+        entries = setup['styles'] + setup['resonances']
+        wanted = {entry['style_id'] for entry in entries if entry is not None}
+        styles = {}
+        for style in self.catalog.styles:
+            try:
+                style_id = self._style_id(style)
+            except ValueError:
+                continue
+            if style_id in wanted:
+                styles[style_id] = style
+                if wanted == styles.keys():
+                    break
+        missing = wanted - styles.keys()
+        if missing:
+            raise ValueError(f'界面数据库找不到风格 ID：{sorted(missing)}')
+        return [styles[entry['style_id']] if entry is not None else None for entry in entries]
+
+    def restore_state(self, setup, styles):
+        self.styles, self.resonances = styles[:6], styles[6:]
+        for i, (entry, resonance) in enumerate(zip(setup['styles'], setup['resonances'])):
+            self.skill_selections[i] = {
+                'active': list(entry['active_skill_ids']),
+                'passive': list(entry['passive_skill_ids']),
+                'orb': list(entry['orb_skill_ids']),
+            }
+            count = sum(len(group) for group in self.skill_selections[i].values())
+            self.skill_buttons[i].setToolTip(f'已选 {count} 项技能')
+            self._set_avatar(i)
+            self._set_avatar(i, resonance=True)
+            self._set_level(self.breaks[i], self.styles[i])
+            self._set_level(self.resonance_breaks[i], self.resonances[i])
+            self.breaks[i].setCurrentIndex(self.breaks[i].findData(entry['break_level']))
+            self.earrings[i].setCurrentIndex(self.earrings[i].findData(entry['od_earring']))
+            self.necklaces[i].setCurrentIndex(self.necklaces[i].findData(entry['necklace_sp']))
+            if resonance is not None:
+                box = self.resonance_breaks[i]
+                box.setCurrentIndex(box.findData(resonance['break_level']))
+        self.enemy_count.setCurrentIndex(self.enemy_count.findData(setup['enemy_count']))
+        self.initial_od.setValue(setup['initial_od'])
+        self.global_od_rate.setValue(setup['global_od_rate'])
+        self.set_weaknesses(setup['enemy_weaknesses'])
+
+    def check_saved_setup(self, setup, styles):
+        # 写入控件前检查范围，避免Qt静默截断存档里的设定
+        for i, entry in enumerate(setup['styles']):
+            if entry['break_level'] not in range(self._max_level(styles[i]) + 1) or \
+               self.earrings[i].findData(entry['od_earring']) < 0 or \
+               self.necklaces[i].findData(entry['necklace_sp']) < 0:
+                raise ValueError(f'第 {i + 1} 个上场风格的突破或饰品设定无效。')
+            for key in ('active_skill_ids', 'passive_skill_ids', 'orb_skill_ids'):
+                if not isinstance(entry[key], list):
+                    raise ValueError(f'第 {i + 1} 个上场风格的技能设定无效。')
+        for i, entry in enumerate(setup['resonances']):
+            if entry is not None and entry['break_level'] not in range(self._max_level(styles[i + 6]) + 1):
+                raise ValueError(f'第 {i + 1} 个共鸣风格的突破设定无效。')
+        for box, value in ((self.initial_od, setup['initial_od']), (self.global_od_rate, setup['global_od_rate'])):
+            if not box.minimum() <= value <= box.maximum():
+                raise ValueError('开局OD或OD倍率超出设定范围。')
+        if any(element not in ELEMENT_NAMES for element in setup['enemy_weaknesses']):
+            raise ValueError('敌人弱点包含未知属性。')
 
     @staticmethod
     def _style_id(style):
@@ -965,10 +1035,9 @@ class BattleTurn(QGroupBox):
         root.addWidget(misc, 7)
         self.stack.addWidget(page)
 
-    def simulation_input(self, state_data=None):
+    @staticmethod
+    def simulation_input(state_data):
         """GUI传给engine可操作的base相关内容，engine内部增量更新"""
-        if state_data is None:
-            state_data = self.state_data
         base = state_data["base"]
         return {
             "member_status": [m["statuses"] for m in base["members"]],
@@ -1481,7 +1550,10 @@ class SimulationTab(QWidget):
         self.apply_setup.clicked.connect(self.apply_setup_changes)
         export = QPushButton('导出模拟数据')
         export.clicked.connect(self.export_state)
-        toolbar.addStretch(); toolbar.addWidget(start); toolbar.addWidget(self.apply_setup); toolbar.addWidget(export)
+        import_button = QPushButton('导入模拟数据')
+        import_button.clicked.connect(self.import_state)
+        toolbar.addStretch(); toolbar.addWidget(start); toolbar.addWidget(self.apply_setup)
+        toolbar.addWidget(export); toolbar.addWidget(import_button)
         self.turn_layout.addLayout(toolbar)
         self.scroll.setWidget(self.container); outer.addWidget(self.scroll)
         self.setStyleSheet(COMPACT +
@@ -1508,12 +1580,15 @@ class SimulationTab(QWidget):
         self.engine = engine
         self.session = {'setup': setup_state}  # 用于存储战斗设置和turn的总体情况
         self.styles = copy.deepcopy(self.setup.styles)
-        # 清除旧回合
-        for turn in self.turns:
-            self.turn_layout.removeWidget(turn); turn.deleteLater()
-        self.turns.clear()
+        self.clear_turns()
         self.add_turn_from_simulation(initialized_turn)
         self.apply_setup.setEnabled(True)
+
+    def clear_turns(self):
+        for turn in self.turns:
+            self.turn_layout.removeWidget(turn)
+            turn.setParent(None); turn.deleteLater()
+        self.turns.clear()
 
     def apply_setup_changes(self):
         if self.session is None:
@@ -1593,10 +1668,7 @@ class SimulationTab(QWidget):
         }
         """
         turn_config = {"base": simulation_state, "adjustments": {"od": 0.0, "members": [{"sp": 0, "token": 0} for _ in range(6)]}}
-        turn = BattleTurn(self, len(self.turns) + 1, turn_config)
-        self.turns.append(turn); self.turn_layout.addWidget(turn)
-        for item in self.turns: item.refresh_turn_controls()
-        return turn
+        return self.add_turn_from_state(turn_config)
 
     # 用于从json文件重构战斗状态，直接使用 state 构造 BattleTurn。
     def add_turn_from_state(self, state):
@@ -1642,7 +1714,7 @@ class SimulationTab(QWidget):
         for i in range(start_index, len(self.turns)):
             turn = self.turns[i]
             result = self.engine.recalculate(
-                turn.simulation_input(),
+                turn.simulation_input(turn.state_data),
                 turn.number
             )
             turn.state_data["base"] = result
@@ -1670,3 +1742,60 @@ class SimulationTab(QWidget):
         if filename:
             Path(filename).write_text(json.dumps(state, ensure_ascii=False, indent=2),
                                       encoding='utf-8')
+
+    def import_state(self):
+        filename, _ = QFileDialog.getOpenFileName(self, '导入模拟数据', '', 'JSON (*.json)')
+        if not filename:
+            return
+        try:
+            data = json.loads(Path(filename).read_text(encoding='utf-8-sig'))
+            self.restore_state(data)
+        except Exception as error:
+            QMessageBox.warning(self, '无法导入模拟数据', str(error))
+
+    def restore_state(self, data):
+        setup = data['setup']
+        states = data['turns']
+        if not isinstance(states, list) or not states:
+            raise ValueError('模拟数据至少需要一个回合。')
+
+        # 重建引擎的开场快照，再逐回合应用存档里的行动和手动调整
+        engine = type(self.engine)()
+        engine.first_turn(setup)
+        styles = self.setup.resolve_styles(setup)
+        self.setup.check_saved_setup(setup, styles)
+        restored = []
+        for number, state in enumerate(states, 1):
+            try:
+                gui_add_state = BattleTurn.simulation_input(state)
+                order = gui_add_state['order']
+                if any(type(slot) is not int for slot in order) or sorted(order) != list(range(6)):
+                    raise ValueError('站位必须包含六个不同的队伍位置。')
+                if len(gui_add_state['actions']) != 6 or len(gui_add_state['member_dp']) != 6 or \
+                   len(gui_add_state['enemies']) != 3 or len(gui_add_state['adjustments']['members']) != 6:
+                    raise ValueError('角色、行动或敌人数量无效。')
+                for action in gui_add_state['actions']:
+                    if action is None:
+                        continue
+                    target = action['target']
+                    slot = target['slot']
+                    kind = target['type']
+                    if kind == 'ignore' and slot is None:
+                        continue
+                    if kind not in ('enemy', 'ally_single', 'ally_single_without_self', 'ally_single_front_without_self') or \
+                       type(slot) is not int or slot not in range(3 if kind == 'enemy' else 6):
+                        raise ValueError('行动目标格式无效。')
+                base = engine.recalculate(copy.deepcopy(gui_add_state), number)
+                restored.append({'base': base, 'adjustments': state['adjustments']})
+            except Exception as error:
+                raise ValueError(f'第 {number} 个回合无法恢复：{error}') from error
+
+        # 全部回合重放成功后再替换当前战斗
+        self.setup.restore_state(setup, styles)
+        self.engine = engine
+        self.session = {'setup': copy.deepcopy(setup)}
+        self.styles = copy.deepcopy(self.setup.styles)
+        self.clear_turns()
+        for state in restored:
+            self.add_turn_from_state(state)
+        self.apply_setup.setEnabled(True)

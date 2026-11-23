@@ -1814,7 +1814,7 @@ class Simulation:
                     elif target_type == "ally_single_front_without_self":
                         target_valid = type(target_slot) is int and target_slot in turn.order[:3] and target_slot != slot
                     selected = action.get("user_selected")
-                    if target_valid and (not skill.user_select or selected in skill.user_select):
+                    if target_valid and (not skill.user_select or str(selected) in skill.user_select):
                         continue
 
             # 无法保留旧行动时，恢复当前站位的默认行动
