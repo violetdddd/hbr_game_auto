@@ -506,7 +506,7 @@ class Battle:
     monsters: List[Monster] = dataclasses.field(default_factory=list)
     field: dict = dataclasses.field(default_factory=lambda: {"value": None, "left_turn": -1})  # 无、元素、稻场、其他
     territory: Optional[int] = None
-    global_od_rate: float = 100.0
+    global_od_rate: int = 100
     super_scale: dict = dataclasses.field(default_factory=lambda: {"element": None, "value": 0})  # 超越量表
     od_consume: int = 100
 
@@ -796,7 +796,7 @@ def calculate_funnel(style: Style, consume=False):
     )
 
 # 根据行动的参数计算od增加数值
-def calculate_od(hit, funnel, enemy, direct, earring: int, extra_rate: float) -> float:
+def calculate_od(hit, funnel, enemy, direct, earring: int, extra_rate: float, global_od_rate: int) -> float:
     if earring != 0:  # 10,12,15
         if hit != 0:
             od_rate_100 = 105 + (earring-5) / 9 * min(hit - 1, 9) + extra_rate
@@ -804,7 +804,8 @@ def calculate_od(hit, funnel, enemy, direct, earring: int, extra_rate: float) ->
             od_rate_100 = 105 + extra_rate
     else:
         od_rate_100 = 100 + extra_rate
-    per_hit_od = math.floor(od_rate_100 * 2.5) / 100  # 2位小数
+    hit_default = math.floor(2.5 * global_od_rate) / 100  # 2位小数
+    per_hit_od = math.floor(od_rate_100 * hit_default) / 100  # 2位小数
     direct_od = math.floor(od_rate_100 * direct) / 100  # 2位小数
     return direct_od if hit == 0 else per_hit_od * (hit + funnel) * enemy + direct_od 
 
@@ -1246,7 +1247,7 @@ class Simulation:
         target_type = effect.get("target", "self")
 
         # 全局目标单独处理；其余统一解析为 Style / Monster 列表
-        if target_type in ("od", "field"):
+        if target_type in ("od", "field", "territory"):
             targets = []
         else:
             targets = resolve_targets(turn, owner, target_type, effect)
@@ -1748,7 +1749,7 @@ class Simulation:
             elif effect.get("type") == "over_drive_point_up_by_token":
                 direct = effect.get("value") * skill.now_cost
         funnel = calculate_funnel(tmp_style, consume=True) if attack_skill else 0
-        turn.stage_tmp_od += calculate_od(hit, funnel, enemy_count, direct, tmp_style.od_earring, tmp_style.od_rate_extra)
+        turn.stage_tmp_od += calculate_od(hit, funnel, enemy_count, direct, tmp_style.od_earring, tmp_style.od_rate_extra, turn.battle.global_od_rate)
 
     def resolve_simei_pursuit(self, simei_style: Style, turn: Turn, simei_ex: bool, attack_skill: bool, skill: Skill, only_od=True):
         """完成四妹的自动追击的od计算或buff计算，目前认为不会触发任何其他被动"""
@@ -1756,7 +1757,7 @@ class Simulation:
             simei_skill = find_skill_by_id(simei_style, 4)
             if simei_ex or simei_style.sp < simei_skill.now_cost:  # 本回合已经发动过或者sp不够发动不出来大招
                 if only_od:  # 计算od
-                    turn.stage_tmp_od += calculate_od(simei_style.hit, 0, 1, 0, 0, simei_style.od_rate_extra)
+                    turn.stage_tmp_od += calculate_od(simei_style.hit, 0, 1, 0, 0, simei_style.od_rate_extra, turn.battle.global_od_rate)
                 # 仅追击则不给任何buff，仅触发被动
                 else:
                     self.trigger_style_passives(turn, simei_style, "on_pursuit", without_od=True)
@@ -1765,7 +1766,7 @@ class Simulation:
                 if only_od:  # 计算od
                     hit = simei_skill.hit_count
                     funnel = calculate_funnel(simei_style)
-                    turn.stage_tmp_od += calculate_od(hit, funnel, 1, 0, simei_style.od_earring, simei_style.od_rate_extra)
+                    turn.stage_tmp_od += calculate_od(hit, funnel, 1, 0, simei_style.od_earring, simei_style.od_rate_extra, turn.battle.global_od_rate)
                 else:  # 计算buff
                     effects = [deepcopy(effect) for effect in simei_skill.effects if effect.get("type") in ACTIVE_EFFECT_TYPES_NEEDED]
                     for effect in effects:
@@ -1827,6 +1828,30 @@ class Simulation:
                 "on_break": False
             }
 
+    def od_legalization(self, turn: Turn, gui_add_state):
+        """检查od是否合法并清除不合法的od设置"""
+        natural_od_timing = turn.od_timing
+        # 前置od发动条件是当前刚刚开启前置od，或者当前处于od外的非附加回合中
+        available_before = True if (natural_od_timing == "before" and turn.bonus == 1) or (turn.od_level == 0 and not turn.additional_turn) else False
+        # 后置od发动条件是当前刚刚开启前置od，或者当前处于od外
+        available_after = True if (natural_od_timing == "before" and turn.bonus == 1) or turn.od_level == 0 else False
+
+        # 检查od设置是否合法
+        legal = True
+        # 新发动前置od不合法
+        if gui_add_state["od_timing"] == "before" and natural_od_timing == None and not available_before:
+            legal = False
+        # 新发动后置od不合法
+        if gui_add_state["od_timing"] == "after" and natural_od_timing == None and not available_after:
+            legal = False
+        # 延续之前的od设置与新设置冲突不合法
+        if natural_od_timing != None and gui_add_state["od_timing"] != natural_od_timing:
+            legal = False
+        # 合法可以应用新设置
+        if legal:
+            turn.od_timing = gui_add_state["od_timing"]
+            turn.od_level = gui_add_state["od_level"]
+            
     def battle_start(self, turn: Turn):
         """
         战斗开场要处理的被动等，刚进场时slot和position一致
@@ -2055,9 +2080,9 @@ class Simulation:
             if not skill_id or skill_id in (0,2,4):  # 没有行动或指挥行动或四妹自动追击
                 continue
             elif skill_id == 1:  # 普通攻击
-                turn.stage_tmp_od += calculate_od(3, 0, 1, 0, 0, style.od_rate_extra)
+                turn.stage_tmp_od += calculate_od(3, 0, 1, 0, 0, style.od_rate_extra, turn.battle.global_od_rate)
             elif skill_id == 3:  # 追击
-                turn.stage_tmp_od += calculate_od(style.hit, 0, 1, 0, 0, style.od_rate_extra)
+                turn.stage_tmp_od += calculate_od(style.hit, 0, 1, 0, 0, style.od_rate_extra, turn.battle.global_od_rate)
             else:  # 一般的skill
                 skill = find_skill_by_id(style, skill_id)
                 # 先消耗资源
@@ -2496,10 +2521,10 @@ class Simulation:
                     case "demon_cavalry":
                         self.using_demon_cavalry(turn, times, before_od=True)
 
-        # 此处开前置od
+        # 此处应用od设置
         pre_od_timing = turn.od_timing
-        turn.od_level = gui_add_state["od_level"]
-        turn.od_timing = gui_add_state["od_timing"]
+        self.od_legalization(turn, gui_add_state)
+        # 开前置od效果
         if turn.od_timing == "before" and pre_od_timing == None:
             sp_added_dict = {1: 5, 2: 12, 3: 20}
             sp_added = sp_added_dict[turn.od_level]

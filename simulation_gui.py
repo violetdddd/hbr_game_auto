@@ -5,8 +5,8 @@ import copy
 import json
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QIcon, QPixmap, QPainter, QColor, QFont, QPen
+from PySide6.QtCore import Qt, QSize, QTimer
+from PySide6.QtGui import QIcon, QPixmap, QPainter, QColor, QFont, QFontMetrics, QPen
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QPushButton,
     QSpinBox, QDoubleSpinBox, QCheckBox, QDialog, QTabWidget, QScrollArea,
@@ -30,6 +30,7 @@ BLUE_BUTTON = ('QPushButton{background:#2563eb;color:white;border:1px solid #1d4
                'QPushButton:hover{background:#1d4ed8}'
                'QPushButton:disabled{background:#cbd5e1;border-color:#cbd5e1}')
 WHITE_BUTTON = ('QPushButton{padding:2px 5px;min-height:0px;}')
+OD_COLORS = {1: '#F8DFEA', 2: '#DDF5F1', 3: '#FAEFC6'}  # 与HBRF编辑器一致
 COMPACT = """
 QComboBox {
     padding: 2px 4px;
@@ -100,18 +101,20 @@ class FullPopupCombo(NoWheelComboBox):
         super().showPopup()
 
 # 一般的图标显示
-def icon_label(path, size=23, fallback=''):
+def icon_label(path, size=23, fallback='', reference_size=None):
     label = QLabel()
-    label.setFixedSize(size, size)
     label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
     pixmap = QPixmap(str(path))
+    width = height = size
     if not pixmap.isNull():
         ratio = label.devicePixelRatioF()
-        pixel_size = round(size * ratio)
+        if reference_size is not None:
+            width = round(pixmap.width() * size / reference_size)
+            height = round(pixmap.height() * size / reference_size)
 
         pixmap = pixmap.scaled(
-            pixel_size, pixel_size,
+            round(width * ratio), round(height * ratio),
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation
         )
@@ -123,6 +126,7 @@ def icon_label(path, size=23, fallback=''):
         label.setText(fallback)
         label.setToolTip(f'图片不存在：{path}')
 
+    label.setFixedSize(width, height)
     return label
 
 # 清理一整个layout
@@ -133,6 +137,109 @@ def clear_layout(layout):
             item.widget().deleteLater()
         elif item.layout():
             clear_layout(item.layout())
+
+class StatusRow(QScrollArea):
+    ICON_SIZE = 21
+    REFERENCE_SIZE = 59
+
+    def __init__(self):
+        super().__init__()
+        self.items = []
+        self.setFrameShape(QFrame.Shape.NoFrame)
+        self.setFixedHeight(self.ICON_SIZE)
+        self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.horizontalScrollBar().setSingleStep(self.ICON_SIZE)
+        self.viewport().setStyleSheet('background:white;')
+        self.icons = QWidget()
+        self.icons.setFixedSize(0, self.ICON_SIZE)
+        self.icons.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        self.row = QHBoxLayout(self.icons)
+        self.row.setContentsMargins(0, 0, 0, 0)
+        self.row.setSpacing(0)
+        self.setWidget(self.icons)
+        self.viewport().setCursor(Qt.CursorShape.PointingHandCursor)
+
+    def set_statuses(self, items):
+        if items == self.items:
+            return
+        self.items = items
+        scroll = self.horizontalScrollBar()
+        offset = scroll.value()
+        while self.row.count():
+            widget = self.row.takeAt(0).widget()
+            widget.hide(); widget.deleteLater()
+        width, height = 0, self.ICON_SIZE
+        for path, _, _ in items:
+            icon = self.status_icon(path)
+            self.row.addWidget(icon)
+            width += icon.width()
+            height = max(height, icon.height())
+        self.icons.setFixedSize(width, height)
+        self.setFixedHeight(height)
+        scroll.setValue(offset)
+
+    def status_icon(self, path):
+        return icon_label(path, self.ICON_SIZE, '?', self.REFERENCE_SIZE)
+
+    def wheelEvent(self, event):
+        # 普通纵向滚轮交给外层页面，横向滚轮或Shift滚轮移动状态栏
+        delta = event.pixelDelta().x() or event.angleDelta().x()
+        if not delta and event.modifiers() & Qt.KeyboardModifier.ShiftModifier:
+            delta = event.pixelDelta().y() or event.angleDelta().y()
+        scroll = self.horizontalScrollBar()
+        if delta and scroll.maximum():
+            scroll.setValue(scroll.value() - delta)
+            event.accept()
+        else:
+            event.ignore()
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.show_details()
+            event.accept()
+        else:
+            super().mouseReleaseEvent(event)
+
+    def show_details(self):
+        dialog = QDialog(self)
+        dialog.setWindowTitle('状态详情')
+        dialog.resize(340, 280)
+        layout = QVBoxLayout(dialog)
+        area = QScrollArea(); area.setWidgetResizable(True)
+        content = QWidget()
+        details = QGridLayout(content)
+        details.setContentsMargins(4, 4, 4, 4)
+        details.setHorizontalSpacing(3); details.setVerticalSpacing(0)
+        details.setAlignment(Qt.AlignmentFlag.AlignTop)
+        details.setColumnStretch(1, 1)
+        for i, (path, name, status) in enumerate(self.items):
+            duration = status.get('duration_type')
+            remaining = status.get('remaining')
+            if duration == 'permanent':
+                name += '（永久）'
+            elif duration not in ('use_immersion_ex', 'on_attack_weak'):
+                label = {'ally_turn': '我方回合', 'enemy_turn': '敌方回合'}.get(duration, '剩余次数')
+                name += f'（{label}：{remaining if remaining is not None else "—"}）'
+            title = QLabel(name)
+            title.setTextFormat(Qt.TextFormat.PlainText)
+            details.addWidget(self.status_icon(path), i * 2, 0, Qt.AlignmentFlag.AlignCenter)
+            details.addWidget(title, i * 2, 1)
+            if status.get('source') not in (None, ''):
+                source = QLabel(f'来源：{status["source"]}')
+                source.setTextFormat(Qt.TextFormat.PlainText)
+                source.setWordWrap(True)
+                details.addWidget(source, i * 2 + 1, 1)
+        if not self.items:
+            details.addWidget(QLabel('当前没有状态'), 0, 0, 1, 2)
+        area.setWidget(content); layout.addWidget(area)
+        close = QPushButton('关闭')
+        close.clicked.connect(dialog.accept)
+        layout.addWidget(close, alignment=Qt.AlignmentFlag.AlignRight)
+        dialog.exec()
+        dialog.deleteLater()
+
 
 class WeaknessDialog(QDialog):
     """所有敌人共享弱点，使用类似技能设置的复选弹窗。"""
@@ -395,7 +502,7 @@ class BattleSetup(QGroupBox):
 
         od_rate_line = QHBoxLayout()
         od_rate_line.addWidget(QLabel('OD率 '))
-        self.global_od_rate = dspin(0, 999, 100); self.global_od_rate.setMaximumWidth(90)
+        self.global_od_rate = spin(0, 999, 100); self.global_od_rate.setMaximumWidth(90)
         self.global_od_rate.setSuffix('%')
         od_rate_line.addWidget(self.global_od_rate, 1)
         enemy_col.addLayout(od_rate_line)
@@ -807,10 +914,13 @@ class BattleTurn(QGroupBox):
         self.select_first = None
         self.setObjectName('simulationTurn')
         self.setFixedHeight(self.HEIGHT)
-        outer = QVBoxLayout(self); outer.setContentsMargins(4, 3, 4, 3)
+        outer = QVBoxLayout(self); outer.setContentsMargins(4, 3, 4, 0)
         outer.setSpacing(0)
         self.stack = QStackedWidget()
         outer.addWidget(self.stack)
+        self.height_timer = QTimer(self)
+        self.height_timer.setSingleShot(True)
+        self.height_timer.timeout.connect(self.update_turn_height)
         self._make_combat_page(); self._make_adjust_page()
         self.refresh()
 
@@ -827,11 +937,21 @@ class BattleTurn(QGroupBox):
         page = QWidget()
         root = QHBoxLayout(page); root.setContentsMargins(0, 0, 0, 0); root.setSpacing(3)
         enemy = QWidget()
-        el = QVBoxLayout(enemy); el.setContentsMargins(4, 1, 4, 1); el.setSpacing(0)
+        el = QVBoxLayout(enemy); el.setContentsMargins(1, 0, 1, 0); el.setSpacing(0)
         self.title = QLabel(); self.title.setStyleSheet('font-weight:700;')
         el.addWidget(self.title)
-        self.enemy_icons_row = QVBoxLayout(); self.enemy_icons_row.setSpacing(0)
-        el.addLayout(self.enemy_icons_row)
+        self.enemy_weakness_row = QHBoxLayout(); self.enemy_weakness_row.setSpacing(1)
+        el.addLayout(self.enemy_weakness_row)
+        self.enemy_status_rows = []
+        for label in ('左侧敌人：', '中间敌人：', '右侧敌人：'):
+            line = QWidget()
+            row = QHBoxLayout(line)
+            row.setContentsMargins(0, 0, 0, 0); row.setSpacing(0)
+            row.addWidget(QLabel(label))
+            statuses = StatusRow()
+            row.addWidget(statuses, 1)
+            el.addWidget(line)
+            self.enemy_status_rows.append((line, statuses))
         self.field_display = QHBoxLayout(); self.field_display.setSpacing(1)
         el.addLayout(self.field_display)
         el.addStretch()
@@ -839,7 +959,7 @@ class BattleTurn(QGroupBox):
         root.addWidget(self._separator())
 
         team = QWidget()
-        tl = QHBoxLayout(team); tl.setContentsMargins(3, 1, 3, 1); tl.setSpacing(3)
+        tl = QHBoxLayout(team); tl.setContentsMargins(1, 0, 1, 0); tl.setSpacing(3)
         self.portraits, self.target_badges, self.action_boxes = [], [], []
         self.status_rows, self.member_resources = [], []
         for first, last, stretch in ((0, 3, 65), (3, 6, 35)):
@@ -891,10 +1011,9 @@ class BattleTurn(QGroupBox):
                 body.addWidget(ep)
                 col.addLayout(body)
                 # 三者下方的statuses
-                statuses = QHBoxLayout()
-                statuses.setSpacing(1)
-                statuses.setAlignment(Qt.AlignmentFlag.AlignLeft)
-                col.addLayout(statuses)
+                statuses = StatusRow() if position < 3 else None
+                if statuses is not None:
+                    col.addWidget(statuses)
                 col.addStretch()
                 group.addLayout(col, 1)
                 self.portraits.append((avatar, portrait))
@@ -915,6 +1034,10 @@ class BattleTurn(QGroupBox):
         od_values = QVBoxLayout(); od_values.setSpacing(0)
         self.od_label = QLabel(); self.od_label.setStyleSheet('font-weight:700;')
         self.predicted_od_label = QLabel(); self.predicted_od_label.setStyleSheet('font-weight:700;')
+        # 为箭头、负号和五位数字预留宽度，OD变化时不挤动其他区域
+        od_font = QFont(self.owner.font())
+        od_font.setBold(True)
+        self.predicted_od_label.setMinimumWidth(QFontMetrics(od_font).horizontalAdvance('→ -100.00%'))
         od_values.addWidget(self.od_label)
         od_values.addWidget(self.predicted_od_label)
         top.addLayout(od_values); top.addStretch()
@@ -1344,17 +1467,25 @@ class BattleTurn(QGroupBox):
         category, not_display = entry.get('category'), entry.get('not_display', False)
         if category == "rule" or not_display:
             return None
-        file_name = (entry.get('icon') or entry.get('icons').get(element))
-        path = ICON_DIR / 'status' / file_name
+        file_name = entry.get('icon') or entry.get('icons', {}).get(element)
+        if file_name:
+            return ICON_DIR / 'status' / file_name
 
-        return path
+    def refresh_status_row(self, row, statuses):
+        items = []
+        for status in statuses:
+            path = self._status_icon(status)
+            if path:
+                entry = self._status_db[str(status['id'])]
+                name = entry.get('zh_cn') or status.get('name') or entry['name']
+                items.append((path, name, status))
+        row.set_statuses(items)
 
     # 敌人弱点和场地的信息显示
     def refresh_enemy_info(self, effective):
-        clear_layout(self.enemy_icons_row)
         # 弱点
-        weak = QHBoxLayout()
-        weak.setSpacing(1)
+        weak = self.enemy_weakness_row
+        clear_layout(weak)
         weak.addWidget(QLabel('敌人弱点：'))
         for element in effective.get('enemy_weaknesses', []):
             path = ICON_DIR / 'element' / f'{element}.webp'
@@ -1363,20 +1494,10 @@ class BattleTurn(QGroupBox):
             weak.addWidget(QLabel('无'))
         weak.addStretch()
         # 敌人具体status信息
-        self.enemy_icons_row.addLayout(weak)
         enemies = effective['enemies']
-        for position, label in enumerate(('左侧敌人：', '中间敌人：', '右侧敌人：')):
-            if enemies[position].get('exist') is not True:
-                continue
-            line = QHBoxLayout()
-            line.setSpacing(1)
-            line.addWidget(QLabel(label))
-            for status in enemies[position].get('statuses', []):
-                path = self._status_icon(status)
-                if path:
-                    line.addWidget(icon_label(path, 15))
-            line.addStretch()
-            self.enemy_icons_row.addLayout(line)
+        for enemy, (line, statuses) in zip(enemies, self.enemy_status_rows):
+            line.setVisible(enemy['exist'])
+            self.refresh_status_row(statuses, enemy['statuses'])
         # 场地信息
         clear_layout(self.field_display)
         self.field_display.addWidget(QLabel('场地：'))
@@ -1405,6 +1526,14 @@ class BattleTurn(QGroupBox):
         effective = copy.deepcopy(self.state_data['base'])
         return effective
 
+    def update_turn_height(self):
+        # 等敌人行显隐和状态图标的尺寸更新后，再读取布局所需高度
+        page = self.stack.widget(0)
+        page.layout().activate()
+        page_height = page.minimumSizeHint().height()
+        border_extra = 2 if self.state_data['base']['additional_turn'] else 0
+        self.setFixedHeight(max(self.HEIGHT, page_height + 8 + border_extra))
+
     def refresh(self):
         effective = self.effective_state()
         additional_turn = effective.get("additional_turn")
@@ -1412,6 +1541,9 @@ class BattleTurn(QGroupBox):
         bonus = effective.get('bonus')
         # 只有后置od的bonus0时now_od不是od_level而是0
         now_od = 0 if now_timing == "after" and bonus == 0 else effective.get("od_level")
+        self.setStyleSheet('QGroupBox#simulationTurn{border:2px solid #dc2626;}' if additional_turn else '')
+        od_color = OD_COLORS.get(effective.get('od_level'), 'white') if now_timing else 'white'
+        self.title.setStyleSheet(f'font-weight:700;background-color:{od_color};')
         od = effective.get('od'); estimate = effective.get('predicted_od')
         level = max(0, min(3, int(od // 100)))
         # od发动选择框
@@ -1482,11 +1614,8 @@ class BattleTurn(QGroupBox):
             faith.setText(f"信念\n{member['token']}" if position < 3 and member.get('token', 0) > 0 else '')
             ep.setText(f"EP\n{member['ep']}" if position < 3 and member.get('ep', 0) > 0 else '')
             # 按slot修改状态图标
-            clear_layout(self.status_rows[position])
-            for status in member.get('statuses', []):
-                path = self._status_icon(status)
-                if path and position <= 2:
-                    self.status_rows[position].addWidget(icon_label(path, 21))
+            if position < 3:
+                self.refresh_status_row(self.status_rows[position], member.get('statuses', []))
             # 按slot修改可行的所有技能选择
             action = self.action_boxes[position]
             skiills = member.get('skills', [])
@@ -1509,6 +1638,7 @@ class BattleTurn(QGroupBox):
                 idx = action.findData(effect_action["id"])
                 action.setCurrentIndex(idx if idx >= 0 else 0)
             action.blockSignals(False)
+        self.height_timer.start(0)
         if self in self.owner.turns:
             self.refresh_turn_controls()
 
@@ -1552,13 +1682,39 @@ class SimulationTab(QWidget):
         export.clicked.connect(self.export_state)
         import_button = QPushButton('导入模拟数据')
         import_button.clicked.connect(self.import_state)
-        toolbar.addStretch(); toolbar.addWidget(start); toolbar.addWidget(self.apply_setup)
+        tips = QPushButton('温馨提示')
+        tips.clicked.connect(self.show_tips)
+        toolbar.addWidget(tips); toolbar.addStretch()
+        toolbar.addWidget(start); toolbar.addWidget(self.apply_setup)
         toolbar.addWidget(export); toolbar.addWidget(import_button)
         self.turn_layout.addLayout(toolbar)
         self.scroll.setWidget(self.container); outer.addWidget(self.scroll)
         self.setStyleSheet(COMPACT +
                         'QGroupBox#simulationTurn{background:white;border:1px solid #dce2eb;'
             'border-radius:9px;margin-top:0;padding:1px}')
+
+    def show_tips(self):
+        QMessageBox.information(
+            self, '温馨提示',
+            '声明\n'
+            '为方便排轴，目前不对任何技能使用进行限制（检查sp、技能使用次数等）。\n\n'
+            '战斗设定\n'
+            '选好六个上场风格，再设置技能、突破、饰品、共鸣和敌人信息。'
+            '「开始战斗」会创建新战斗，「应用设定修改」会从首回合重算现有排轴。\n\n'
+            '编辑回合\n'
+            '从下拉框选择技能和OD发动情况。依次点击两个头像可交换站位，右键点击头像可设置破盾及角色专属特殊行动。'
+            '点击「调整」可修改本回合的资源、DP、敌人和场地，用于一些特殊被动的触发和技能费用计算等。\n\n'
+            '查看与推进\n'
+            '点击状态栏查看该单位的状态详情。状态较多时，可用横向滚轮或 Shift 加滚轮查看后续状态。'
+            '点击「下一回合」结算行动，「回到本回合」会移除之后的回合。\n\n'
+            '保存与恢复\n'
+            '用「导出模拟数据」保存设定和排轴，再用「导入模拟数据」可以恢复并继续编辑。\n\n'
+            '目前暂未支持\n'
+            '我方DP、敌方破坏率、倒地和技能破盾等需要手动填写。\n'
+            '实际伤害、回复DP等与排轴无关的效果尚未结算。\n'
+            '敌方上buff、给予我方的异常状态等，以及受击触发尚未模拟。部分概率效果默认触发。'
+            
+        )
 
     def read_setup(self, warning_title):
         if any(style is None for style in self.setup.styles):
