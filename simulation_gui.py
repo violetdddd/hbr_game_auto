@@ -1542,7 +1542,7 @@ class BattleTurn(QGroupBox):
         # 只有后置od的bonus0时now_od不是od_level而是0
         now_od = 0 if now_timing == "after" and bonus == 0 else effective.get("od_level")
         self.setStyleSheet('QGroupBox#simulationTurn{border:2px solid #dc2626;}' if additional_turn else '')
-        od_color = OD_COLORS.get(effective.get('od_level'), 'white') if now_timing else 'white'
+        od_color = OD_COLORS.get(effective.get('od_level'), 'white') if now_timing and bonus != 0 else 'white'
         self.title.setStyleSheet(f'font-weight:700;background-color:{od_color};')
         od = effective.get('od'); estimate = effective.get('predicted_od')
         level = max(0, min(3, int(od // 100)))
