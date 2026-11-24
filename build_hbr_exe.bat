@@ -1,9 +1,9 @@
 @echo off
 setlocal EnableExtensions
 REM Run from the directory containing this BAT file.
-cd /d "%~dp0"
+cd /d "%~dp0" || exit /b 1
 
-for %%D in (char-data char-images templates) do (
+for %%D in (char-data char-images templates simulation icons) do (
     if not exist "assets\%%D\" (echo ERROR: missing assets\%%D & exit /b 1)
 )
 if not exist "hbrf\axisWebsite\mapping.json" (echo ERROR: missing mapping.json & exit /b 1)
@@ -17,7 +17,7 @@ if not exist "run_card_game.py" (echo ERROR: missing run_card_game.py & exit /b 
 
 set "STAGE=%TEMP%\HBRTool_assets_%RANDOM%_%RANDOM%"
 mkdir "%STAGE%\assets" || exit /b 1
-for %%D in (char-data char-images templates) do (
+for %%D in (char-data char-images templates simulation icons) do (
     robocopy "assets\%%D" "%STAGE%\assets\%%D" /E /XD __pycache__ .git .vscode /XF *.pyc *.pyo .gitignore >nul
     if errorlevel 8 goto :fail
 )
@@ -26,6 +26,8 @@ python -m PyInstaller --noconfirm --clean --onedir --windowed --name HBRTool ^
   --add-data "%STAGE%\assets\char-data;assets\char-data" ^
   --add-data "%STAGE%\assets\char-images;assets\char-images" ^
   --add-data "%STAGE%\assets\templates;assets\templates" ^
+  --add-data "%STAGE%\assets\simulation;assets\simulation" ^
+  --add-data "%STAGE%\assets\icons;assets\icons" ^
   --add-data "hbrf\axisWebsite\mapping.json;hbrf\axisWebsite" ^
   --hidden-import=hbrf.axletool.axle_jpg_to_hbrf ^
   --hidden-import=piexif ^
