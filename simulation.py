@@ -2438,13 +2438,10 @@ class Simulation:
         """
         接受gui传入的state并直接覆盖当前的Turn类对应值：
         gui_add_state = {
-            "member_status": [{"id": int, "name": str, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None}] * 6,
             "member_dp": [float] * 6,
             'order': [int] * 6,  # 在recalculate中处理
             'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int | None}, "user_selected": None | int, "on_break": False}] * 6,
-            'enemies': [{"exist": bool, "damage_rate": int, 'down': bool, "statuses": [  # 回合开始前处理
-            {"id": int, "name": str, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None}, ...
-            ]} for _ in range(3)],
+            'enemies': [{"exist": bool, "damage_rate": int, 'down': bool}] * 3,
             'field': str or None,  # 回合开始前处理
             'od_timing': str or None,
             'od_level': int,
@@ -2568,11 +2565,6 @@ class Simulation:
 
         # 结算on_action_start被动
         self.trigger_passives(turn, "on_action_start")
-
-        # 此处应用member_status，本质上是对当前某些无法model的status duration进行trash标记
-        # 在下一次advance时通过resolve_turn_end_status清除该状态
-        # for slot, style in enumerate(turn.team):
-        #     style.statuses = [Status(**s) for s in gui_add_state["member_status"][slot]]
 
         self.apply_actions_od_shortcut(turn)
 

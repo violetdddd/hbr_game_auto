@@ -740,9 +740,10 @@ class BattleSetup(QGroupBox):
         entries = setup['styles'] + setup['resonances']
         wanted = {entry['style_id'] for entry in entries if entry is not None}
         styles = {}
+        team_data = {}
         for style in self.catalog.styles:
             try:
-                style_id = self._style_id(style)
+                style_id = self._style_id(style, team_data)
             except ValueError:
                 continue
             if style_id in wanted:
@@ -799,11 +800,15 @@ class BattleSetup(QGroupBox):
             raise ValueError('敌人弱点包含未知属性。')
 
     @staticmethod
-    def _style_id(style):
+    def _style_id(style, team_data=None):
         if style is None: return None
         path = SkillSelectionDialog.catalog_data_path(style)
-        if not path.exists(): raise FileNotFoundError(f'找不到风格数据库：{path}')
-        data = json.loads(path.read_text(encoding='utf-8'))
+        if team_data is None:
+            team_data = {}
+        if path not in team_data:
+            if not path.exists(): raise FileNotFoundError(f'找不到风格数据库：{path}')
+            team_data[path] = json.loads(path.read_text(encoding='utf-8'))
+        data = team_data[path]
         person = next((v for v in data.values() if isinstance(v, dict) and
                        v.get('english name') == style.english), {})
         entry = next((v for v in person.get('style', {}).values()
@@ -822,13 +827,20 @@ class PortraitWithSP(QWidget):
         super().__init__(parent)
         self.setFixedSize(size + 7, size + 5)
         self.picture = QPixmap()
+        self.image_path = None
+        self.image_ratio = None
         self.sp = 0
         self.size = size
 
     def configure(self, path, round_pixmap, sp):
-        self.picture = round_pixmap(path, self.size) if path else QPixmap()
-        self.sp = sp
-        self.update()
+        ratio = self.devicePixelRatioF()
+        image_changed = path != self.image_path or ratio != self.image_ratio
+        if image_changed:
+            self.image_path, self.image_ratio = path, ratio
+            self.picture = round_pixmap(path, self.size) if path else QPixmap()
+        if image_changed or self.sp != sp:
+            self.sp = sp
+            self.update()
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -918,6 +930,12 @@ class BattleTurn(QGroupBox):
         self.owner, self.number = owner, number
         self.state_data = copy.deepcopy(state)
         self._status_db = self.owner.status_db
+        self._combo_options = {}
+        self._shown_statuses = {}
+        self._shown_targets = {}
+        self._shown_weaknesses = None
+        self._shown_field = None
+        self._shown_od_icon = None
         self.select_first = None
         self.setObjectName('simulationTurn')
         self.setFixedHeight(self.HEIGHT)
@@ -928,7 +946,7 @@ class BattleTurn(QGroupBox):
         self.height_timer = QTimer(self)
         self.height_timer.setSingleShot(True)
         self.height_timer.timeout.connect(self.update_turn_height)
-        self._make_combat_page(); self._make_adjust_page()
+        self._make_combat_page()
         self.refresh()
 
     @staticmethod
@@ -1170,11 +1188,11 @@ class BattleTurn(QGroupBox):
         """GUI传给engine可操作的base相关内容，engine内部增量更新"""
         base = state_data["base"]
         return {
-            "member_status": [m["statuses"] for m in base["members"]],
             "member_dp": [m["dp"] for m in base["members"]],
             "order": base["order"],
             "actions": base["actions"],
-            "enemies": base["enemies"],
+            "enemies": [{key: enemy[key] for key in ("exist", "damage_rate", "down")}
+                        for enemy in base["enemies"]],
             "field": base["field"],
             "od_timing": base["od_timing"],
             "od_level": base["od_level"],
@@ -1445,6 +1463,8 @@ class BattleTurn(QGroupBox):
 
     def toggle_mode(self):
         if self.stack.currentIndex() == 0:
+            if self.stack.count() == 1:
+                self._make_adjust_page()
             self.load_adjust()
             self.stack.setCurrentIndex(1)
             self.refresh_enemy_setting()
@@ -1479,6 +1499,9 @@ class BattleTurn(QGroupBox):
             return ICON_DIR / 'status' / file_name
 
     def refresh_status_row(self, row, statuses):
+        if self._shown_statuses.get(row) == statuses:
+            return
+        self._shown_statuses[row] = statuses
         items = []
         for status in statuses:
             path = self._status_icon(status)
@@ -1491,24 +1514,33 @@ class BattleTurn(QGroupBox):
     # 敌人弱点和场地的信息显示
     def refresh_enemy_info(self, effective):
         # 弱点
-        weak = self.enemy_weakness_row
-        clear_layout(weak)
-        weak.addWidget(QLabel('敌人弱点：'))
-        for element in effective.get('enemy_weaknesses', []):
-            path = ICON_DIR / 'element' / f'{element}.webp'
-            weak.addWidget(icon_label(path, 18, ELEMENT_NAMES.get(element, '?')))
-        if len(effective.get('enemy_weaknesses', [])) == 0:
-            weak.addWidget(QLabel('无'))
-        weak.addStretch()
+        weaknesses = tuple(effective.get('enemy_weaknesses', []))
+        if weaknesses != self._shown_weaknesses:
+            self._shown_weaknesses = weaknesses
+            weak = self.enemy_weakness_row
+            clear_layout(weak)
+            weak.addWidget(QLabel('敌人弱点：'))
+            for element in weaknesses:
+                path = ICON_DIR / 'element' / f'{element}.webp'
+                weak.addWidget(icon_label(path, 18, ELEMENT_NAMES.get(element, '?')))
+            if not weaknesses:
+                weak.addWidget(QLabel('无'))
+            weak.addStretch()
         # 敌人具体status信息
         enemies = effective['enemies']
         for enemy, (line, statuses) in zip(enemies, self.enemy_status_rows):
-            line.setVisible(enemy['exist'])
+            if line.isHidden() == enemy['exist']:
+                line.setVisible(enemy['exist'])
             self.refresh_status_row(statuses, enemy['statuses'])
         # 场地信息
+        field = effective.get('field')
+        super_scale = effective['super_scale']
+        field_key = (field, super_scale['element'], super_scale['value'])
+        if field_key == self._shown_field:
+            return
+        self._shown_field = field_key
         clear_layout(self.field_display)
         self.field_display.addWidget(QLabel('场地：'))
-        field = effective.get('field')
         if field is None:
             self.field_display.addWidget(QLabel('无'))
         elif field == "others": 
@@ -1519,7 +1551,6 @@ class BattleTurn(QGroupBox):
                 ICON_DIR / 'status' / icon, 18, FIELD_NAMES.get(field, '场')))
         self.field_display.addStretch()
         # 超越量表信息和场地放在一起
-        super_scale = self.state_data["base"]["super_scale"]
         if super_scale["element"]:
             element = super_scale["element"]
             path = ICON_DIR / 'element' / f'{element}.webp'
@@ -1527,11 +1558,28 @@ class BattleTurn(QGroupBox):
             self.field_display.addWidget(QLabel('量表：'))
             self.field_display.addWidget(QLabel(f'{super_scale["value"]}%'))
 
-    def effective_state(self):
-        """只读输出；base 中 members 恒按 slot 0–5 排列。"""
-        # 应用adjustments逻辑放在simulation中，并且在recalculation中更新
-        effective = copy.deepcopy(self.state_data['base'])
-        return effective
+    @staticmethod
+    def refresh_stylesheet(widget, style):
+        if widget.styleSheet() != style:
+            widget.setStyleSheet(style)
+
+    def refresh_combo(self, box, options, selected):
+        options = tuple(options)
+        if box.isHidden() == bool(options):
+            box.setVisible(bool(options))
+        if not options:
+            return
+        options_changed = self._combo_options.get(box) != options
+        if not options_changed and box.currentData() == selected:
+            return
+        was_blocked = box.blockSignals(True)
+        if options_changed:
+            box.clear()
+            for label, value in options:
+                box.addItem(label, value)
+            self._combo_options[box] = options
+        box.setCurrentIndex(max(0, box.findData(selected)))
+        box.blockSignals(was_blocked)
 
     def update_turn_height(self):
         # 等敌人行显隐和状态图标的尺寸更新后，再读取布局所需高度
@@ -1539,18 +1587,21 @@ class BattleTurn(QGroupBox):
         page.layout().activate()
         page_height = page.minimumSizeHint().height()
         border_extra = 2 if self.state_data['base']['additional_turn'] else 0
-        self.setFixedHeight(max(self.HEIGHT, page_height + 8 + border_extra))
+        height = max(self.HEIGHT, page_height + 8 + border_extra)
+        if self.minimumHeight() != height:
+            self.setFixedHeight(height)
 
     def refresh(self):
-        effective = self.effective_state()
+        # 仅用于显示，直接读取已提交的base
+        effective = self.state_data['base']
         additional_turn = effective.get("additional_turn")
         now_timing = effective.get('od_timing')
         bonus = effective.get('bonus')
         # 只有后置od的bonus0时now_od不是od_level而是0
         now_od = 0 if now_timing == "after" and bonus == 0 else effective.get("od_level")
-        self.setStyleSheet('QGroupBox#simulationTurn{border:2px solid #dc2626;}' if additional_turn else '')
+        self.refresh_stylesheet(self, 'QGroupBox#simulationTurn{border:2px solid #dc2626;}' if additional_turn else '')
         od_color = OD_COLORS.get(effective.get('od_level'), 'white') if now_timing and bonus != 0 else 'white'
-        self.title.setStyleSheet(f'font-weight:700;background-color:{od_color};')
+        self.refresh_stylesheet(self.title, f'font-weight:700;background-color:{od_color};')
         od = effective.get('od'); estimate = effective.get('predicted_od')
         level = max(0, min(3, int(od // 100)))
         # od发动选择框
@@ -1559,24 +1610,12 @@ class BattleTurn(QGroupBox):
         # 后置od发动条件是当前刚刚开启前置od，或者当前处于od外
         available_after = 3 if (now_timing == "before" and bonus == 1) or now_od == 0 else 0
         for timing, caption, box, available in (('before', self.before_od_caption, self.before_od, available_before), ('after', self.after_od_caption, self.after_od, available_after)):
-            if available:
-                caption.setVisible(True)
-                box.setVisible(True)
-
-            else:
-                caption.setVisible(False)
-                box.setVisible(False)
-                continue
-            box.blockSignals(True)
-            box.clear()
-            box.addItem('不发动', 0)
+            if caption.isHidden() == bool(available):
+                caption.setVisible(bool(available))
             # 不做任何检查，只要可以发动od就允许发动任意等级的od
-            for n in range(1, available + 1):
-                box.addItem(f'OD{n}', n)
+            options = [('不发动', 0)] + [(f'OD{n}', n) for n in range(1, available + 1)] if available else []
             selected_level = effective.get('od_level', 0) if now_timing == timing else 0
-            index = box.findData(selected_level)
-            box.setCurrentIndex(index)
-            box.blockSignals(False)
+            self.refresh_combo(box, options, selected_level)
         # label，bonus由simulation决定
         self.title.setText(f'T{effective.get("turn")}' + 
                            (f"-OD{now_od}" if now_od != 0 else '') +
@@ -1585,15 +1624,17 @@ class BattleTurn(QGroupBox):
         # od
         self.od_label.setText(f'{od:.2f}%')
         self.predicted_od_label.setText(f'→ {estimate:.2f}%')
-        self.od_label.setStyleSheet(f"font-weight:700;color:{'#dc2626' if od < 0 else '#242933'}")
-        self.predicted_od_label.setStyleSheet(
+        self.refresh_stylesheet(self.od_label, f"font-weight:700;color:{'#dc2626' if od < 0 else '#242933'}")
+        self.refresh_stylesheet(self.predicted_od_label,
             f"font-weight:700;color:{'#dc2626' if estimate < 0 else '#242933'}")
-        pix = QPixmap(str(ICON_DIR / 'od' / f'od{level}.webp'))
-        if pix.isNull():
-            self.od_icon.setText(f'OD{level}')
-        else:
-            self.od_icon.setPixmap(pix.scaled(30, 30, Qt.AspectRatioMode.KeepAspectRatio,
-                                              Qt.TransformationMode.SmoothTransformation))
+        if level != self._shown_od_icon:
+            self._shown_od_icon = level
+            pix = QPixmap(str(ICON_DIR / 'od' / f'od{level}.webp'))
+            if pix.isNull():
+                self.od_icon.setText(f'OD{level}')
+            else:
+                self.od_icon.setPixmap(pix.scaled(30, 30, Qt.AspectRatioMode.KeepAspectRatio,
+                                                  Qt.TransformationMode.SmoothTransformation))
         # 敌人
         self.refresh_enemy_info(effective)
         # 队伍
@@ -1613,7 +1654,13 @@ class BattleTurn(QGroupBox):
                                self.owner.setup.round_pixmap, int(member.get('sp', 0)))
             effect_action = effective['actions'][slot]
             target = effect_action['target'] if effect_action else {}
-            self.target_badges[position].configure(target, self.owner.styles, self.owner.setup.round_pixmap)
+            target_slot = target.get('slot')
+            target_style = self.owner.styles[target_slot] if target_slot is not None and target.get('type') != 'enemy' else None
+            target_key = (target.get('type'), target_slot, target_style.image if target_style else None,
+                          button.devicePixelRatioF())
+            if self._shown_targets.get(position) != target_key:
+                self._shown_targets[position] = target_key
+                self.target_badges[position].configure(target, self.owner.styles, self.owner.setup.round_pixmap)
             button.setToolTip((style.localized_title if style else f'角色{slot+1}') +
                               '（点击两名角色头像交换位置）')
             # 按slot修改token和ep
@@ -1624,27 +1671,14 @@ class BattleTurn(QGroupBox):
             if position < 3:
                 self.refresh_status_row(self.status_rows[position], member.get('statuses', []))
             # 按slot修改可行的所有技能选择
-            action = self.action_boxes[position]
-            skiills = member.get('skills', [])
-            action.blockSignals(True)
-            action.clear()
-            if len(skiills) == 0:
-                action.setVisible(False)
-            else:  # 此时理论上action一定不是None
-                action.setVisible(True)
-                if position < 3:
-                    for i, skill in enumerate(member.get('skills', [])):
-                        if i == 0:  # 默认普通攻击行动
-                            action.addItem(f"{skill.get('name')}", skill.get('id'))
-                        elif i not in (1, 2):  # 排除无和追击
-                            action.addItem(f"{skill.get('name')}（{skill.get('cost')} {skill.get('cost_type')}）", skill.get('id'))
-                else:  # 后排只有无和追击
-                    for skill in member.get('skills')[1:3]:
-                        action.addItem(f"{skill.get('name')}", skill.get('id'))
-                # 按当前技能选择安排动作
-                idx = action.findData(effect_action["id"])
-                action.setCurrentIndex(idx if idx >= 0 else 0)
-            action.blockSignals(False)
+            skills = member.get('skills', [])
+            if position < 3:
+                options = [(skill['name'], skill['id']) for skill in skills[:1]]
+                options.extend((f"{skill['name']}（{skill['cost']} {skill['cost_type']}）", skill['id'])
+                               for skill in skills[3:])
+            else:  # 后排只有无和追击
+                options = [(skill['name'], skill['id']) for skill in skills[1:3]]
+            self.refresh_combo(self.action_boxes[position], options, effect_action['id'] if effect_action else None)
         self.height_timer.start(0)
         if self in self.owner.turns:
             self.refresh_turn_controls()
@@ -1755,7 +1789,7 @@ class SimulationTab(QWidget):
     def clear_turns(self):
         for turn in self.turns:
             self.turn_layout.removeWidget(turn)
-            turn.setParent(None); turn.deleteLater()
+            turn.hide(); turn.deleteLater()
         self.turns.clear()
 
     def apply_setup_changes(self):
@@ -1844,9 +1878,12 @@ class SimulationTab(QWidget):
         {"base": simulation_state, 
         "adjustments": {"od": float, "members": [{"sp": int, "token": int} for _ in range(6)]} }
         """
+        previous = self.turns[-1] if self.turns else None
         turn = BattleTurn(self, len(self.turns) + 1, state)
         self.turns.append(turn); self.turn_layout.addWidget(turn)
-        for item in self.turns: item.refresh_turn_controls()
+        if previous is not None:
+            previous.refresh_turn_controls()
+        turn.refresh_turn_controls()
         return turn
 
     def truncate_after(self, turn):
@@ -1863,13 +1900,10 @@ class SimulationTab(QWidget):
         """
         某一个turn出现调整的时候调用本函数进行后续所有turn的刷新和同步
         gui_add_state = {
-            "member_status": [{"id": int, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None}] * 6,
             "member_dp": [m["dp"] for m in base["members"]],
             'order': [int] * 6,
             'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int | None}, "user_selected": None | int, "on_break": False}] * 6,
-            'enemies': [{"exist": bool, "damage_rate": int, 'down': bool, "statuses": [
-            {"id": int, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None}, ...
-            ]} for _ in range(3)],
+            'enemies': [{"exist": bool, "damage_rate": int, 'down': bool}] * 3,
             'field': str or None,
             'od_timing': str or None,
             'od_level': int,
