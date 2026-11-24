@@ -932,7 +932,7 @@ class MainWindow(QMainWindow):
         admin.clicked.connect(self.restart_admin)
         form.addRow(admin)
         # 在正式运行前检测窗口，同时确定游戏分辨率
-        test = QPushButton('寻找并激活窗口')
+        test = QPushButton('寻找并激活窗口（程序自动操作时请保持游戏窗口处于激活的焦点状态，窗口未激活时会暂停操作）')
         test.clicked.connect(lambda: self.test_window())
         form.addRow(test)
         self.run_path = QLineEdit()
@@ -1027,7 +1027,7 @@ class MainWindow(QMainWindow):
         card_admin = QPushButton('以管理员身份重启 GUI（Windows）')
         card_admin.clicked.connect(self.restart_admin)
         card_form.addRow(card_admin)
-        card_test = QPushButton('寻找并激活窗口（程序自动操作时请保持游戏窗口处于激活的焦点状态，窗口未激活时会暂停运行）\n')
+        card_test = QPushButton('寻找并激活窗口（程序自动操作时请保持游戏窗口处于激活的焦点状态，窗口未激活时会暂停操作）')
         card_test.clicked.connect(lambda: self.test_window(self.card_window_title, self.card_log))
         card_form.addRow(card_test)
         # 重复次数传给 repetition.card_game，不需要加载 HBRF
