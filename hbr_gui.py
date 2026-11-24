@@ -947,9 +947,9 @@ class MainWindow(QMainWindow):
                             ('开启NORMAL自动战斗', 'normal'), ('无', 'none')):
             self.auto_mode.addItem(label, mode)
         auto_row = QHBoxLayout()
-        auto_label = QLabel('自动战斗设置（只使用游戏内自动战斗时，可以选择空 HBRF 脚本）')
-        auto_label.setWordWrap(True)
-        auto_row.addWidget(auto_label, 1); auto_row.addWidget(self.auto_mode, 1)
+        auto_label = QLabel('自动战斗设置（只使用游戏内自动战斗时，可以选择空 HBRF 脚本，并开启对应自动战斗）')
+        auto_label.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
+        auto_row.addWidget(auto_label); auto_row.addWidget(self.auto_mode, 1)
         form.addRow(auto_row)
 
         # 等宽等高的两栏；高度只取右侧表单的建议高度，不占满页面
@@ -958,7 +958,6 @@ class MainWindow(QMainWindow):
         single_layout = QVBoxLayout(single_box)
         # 提示用户分辨率支持
         resolution_note = QLabel(
-            '点击激活游戏窗口时自动战斗，窗口未激活时会暂停运行\n'
             '目前支持的分辨率为：\n'
             '(1680, 1050)、(1920, 1200)、(2560, 1600)、\n'
             '(2048, 1152)、(2160, 1215)、(2560, 1440)。\n'
@@ -1015,7 +1014,7 @@ class MainWindow(QMainWindow):
         self.stop_button.setEnabled(False)
         form.addRow(self.stop_button)
         self.log = QTextEdit(); self.log.setReadOnly(True)
-        form.addRow('状态', self.log)
+        form.addRow('当前运行状态', self.log)
 
         # 技术模拟战 tab：与普通战斗使用同一 Worker/中断机制，不需要 HBRF
         card_runner = QWidget(); tabs.addTab(card_runner, '技术模拟战')
@@ -1028,7 +1027,7 @@ class MainWindow(QMainWindow):
         card_admin = QPushButton('以管理员身份重启 GUI（Windows）')
         card_admin.clicked.connect(self.restart_admin)
         card_form.addRow(card_admin)
-        card_test = QPushButton('寻找并激活窗口')
+        card_test = QPushButton('寻找并激活窗口（程序自动操作时请保持游戏窗口处于激活的焦点状态，窗口未激活时会暂停运行）\n')
         card_test.clicked.connect(lambda: self.test_window(self.card_window_title, self.card_log))
         card_form.addRow(card_test)
         # 重复次数传给 repetition.card_game，不需要加载 HBRF
