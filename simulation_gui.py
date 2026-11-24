@@ -217,6 +217,9 @@ class StatusRow(QScrollArea):
         for i, (path, name, status) in enumerate(self.items):
             duration = status.get('duration_type')
             remaining = status.get('remaining')
+            element = status.get('element')
+            if element:
+                name = ELEMENT_NAMES[element] + name
             if duration == 'permanent':
                 name += '（永久）'
             elif duration not in ('use_immersion_ex', 'on_attack_weak'):
@@ -1667,12 +1670,12 @@ class SimulationTab(QWidget):
         outer.setSpacing(5)
         toolbar = QHBoxLayout(); toolbar.setSpacing(4)
         for label, handler in (
-            ('导入模拟数据', self.import_state),
-            ('导出模拟数据', self.export_state),
+            ('导入完整模拟数据', self.import_state),
+            ('导出完整模拟数据', self.export_state),
             ('从HBRF导入', self.import_hbrf),
             ('导出HBRF', self.export_hbrf),
         ):
-            button = QPushButton(label); button.setStyleSheet(WHITE_BUTTON)
+            button = QPushButton(label)
             button.clicked.connect(handler)
             toolbar.addWidget(button)
         tips = QPushButton('温馨提示'); tips.setStyleSheet(WHITE_BUTTON)
