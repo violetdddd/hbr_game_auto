@@ -76,6 +76,25 @@ if exist "dist\HBRTool\_internal\cv2\opencv_videoio_ffmpeg500_64.dll" (
     del /f /q "dist\HBRTool\_internal\cv2\opencv_videoio_ffmpeg500_64.dll"
     echo Removed OpenCV FFmpeg DLL.
 )
+
+REM Remove the unused Qt PDF and virtual keyboard plugins and their private dependencies.
+set "QT_DIST=dist\HBRTool\_internal\PySide6"
+for %%F in (
+    "plugins\imageformats\qpdf.dll"
+    "plugins\platforminputcontexts\qtvirtualkeyboardplugin.dll"
+    "Qt6Pdf.dll"
+    "Qt6VirtualKeyboard.dll"
+    "Qt6Quick.dll"
+    "Qt6Qml.dll"
+    "Qt6QmlMeta.dll"
+    "Qt6QmlModels.dll"
+    "Qt6QmlWorkerScript.dll"
+) do (
+    if exist "%QT_DIST%\%%~F" (
+        del /f /q "%QT_DIST%\%%~F"
+        if exist "%QT_DIST%\%%~F" goto :fail
+    )
+)
 echo.
 echo Packaging completed!
 pause
