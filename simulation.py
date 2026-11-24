@@ -1661,7 +1661,10 @@ class Simulation:
                     if status.duration_type == "use_immersion_ex":
                         for none_skill in style.skills:
                             if is_attack_skill(none_skill):
-                                none_skill.elements = self.skill_records[skill.id]["elements"]
+                                elements = self.skill_records[none_skill.id].get("elements")
+                                if elements == None:
+                                    elements = []
+                                none_skill.elements = elements
         # 加攻加深去除
         effects = self.resolve_active_effects(skill, action, ctx)
         buff_num = sum(effect.get("type") in ATTACK_UP_GROUP for effect in effects)
