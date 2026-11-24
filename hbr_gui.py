@@ -1337,13 +1337,8 @@ class MainWindow(QMainWindow):
     # 匹配注释中的风格元数据，group(0)是整个匹配字符串，(1)是slot，(2)是字典
     @staticmethod
     def _style_notes(path):
-        # Format: # HBRTOOL_STYLE 1 {"team":"31A","english":"...","id":"001"}
-        result = {}
-        for line in Path(path).read_text(encoding='utf-8').splitlines():
-            match = re.match(r'^\s*#\s*HBRTOOL_STYLE\s+(1[0-2]|[1-9])\s+(\{.*\})\s*$', line)
-            if match:
-                result[int(match.group(1))] = json.loads(match.group(2))
-        return result
+        from hbrf.model import load_style_metadata
+        return load_style_metadata(path)
 
     # 打开从 hbr-tool.com 保存的 SAV，转换后复用现有 HBRF 编辑器导入逻辑
     def open_sav(self):

@@ -14,7 +14,7 @@ from PySide6.QtWidgets import (
     QComboBox,
 )
 
-from paths import ROOT_DIR
+from paths import ROOT_DIR, SCRIPTS_DIR
 SIMULATION_DIR = ROOT_DIR / 'assets' / 'simulation'
 ICON_DIR = ROOT_DIR / 'assets' / 'icons'
 KELIAN_DIR = ROOT_DIR / "assets" / "char-images" / "31A" / "Karen_Asakura"
@@ -586,12 +586,16 @@ class BattleSetup(QGroupBox):
         return {'A': 20, 'S': 10, 'SS': 4, 'SSR': 4}.get(style.tier, 4) if style else 4
 
     @staticmethod
+    def _default_level(style):
+        return BattleSetup._max_level(style) if style and style.tier in ('A', 'S') else 2
+
+    @staticmethod
     def _set_level(box, style):
         maximum = BattleSetup._max_level(style)
         box.clear()
         for n in range(maximum + 1):
             box.addItem(str(n), n)
-        box.setCurrentIndex(maximum if style and style.tier in ('A', 'S') else min(2, maximum))
+        box.setCurrentIndex(BattleSetup._default_level(style))
 
     def _set_avatar(self, index, resonance=False):
         style = self.resonances[index] if resonance else self.styles[index]
@@ -1661,6 +1665,21 @@ class SimulationTab(QWidget):
         self.engine = Simulation()
         outer = QVBoxLayout(self); outer.setContentsMargins(7, 7, 7, 5)
         outer.setSpacing(5)
+        toolbar = QHBoxLayout(); toolbar.setSpacing(4)
+        for label, handler in (
+            ('导入模拟数据', self.import_state),
+            ('导出模拟数据', self.export_state),
+            ('从HBRF导入', self.import_hbrf),
+            ('导出HBRF', self.export_hbrf),
+        ):
+            button = QPushButton(label); button.setStyleSheet(WHITE_BUTTON)
+            button.clicked.connect(handler)
+            toolbar.addWidget(button)
+        tips = QPushButton('温馨提示'); tips.setStyleSheet(WHITE_BUTTON)
+        tips.clicked.connect(self.show_tips)
+        toolbar.addStretch(); toolbar.addWidget(tips)
+        outer.addLayout(toolbar)
+
         self.scroll = QScrollArea(); self.scroll.setWidgetResizable(True)
         self.container = QWidget(); self.turn_layout = QVBoxLayout(self.container)
         self.turn_layout.setContentsMargins(3, 3, 3, 3)
@@ -1668,25 +1687,15 @@ class SimulationTab(QWidget):
         self.turn_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         # 设置面板与回合面板属于同一个滚动容器，不会固定悬浮在顶部。
         self.turn_layout.addWidget(self.setup)
-        toolbar = QHBoxLayout()
+        setup_buttons = QHBoxLayout()
         start = QPushButton('开始战斗'); start.setStyleSheet(BLUE_BUTTON)
-        self.apply_setup = QPushButton('应用设定修改'); self.apply_setup.setStyleSheet(BLUE_BUTTON)
+        self.apply_setup = QPushButton('应用调整'); self.apply_setup.setStyleSheet(BLUE_BUTTON)
         self.apply_setup.setEnabled(False)
 
         start.clicked.connect(self.start)
         self.apply_setup.clicked.connect(self.apply_setup_changes)
-        export = QPushButton('导出模拟数据')
-        export.clicked.connect(self.export_state)
-        import_button = QPushButton('导入模拟数据')
-        import_button.clicked.connect(self.import_state)
-        export_hbrf = QPushButton('导出 HBRF')
-        export_hbrf.clicked.connect(self.export_hbrf)
-        tips = QPushButton('温馨提示')
-        tips.clicked.connect(self.show_tips)
-        toolbar.addWidget(tips); toolbar.addStretch()
-        toolbar.addWidget(start); toolbar.addWidget(self.apply_setup)
-        toolbar.addWidget(export); toolbar.addWidget(import_button); toolbar.addWidget(export_hbrf)
-        self.turn_layout.addLayout(toolbar)
+        setup_buttons.addStretch(); setup_buttons.addWidget(start); setup_buttons.addWidget(self.apply_setup)
+        self.turn_layout.addLayout(setup_buttons)
         self.scroll.setWidget(self.container); outer.addWidget(self.scroll)
         self.setStyleSheet(COMPACT +
                         'QGroupBox#simulationTurn{background:white;border:1px solid #dce2eb;'
@@ -1699,7 +1708,7 @@ class SimulationTab(QWidget):
             '为方便排轴，目前不对任何技能和OD使用进行限制（检查OD/SP消耗、技能次数限制、冷却回合等）。\n\n'
             '战斗设定\n'
             '选好六个上场风格，再设置技能、突破、饰品、共鸣和敌人信息。'
-            '「开始战斗」会创建新战斗，「应用设定修改」会从首回合重算现有排轴。\n\n'
+            '「开始战斗」会创建新战斗，「应用调整」会从首回合重算现有排轴。\n\n'
             '编辑回合\n'
             '从下拉框选择技能和OD发动情况。依次点击两个头像可交换站位，右键点击头像可设置破盾及角色专属特殊行动。'
             '点击「调整」可修改本回合的资源、DP、敌人和场地，用于一些特殊被动的触发和技能费用计算等。\n\n'
@@ -1707,7 +1716,8 @@ class SimulationTab(QWidget):
             '点击状态栏查看该单位的状态详情。状态较多时，可用横向滚轮或 Shift 加滚轮查看后续状态。'
             '点击「下一回合」结算行动，「回到本回合」会移除之后的回合。\n\n'
             '保存与恢复\n'
-            '用「导出模拟数据」保存设定和排轴，再用「导入模拟数据」可以恢复并继续编辑。\n\n'
+            '用「导出模拟数据」保存设定和排轴，再用「导入模拟数据」可以恢复并继续编辑。'
+            '「从HBRF导入」会以默认战斗设定重放单队排轴，导入后请检查并调整。\n\n'
             '目前暂未支持\n'
             '我方DP、敌方破坏率、倒地和技能破盾等需要手动填写。\n'
             '实际伤害、回复DP等与排轴无关的效果尚未结算。\n'
@@ -2024,17 +2034,179 @@ class SimulationTab(QWidget):
         except Exception as error:
             QMessageBox.warning(self, '无法导出 HBRF', str(error))
 
-    def import_state(self):
-        filename, _ = QFileDialog.getOpenFileName(self, '导入模拟数据', '', 'JSON (*.json)')
+    def import_hbrf(self):
+        from hbrf import model as m
+
+        answer = QMessageBox.question(
+            self, '从HBRF导入',
+            'HBRF只记录游戏操作，导入时可能丢失共鸣、资源调整、随机分支和破盾等信息。'
+            '回合和状态会按模拟规则重算，请在导入后手动检查和调整。\n\n是否继续？',
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
+        )
+        if answer != QMessageBox.StandardButton.Yes:
+            return
+        filename, _ = QFileDialog.getOpenFileName(self, '从HBRF导入', str(SCRIPTS_DIR), 'HBRF (*.hbrf)')
         if not filename:
             return
         try:
-            data = json.loads(Path(filename).read_text(encoding='utf-8-sig'))
-            self.restore_state(data)
+            script = m.load_hbrf(filename)
+            if len(script.roles) != 6:
+                raise ValueError('战斗模拟只支持单队HBRF。')
+            styles = self.hbrf_styles(script.roles, m.load_style_metadata(filename))
+            if styles is not None:
+                self.import_state(self.hbrf_to_state(script, styles), inherit_battle=True)
         except Exception as error:
-            QMessageBox.warning(self, '无法导入模拟数据', str(error))
+            QMessageBox.warning(self, '无法从HBRF导入', str(error))
 
-    def restore_state(self, data):
+    def hbrf_styles(self, roles, metadata):
+        styles = []
+        occupied = set()
+        for role in roles:
+            note = metadata.get(role.slot, {})
+            style = self.catalog.find_style(note.get('team'), note.get('english'), note.get('id'))
+            if style is None:
+                names = {name for entry in role.skills for name in entry.split('/')}
+                candidates = [style for style in self.catalog.styles
+                              if style.name not in occupied
+                              and role.name in (style.name, style.label.replace(' ', '').replace('　', ''))
+                              and names.issubset(self.catalog.skills_for(style))]
+                if len(candidates) == 1:
+                    style = candidates[0]
+                else:
+                    dialog = self.setup.style_dialog_class(self.catalog, occupied, self)
+                    dialog.setWindowTitle(f'为HBRF角色「{role.name}」选择风格')
+                    if dialog.exec() != QDialog.DialogCode.Accepted:
+                        return None
+                    style = dialog.chosen
+            if style.name in occupied:
+                raise ValueError(f'同一角色重复上场：{style.name}')
+            occupied.add(style.name)
+            styles.append(style)
+        return styles
+
+    def hbrf_to_state(self, script, styles):
+        from hbrf import model as m
+        from simulation import Skill, json_records_to_dict
+
+        # HBRF的7对应左侧敌人，只有三体配置才会出现左侧位置
+        targets = {move.target for turn in script.actions if isinstance(turn, m.BattleTurn)
+                   for move in turn.actions}
+        enemy_count = 3 if 7 in targets else 2 if targets & {8, 9} else 1
+        enemy_slots = {1: [1], 2: [1, 2], 3: [0, 1, 2]}[enemy_count]
+        setup = {
+            'styles': [], 'resonances': [None] * 6,
+            'enemy_count': enemy_count, 'enemy_weaknesses': [value for _, value in ELEMENTS[1:]],
+            'initial_od': 0.0, 'global_od_rate': 100,
+        }
+        records = json_records_to_dict(self.engine.skills_path)
+        role_skills = []
+        for role, style in zip(script.roles, styles):
+            entries = []
+            active_ids, orb_ids = [], []
+            for entry in role.skills:
+                variants = []
+                for name in entry.split('/'):
+                    skill_id = self.catalog.skill_data.get(name, {}).get('simulation_id')
+                    if skill_id is None or name not in self.catalog.skills_for(style):
+                        raise ValueError(f'{role.name}的技能「{name}」无法匹配所选风格。')
+                    skill_id = int(skill_id)
+                    variants.append(Skill.from_record(records[skill_id]))
+                    (orb_ids if name in self.catalog.common_global else active_ids).append(skill_id)
+                entries.append(variants)
+            role_skills.append(entries)
+            setup['styles'].append({
+                'style_id': self.setup._style_id(style),
+                'break_level': self.setup._default_level(style),
+                'od_earring': 15, 'necklace_sp': 3,
+                'active_skill_ids': list(dict.fromkeys(active_ids)),
+                'orb_skill_ids': list(dict.fromkeys(orb_ids)),
+                'passive_skill_ids': [int(entry['simulation_id'])
+                                      for _, entry in SkillSelectionDialog._get_passives(style)],
+            })
+
+        # 按执行器的交换顺序更新站位，切换技能从文件头的第一项开始
+        order = list(range(6))
+        selected = [[0] * len(entries) for entries in role_skills]
+        special = {key: 0 for key in SpecialActionDialog.SPECIAL_NAMES}
+        special.update({key + '_after': 0 for key in SpecialActionDialog.SPECIAL_NAMES
+                        if key != 'kelian_form_change'})
+        states = []
+        for entry in script.actions:
+            if isinstance(entry, (m.SkillSwitch, m.SpecialRoleButton)):
+                slot = entry.role - 1
+                index = order.index(slot)
+                order[index], order[entry.position] = order[entry.position], order[index]
+                if isinstance(entry, m.SkillSwitch):
+                    index = entry.skill - 1
+                    if len(role_skills[slot][index]) < 2:
+                        raise ValueError(f'{script.roles[slot].name}的第{entry.skill}个技能没有切换版本。')
+                    selected[slot][index] ^= 1
+                elif entry.button == 'kelian':
+                    special['kelian_form_change'] ^= 1
+                elif entry.button == 'siling':
+                    special['demonic_rage'] += 1
+            elif isinstance(entry, m.SpecialGlobalButton):
+                special[{'waki': 'demon_cavalry', 'attack': 'all_out_attack'}[entry.button]] += 1
+            elif isinstance(entry, m.BattleTurn):
+                actions = [None] * 6  # 后排及技能编号0交给引擎补默认行动
+                for position, move in enumerate(entry.actions):
+                    slot = move.role - 1
+                    index = order.index(slot)
+                    order[index], order[position] = order[position], order[index]
+                for move in entry.actions:
+                    if not move.skill:
+                        continue
+                    slot = move.role - 1
+                    skill = role_skills[slot][move.skill - 1][selected[slot][move.skill - 1]]
+                    actions[slot] = self.hbrf_skill_action(skill, move.target, slot, order, enemy_slots)
+                states.append({
+                    'base': {
+                        'order': order.copy(), 'actions': actions,
+                        'od_timing': 'before' if entry.od < 0 else 'after' if entry.od > 0 else None,
+                        'od_level': abs(entry.od), 'special_actions': special.copy(),
+                    },
+                    'adjustments': {'od': 0, 'members': [{'sp': 0, 'token': 0} for _ in range(6)]},
+                })
+                for key in ('demonic_rage', 'demon_cavalry', 'all_out_attack'):
+                    special[key] = 0
+        return {'setup': setup, 'turns': states}
+
+    @staticmethod
+    def hbrf_skill_action(skill, target, slot, order, enemy_slots):
+        kind = skill.selection_target_type()
+        target_slot = None
+        if kind == 'enemy':
+            target_slot = target - 7 if target in (7, 8, 9) else enemy_slots[0]
+        elif kind != 'ignore':
+            candidates = order[:3] if kind == 'ally_single_front_without_self' else order
+            if kind != 'ally_single':
+                candidates = [candidate for candidate in candidates if candidate != slot]
+            target_slot = target - 1 if target in range(1, 7) and target - 1 in candidates else candidates[0]
+        # HBRF不记录随机分支和破盾结果，分支取数据库中的第一项
+        return {
+            'id': skill.id, 'name': skill.names['zh_cn'], 'on_break': False,
+            'target': {'type': kind, 'slot': target_slot},
+            'user_selected': int(next(iter(skill.user_select))) if skill.user_select else None,
+        }
+
+    def import_state(self, data=None, *, inherit_battle=False):
+        # QPushButton.clicked传入的布尔值不代表存档
+        if not isinstance(data, dict):
+            filename, _ = QFileDialog.getOpenFileName(self, '导入模拟数据', '', 'JSON (*.json)')
+            if not filename:
+                return
+            try:
+                data = json.loads(Path(filename).read_text(encoding='utf-8-sig'))
+            except Exception as error:
+                QMessageBox.warning(self, '无法导入模拟数据', str(error)); return
+        try:
+            self.restore_state(data, inherit_battle=inherit_battle)
+        except Exception as error:
+            title = '无法从HBRF导入' if inherit_battle else '无法导入模拟数据'
+            QMessageBox.warning(self, title, str(error))
+
+    def restore_state(self, data, *, inherit_battle=False):
         setup = data['setup']
         states = data['turns']
         if not isinstance(states, list) or not states:
@@ -2042,12 +2214,14 @@ class SimulationTab(QWidget):
 
         # 重建引擎的开场快照，再逐回合应用存档里的行动和手动调整
         engine = type(self.engine)()
-        engine.first_turn(setup)
+        initial = engine.first_turn(setup)
         styles = self.setup.resolve_styles(setup)
         self.setup.check_saved_setup(setup, styles)
         restored = []
         for number, state in enumerate(states, 1):
             try:
+                if inherit_battle:
+                    state = {'base': {**initial, **state['base']}, 'adjustments': state['adjustments']}
                 gui_add_state = BattleTurn.simulation_input(state)
                 order = gui_add_state['order']
                 if any(type(slot) is not int for slot in order) or sorted(order) != list(range(6)):
@@ -2066,7 +2240,7 @@ class SimulationTab(QWidget):
                     if kind not in ('enemy', 'ally_single', 'ally_single_without_self', 'ally_single_front_without_self') or \
                        type(slot) is not int or slot not in range(3 if kind == 'enemy' else 6):
                         raise ValueError('行动目标格式无效。')
-                base = engine.recalculate(copy.deepcopy(gui_add_state), number)
+                base = engine.recalculate(copy.deepcopy(gui_add_state), number, inherit_battle=inherit_battle)
                 restored.append({'base': base, 'adjustments': state['adjustments']})
             except Exception as error:
                 raise ValueError(f'第 {number} 个回合无法恢复：{error}') from error

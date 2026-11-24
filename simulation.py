@@ -2431,7 +2431,7 @@ class Simulation:
 
         return self.turn_to_dict(turn)
 
-    def recalculate(self, gui_add_state, turn_number: int) -> dict:
+    def recalculate(self, gui_add_state, turn_number: int, *, inherit_battle=False) -> dict:
         """
         接受gui传入的state并直接覆盖当前的Turn类对应值：
         gui_add_state = {
@@ -2475,24 +2475,23 @@ class Simulation:
             self.resolve_turn_end_status(turn)
             new_turn = self.new_turn_label_refresh(turn)
 
-        # 应用回合开始时需要的gui修改覆盖状态
-        for position, monster in enumerate(turn.battle.monsters):
-            replace_monster = gui_add_state["enemies"][position]
-            monster.exist = replace_monster["exist"]
-            monster.damage_rate = replace_monster["damage_rate"]
-            monster.down = replace_monster["down"]
-            for status in monster.statuses:
-                if status.id == 170 and not monster.down:
-                    monster.statuses.remove(status)
-                    break
-            # monster.statuses = [Status(**s) for s in replace_monster["statuses"]]
-        if turn.battle.field["value"] != gui_add_state["field"]:
-            turn.battle.field["value"] = gui_add_state["field"]
-            turn.battle.field["left_turn"] = -1
-        
-        # 此处更新member_dp
-        for slot, style in enumerate(turn.team):
-            style.dp = gui_add_state["member_dp"][slot]
+        # HBRF没有这些手动调整，重放时直接沿用引擎计算出的状态
+        if not inherit_battle:
+            for position, monster in enumerate(turn.battle.monsters):
+                replace_monster = gui_add_state["enemies"][position]
+                monster.exist = replace_monster["exist"]
+                monster.damage_rate = replace_monster["damage_rate"]
+                monster.down = replace_monster["down"]
+                for status in monster.statuses:
+                    if status.id == 170 and not monster.down:
+                        monster.statuses.remove(status)
+                        break
+            if turn.battle.field["value"] != gui_add_state["field"]:
+                turn.battle.field["value"] = gui_add_state["field"]
+                turn.battle.field["left_turn"] = -1
+
+            for slot, style in enumerate(turn.team):
+                style.dp = gui_add_state["member_dp"][slot]
 
         # 新回合开始的被动和机制触发
         self.turn_start(turn, new_turn)

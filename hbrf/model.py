@@ -420,6 +420,15 @@ def load_hbrf(filepath) -> BattleScript:
 
     return script
 
+def load_style_metadata(filepath):
+    result = {}
+    for line in Path(filepath).read_text(encoding='utf-8-sig').splitlines():
+        match = re.match(r'^\s*#\s*HBRTOOL_STYLE\s+(1[0-2]|[1-9])\s+(\{.*\})\s*$', line)
+        if match:
+            result[int(match.group(1))] = json.loads(match.group(2))
+    return result
+
+
 def save_hbrf(script: BattleScript, filepath, style_metadata=None):
     validate_hbrf(script)
 
