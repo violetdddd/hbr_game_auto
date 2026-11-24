@@ -1704,14 +1704,9 @@ class MainWindow(QMainWindow):
             path=Path(filename)
         try:
             from hbrf import model as m
-            m.save_hbrf(script,path)
-            # 在文件尾部 Include style metadata as comments to retain compatibility with model.load_hbrf.
-            with Path(path).open('a', encoding='utf-8') as f:
-                f.write('\n# HBRTool style metadata\n')
-                for slot, style in enumerate(styles, 1):
-                    if style:
-                        meta = dict(team=style.team, english=style.english, id=style.sid)
-                        f.write(f'# HBRTOOL_STYLE {slot} {json.dumps(meta, ensure_ascii=False)}\n')
+            metadata = [dict(team=style.team, english=style.english, id=style.sid) if style else None
+                        for style in styles]
+            m.save_hbrf(script, path, metadata)
             # Keep the GUI view's slots and actions untouched on save.
             self.current_path=path
             self.statusBar().showMessage(f'已保存：{path}')

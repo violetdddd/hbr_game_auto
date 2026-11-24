@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 from config import templates as tpl
+import json
 import re
 
 """
@@ -419,7 +420,7 @@ def load_hbrf(filepath) -> BattleScript:
 
     return script
 
-def save_hbrf(script: BattleScript, filepath):
+def save_hbrf(script: BattleScript, filepath, style_metadata=None):
     validate_hbrf(script)
 
     filepath = Path(filepath)
@@ -499,3 +500,9 @@ def save_hbrf(script: BattleScript, filepath):
                 raise ValueError(
                     f"暂不支持的action class: {type(action)}"
                 )
+
+        if style_metadata:
+            f.write('\n# HBRTool style metadata\n')
+            for slot, meta in enumerate(style_metadata, 1):
+                if meta:
+                    f.write(f'# HBRTOOL_STYLE {slot} {json.dumps(meta, ensure_ascii=False)}\n')

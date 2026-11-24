@@ -433,8 +433,10 @@ class Style:
                     instance.limit_break_passive.append(passive)
         # 读入主动技能
         skill_records = skill_records or {}
+        simei_auto = False
         for skill_id in active_skill_ids or []:
             if skill_id == 737:
+                simei_auto = True
                 continue
             raw = skill_records[int(skill_id)]
             instance.active_skills.append(Skill.from_record(raw))
@@ -472,7 +474,7 @@ class Style:
         # 舰长的行动为指挥+无+追击，其他为普攻+无+追击
         basic_ids = [2 if instance.role == 'admiral' else 1, 0, 3]
         # 两个追击/普攻替换技能
-        if "replace_pursuit" in instance.passive_triggers:  # 暗四妹是普攻+自动追击+无
+        if "replace_pursuit" in instance.passive_triggers and simei_auto:  # 暗四妹是普攻+自动追击+无
             basic_ids[2] = 0
             basic_ids[1] = 4
             raw = skill_records[int(7280001)]
@@ -2548,9 +2550,14 @@ class Simulation:
                     case "demon_cavalry_after":
                         self.using_demon_cavalry(turn, times, before_od=False)
 
-        # 附加回合则必须遵守和上一回合相同的order
-        if not turn.additional_turn:
-            turn.order = gui_add_state["order"]
+        # 追加回合只能在原前排中交换有行动资格的角色
+        order = gui_add_state["order"]
+        if not turn.additional_turn or (
+            sorted(order[:3]) == sorted(turn.order[:3]) and order[3:] == turn.order[3:] and
+            all(old == new or has_status_id(turn.team[old], 20, True)
+                for old, new in zip(turn.order[:3], order[:3]))
+        ):
+            turn.order = order.copy()
         # 按当前站位计算技能，再检查GUI传入的行动
         self.calculate_member_skills(turn)
         turn.actions = gui_add_state["actions"]

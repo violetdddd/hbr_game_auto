@@ -1509,15 +1509,15 @@ class BattleTurn(QGroupBox):
         else:
             icon = 'RiceFieldZone.webp' if field == 'rice_field' else f'{field.capitalize()}Zone.webp'
             self.field_display.addWidget(icon_label(
-                ICON_DIR / 'status' / icon, 15, FIELD_NAMES.get(field, '场')))
+                ICON_DIR / 'status' / icon, 18, FIELD_NAMES.get(field, '场')))
         self.field_display.addStretch()
         # 超越量表信息和场地放在一起
         super_scale = self.state_data["base"]["super_scale"]
         if super_scale["element"]:
             element = super_scale["element"]
             path = ICON_DIR / 'element' / f'{element}.webp'
-            self.field_display.addWidget(icon_label(path, 15, ELEMENT_NAMES.get(element, '?')))
-            self.field_display.addWidget(QLabel('超越量表：'))
+            self.field_display.addWidget(icon_label(path, 18, ELEMENT_NAMES.get(element, '?')))
+            self.field_display.addWidget(QLabel('量表：'))
             self.field_display.addWidget(QLabel(f'{super_scale["value"]}%'))
 
     def effective_state(self):
@@ -1679,11 +1679,13 @@ class SimulationTab(QWidget):
         export.clicked.connect(self.export_state)
         import_button = QPushButton('导入模拟数据')
         import_button.clicked.connect(self.import_state)
+        export_hbrf = QPushButton('导出 HBRF')
+        export_hbrf.clicked.connect(self.export_hbrf)
         tips = QPushButton('温馨提示')
         tips.clicked.connect(self.show_tips)
         toolbar.addWidget(tips); toolbar.addStretch()
         toolbar.addWidget(start); toolbar.addWidget(self.apply_setup)
-        toolbar.addWidget(export); toolbar.addWidget(import_button)
+        toolbar.addWidget(export); toolbar.addWidget(import_button); toolbar.addWidget(export_hbrf)
         self.turn_layout.addLayout(toolbar)
         self.scroll.setWidget(self.container); outer.addWidget(self.scroll)
         self.setStyleSheet(COMPACT +
@@ -1694,7 +1696,7 @@ class SimulationTab(QWidget):
         QMessageBox.information(
             self, '温馨提示',
             '声明\n'
-            '为方便排轴，目前不对任何技能使用进行限制（检查sp、技能使用次数等）。\n\n'
+            '为方便排轴，目前不对任何技能和OD使用进行限制（检查OD/SP消耗、技能次数限制、冷却回合等）。\n\n'
             '战斗设定\n'
             '选好六个上场风格，再设置技能、突破、饰品、共鸣和敌人信息。'
             '「开始战斗」会创建新战斗，「应用设定修改」会从首回合重算现有排轴。\n\n'
@@ -1895,6 +1897,132 @@ class SimulationTab(QWidget):
         if filename:
             Path(filename).write_text(json.dumps(state, ensure_ascii=False, indent=2),
                                       encoding='utf-8')
+
+    def build_hbrf(self):
+        from hbrf import model as m
+
+        if not self.turns:
+            raise ValueError('请先开始战斗。')
+        roles = [m.Role(slot + 1, (style.label or style.name).replace(' ', '').replace('　', ''))
+                 for slot, style in enumerate(self.styles)]
+        if len({role.name for role in roles}) != 6:
+            raise ValueError('HBRF要求六名角色的名称各不相同。')
+
+        # 先收集每名角色用到的技能，同一对切换技能共用一个位置
+        skill_names = [
+            {self.catalog.skill_data[name]['simulation_id']: name
+             for name in self.catalog.skills_for(style)
+             if 'simulation_id' in self.catalog.skill_data.get(name, {})}
+            for style in self.styles
+        ]
+        used = [{} for _ in roles]
+        rows = []
+        for turn in self.turns:
+            base = turn.state_data['base']
+            enemy_count = sum(enemy['exist'] for enemy in base['enemies'])
+            moves = []
+            for slot in base['order'][:3]:
+                action = base['actions'][slot]
+                skill_id = action['id'] if action else 0
+                skill = None
+                target = None
+                if skill_id not in (0, 1, 2, 4520001):
+                    skill = skill_names[slot].get(skill_id)
+                    if skill is None:
+                        raise ValueError(f'第{turn.number}张回合卡：{roles[slot].name}的技能 {action["name"]} 无法对应HBRF技能。')
+                    linked = self.catalog.linked(self.styles[slot], skill)
+                    pair = frozenset((skill, linked)) if linked else frozenset((skill,))
+                    if pair not in used[slot]:
+                        role = roles[slot]
+                        role.skills.append(f'{skill}/{linked}' if linked else skill)
+                        if len(role.skills) > 6:
+                            raise ValueError(f'{role.name}使用的技能超过6个，无法转换。')
+                        used[slot][pair] = (len(role.skills), skill)
+                    choice = action['target']
+                    if choice['slot'] is not None:
+                        if choice['type'] != 'enemy':
+                            target = choice['slot'] + 1
+                        elif enemy_count > 1:
+                            target = choice['slot'] + 7
+                    moves.append((slot, skill, pair, target))
+                else:
+                    moves.append((slot, None, None, None))
+            # 使用HBRF编辑器支持的标签，显示标题不参与导出
+            if not 1 <= base['turn'] <= 20:
+                raise ValueError(f'第{turn.number}张回合卡超出HBRF编辑器支持的T1–T20。')
+            label = f"T{base['turn']}"
+            timing, level, bonus = base['od_timing'], base['od_level'], base['bonus']
+            if timing and level:
+                direction = '前置' if timing == 'before' else '后置'
+                phase = f'bonus{bonus}' if bonus else 'OD前'
+                label += f'-{direction}OD{level}-{phase}'
+            if base['additional_turn']:
+                label += '-追加'
+            rows.append((label, base, moves))
+
+        actions = []
+        form = 0
+        previous = None
+        for label, base, moves in rows:
+            special = base['special_actions']
+            # 小按钮统一安排在本回合发动OD之前
+            for trigger, button in (('kelian_form_change', 'kelian'), ('demonic_rage', 'siling')):
+                if trigger == 'kelian_form_change':
+                    count = int(special[trigger] != form)
+                    form = special[trigger]
+                else:
+                    count = special[trigger] + special[trigger + '_after']
+                if count:
+                    slot = next((i for i, member in enumerate(base['members'])
+                                 if member['special_trigger'] == trigger), None)
+                    if slot is None:
+                        raise ValueError(f'{label}缺少发动{button}的角色。')
+                    position = base['order'].index(slot)
+                    actions.extend(m.SpecialRoleButton(slot + 1, position if position < 3 else 0, button)
+                                   for _ in range(count))
+            for trigger, button in (('demon_cavalry', 'waki'), ('all_out_attack', 'attack')):
+                count = special[trigger] + special[trigger + '_after']
+                actions.extend(m.SpecialGlobalButton(button) for _ in range(count))
+
+            turn_moves = []
+            for position, (slot, skill, pair, target) in enumerate(moves):
+                number = 0
+                if pair is not None:
+                    number, current = used[slot][pair]
+                    if current != skill:
+                        actions.append(m.SkillSwitch(slot + 1, number, position))
+                        used[slot][pair] = (number, skill)
+                turn_moves.append(m.SkillAction(slot + 1, number, target))
+
+            # 只有发动OD的回合写入档位，后续Bonus继续按普通行动执行
+            od = 0
+            if base['od_timing'] == 'before' and base['bonus'] == 1 and not base['additional_turn']:
+                od = -base['od_level']
+            elif base['od_timing'] == 'after' and base['bonus'] == 0:
+                if not base['additional_turn'] or previous is None or previous['od_timing'] != 'after':
+                    od = base['od_level']
+            actions.append(m.BattleTurn(label, od, turn_moves))
+            previous = base
+
+        script = m.BattleScript(roles, actions)
+        m.validate_hbrf(script)
+        return script
+
+    def export_hbrf(self):
+        from hbrf import model as m
+
+        try:
+            script = self.build_hbrf()
+            filename, _ = QFileDialog.getSaveFileName(self, '导出 HBRF', 'simulation.hbrf', 'HBRF (*.hbrf)')
+            if not filename:
+                return
+            path = Path(filename)
+            if path.suffix.lower() != '.hbrf':
+                path = path.with_name(path.name + '.hbrf')
+            metadata = [dict(team=style.team, english=style.english, id=style.sid) for style in self.styles]
+            m.save_hbrf(script, path, metadata)
+        except Exception as error:
+            QMessageBox.warning(self, '无法导出 HBRF', str(error))
 
     def import_state(self):
         filename, _ = QFileDialog.getOpenFileName(self, '导入模拟数据', '', 'JSON (*.json)')
