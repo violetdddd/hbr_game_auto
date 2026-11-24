@@ -14,7 +14,7 @@ log = logging.getLogger('hbr.repetition')
 MAX_TIME = 20*60
 
 # 用于反复多次刷体力
-def repeat_fight(game, fight_config, times, ticket="stone", auto_close=False):
+def repeat_fight(game, fight_config, times, ticket="stone", *, auto_mode="none"):
     if times < 1:
         raise ValueError("战斗次数必须至少为1")
     if ticket not in ("stone", "ticket", "spare"):
@@ -39,12 +39,12 @@ def repeat_fight(game, fight_config, times, ticket="stone", auto_close=False):
     counter = 1
     repeat_one_time()
     time.sleep(0.5)
-    # 第一次战斗，要auto_close
+    # 第一次战斗应用自动战斗设定
     wait_and_click(game, load_template(tpl.go_for_fight_fig))
     if fight_config is not None:
-        fight(game, fight_config, auto_close=auto_close)
+        fight(game, fight_config, auto_mode=auto_mode)
 
-    # 后续所有战斗不需要auto_close
+    # 后续战斗沿用游戏内的自动战斗状态
     for i in range(times-1):
         wait_and_click(game, load_template(tpl.again_fig), 
                        click_blank=True, timeout=MAX_TIME, 

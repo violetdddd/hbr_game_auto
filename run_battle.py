@@ -16,7 +16,7 @@ def main():
         force=True
     )
 
-    path, repeated, count, ticket, auto_close, title = sys.argv[1:]
+    path, repeated, count, ticket, auto_mode, title = sys.argv[1:]
     script = m.load_hbrf(path)
     game = find_window(title)
     settings.set_resolution(settings.detect_resolution(game))
@@ -26,16 +26,15 @@ def main():
         if need_ao:
             raise ValueError("重复刷取光球不支持凹追击检查")
         from repetition import repeat_fight
-        repeat_fight(game, script, int(count), ticket=ticket, auto_close=(auto_close == '1'))
+        repeat_fight(game, script, int(count), ticket=ticket, auto_mode=auto_mode)
     else:
         from fight import fight
-        need_auto_close = auto_close == '1'
         if need_ao:
             from fight import restart_battle
             for attempt in range(1, MAX_RETRY + 1):
                 # 成功就return结束即可
                 try:
-                    fight(game, script, auto_close=(attempt == 1 and need_auto_close))
+                    fight(game, script, auto_mode=auto_mode if attempt == 1 else 'none')
                     return True
                 # 失败则捕捉异常重新开始
                 except m.ODRetryRequired as e:
@@ -45,7 +44,7 @@ def main():
                         ) from e
                     restart_battle(game, attempt, e)
         else:
-            fight(game, script, auto_close=need_auto_close)
+            fight(game, script, auto_mode=auto_mode)
 
 if __name__ == '__main__':
     try:

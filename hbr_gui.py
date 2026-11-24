@@ -782,12 +782,12 @@ class Worker(QThread):
     log_text = Signal(str)
     finished_text = Signal(str)
 
-    def __init__(self, path, repeated, count, ticket, auto_close, title, mode='battle'):
+    def __init__(self, path, repeated, count, ticket, auto_mode, title, mode='battle'):
         super().__init__()
         self.mode = mode  # battle 对应普通战斗，card 对应技术模拟战
         self.args = ([str(count), title] if mode == 'card' else
                      [str(path), str(int(repeated)), str(count), ticket,
-                      str(int(auto_close)), title])
+                      auto_mode, title])
         self.process = None
         self.stopping = False
 
@@ -942,21 +942,23 @@ class MainWindow(QMainWindow):
         select.clicked.connect(self.select_run_file)
         pathrow = QHBoxLayout(); pathrow.addWidget(self.run_path); pathrow.addWidget(select)
         form.addRow('HBRF 路径', pathrow)
-        # 勾选后先关闭自动战斗；空行动脚本可以配合游戏内自动战斗使用
-        self.auto_close = QCheckBox(
-            '战斗前关闭自动战斗（需要自动战斗则不勾选，并上传无任何行动的空 HBRF 文件）'
-        )
-        self.auto_close.setChecked(True)
-        auto_close_row = QHBoxLayout()
-        auto_close_row.addStretch(); auto_close_row.addWidget(self.auto_close); auto_close_row.addStretch()
-        form.addRow(auto_close_row)
+        self.auto_mode = QComboBox()
+        for label, mode in (('关闭自动战斗', 'off'), ('开启FULL自动战斗', 'full'),
+                            ('开启NORMAL自动战斗', 'normal'), ('无', 'none')):
+            self.auto_mode.addItem(label, mode)
+        auto_row = QHBoxLayout()
+        auto_label = QLabel('自动战斗设置（只使用游戏内自动战斗时，可以选择空 HBRF 脚本）')
+        auto_label.setWordWrap(True)
+        auto_row.addWidget(auto_label, 1); auto_row.addWidget(self.auto_mode, 1)
+        form.addRow(auto_row)
 
         # 等宽等高的两栏；高度只取右侧表单的建议高度，不占满页面
         battle_modes = QHBoxLayout()
         single_box = QGroupBox('执行单次战斗')
         single_layout = QVBoxLayout(single_box)
         # 提示用户分辨率支持
-        resolution_note = QLabel(                         
+        resolution_note = QLabel(
+            '点击激活游戏窗口时自动战斗，窗口未激活时会暂停运行\n'
             '目前支持的分辨率为：\n'
             '(1680, 1050)、(1920, 1200)、(2560, 1600)、\n'
             '(2048, 1152)、(2160, 1215)、(2560, 1440)。\n'
@@ -1806,7 +1808,7 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self,'脚本无效',str(e)); return
         self.log.append('开始执行：'+('重复战斗' if repeated else '单次战斗'))
         self.worker=Worker(path,repeated,self.run_count.value(),self.ticket.currentData(),
-                           self.auto_close.isChecked(),self.window_title.text().strip())
+                           self.auto_mode.currentData(),self.window_title.text().strip())
         self.worker.finished_text.connect(self.log.append)
         self.worker.log_text.connect(self.log.append)
         self.worker.finished.connect(self.run_finished)

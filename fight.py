@@ -14,7 +14,10 @@ from dataclasses import replace
 
 log = logging.getLogger('hbr.fight')
 
-def close_auto_fight(game):
+def set_auto_fight(game, mode):
+    if mode == "none":
+        return
+    log.info("正在%s自动战斗", "关闭" if mode == "off" else f"开启 {mode.upper()} ")
     resolution = settings.current_resolution
     region = (0,0,resolution[0]//4,resolution[1]//8)
     templates = {"off": load_template(tpl.auto_off_fig), "on":load_template(tpl.auto_on_fig)}
@@ -25,7 +28,19 @@ def close_auto_fight(game):
     if name == "on":
         click_in_game(game, pt)
 
-    return name
+    if mode == "off":
+        return
+
+    # 先确认已关闭，再打开模式菜单，避免沿用上次选择
+    if name == "on":
+        wait_and_click(game, templates["off"], region=region, interval=0.1,
+                       warning="未匹配到已关闭的自动战斗按钮")
+    else:
+        click_in_game(game, pt)
+
+    mode_template = tpl.auto_full_fig if mode == "full" else tpl.auto_normal_fig
+    wait_and_click(game, load_template(mode_template),
+                   warning=f"未匹配到 {mode.upper()} 自动战斗选项")
 
 def detect_start_button(game, is_gray=False):
     resolution = settings.current_resolution
@@ -285,7 +300,10 @@ def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mo
 
     return member_position_output
 
-def fight(game, script: mod.BattleScript, auto_close=False):
+def fight(game, script: mod.BattleScript, auto_mode="none"):
+    if auto_mode not in ("off", "full", "normal", "none"):
+        raise ValueError(f"未知自动战斗设定: {auto_mode}")
+
     def local_role(role):  # 用于将7-12映射回1-6
         return role - (current_team - 1) * 6
     
@@ -305,17 +323,15 @@ def fight(game, script: mod.BattleScript, auto_close=False):
     # 初始默认team为1
     current_team = 1
 
-    # 设置关闭自动战斗flag
-    has_turn_off_auto = False
+    # 自动战斗设定只在本次脚本开始时应用
+    auto_pending = auto_mode != "none"
     # 设置检查od凹追击flag，理论上只有CheckOD紧接BattleTurn才会触发检查
     need_od_check = False
 
     for action in script.actions:
-        # 需要auto close并且遇到第一个不是mod.SkipEvent的行动
-        if auto_close and not has_turn_off_auto and not isinstance(action, mod.SkipEvent):
-            log.info("正在关闭自动战斗")
-            close_auto_fight(game)
-            has_turn_off_auto = True
+        if auto_pending and not isinstance(action, mod.SkipEvent):
+            set_auto_fight(game, auto_mode)
+            auto_pending = False
 
         if isinstance(action, mod.CheckOD):  # check_od只负责修改flag
             need_od_check = True
@@ -409,6 +425,10 @@ def fight(game, script: mod.BattleScript, auto_close=False):
 
         need_od_check = False  # 还原need_od_check为false
 
+    # 空脚本也可以只用于开启或关闭游戏内的自动战斗
+    if auto_pending:
+        set_auto_fight(game, auto_mode)
+
 def restart_battle(game, attempt, e):
     log.info(
         "第 %d 次凹追击失败：%s",
@@ -436,6 +456,5 @@ if __name__ == "__main__":
     game = find_window()
     fight_script = mod.load_hbrf(SCRIPTS_DIR / "test111.hbrf")
     # """异时层由于有很多剧情，暂时不能自动关闭auto战斗"""
-    fight(game, fight_script, auto_close=False)
-    # fight(game, fight_config, auto_close=True)
+    fight(game, fight_script)
 
