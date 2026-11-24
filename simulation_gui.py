@@ -1496,7 +1496,7 @@ class BattleTurn(QGroupBox):
         weak.addWidget(QLabel('敌人弱点：'))
         for element in effective.get('enemy_weaknesses', []):
             path = ICON_DIR / 'element' / f'{element}.webp'
-            weak.addWidget(icon_label(path, 15, ELEMENT_NAMES.get(element, '?')))
+            weak.addWidget(icon_label(path, 18, ELEMENT_NAMES.get(element, '?')))
         if len(effective.get('enemy_weaknesses', [])) == 0:
             weak.addWidget(QLabel('无'))
         weak.addStretch()
@@ -2105,6 +2105,7 @@ class SimulationTab(QWidget):
         records = json_records_to_dict(self.engine.skills_path)
         role_skills = []
         for role, style in zip(script.roles, styles):
+            style_id = self.setup._style_id(style)
             entries = []
             active_ids, orb_ids = [], []
             for entry in role.skills:
@@ -2117,9 +2118,12 @@ class SimulationTab(QWidget):
                     variants.append(Skill.from_record(records[skill_id]))
                     (orb_ids if name in self.catalog.common_global else active_ids).append(skill_id)
                 entries.append(variants)
+            # HBRF只记录前排行动，暗四妹仍默认装备自动追击所需的猫咪喷射打靶
+            if style_id == 266:
+                active_ids.append(737)
             role_skills.append(entries)
             setup['styles'].append({
-                'style_id': self.setup._style_id(style),
+                'style_id': style_id,
                 'break_level': self.setup._default_level(style),
                 'od_earring': 15, 'necklace_sp': 3,
                 'active_skill_ids': list(dict.fromkeys(active_ids)),
@@ -2162,6 +2166,8 @@ class SimulationTab(QWidget):
                         continue
                     slot = move.role - 1
                     skill = role_skills[slot][move.skill - 1][selected[slot][move.skill - 1]]
+                    if setup['styles'][slot]['style_id'] == 266 and skill.id == 737:
+                        continue  # 该技能只通过后排自动追击发动
                     actions[slot] = self.hbrf_skill_action(skill, move.target, slot, order, enemy_slots)
                 states.append({
                     'base': {
