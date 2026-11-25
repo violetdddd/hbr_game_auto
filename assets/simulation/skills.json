@@ -9047,7 +9047,7 @@
   "574": {
     "id": 574,
     "names": {"zh_cn": "冷奏", "zh_tw": "冷奏", "jp": "フレッダメンテ"},
-    "conditions": {"cost": "has(204)"},
+    "conditions": {"cost": "territory_is(204)"},
     "kind": "active",
     "cost": {
       "yes": {"sp": 8},

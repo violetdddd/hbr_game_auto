@@ -1305,7 +1305,7 @@ class Simulation:
                 remaining=remaining,
                 level=level,
                 source=source,
-                data=deepcopy(effect),
+                data=deepcopy({key: value for key, value in effect.items() if key != "effect_target"}),
             )
             target.statuses.append(status)
             return status
@@ -1834,6 +1834,10 @@ class Simulation:
 
     def od_legalization(self, turn: Turn, gui_add_state):
         """检查od是否合法并清除不合法的od设置"""
+        # od 相关发动没有变化，和natural一致则直接返回
+        if turn.od_timing == gui_add_state["od_timing"] and turn.od_level == gui_add_state["od_level"]:
+            return
+
         natural_od_timing = turn.od_timing
         # 前置od发动条件是当前刚刚开启前置od，或者当前处于od外的非附加回合中
         available_before = True if (natural_od_timing == "before" and turn.bonus == 1) or (turn.od_level == 0 and not turn.additional_turn) else False
@@ -1988,7 +1992,7 @@ class Simulation:
                         spri = [status for status in style.statuses if status.id == 194]
                         if spri:
                             value_max = max(status.data.get("value") for status in spri)
-                            if skill.id != 336 and skill.now_cost == skill.default_cost:
+                            if skill.id != 366 and skill.now_cost == skill.default_cost:
                                 skill.now_cost = math.ceil(skill.default_cost * (1-value_max))
                                 for status in spri:  # 把用过的轻快status标记为trash，回合末清除
                                     if status.data.get("value") == value_max:
@@ -2040,7 +2044,12 @@ class Simulation:
         on_relieve_enemy_buff
         on_break_enemy
         """
-        tmp_turn = deepcopy(turn)
+        # 预测只给队友临时增加连击珠，并标记已消费的珠子
+        tmp_turn = replace(turn, team=[
+            replace(style, statuses=[replace(status) if status.id == 13 else status
+                                    for status in style.statuses])
+            for style in turn.team
+        ])
         turn.stage_tmp_od = 0
         # 判断超越量表
         super_scale_element = turn.battle.super_scale.get("element")
@@ -2066,7 +2075,7 @@ class Simulation:
             elif i > 2:
                 action_type.append(3)
                 if skill_id == 4:
-                    simei_style = style
+                    simei_style = tmp_turn.team[slot]
             else:
                 if skill_id == 1:  # 普通行动
                     action_type.append(2)
@@ -2079,7 +2088,7 @@ class Simulation:
                     else:
                         action_type.append(1)
         # 应用每个角色的技能，消耗对应资源，增加连击珠，并计算技能的od增量
-        for slot in [x for _, x in sorted(zip(action_type, turn.order))]:
+        for _, slot in sorted(zip(action_type, turn.order), key=lambda item: item[0]):
             skill_id, style, action = skill_ids[slot], turn.team[slot], turn.actions[slot]
             if not skill_id or skill_id in (0,2,4):  # 没有行动或指挥行动或四妹自动追击
                 continue
@@ -2213,7 +2222,7 @@ class Simulation:
                     else:
                         action_type.append(1)
         # 应用每个角色的技能
-        for slot in [x for _, x in sorted(zip(action_type, turn.order))]:
+        for _, slot in sorted(zip(action_type, turn.order), key=lambda item: item[0]):
             skill_id, style, action = skill_ids[slot], turn.team[slot], turn.actions[slot]
             if not skill_id or skill_id in (1, 3):  # 没有行动、普攻、追击
                 fresh_sprightly(style)
