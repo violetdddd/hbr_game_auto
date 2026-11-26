@@ -25,6 +25,7 @@ FIELD_OPTIONS = [('无', None), ('火场', 'fire'), ('冰场', 'ice'),
                  ('雷场', 'thunder'), ('光场', 'light'), ('暗场', 'dark'), ('稻场', 'rice_field'), ("其他", "others")]
 ELEMENT_NAMES = dict((value, label) for label, value in ELEMENTS)
 FIELD_NAMES = dict((value, label) for label, value in FIELD_OPTIONS)
+TERRITORY_NAMES = {204: "晚夏", 157: "再生"}
 BLUE_BUTTON = ('QPushButton{background:#2563eb;color:white;border:1px solid #1d4ed8;'
                'border-radius:7px;padding:3px 9px;font-weight:600}'
                'QPushButton:hover{background:#1d4ed8}'
@@ -218,8 +219,11 @@ class StatusRow(QScrollArea):
             duration = status.get('duration_type')
             remaining = status.get('remaining')
             element = status.get('element')
+            level = status.get('level')
             if element:
                 name = ELEMENT_NAMES[element] + name
+            if level:
+                name += f" Level {level} "
             if duration == 'permanent':
                 name += '（永久）'
             elif duration not in ('use_immersion_ex', 'on_attack_weak'):
@@ -1532,15 +1536,17 @@ class BattleTurn(QGroupBox):
             if line.isHidden() == enemy['exist']:
                 line.setVisible(enemy['exist'])
             self.refresh_status_row(statuses, enemy['statuses'])
-        # 场地信息
+        # 场地行的信息：场地、域、量表
         field = effective.get('field')
         super_scale = effective['super_scale']
-        field_key = (field, super_scale['element'], super_scale['value'])
+        territory = effective.get("territory")
+        field_key = (field, territory, super_scale['element'], super_scale['value'])
         if field_key == self._shown_field:
             return
         self._shown_field = field_key
         clear_layout(self.field_display)
-        self.field_display.addWidget(QLabel('场地：'))
+        # 场地信息
+        self.field_display.addWidget(QLabel('场：'))
         if field is None:
             self.field_display.addWidget(QLabel('无'))
         elif field == "others": 
@@ -1550,13 +1556,17 @@ class BattleTurn(QGroupBox):
             self.field_display.addWidget(icon_label(
                 ICON_DIR / 'status' / icon, 18, FIELD_NAMES.get(field, '场')))
         self.field_display.addStretch()
+        # 域信息和场地放在一起
+        if isinstance(territory, int):
+            self.field_display.addWidget(QLabel("域：" + TERRITORY_NAMES[territory]))
+        self.field_display.addStretch()
         # 超越量表信息和场地放在一起
         if super_scale["element"]:
             element = super_scale["element"]
             path = ICON_DIR / 'element' / f'{element}.webp'
             self.field_display.addWidget(icon_label(path, 18, ELEMENT_NAMES.get(element, '?')))
             self.field_display.addWidget(QLabel('量表：'))
-            self.field_display.addWidget(QLabel(f'{super_scale["value"]}%'))
+            self.field_display.addWidget(QLabel(f'{super_scale["value"]}'))
 
     @staticmethod
     def refresh_stylesheet(widget, style):

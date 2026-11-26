@@ -49,6 +49,7 @@ PASSIVE_EFFECT_TYPES_NEEDED = {
     "funnel",
     "buff_charge",
     "give_debuff_turn_up",
+    "makeup",
     "shadow_clone",
     "negative_mind",
     "infantilized",
@@ -131,6 +132,7 @@ ACTIVE_EFFECT_TYPES_NEEDED = {
     "infantilized",
     "hacking",
 }
+
 ATTACK_UP_GROUP = {
     "attack_up",
     "attack_up_by_token",
@@ -142,6 +144,12 @@ DEBUFF_UP_GROUP = {
     "defense_down",
     "fragile",
     "resist_down",
+}
+
+DP_HEAL_GROUP = {
+    "heal_dp",
+    "heal_dp_rate",
+    "revive_dp",
 }
 
 from paths import ROOT_DIR
@@ -396,6 +404,11 @@ class Style:
     def generate_default_skills_from_skill(skill: Skill) -> dict:
         return {"name": skill.names["zh_cn"], "id": skill.id, "cost": 0, "cost_type": "sp",
                 "target_type": "ignore", "user_select": None}
+
+    def style_has_passive_id(self, skill_id: int) -> bool:
+        if not self.skill_passive:
+            return
+        return any(passive.id == skill_id for passive in self.skill_passive)
 
     @classmethod
     def from_record(
@@ -964,6 +977,7 @@ class Simulation:
         'enemy_weaknesses': turn.battle.enemy_weaknesses,
         "super_scale": turn.battle.super_scale,
         'field': turn.battle.field["value"],
+        "territory": turn.battle.territory,
         'turn': turn.turn_num,
         'od': turn.od,
         'predicted_od': turn.predicted_od,
@@ -1226,7 +1240,13 @@ class Simulation:
         # 未知结构
         else:
             raise ValueError(f"未知主动技能效果结构: {skill.effects}")
+        # 理莎的返婴被动，在filter之前确认是否有dp恢复相关效果，并添加返婴1层
+        tmp_effect = None
+        if ctx.subject.style_has_passive_id(556) and before_filter and any(effect.get("type") in DP_HEAL_GROUP for effect in before_filter):
+            tmp_effect = {"type": "infantilized", "target": "all", "status_id": 214, "duration": {"type": "permanent"}, "level": 1, "target_condition": "target.has(214)"}
         after_filter = [deepcopy(effect) for effect in before_filter if effect.get("type") in ACTIVE_EFFECT_TYPES_NEEDED]
+        if tmp_effect:
+            after_filter.append(tmp_effect)
         # 对每个effect确定单体的target
         turn = ctx.turn
         for effect in after_filter:
@@ -1437,12 +1457,15 @@ class Simulation:
             case "mocktail":
                 for target in targets:
                     add_status(target, unique=True)
+            case "makeup":
+                for target in targets:
+                    add_status(target, unique=True)
             case "talisman":
                 for target in targets:
-                    add_status(target, level=effect.get("level", 0))
+                    add_status(target, level=effect.get("level", 0), max_level=10)
             case "inscription":
                 for target in targets:
-                    add_status(target, level=effect.get("level", 0))
+                    add_status(target, level=effect.get("level", 0), max_level=15)
             case "morale":  # 这里共鸣会写value，但其他时候会写level
                 for target in targets:
                     add_status(target, level=effect.get("level", effect.get("value", 1)), max_level=10,)
@@ -1595,13 +1618,15 @@ class Simulation:
         turn.stage_tmp_od = 0
 
     def consume_enemy_turn(self, turn: Turn):
-        """把所有己方和敌方的enemy_turn进行消耗"""
+        """把所有己方和敌方的enemy_turn进行消耗，包括灵符状态重置等级"""
         for enemy in turn.battle.monsters:
             for status in enemy.statuses:
                 if status.duration_type == "enemy_turn":
                     status.remaining -= 1
                     if status.remaining <= 0:
                         status.trash = True
+                if status.id == 177 and not enemy.down:
+                    status.level = 0
         for style in turn.team:
             for status in style.statuses:
                 if status.duration_type == "enemy_turn":
@@ -1770,7 +1795,8 @@ class Simulation:
                 if only_od:  # 计算od
                     hit = simei_skill.hit_count
                     funnel = calculate_funnel(simei_style)
-                    turn.stage_tmp_od += calculate_od(hit, funnel, 1, 0, simei_style.od_earring, simei_style.od_rate_extra, turn.battle.default_hit)
+                    # 四妹大招吃连击珠但是不吃od耳环
+                    turn.stage_tmp_od += calculate_od(hit, funnel, 1, 0, 0, simei_style.od_rate_extra, turn.battle.default_hit)
                 else:  # 计算buff
                     effects = [deepcopy(effect) for effect in simei_skill.effects if effect.get("type") in ACTIVE_EFFECT_TYPES_NEEDED]
                     for effect in effects:
@@ -1781,6 +1807,27 @@ class Simulation:
                     self.trigger_style_passives(turn, simei_style, "on_pursuit", without_od=True)
                 return True
         return simei_ex
+
+    def resolve_sp_up_effect_passive(self, effect, turn, style, ctx, *, only_od):
+        """对一个具体的effect判断是否恢复sp，根据target condition判断恢复几次sp，并最终触发被动"""
+        if effect.get("sp"):  # 对于恢复sp的主动技能
+            target_condition = effect.get("target_condition")
+            targets = resolve_targets(turn, style, effect.get("target"), effect)
+            for target in targets:
+                ctx_target = replace(ctx, subject=target)
+                # 每一个非自身target触发被动
+                if target != style and (target_condition == None or check(target_condition, ctx_target)):
+                    if only_od:
+                        self.trigger_style_passives(turn, target, "on_sp_up_by_nonself_active_skill", only_od=True)
+                    else:
+                        self.trigger_style_passives(turn, target, "on_sp_up_by_nonself_active_skill", without_od=True)
+
+    def resolve_talisman(self, monster: Monster):
+        """把tama灵符的等级对某一怪物提升1级"""
+        for status in monster.statuses:
+            if status.id == 177:
+                status.level = min(status.level+1, 10)
+            break
 
     def action_legalization(self, turn: Turn):
         """合法化turn.actions，允许recalculate的action和初始化的[None]*6"""
@@ -1834,15 +1881,17 @@ class Simulation:
 
     def od_legalization(self, turn: Turn, gui_add_state):
         """检查od是否合法并清除不合法的od设置"""
+        natural_od_timing = turn.od_timing
+        natural_od_level = turn.od_level
+        natural_od_bonus = turn.bonus
         # od 相关发动没有变化，和natural一致则直接返回
-        if turn.od_timing == gui_add_state["od_timing"] and turn.od_level == gui_add_state["od_level"]:
+        if natural_od_timing == gui_add_state["od_timing"] and natural_od_level == gui_add_state["od_level"]:
             return
 
-        natural_od_timing = turn.od_timing
         # 前置od发动条件是当前刚刚开启前置od，或者当前处于od外的非附加回合中
-        available_before = True if (natural_od_timing == "before" and turn.bonus == 1) or (turn.od_level == 0 and not turn.additional_turn) else False
+        available_before = True if (natural_od_timing == "before" and natural_od_bonus == 1) or (natural_od_level == 0 and not turn.additional_turn) else False
         # 后置od发动条件是当前刚刚开启前置od，或者当前处于od外
-        available_after = True if (natural_od_timing == "before" and turn.bonus == 1) or turn.od_level == 0 else False
+        available_after = True if (natural_od_timing == "before" and natural_od_bonus == 1) or natural_od_level == 0 else False
 
         # 检查od设置是否合法
         legal = True
@@ -1853,7 +1902,7 @@ class Simulation:
         if gui_add_state["od_timing"] == "after" and natural_od_timing == None and not available_after:
             legal = False
         # 延续之前的od设置与新设置冲突不合法
-        if natural_od_timing != None and gui_add_state["od_timing"] != natural_od_timing:
+        if natural_od_timing != None and (gui_add_state["od_timing"] != natural_od_timing or gui_add_state["od_level"] != natural_od_level):
             legal = False
         # 合法可以应用新设置
         if legal:
@@ -2158,17 +2207,10 @@ class Simulation:
                 if self.skill_has_effect_with(skill, action, ctx, effect_key="sp"):
                     effects = self.resolve_active_effects(skill, action, ctx)
                     for effect in effects:
-                        if effect.get("sp"):  # 对于恢复sp的主动技能
-                            targets = resolve_targets(turn, style, effect.get("target"), effect)
-                            for target in targets:
-                                if target != style:  # 每一个非自身target触发被动
-                                    self.trigger_style_passives(turn, target, "on_sp_up_by_nonself_active_skill", only_od=True)
+                        self.resolve_sp_up_effect_passive(effect, turn, style, ctx, only_od=True)
                         # 对于非破盾时恢复sp的ex双动技能
-                        if effect.get("sp") and has_status_id(style, 125) and skill.ex_skill and not effect.get("need_break"):
-                            targets = resolve_targets(turn, style, effect.get("target"), effect)
-                            for target in targets:
-                                if target != style:  # 每一个非自身target触发被动
-                                    self.trigger_style_passives(turn, target, "on_sp_up_by_nonself_active_skill", only_od=True)
+                        if has_status_id(style, 125) and skill.ex_skill and not effect.get("need_break"):
+                            self.resolve_sp_up_effect_passive(effect, turn, style, ctx, only_od=True)
 
         self.resolve_tmp_od(turn, direct=False)
 
@@ -2236,6 +2278,15 @@ class Simulation:
             else:  # 一般的skill
                 skill = find_skill_by_id(style, skill_id)
                 attack_skill = is_attack_skill(skill)
+                # 攻击技能需要把灵符等级增加1
+                if attack_skill:
+                    if skill.target == "all":
+                        for monster in turn.battle.monsters:
+                            if monster.exist:
+                                self.resolve_talisman(monster)
+                    elif skill.target == "single":
+                        monster = turn.battle.monsters[action["target"]["slot"]]
+                        self.resolve_talisman(monster)
                 # 恢复轻快
                 if skill.cost_type != "sp":
                     fresh_sprightly(style)
@@ -2248,6 +2299,12 @@ class Simulation:
                 relieve_buff = monster_has_buff(turn, action["target"]["slot"])
                 # 正式结算effects
                 self.trigger_active_actions(style, skill, action, ctx)
+                # 刻蚀的解除
+                if skill.id == 741:
+                    enemy = turn.battle.monsters[action["target"]["slot"]]
+                    for status in enemy.statuses[::-1]:
+                        if status.id == 223:
+                            status.trash = True
                 # 确定buff的消耗
                 self.consume_buff_by_use(skill, style, ctx, action)
                 simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill, False)  # 四妹追击
@@ -2259,7 +2316,7 @@ class Simulation:
                     self.consume_buff_by_use(skill, style, ctx, action)
                     simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill, False)  # 四妹追击
                 # ex技能双动
-                elif has_status_id(style, 125, allow_trash=True) and skill.ex_skill:
+                elif has_status_id(style, 125, allow_trash=True) and skill.ex_skill and skill.id != 741:  # 排除可怜的刻蚀大招
                     # 正式结算effects
                     self.trigger_active_actions(style, skill, action, ctx, second=True)
                     # 确定buff的消耗
@@ -2294,11 +2351,7 @@ class Simulation:
                 if self.skill_has_effect_with(skill, action, ctx, effect_key="sp"):
                     effects = self.resolve_active_effects(skill, action, ctx)
                     for effect in effects:
-                        if effect.get("sp"):  # 对于恢复sp的主动技能
-                            targets = resolve_targets(turn, style, effect.get("target"), effect)
-                            for target in targets:
-                                if target != style:  # 每一个非自身target触发被动
-                                    self.trigger_style_passives(turn, target, "on_sp_up_by_nonself_active_skill", without_od=True)
+                        self.resolve_sp_up_effect_passive(effect, turn, style, ctx, only_od=False)
 
                 # ex技能双动可能触发2次after_ex_use和on_sp_up_by_nonself_active_skill
                 if has_status_id(style, 125, allow_trash=True) and skill.ex_skill:
@@ -2307,11 +2360,8 @@ class Simulation:
                     if self.skill_has_effect_with(skill, action, ctx, effect_key="sp"):
                         effects = self.resolve_active_effects(skill, action, ctx)
                         for effect in effects:
-                            if effect.get("sp") and not effect.get("need_break"):  # 对于恢复sp的主动技能
-                                targets = resolve_targets(turn, style, effect.get("target"), effect)
-                                for target in targets:
-                                    if target != style:  # 每一个非自身target触发被动
-                                        self.trigger_style_passives(turn, target, "on_sp_up_by_nonself_active_skill", without_od=True)
+                            if not effect.get("need_break"):  # 对于不需要break的技能
+                                self.resolve_sp_up_effect_passive(effect, turn, style, ctx, only_od=False)
                 # 白虎攻击技能双动可能触发2次after_ex_use
                 elif has_status_id(style, 227) and attack_skill and skill.ex_skill:
                     self.trigger_style_passives(turn, style, "after_ex_use", without_od=True)
@@ -2360,6 +2410,10 @@ class Simulation:
             for status in style.statuses[::-1]:
                 if status.trash:
                     style.statuses.remove(status)
+        for monster in turn.battle.monsters:
+            for status in monster.statuses[::-1]:
+                if status.trash:
+                    monster.statuses.remove(status)
 
         # 把predict od存到od中，保持两者一致
         turn.od = min(turn.predicted_od, 300)

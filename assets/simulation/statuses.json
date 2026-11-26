@@ -160,6 +160,7 @@
   "144": {"name": "shredding", "zh_cn": "速弹", "category": "buff", "removable": true, "icon": "Shredding.png"},
   "154": {"name": "b_i_yamawaki_servant", "zh_cn": "山胁仆从", "category": "buff", "forced_one": true, "icon": "BIYamawakiServant.png"},
   "160": {"name": "high_boost", "zh_cn": "高阶增强", "category": "buff", "removable": true, "forced_one": true, "icon": "HighBoost.png"},
+  "163": {"name": "makeup", "zh_cn": "彩妆", "category": "buff", "removable": true, "forced_one": true, "icon": "Makeup.png"},
   "166": {"name": "element_mark", "zh_cn": "属性印记", "category": "buff", "removable": true, "forced_one": true, "has_level": true, "special": true, "icons": {
     "dark": "DarkMark.webp",
     "fire": "FireMark.png",
@@ -183,7 +184,7 @@
     "special": true
   },
   "202": {"name": "dim_sum", "zh_cn": "点心", "category": "buff", "removable": true, "forced_one": true, "icon": "DimSum.webp"},
-  "208": {"name": "revenge", "zh_cn": "复仇", "category": "buff", "forced_one": true, "has_level": true, "icon": "Revenge.webp"},
+  "208": {"name": "revenge", "zh_cn": "反击", "category": "buff", "forced_one": true, "has_level": true, "icon": "Revenge.webp"},
   "213": {"name": "tea", "zh_cn": "红茶", "category": "buff", "removable": true, "forced_one": true, "icon": "Tea.webp"},
   "227": {
     "name": "double_attack_skill",
@@ -273,7 +274,6 @@
   "113": {"name": "break_guard", "zh_cn": "破盾防护", "category": "buff", "forced_one": true, "not_display": true},
   "133": {"name": "babied", "zh_cn": "幼儿化", "category": "buff", "forced_one": true, "not_display": true},
   "148": {"name": "damage_rate_up_per_token", "zh_cn": "每层Token破坏率提升", "category": "buff", "stack_group": "damage_rate_up", "removable": true, "not_display": true},
-  "163": {"name": "makeup", "zh_cn": "彩妆", "category": "buff", "removable": true, "forced_one": true, "not_display": true},
   "186": {"name": "border_ref_p_down_by_admiral", "zh_cn": "超越量表敌方属性降低", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "not_display": true},
   "209": {"name": "e_a_guard", "zh_cn": "埃癸斯无敌护盾", "category": "buff", "removable": true, "forced_one": true, "not_display": true},
   "226": {"name": "toughness_up_value_per_revenge_level", "zh_cn": "按复仇层数提升体力", "category": "buff", "not_display": true}
