@@ -935,9 +935,9 @@ class Simulation:
         members = []
         for style in turn.team:
             # 把style的skills转换为字典
-            if not style.skills:  # 如果当回合没有可以使用的skills则返回空的列表
+            if turn.actions[style.slot] is None:  # 无法行动时才隐藏基础技能
                 skills = []
-            else:  # 当回合有可以使用的技能
+            else:
                 skills = deepcopy(style.basic_skills)  # 3个，默认的顺序为：前排默认技能，无，追击
                 for skill in style.skills:
                     # 处理target type，GUI仅需要知道是敌人还是友方（是否可选自己）
