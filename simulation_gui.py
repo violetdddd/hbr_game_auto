@@ -2043,7 +2043,10 @@ class SimulationTab(QWidget):
             for style in self.styles
         ]
         used = [{} for _ in roles]
-        dark_simei = [self.catalog.is_dark_simei(style) for style in self.styles]
+        pursuit_enabled = [
+            self.catalog.is_dark_simei(style) and 728 in entry.get('passive_skill_ids', [])
+            for style, entry in zip(self.styles, self.session['setup']['styles'])
+        ]
         pursuit = frozenset((m.SIMEI_PURSUIT_SKILL,))
         rows = []
         for turn in self.turns:
@@ -2063,11 +2066,8 @@ class SimulationTab(QWidget):
                     pair = frozenset((skill, linked)) if linked else frozenset((skill,))
                     if pair not in used[slot]:
                         role = roles[slot]
-                        if not (dark_simei[slot] and pair == pursuit):
+                        if not (pursuit_enabled[slot] and pair == pursuit):
                             role.skills.append(f'{skill}/{linked}' if linked else skill)
-                            limit = 5 if dark_simei[slot] else 6
-                            if len(role.skills) > limit:
-                                raise ValueError(f'{role.name}最多可使用{limit}个主动技能，无法转换。')
                         used[slot][pair] = (len(role.skills), skill)
                     choice = action['target']
                     if choice['slot'] is not None:
@@ -2092,9 +2092,16 @@ class SimulationTab(QWidget):
             rows.append((label, base, moves))
 
         for slot, role in enumerate(roles):
-            if dark_simei[slot]:
+            count = len(role.skills)
+            if pursuit_enabled[slot]:
+                if count > 5:
+                    raise ValueError(f'{role.name}启用了「温泉通行木牌」，第6栏需保留给猫咪喷射打靶。'
+                                     f'当前排轴使用了{count}个其他技能，上限为5个，无法导出HBRF。')
                 role.skills.append(m.SIMEI_PURSUIT_SKILL)
                 used[slot][pursuit] = (len(role.skills), m.SIMEI_PURSUIT_SKILL)
+            elif count > 6:
+                prefix = '未启用「温泉通行木牌」，' if self.catalog.is_dark_simei(self.styles[slot]) else ''
+                raise ValueError(f'{role.name}：{prefix}当前排轴使用了{count}个技能，上限为6个，无法导出HBRF。')
 
         actions = []
         form = 0
@@ -2241,9 +2248,10 @@ class SimulationTab(QWidget):
                     variants.append(Skill.from_record(records[skill_id]))
                     (orb_ids if name in self.catalog.common_global else active_ids).append(skill_id)
                 entries.append(variants)
-            # HBRF只记录前排行动，暗四妹仍默认装备自动追击所需的猫咪喷射打靶
-            if style_id == 266:
-                active_ids.append(737)
+            # 暗四妹的技能栏含打靶时，还原配套的追击被动
+            passive_ids = [int(entry['simulation_id']) for _, entry in SkillSelectionDialog._get_passives(style)]
+            if style_id == 266 and 737 not in active_ids:
+                passive_ids = [skill_id for skill_id in passive_ids if skill_id != 728]
             role_skills.append(entries)
             setup['styles'].append({
                 'style_id': style_id,
@@ -2251,8 +2259,7 @@ class SimulationTab(QWidget):
                 'od_earring': 15, 'necklace_sp': 3,
                 'active_skill_ids': list(dict.fromkeys(active_ids)),
                 'orb_skill_ids': list(dict.fromkeys(orb_ids)),
-                'passive_skill_ids': [int(entry['simulation_id'])
-                                      for _, entry in SkillSelectionDialog._get_passives(style)],
+                'passive_skill_ids': passive_ids,
             })
 
         # 按执行器的交换顺序更新站位，切换技能从文件头的第一项开始

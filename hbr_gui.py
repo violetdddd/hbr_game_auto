@@ -1602,10 +1602,27 @@ class MainWindow(QMainWindow):
                 for i,(slot,skill,target) in enumerate(moves):
                     if i != special[0] and skill != self.catalog.default_action(self.slots[slot-1]):
                         raise ValueError(f'{row.label_text()}：特殊前排行动时其他角色必须使用默认行动')
+        # 四妹追击弹窗
+        pursuit_slots = set()
         for index, items in enumerate(used):
-            if self.catalog.is_dark_simei(styles[index]) and len(items) > 5:
-                raise ValueError(f'{roles[index].name}最多可使用5个其他主动技能，最后一位保留给猫咪喷射打靶。')
-            if len(items)>6: raise ValueError(f'{roles[index].name}：使用技能超过6个，目前暂不支持')
+            if self.catalog.is_dark_simei(styles[index]):
+                answer = QMessageBox.question(
+                    self, '温泉通行木牌',
+                    f'队伍{team_order[index // 6]}的{roles[index].name}是否使用「温泉通行木牌」被动？\n'
+                    '是：最多安排5个其他技能，最后一栏追加猫咪喷射打靶。\n'
+                    '否：最多安排6个技能。',
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel,
+                    QMessageBox.StandardButton.Cancel,
+                )
+                if answer == QMessageBox.StandardButton.Cancel:
+                    return
+                if answer == QMessageBox.StandardButton.Yes:
+                    pursuit_slots.add(index)
+                    if len(items) > 5:
+                        raise ValueError(f'{roles[index].name}启用了「温泉通行木牌」，第6栏需保留给猫咪喷射打靶。'
+                                         f'当前安排了{len(items)}个其他技能，上限为5个。')
+            if len(items) > 6:
+                raise ValueError(f'{roles[index].name}当前安排了{len(items)}个技能，上限为6个。')
         # 收集switchable pair初始默认选择
         defaults = {}  # (角色slot, 技能pair的set) → 初始选择
         for (slot,pair),(a,b) in used_pairs.items():
@@ -1622,7 +1639,7 @@ class MainWindow(QMainWindow):
                     first=defaults[(index+1,item)]; second=next(x for x in item if x!=first)
                     names.append(first+'/'+second)
                 else: names.append(item)
-            if self.catalog.is_dark_simei(styles[index]):
+            if index in pursuit_slots:
                 names.append(m.SIMEI_PURSUIT_SKILL)
             roles[index].skills=names
         # 开始遍历所有rows来构建BattleScript
@@ -1702,9 +1719,11 @@ class MainWindow(QMainWindow):
 
     # 保存文件
     def save(self, save_as=False):
-        try: script, styles=self.build_script()
+        try: result = self.build_script()
         except Exception as e:
             QMessageBox.warning(self,'无法保存',str(e)); return False
+        if result is None: return False
+        script, styles = result
         path = self.current_path
         if save_as or not path:
             filename,_ = QFileDialog.getSaveFileName(self,'保存 HBRF',str(path or SCRIPTS / 'new.hbrf'),'HBRF (*.hbrf)')
