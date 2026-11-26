@@ -1250,7 +1250,7 @@ class Simulation:
             raise ValueError(f"未知主动技能效果结构: {skill.effects}")
         # 理莎的返婴被动，在filter之前确认是否有dp恢复相关效果，并添加返婴1层
         tmp_effect = None
-        if ctx.subject.style_has_passive_id(556) and before_filter and any(effect.get("type") in DP_HEAL_GROUP for effect in before_filter):
+        if isinstance(ctx.subject, Style) and ctx.subject.style_has_passive_id(556) and before_filter and any(effect.get("type") in DP_HEAL_GROUP for effect in before_filter):
             tmp_effect = {"type": "infantilized", "target": "all", "status_id": 214, "duration": {"type": "permanent"}, "level": 1, "target_condition": "target.has(214)"}
         after_filter = [deepcopy(effect) for effect in before_filter if effect.get("type") in ACTIVE_EFFECT_TYPES_NEEDED]
         if tmp_effect:
