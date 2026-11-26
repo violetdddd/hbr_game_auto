@@ -4,6 +4,9 @@ from config import templates as tpl
 import json
 import re
 
+SIMEI_PURSUIT_SKILL = '噴射貓咪打靶趣'
+
+
 """
 未来可以增加的内容：平A、选择怪物目标、技能切换、小按钮
 """
@@ -436,7 +439,7 @@ def save_hbrf(script: BattleScript, filepath, style_metadata=None):
 
     with filepath.open("w", encoding="utf-8") as f:
 
-        f.write("# 配队和技能（用于初始化角色编号为1-6，目前支持技能数最多6个，角色最少需要装备3个技能）\n")
+        f.write("# 配队和技能（每名角色最多6个技能，暗四妹的打靶计入上限，角色最少需要装备3个技能）\n")
 
         role_num = len(script.roles)
 

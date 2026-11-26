@@ -152,6 +152,16 @@ class Catalog:
         # Styles containing the command action cannot use an ordinary attack.
         return '指揮行動' if (style.name, style.title) in self.command_styles else '普通攻击'
 
+    # 排除暗四妹的ex主动技能
+    @staticmethod
+    def is_dark_simei(style):
+        return style is not None and style.english == 'Yotsuha_Ohshima' and style.title == '裊裊溫泉樂'
+
+    def hbrf_skills_for(self, style):
+        from hbrf.model import SIMEI_PURSUIT_SKILL
+        skills = self.skills_for(style)
+        return [skill for skill in skills if skill != SIMEI_PURSUIT_SKILL] if self.is_dark_simei(style) else skills
+
     # 确认目标风格是否是有特殊前排技能的风格，并返回特殊技能名称
     def special_for(self, style):
         return self.special_styles.get(style.name, {}).get(style.title) if style else None
@@ -489,7 +499,7 @@ class TurnRow(QGroupBox):
         special = self.editor.catalog.special_for(style)
         if special: s.addItem(f'{special}（特殊行动）', f'@special:{special}')
         # 添加其他skill
-        for name in self.editor.catalog.skills_for(style):
+        for name in self.editor.catalog.hbrf_skills_for(style):
             if name != default: s.addItem(self.editor.catalog.skill_label(name), name)
         # 如果之前的选中的技能现在角色也有，则恢复技能，没有就默认技能
         ix = s.findData(skill)
@@ -501,9 +511,9 @@ class TurnRow(QGroupBox):
             j = start + local
             if selected_style: t.addItem(f'{local} · {self.editor.nickname(j)}', j)
         # 怪物在内部先使用107, 108, 109避免和二队冲突
-        t.addItem('双体左 / 三体中', 108)
-        t.addItem('双体右 / 三体右', 109)
-        t.addItem('三体左', 107)
+        t.addItem('左侧敌人', 107)
+        t.addItem('中间敌人', 108)
+        t.addItem('右侧敌人', 109)
         ix = t.findData(target); t.setCurrentIndex(max(0, ix))
         s.blockSignals(False); t.blockSignals(False)
         self._skill_changed(i)
@@ -877,22 +887,22 @@ class MainWindow(QMainWindow):
         self.team_tabs.currentChanged.connect(self.on_team_tab_changed)
         root.addWidget(self.team_tabs)
         # 角色slot
-        slots_box = QGroupBox('队伍1 · 选择6名角色（点击设置风格；右键清空；点击交换角色以调整位置）')
+        slots_box = QGroupBox('队伍1 · 选择6名角色（左键选择，右键交换）')
         self.slots_box = slots_box
         slots_layout = QHBoxLayout(slots_box)
         self.slot_buttons = []
         self.slot_swap_source = None  # 储存第一次点击的角色
-        self.slot_swap_mode = QPushButton('交换角色：关闭')
-        self.slot_swap_mode.setCheckable(True)
-        self.slot_swap_mode.toggled.connect(self.set_slot_swap_mode)
-        toolbar.addWidget(self.slot_swap_mode)
+        self.editor_tips = QPushButton('温馨提示')
+        self.editor_tips.setStyleSheet('' if settings.tips_seen('editor') else settings.TIPS_STYLE)
+        self.editor_tips.clicked.connect(self.show_editor_tips)
+        toolbar.addWidget(self.editor_tips)
         for i in range(6):
             col = QVBoxLayout()
             b = QPushButton('＋'); b.setFixedSize(92,92)
-            # 普通模式点击选风格；交换模式点击两个槽位来交换
+            # 左键选风格，右键依次选择两个槽位进行交换
             b.clicked.connect(lambda _=False, ix=i: self.handle_slot_click(ix))
             b.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-            b.customContextMenuRequested.connect(lambda _=None, ix=i: self.clear_style(ix))
+            b.customContextMenuRequested.connect(lambda _=None, ix=i: self.handle_slot_swap(ix))
             # 昵称
             label = QLineEdit(); label.setPlaceholderText(f'Slot {i+1} · 昵称（可选）')
             label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -941,6 +951,9 @@ class MainWindow(QMainWindow):
         select = QPushButton('选择脚本')
         select.clicked.connect(self.select_run_file)
         pathrow = QHBoxLayout(); pathrow.addWidget(self.run_path); pathrow.addWidget(select)
+        print_skills = QPushButton('打印技能顺序')
+        print_skills.clicked.connect(self.preview_run_file)
+        pathrow.addWidget(print_skills)
         form.addRow('HBRF 路径', pathrow)
         self.auto_mode = QComboBox()
         for label, mode in (('关闭自动战斗', 'off'), ('开启FULL自动战斗', 'full'),
@@ -1095,11 +1108,10 @@ class MainWindow(QMainWindow):
     # 调整可使用的team角色
     def on_team_tab_changed(self, index):
         self.current_team = index + 1  # 修改current_team，1和2
-        self.slot_swap_source = None
-        self.slot_swap_mode.setChecked(False)
+        self.clear_slot_swap()
         self.refresh_slots()  # 修改6个slot
         self.refresh_row_team_states()  # 修改turn row，主要是冻结
-        self.slots_box.setTitle(f'队伍 {self.current_team} · 选择6名角色（点击设置风格；右键清空；点击交换角色以调整位置）')
+        self.slots_box.setTitle(f'队伍 {self.current_team} · 选择6名角色（左键选择，右键交换）')
 
     def team_indices(self, team):  # 获得team对应slots的工具函数
         start = (team - 1) * 6
@@ -1112,31 +1124,35 @@ class MainWindow(QMainWindow):
                 if not row._team_frozen:
                     row.refresh_roles()
 
-    # 设置mod为swap，全部重置为可以交换角色的样式
-    def set_slot_swap_mode(self, enabled):
-        self.slot_swap_source = None
-        self.slot_swap_mode.setText('交换角色：开启' if enabled else '交换角色：关闭')
-        for button, _ in self.slot_buttons:  # 交换角色样式
-            button.setStyleSheet('QPushButton { border: 2px solid #2563eb; }' if enabled else '')
+    def show_editor_tips(self):
+        QMessageBox.information(
+            self, '温馨提示',
+            '左键选择风格，依次右键两个角色可交换队伍位置。\n'
+            '为每回合填写三名前排角色、技能、目标和 OD，再保存为 HBRF。\n'
+            '在普通战斗页选择脚本后，可点击「打印技能顺序」查看进游戏前的装备顺序。'
+        )
+        settings.mark_tips_seen('editor')
+        self.editor_tips.setStyleSheet('')
 
-    # 需要分mod处理slot点击事件
+    def clear_slot_swap(self):
+        if self.slot_swap_source is not None:
+            self.slot_buttons[self.slot_swap_source][0].setStyleSheet('')
+        self.slot_swap_source = None
+
     def handle_slot_click(self, index):
-        # 不是swap mod则展开style选择面板
-        if not self.slot_swap_mode.isChecked():
-            self.choose_style(index)
-            return
-        # swap mod内第一次点击角色，储存并更改样式
+        self.clear_slot_swap()
+        self.choose_style(index)
+
+    def handle_slot_swap(self, index):
         if self.slot_swap_source is None:
             self.slot_swap_source = index
             self.slot_buttons[index][0].setStyleSheet('QPushButton { border: 3px solid #16a34a; background: #dcfce7; }')
             return
         # 第二次点击角色，若重复则重置样式，不重复则交换slot
         source = self.slot_swap_source
-        self.slot_swap_source = None
-        if source == index:
-            self.set_slot_swap_mode(True)
-            return
-        self.swap_team_slots(source, index)
+        self.clear_slot_swap()
+        if source != index:
+            self.swap_team_slots(source, index)
 
     # 交换slot
     def swap_team_slots(self, first, second):
@@ -1161,11 +1177,10 @@ class MainWindow(QMainWindow):
                 row.refresh_roles(remapped)
 
         self.refresh_slots()
-        if self.slot_swap_mode.isChecked():
-            self.set_slot_swap_mode(True)
 
     # 选择风格、清除风格、换位置、切换tab、新建的时候调用
     def refresh_slots(self):
+        self.clear_slot_swap()
         # 保证当前使用tab的6个风格
         # 更新下面选技能的角色部分/重新判断特殊行动是否可用，不可用则弹出提示框删除
         offset = (self.current_team - 1) * 6
@@ -1241,13 +1256,6 @@ class MainWindow(QMainWindow):
             self.slots[global_index] = dialog.chosen
             self.nicknames[global_index] = ''
             self.refresh_slots()
-
-    # 右键槽位清除风格
-    def clear_style(self, index):
-        global_index = (self.current_team - 1) * 6 + index
-        self.slots[global_index] = None
-        self.nicknames[global_index] = ''
-        self.refresh_slots()
 
     # 新增一行，默认turn，连接删除复制移动行的功能，有index则可以在目标位置插入行
     def add_row(self, state=None, index=None, kind='turn', scroll=True):
@@ -1327,7 +1335,7 @@ class MainWindow(QMainWindow):
         self.team_tabs.setCurrentIndex(0)
         self.team_tabs.blockSignals(False)
         for row in list(self.rows): self.remove_row(row)
-        self.slots_box.setTitle(f'队伍 {self.current_team} · 选择6名角色（点击设置风格；右键清空；点击交换角色以调整位置）')
+        self.slots_box.setTitle(f'队伍 {self.current_team} · 选择6名角色（左键选择，右键交换）')
         self.refresh_slots(); self.add_row()
 
     # 刷新所有块右上角index编号
@@ -1581,7 +1589,7 @@ class MainWindow(QMainWindow):
                 elif skill == '普通攻击':
                     pass
                 else:
-                    if skill not in self.catalog.skills_for(style): raise ValueError(f'{self.nickname(slot)} 无法使用 {skill}')
+                    if skill not in self.catalog.hbrf_skills_for(style): raise ValueError(f'{self.nickname(slot)} 无法使用 {skill}')
                     # 如果是可切换技能，和切换后的技能名放一起作为元组存储，键是(角色slot, 技能pair的set)
                     link=self.catalog.linked(style,skill)
                     if link:
@@ -1595,6 +1603,8 @@ class MainWindow(QMainWindow):
                     if i != special[0] and skill != self.catalog.default_action(self.slots[slot-1]):
                         raise ValueError(f'{row.label_text()}：特殊前排行动时其他角色必须使用默认行动')
         for index, items in enumerate(used):
+            if self.catalog.is_dark_simei(styles[index]) and len(items) > 5:
+                raise ValueError(f'{roles[index].name}最多可使用5个其他主动技能，最后一位保留给猫咪喷射打靶。')
             if len(items)>6: raise ValueError(f'{roles[index].name}：使用技能超过6个，目前暂不支持')
         # 收集switchable pair初始默认选择
         defaults = {}  # (角色slot, 技能pair的set) → 初始选择
@@ -1612,6 +1622,8 @@ class MainWindow(QMainWindow):
                     first=defaults[(index+1,item)]; second=next(x for x in item if x!=first)
                     names.append(first+'/'+second)
                 else: names.append(item)
+            if self.catalog.is_dark_simei(styles[index]):
+                names.append(m.SIMEI_PURSUIT_SKILL)
             roles[index].skills=names
         # 开始遍历所有rows来构建BattleScript
         current = dict(defaults)

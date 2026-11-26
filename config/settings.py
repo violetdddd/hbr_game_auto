@@ -1,6 +1,17 @@
 import ctypes
 from ctypes import wintypes
 
+TIPS_STYLE = ('QPushButton{background:#FF3F55;color:white;}'
+              'QPushButton:hover{background:#D92439;color:white;}')
+
+def tips_seen(page):
+    from PySide6.QtCore import QSettings
+    return QSettings('HBRTool', 'HBRTool').value(f'tips_seen/{page}2', False, type=bool)
+
+def mark_tips_seen(page):
+    from PySide6.QtCore import QSettings
+    QSettings('HBRTool', 'HBRTool').setValue(f'tips_seen/{page}2', True)
+
 def detect_resolution(game):
     user32 = ctypes.windll.user32
     rect = wintypes.RECT()

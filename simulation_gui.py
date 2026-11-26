@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
 )
 
 from paths import ROOT_DIR, SCRIPTS_DIR
+from config import settings
 SIMULATION_DIR = ROOT_DIR / 'assets' / 'simulation'
 ICON_DIR = ROOT_DIR / 'assets' / 'icons'
 KELIAN_DIR = ROOT_DIR / "assets" / "char-images" / "31A" / "Karen_Asakura"
@@ -321,6 +322,14 @@ class SkillSelectionDialog(QDialog):
         save = QPushButton('保存技能设置'); save.setStyleSheet(BLUE_BUTTON)
         save.clicked.connect(self.accept); root.addWidget(save)
 
+        if catalog.is_dark_simei(style):
+            active = self.checks['active', 737]
+            passive = self.checks['passive', 728]
+            active.setChecked(active.isChecked() or passive.isChecked())
+            passive.setChecked(active.isChecked())
+            active.toggled.connect(passive.setChecked)
+            passive.toggled.connect(active.setChecked)
+
     @staticmethod
     def catalog_data_path(style):
         return ROOT_DIR / 'assets' / 'char-data' / (style.team + '.json')
@@ -489,7 +498,7 @@ class SpecialActionDialog(QDialog):
 class BattleSetup(QGroupBox):
     """固定高度，敌人初始数据、六名上场风格及独立的共鸣风格。"""
     def __init__(self, catalog, style_dialog_class, round_pixmap, parent=None):
-        super().__init__('战斗设置', parent)
+        super().__init__('战斗设置（左键选择，右键交换）', parent)
         self.setFixedHeight(230)
         self.catalog = catalog
         self.style_dialog_class = style_dialog_class
@@ -544,6 +553,7 @@ class BattleSetup(QGroupBox):
             caption = QLabel(label); caption.setFixedWidth(69)
             grid.addWidget(caption, row, 0)
         self.avatar_buttons, self.resonance_buttons = [], []
+        self.swap_source = None
         self.breaks, self.earrings, self.necklaces, self.skill_buttons, self.resonance_breaks = [], [], [], [], []
         for i in range(6):
             avatars = QWidget(); av = QHBoxLayout(avatars)
@@ -551,6 +561,8 @@ class BattleSetup(QGroupBox):
             av.setAlignment(Qt.AlignmentFlag.AlignHCenter)
             avatar = QPushButton('＋'); avatar.setFixedSize(61, 61)
             avatar.clicked.connect(lambda _=False, index=i: self.choose_style(index))
+            avatar.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+            avatar.customContextMenuRequested.connect(lambda _=None, index=i: self.swap_setup_slots(index))
             resonance = QPushButton('＋'); resonance.setFixedSize(35, 35)
             resonance.setToolTip('选择共鸣风格（右键清空）')
             resonance.clicked.connect(lambda _=False, index=i: self.choose_resonance(index))
@@ -625,6 +637,7 @@ class BattleSetup(QGroupBox):
                           ('选择共鸣风格（右键清空）' if resonance else '选择上场风格'))
 
     def choose_style(self, index):
+        self.clear_setup_swap()
         occupied = {style.name for i, style in enumerate(self.styles)
                     if style is not None and i != index}
         # 不允许与已经使用的共鸣风格相同：在选择弹窗内直接隐藏。
@@ -655,6 +668,36 @@ class BattleSetup(QGroupBox):
         self._set_avatar(index)
         self._set_level(self.breaks[index], selected)
 
+    def clear_setup_swap(self):
+        if self.swap_source is not None:
+            self.avatar_buttons[self.swap_source].setStyleSheet('')
+            self.swap_source = None
+
+    def swap_setup_slots(self, index):
+        if self.swap_source is None:
+            self.swap_source = index
+            self.avatar_buttons[index].setStyleSheet('QPushButton{border:2px solid #2563eb;background:#dbeafe;}')
+            return
+        first = self.swap_source
+        self.clear_setup_swap()
+        if first == index:
+            return
+        # 风格、共鸣、技能与饰品配置一起换位
+        for entries in (self.styles, self.resonances, self.skill_selections):
+            entries[first], entries[index] = entries[index], entries[first]
+        for boxes, styles in ((self.breaks, self.styles), (self.resonance_breaks, self.resonances),
+                              (self.earrings, None), (self.necklaces, None)):
+            first_value, second_value = boxes[first].currentData(), boxes[index].currentData()
+            for slot, value in ((first, second_value), (index, first_value)):
+                if styles is not None:
+                    self._set_level(boxes[slot], styles[slot])
+                boxes[slot].setCurrentIndex(boxes[slot].findData(value))
+        for slot in (first, index):
+            self._set_avatar(slot)
+            self._set_avatar(slot, resonance=True)
+            count = sum(len(group) for group in self.skill_selections[slot].values())
+            self.skill_buttons[slot].setToolTip(f'已选 {count} 项技能' if self.styles[slot] else '')
+
     def _filtered_dialog(self, occupied, forbidden):
         # StyleDialog 的过滤按角色名进行；通过轻量代理追加风格级精确排除，
         # 不修改原 Catalog，不影响其余 GUI。
@@ -668,6 +711,7 @@ class BattleSetup(QGroupBox):
         return self.style_dialog_class(CatalogView(self.catalog, forbidden), occupied, self)
 
     def choose_resonance(self, index):
+        self.clear_setup_swap()
         forbidden = {self.identity(style) for style in self.styles if style}
         forbidden.update(self.identity(style) for i, style in enumerate(self.resonances)
                          if i != index and style)
@@ -693,6 +737,7 @@ class BattleSetup(QGroupBox):
             self.skill_buttons[index].setToolTip(f'已选 {count} 项技能')
 
     def reset(self):
+        self.clear_setup_swap()
         self.styles = [None]*6; self.resonances = [None]*6
         self.skill_selections = [{'active': [], 'passive': [], 'orb': []} for _ in range(6)]
         self.enemy_count.setCurrentIndex(0); self.initial_od.setValue(0); self.global_od_rate.setValue(100)
@@ -769,6 +814,7 @@ class BattleSetup(QGroupBox):
         return [styles[entry['style_id']] if entry is not None else None for entry in entries]
 
     def restore_state(self, setup, styles):
+        self.clear_setup_swap()
         self.styles, self.resonances = styles[:6], styles[6:]
         for i, (entry, resonance) in enumerate(zip(setup['styles'], setup['resonances'])):
             self.skill_selections[i] = {
@@ -1041,7 +1087,7 @@ class BattleTurn(QGroupBox):
                 # 头像右键展开特殊状态编辑
                 avatar.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
                 avatar.customContextMenuRequested.connect(
-                    lambda _=None, pos=position: self.edit_special_action(pos)
+                    lambda _=None, pos=position: self.handle_special_click(pos)
                 )
                 # 顺序为：信念、头像、ep
                 body.addWidget(token)
@@ -1130,7 +1176,7 @@ class BattleTurn(QGroupBox):
         grid.addWidget(QLabel('倒下'), 1, 0)
         grid.addWidget(QLabel('破坏率'), 2, 0)
         self.enemy_presence_checks, self.enemy_edits = [], []
-        for position, title in enumerate(('三体左', '单体中', '双体右')):
+        for position, title in enumerate(('敌人左', '敌人中', '敌人右')):
             # 选择敌人
             header = QHBoxLayout(); header.setSpacing(1)
             header.addWidget(QLabel(title))
@@ -1351,15 +1397,24 @@ class BattleTurn(QGroupBox):
         self.update_state_from_simulation()
         self.refresh()
 
+    def clear_swap_selection(self):
+        if self.select_first is not None:
+            self.portraits[self.select_first][0].setStyleSheet(
+                'QPushButton{background:transparent;border:0;padding:0}')
+            self.select_first = None
+
+    def handle_special_click(self, position):
+        self.clear_swap_selection()
+        self.edit_special_action(position)
+
     def swap_position(self, position):
         if self.select_first is None:
             self.select_first = position
             self.portraits[position][0].setStyleSheet(
                 'QPushButton{border:2px solid #2563eb;background:#dbeafe}')  # 选中样式
             return
-        first, second, self.select_first = self.select_first, position, None
-        self.portraits[first][0].setStyleSheet(
-            'QPushButton{background:transparent;border:0;padding:0}')  # 还原普通样式
+        first, second = self.select_first, position
+        self.clear_swap_selection()
         if first == second or (first >= 3 and second >= 3):  # 后排交换不允许
             return
         base = self.state_data['base']
@@ -1684,8 +1739,7 @@ class BattleTurn(QGroupBox):
             if self._shown_targets.get(position) != target_key:
                 self._shown_targets[position] = target_key
                 self.target_badges[position].configure(target, self.owner.styles, self.owner.setup.round_pixmap)
-            button.setToolTip((style.localized_title if style else f'角色{slot+1}') +
-                              '（点击两名角色头像交换位置）')
+            button.setToolTip("左键依次选择两名角色交换；右键设置特殊行动")
             # 按slot修改token和ep
             faith, ep = self.member_resources[position]
             faith.setText(f"信念\n{member['token']}" if position < 3 and member.get('token', 0) > 0 else '')
@@ -1735,9 +1789,10 @@ class SimulationTab(QWidget):
             button = QPushButton(label)
             button.clicked.connect(handler)
             toolbar.addWidget(button)
-        tips = QPushButton('温馨提示'); tips.setStyleSheet(WHITE_BUTTON)
-        tips.clicked.connect(self.show_tips)
-        toolbar.addStretch(); toolbar.addWidget(tips)
+        self.tips_button = QPushButton('温馨提示')
+        self.tips_button.setStyleSheet('' if settings.tips_seen('simulation') else settings.TIPS_STYLE)
+        self.tips_button.clicked.connect(self.show_tips)
+        toolbar.addStretch(); toolbar.addWidget(self.tips_button)
         outer.addLayout(toolbar)
 
         self.scroll = QScrollArea(); self.scroll.setWidgetResizable(True)
@@ -1767,10 +1822,10 @@ class SimulationTab(QWidget):
             '声明\n'
             '为方便排轴，目前不对任何技能和OD使用进行限制（检查OD/SP消耗、技能次数限制、冷却回合等）。\n\n'
             '战斗设定\n'
-            '选好六个上场风格，再设置技能、突破、饰品、共鸣和敌人信息。'
+            '左键选风格，依次右键两个上场角色可交换战斗设定中的位置。再设置技能、突破、饰品、共鸣和敌人信息。'
             '「开始战斗」会创建新战斗，「应用调整」会从首回合重算现有排轴。\n\n'
             '编辑回合\n'
-            '从下拉框选择技能和OD发动情况。依次点击两个头像可交换站位，右键点击头像可设置破盾及角色专属特殊行动。'
+            '从下拉框选择技能和OD发动情况。依次左键两个头像可交换站位，右键点击头像可设置破盾及角色专属特殊行动。'
             '点击「调整」可修改本回合的资源、DP、敌人和场地，用于一些特殊被动的触发和技能费用计算等。\n\n'
             '查看与推进\n'
             '点击状态栏查看该单位的状态详情。状态较多时，可用横向滚轮或 Shift 加滚轮查看后续状态。'
@@ -1784,6 +1839,8 @@ class SimulationTab(QWidget):
             '敌方上buff、给予我方的异常状态等，以及受击触发尚未模拟。部分概率效果默认触发。'
             
         )
+        settings.mark_tips_seen('simulation')
+        self.tips_button.setStyleSheet('')
 
     def read_setup(self, warning_title):
         if any(style is None for style in self.setup.styles):
@@ -1986,6 +2043,8 @@ class SimulationTab(QWidget):
             for style in self.styles
         ]
         used = [{} for _ in roles]
+        dark_simei = [self.catalog.is_dark_simei(style) for style in self.styles]
+        pursuit = frozenset((m.SIMEI_PURSUIT_SKILL,))
         rows = []
         for turn in self.turns:
             base = turn.state_data['base']
@@ -2004,9 +2063,11 @@ class SimulationTab(QWidget):
                     pair = frozenset((skill, linked)) if linked else frozenset((skill,))
                     if pair not in used[slot]:
                         role = roles[slot]
-                        role.skills.append(f'{skill}/{linked}' if linked else skill)
-                        if len(role.skills) > 6:
-                            raise ValueError(f'{role.name}使用的技能超过6个，无法转换。')
+                        if not (dark_simei[slot] and pair == pursuit):
+                            role.skills.append(f'{skill}/{linked}' if linked else skill)
+                            limit = 5 if dark_simei[slot] else 6
+                            if len(role.skills) > limit:
+                                raise ValueError(f'{role.name}最多可使用{limit}个主动技能，无法转换。')
                         used[slot][pair] = (len(role.skills), skill)
                     choice = action['target']
                     if choice['slot'] is not None:
@@ -2029,6 +2090,11 @@ class SimulationTab(QWidget):
             if base['additional_turn']:
                 label += '-追加'
             rows.append((label, base, moves))
+
+        for slot, role in enumerate(roles):
+            if dark_simei[slot]:
+                role.skills.append(m.SIMEI_PURSUIT_SKILL)
+                used[slot][pursuit] = (len(role.skills), m.SIMEI_PURSUIT_SKILL)
 
         actions = []
         form = 0
