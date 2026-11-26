@@ -6,11 +6,11 @@ TIPS_STYLE = ('QPushButton{background:#FF3F55;color:white;}'
 
 def tips_seen(page):
     from PySide6.QtCore import QSettings
-    return QSettings('HBRTool', 'HBRTool').value(f'tips_seen/{page}2', False, type=bool)
+    return QSettings('HBRTool', 'HBRTool').value(f'tips_seen/{page}', False, type=bool)
 
 def mark_tips_seen(page):
     from PySide6.QtCore import QSettings
-    QSettings('HBRTool', 'HBRTool').setValue(f'tips_seen/{page}2', True)
+    QSettings('HBRTool', 'HBRTool').setValue(f'tips_seen/{page}', True)
 
 def detect_resolution(game):
     user32 = ctypes.windll.user32
