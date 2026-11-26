@@ -64,7 +64,7 @@ Duration：
   use、use_debuff、use_buff、use_any、use_ex、use_immersion_ex：按相应技能使用事件消耗。
   ally_turn、enemy_turn：按相应回合边界递减，而不是每名角色行动一次递减。
   on_attack_weak：由对应事件决定次数消耗
-  on_attacked 目前暂不处理，gui可以手动清除buff。
+  on_attacked 右键面板选择受击次数，根据次数进行消耗。
   od_end：OD 结束移除。
   one_shot：使用或触发一次后结束。目前没有需要模拟的effect使用这种duration
 
@@ -118,7 +118,7 @@ Duration：
   on_sp_up_by_nonself_active_skill: 8
   user_select: 7          # 以GUI小按钮形式发动
   on_attack_weak: 5
-  on_attacked: 5          # 默认不发动，涉及到od、sp用户手动调整
+  on_attacked: 5          
   on_relieve_enemy_buff: 4          # 侦探等可以给敌方上buff，敌人行动的buff需要用户手动调整
   after_action: 5
   on_use_specific_status_skill: 2
@@ -135,7 +135,7 @@ Duration：
   enemy_turn: 352
   permanent: 278
   use: 205
-  on_attacked: 14         # 默认不消耗，涉及到od、sp用户手动调整，buff可以手动清除
+  on_attacked: 14         
   on_attack_weak: 13
   od_end: 12
   one_shot: 7

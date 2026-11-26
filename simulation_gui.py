@@ -419,7 +419,7 @@ class SpecialActionDialog(QDialog):
         'demon_cavalry': '魔界骑兵启动',
         "kelian_form_change": "可怜形态"  # 0为可怜，1为可镰
     }
-    def __init__(self, on_break, special_trigger, special_count=None, parent=None):
+    def __init__(self, on_break, be_attacked_times, special_trigger, special_count=None, parent=None):
         super().__init__(parent)
         if special_count == None:
             special_count = [0,0]
@@ -433,6 +433,14 @@ class SpecialActionDialog(QDialog):
         self.break_check = QCheckBox('是否击破敌人')
         self.break_check.setChecked(bool(on_break))
         layout.addWidget(self.break_check)
+
+        # 是否受敌人攻击
+        attacked_line = QHBoxLayout()
+        attacked_line.addWidget(QLabel('受敌人攻击次数 '))
+        self.attacked_num = spin(low=0, high=10, value=0)
+        self.attacked_num.setValue(be_attacked_times)
+        attacked_line.addWidget(self.attacked_num)
+        layout.addLayout(attacked_line)
 
         # 特殊技能发动次数 before/after
         self.special_combos = []
@@ -474,6 +482,7 @@ class SpecialActionDialog(QDialog):
             special_count.append(combo.currentData())
         return {
             'on_break': self.break_check.isChecked(),
+            'be_attacked_times': self.attacked_num.value(),
             'special_count': special_count  # 空列表/长度为1的列表（可镰）/长度为2的列表（waki/总攻击/司令）
         }
 
@@ -1221,6 +1230,7 @@ class BattleTurn(QGroupBox):
             special_count = None if special_trigger == None else [special_actions.get(special_trigger, 0), special_actions.get(special_trigger+"_after", 0)]
             dialog = SpecialActionDialog(
                 on_break=action.get('on_break', False),
+                be_attacked_times=action.get('be_attacked_times', False),
                 special_trigger=special_trigger,
                 special_count=special_count,
                 parent=self
@@ -1231,6 +1241,7 @@ class BattleTurn(QGroupBox):
             values = dialog.values()
             # 保存角色的 on_break
             action['on_break'] = values['on_break']
+            action['be_attacked_times'] = values['be_attacked_times']
             # 保存特殊技能发动次数
             if special_trigger in SpecialActionDialog.SPECIAL_NAMES:
                 special_actions[special_trigger] = values['special_count'][0]
@@ -1307,7 +1318,8 @@ class BattleTurn(QGroupBox):
                 'slot': target_slot
             },
             'user_selected': user_selected,
-            'on_break': False
+            'on_break': False,
+            "be_attacked_times": 0
         }
 
         self.update_state_from_simulation()
@@ -1385,7 +1397,8 @@ class BattleTurn(QGroupBox):
                             'slot': None
                         },
                         'user_selected': None,
-                        'on_break': False
+                        'on_break': False,
+                        "be_attacked_times": 0
                     }
                 # recoil时无法行动
                 else:

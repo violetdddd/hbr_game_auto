@@ -51,6 +51,7 @@ PASSIVE_EFFECT_TYPES_NEEDED = {
     "give_debuff_turn_up",
     "makeup",
     "shadow_clone",
+    "invincible",
     "negative_mind",
     "infantilized",
     "high_boost",
@@ -88,6 +89,7 @@ ACTIVE_EFFECT_TYPES_NEEDED = {
     "provoke",
     "cover",
     "dodge",
+    "invincible",
     "sprightly",
     "shadow_clone",
     "revenge",
@@ -150,6 +152,12 @@ DP_HEAL_GROUP = {
     "heal_dp",
     "heal_dp_rate",
     "revive_dp",
+}
+
+ON_ATTACKED_GROUP = {
+    "shadow_clone",
+    "invincible",
+    "dodge",
 }
 
 from paths import ROOT_DIR
@@ -621,14 +629,14 @@ class Conditions:
     @staticmethod
     def skill_sp(ctx: Context):
         slot = ctx.subject.slot
-        action_skill_id = ctx.turn.actions[slot].get("id")
-        return find_skill_by_id(ctx.subject, action_skill_id).now_cost
+        action = ctx.turn.actions[slot]
+        return find_skill_by_id(ctx.subject, action.get("id")).now_cost if action else 0
 
     @staticmethod
     def normal_attack(ctx: Context):
         slot = ctx.subject.slot
-        action_skill_id = ctx.turn.actions[slot].get("id")
-        return action_skill_id == 1
+        action = ctx.turn.actions[slot]
+        return action.get("id") == 1 if action else False
 
     @staticmethod
     def is_team(ctx: Context, need_team: str):
@@ -906,7 +914,7 @@ class Simulation:
             "skills": [{"name": str, "cost_type": str, "cost": int, "id": int, "target_type": str, "user_select": None | [str]}, ... ] 
             } for _ in range(6)],
             'order': [int] * 6,
-            'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int | None}, "user_selected": None | int, "on_break": False}] * 6,
+            'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int | None}, "user_selected": None | int, "on_break": False, "be_attacked_times": False}] * 6,
             'enemies': [{"exist": bool, "damage_rate": int, 'down': bool, "statuses": [
             {"id": int, "name": str, "duration_type": str, "remaining": int, "level": int, "element": str, "source": str | None}, ...
             ]} for _ in range(3)],
@@ -1307,6 +1315,8 @@ class Simulation:
                 )
                 # 不重复添加
                 if unique and old is not None:
+                    if effect_type in ON_ATTACKED_GROUP:
+                        old.remaining += remaining
                     return old
                 # 叠加层数
                 elif level is not None and old is not None:
@@ -1487,7 +1497,7 @@ class Simulation:
             case "arrow_cherry_blossoms":
                 for target in targets:
                     add_status(target, unique=True)
-            case "dodge":  # 不追踪该状态，因此暂时认为unique
+            case "dodge":
                 for target in targets:
                     add_status(target, unique=True)
             case "disaster":
@@ -1568,6 +1578,10 @@ class Simulation:
                 for target in targets:
                     if target.down:
                         add_status(target)
+
+            case "invincible":
+                for target in targets:
+                    add_status(target, unique=True)
                 
             case "recoil" | "b_i_yamawaki_servant" | "curry" | "dim_sum" | "gelato" | "shchi" | "steak" | "tea":
                 for target in targets:
@@ -1827,7 +1841,7 @@ class Simulation:
         for status in monster.statuses:
             if status.id == 177:
                 status.level = min(status.level+1, 10)
-            break
+                break
 
     def action_legalization(self, turn: Turn):
         """合法化turn.actions，允许recalculate的action和初始化的[None]*6"""
@@ -1876,7 +1890,8 @@ class Simulation:
                 "id": default_skill["id"],
                 "target": {"type": "ignore", "slot": None},
                 "user_selected": None,
-                "on_break": False
+                "on_break": False,
+                "be_attacked_times": 0
             }
 
     def od_legalization(self, turn: Turn, gui_add_state):
@@ -2405,6 +2420,19 @@ class Simulation:
                 turn.battle.field["left_turn"] = -1
                 turn.battle.field["value"] = None
 
+        # 受击与dp还原
+        for slot, style in enumerate(turn.team):
+            style.dp = 100
+            be_attacked_times = turn.actions[slot]["be_attacked_times"] if turn.actions[slot] else 0
+            if be_attacked_times > 0:
+                for i in range(be_attacked_times):
+                    self.trigger_style_passives(turn, style, "on_attacked")
+                for status in style.statuses:
+                    if status.duration_type == "on_attacked":
+                        status.remaining -= be_attacked_times
+                        if status.remaining <= 0:
+                            status.trash = True
+
         # 清除掉所有标记为trash的status
         for style in turn.team:
             for status in style.statuses[::-1]:
@@ -2503,7 +2531,7 @@ class Simulation:
         gui_add_state = {
             "member_dp": [float] * 6,
             'order': [int] * 6,  # 在recalculate中处理
-            'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int | None}, "user_selected": None | int, "on_break": False}] * 6,
+            'actions': [{"name": str, "id": int, "target": {"type": str, "slot": int | None}, "user_selected": None | int, "on_break": False, "be_attacked_times": False}] * 6,
             'enemies': [{"exist": bool, "damage_rate": int, 'down': bool}] * 3,
             'field': str or None,  # 回合开始前处理
             'od_timing': str or None,

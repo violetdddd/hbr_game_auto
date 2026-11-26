@@ -29,6 +29,7 @@
     "category": "rule",
     "forced_one": true
   },
+  "108": {"name": "resist_down_overwrite", "zh_cn": "弱点覆盖", "category": "rule"},
   "126": {"name": "zone_up_eternal_plus_15", "zh_cn": "领域强化（常驻）", "category": "rule"},
   "132": {
     "name": "rice_field_zone",
@@ -138,6 +139,7 @@
     "icon": "Funnel.webp",
     "special": true
   },
+  "15": {"name": "invincible", "zh_cn": "无敌", "category": "buff", "removable": true, "forced_one": true, "icon": "Invincible.png"},
   "25": {"name": "buff_charge", "zh_cn": "充能", "category": "buff", "removable": true, "forced_one": true, "icon": "Charge.png"},
   "54": {"name": "give_attack_buff_up", "zh_cn": "加攻增益强化", "category": "buff", "stack_group": "give_attack_buff_up", "removable": true, "icon": "GiveAttackBuffUp.png"},
   "76": {"name": "fighting_spirit", "zh_cn": "斗志", "category": "buff", "removable": true, "forced_one": true, "icon": "FightingSpirit.png"},
@@ -254,7 +256,6 @@
   "4": {"name": "defense_up", "zh_cn": "防御力提升", "category": "buff", "stack_group": "defense_up", "removable": true, "not_display": true},
   "5": {"name": "critical_rate_up", "zh_cn": "暴击率提升", "category": "buff", "stack_group": "critical_rate_up", "removable": true, "not_display": true},
   "10": {"name": "stun", "zh_cn": "眩晕", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "not_display": true},
-  "15": {"name": "invincible", "zh_cn": "无敌", "category": "buff", "removable": true, "forced_one": true, "not_display": true},
   "27": {"name": "attack_up_per_token", "zh_cn": "每层Token攻击提升", "category": "buff", "stack_group": "attack_up", "removable": true, "not_display": true},
   "28": {"name": "defense_up_per_token", "zh_cn": "每层Token防御提升", "category": "buff", "stack_group": "defense_up", "removable": true, "not_display": true},
   "30": {"name": "virus", "zh_cn": "病毒", "category": "debuff", "removable": true, "debuff_guard": true, "not_display": true},
@@ -269,7 +270,6 @@
   "94": {"name": "give_defense_debuff_up", "zh_cn": "防御削弱效果强化", "category": "buff", "stack_group": "give_defense_debuff_up", "removable": true, "not_display": true},
   "95": {"name": "all_status_up_value", "zh_cn": "全能力值提升", "category": "buff", "stack_group": "all_status_up_value", "removable": true, "not_display": true},
   "105": {"name": "super_break", "zh_cn": "超破盾", "category": "debuff", "forced_one": true, "not_display": true},
-  "108": {"name": "resist_down_overwrite", "zh_cn": "耐性降低覆盖", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "not_display": true},
   "110": {"name": "debuff_guard", "zh_cn": "负面状态防护", "category": "buff", "removable": true, "forced_one": true, "not_display": true},
   "113": {"name": "break_guard", "zh_cn": "破盾防护", "category": "buff", "forced_one": true, "not_display": true},
   "133": {"name": "babied", "zh_cn": "幼儿化", "category": "buff", "forced_one": true, "not_display": true},
