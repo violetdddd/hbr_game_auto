@@ -1230,7 +1230,7 @@ class BattleTurn(QGroupBox):
             special_count = None if special_trigger == None else [special_actions.get(special_trigger, 0), special_actions.get(special_trigger+"_after", 0)]
             dialog = SpecialActionDialog(
                 on_break=action.get('on_break', False),
-                be_attacked_times=action.get('be_attacked_times', False),
+                be_attacked_times=action.get('be_attacked_times') or 0,
                 special_trigger=special_trigger,
                 special_count=special_count,
                 parent=self

@@ -2423,7 +2423,7 @@ class Simulation:
         # 受击与dp还原
         for slot, style in enumerate(turn.team):
             style.dp = 100
-            be_attacked_times = turn.actions[slot]["be_attacked_times"] if turn.actions[slot] else 0
+            be_attacked_times = (turn.actions[slot] or {}).get("be_attacked_times") or 0
             if be_attacked_times > 0:
                 for i in range(be_attacked_times):
                     self.trigger_style_passives(turn, style, "on_attacked")
