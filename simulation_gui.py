@@ -11,11 +11,12 @@ from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QPushButton,
     QSpinBox, QDoubleSpinBox, QCheckBox, QDialog, QTabWidget, QScrollArea,
     QGroupBox, QStackedWidget, QMessageBox, QFileDialog, QSizePolicy, QFrame,
-    QComboBox,
+    QComboBox, QAbstractButton, QInputDialog,
 )
 
 from paths import ROOT_DIR, SCRIPTS_DIR
 from config import settings
+from simulation import DEFAULT_ENEMY_SLOTS
 SIMULATION_DIR = ROOT_DIR / 'assets' / 'simulation'
 ICON_DIR = ROOT_DIR / 'assets' / 'icons'
 KELIAN_DIR = ROOT_DIR / "assets" / "char-images" / "31A" / "Karen_Asakura"
@@ -514,8 +515,15 @@ class BattleSetup(QGroupBox):
         enemy_col.setContentsMargins(0, 0, 0, 4); enemy_col.setSpacing(2)
 
         enemy_col.addWidget(QLabel('敌人数量'))
+        enemy_line = QHBoxLayout()
         self.enemy_count = combo([(str(n), n) for n in range(1, 4)])
-        enemy_col.addWidget(self.enemy_count)
+        self.enemy_count.currentIndexChanged.connect(self.change_enemy_count)
+        enemy_line.addWidget(self.enemy_count, 1)
+        self.enemy_positions = QPushButton()
+        self.enemy_positions.clicked.connect(self.change_enemy_count)
+        enemy_line.addWidget(self.enemy_positions)
+        enemy_col.addLayout(enemy_line)
+        self.set_enemy_slots(DEFAULT_ENEMY_SLOTS[1])
 
         enemy_col.addWidget(QLabel('敌人弱点'))
         self.enemy_weaknesses = []
@@ -736,11 +744,35 @@ class BattleSetup(QGroupBox):
             count = sum(len(group) for group in self.skill_selections[index].values())
             self.skill_buttons[index].setToolTip(f'已选 {count} 项技能')
 
+    def set_enemy_slots(self, slots):
+        self.enemy_slots = tuple(sorted(slots))
+        blocked = self.enemy_count.blockSignals(True)
+        self.enemy_count.setCurrentIndex(self.enemy_count.findData(len(slots)))
+        self.enemy_count.blockSignals(blocked)
+        self.enemy_positions.setVisible(len(slots) == 2)
+        self.enemy_positions.setText('、'.join('左中右'[slot] for slot in self.enemy_slots))
+        self.enemy_positions.setToolTip('重新选择双体敌人的位置')
+
+    def change_enemy_count(self):
+        count = self.enemy_count.currentData()
+        if count != 2:
+            self.set_enemy_slots(DEFAULT_ENEMY_SLOTS[count])
+            return
+        positions = [(0, 1), (0, 2), (1, 2)]
+        labels = ['左侧和中间', '左侧和右侧', '中间和右侧']
+        current = positions.index(self.enemy_slots) if self.enemy_slots in positions else 0
+        selected, ok = QInputDialog.getItem(
+            self, '选择双体敌人位置', '请根据实际战斗界面选择两个敌人的位置。',
+            labels, current, False
+        )
+        self.set_enemy_slots(positions[labels.index(selected)] if ok else self.enemy_slots)
+
     def reset(self):
         self.clear_setup_swap()
         self.styles = [None]*6; self.resonances = [None]*6
         self.skill_selections = [{'active': [], 'passive': [], 'orb': []} for _ in range(6)]
-        self.enemy_count.setCurrentIndex(0); self.initial_od.setValue(0); self.global_od_rate.setValue(100)
+        self.set_enemy_slots(DEFAULT_ENEMY_SLOTS[1])
+        self.initial_od.setValue(0); self.global_od_rate.setValue(100)
         self.enemy_weaknesses = []
         self.weakness_button.setText('设置弱点')
         self.weakness_button.setToolTip('无弱点')
@@ -788,6 +820,7 @@ class BattleSetup(QGroupBox):
             'styles': styles,
             'resonances': resonances,
             'enemy_count': int(self.enemy_count.currentData() or 1),
+            'enemy_slots': list(self.enemy_slots),
             'enemy_weaknesses': list(self.enemy_weaknesses),
             'initial_od': float(self.initial_od.value()),
             'global_od_rate': float(self.global_od_rate.value()),
@@ -834,7 +867,7 @@ class BattleSetup(QGroupBox):
             if resonance is not None:
                 box = self.resonance_breaks[i]
                 box.setCurrentIndex(box.findData(resonance['break_level']))
-        self.enemy_count.setCurrentIndex(self.enemy_count.findData(setup['enemy_count']))
+        self.set_enemy_slots(setup.get('enemy_slots', DEFAULT_ENEMY_SLOTS[setup['enemy_count']]))
         self.initial_od.setValue(setup['initial_od'])
         self.global_od_rate.setValue(setup['global_od_rate'])
         self.set_weaknesses(setup['enemy_weaknesses'])
@@ -923,12 +956,13 @@ class PortraitWithSP(QWidget):
         painter.drawText(rect, Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignRight, text)
         painter.end()
 
-class TargetBadge(QWidget):
+class TargetBadge(QAbstractButton):
     """头像右下角的技能目标标记。"""
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setFixedSize(25, 25)
-        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.setToolTip('左键重新选择技能目标')
         self.pixmap = QPixmap()
         self.text = ''
         self.hide()
@@ -1082,7 +1116,8 @@ class BattleTurn(QGroupBox):
                 portrait = PortraitWithSP(45, avatar)
                 portrait.move(2, 1)
                 badge = TargetBadge(avatar)
-                badge.move(31, 29)
+                badge.move(30, 29)
+                badge.clicked.connect(lambda _=False, pos=position: self.change_action_target(pos))
                 avatar.clicked.connect(lambda _=False, pos=position: self.swap_position(pos))
                 # 头像右键展开特殊状态编辑
                 avatar.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -1322,29 +1357,14 @@ class BattleTurn(QGroupBox):
         slot = base['order'][position]
         skill_id = self.action_boxes[position].currentData()
         skill = next((s for s in base['members'][slot]['skills'] if s['id'] == skill_id), None)
-        target_type = skill.get('target_type', 'ignore')
+        if skill is None:
+            return
         old_action = base['actions'][slot]
-        target_slot = None
+        target = self.select_action_target(skill['target_type'], slot, base)
+        if target is None:
+            self.restore_action(position, old_action)
+            return
         user_selected = None
-        target_selected = False
-        # 单体敌人或ignore的情况，不要弹出选择框
-        if target_type == "ignore":
-            target_selected = True
-        elif target_type == 'enemy':
-            enemies = [i for i, enemy in enumerate(base['enemies']) if enemy['exist']]
-            if len(enemies) == 1:
-                target_slot = enemies[0]
-                target_selected = True
-        # 敌人多体和我方角色，弹出选择框
-        if not target_selected:
-            dialog = TargetSelectionDialog(
-                self.owner, target_type, slot, base, self
-            )
-            if dialog.exec() == QDialog.DialogCode.Accepted:
-                target_slot = dialog.selected_slot
-            else:
-                self.restore_action(position, old_action)
-                return
         # 选择 user_select 分支
         options = skill.get('user_select')
         if options:
@@ -1359,10 +1379,7 @@ class BattleTurn(QGroupBox):
         base['actions'][slot] = {
             'id': skill['id'],
             'name': skill['name'],
-            'target': {
-                'type': target_type,
-                'slot': target_slot
-            },
+            'target': target,
             'user_selected': user_selected,
             'on_break': False,
             "be_attacked_times": 0
@@ -1372,12 +1389,39 @@ class BattleTurn(QGroupBox):
         # 刷新显示
         self.refresh()
 
+    def select_action_target(self, target_type, slot, base):
+        # 单体敌人和无需指定目标的技能直接返回
+        if target_type == 'ignore':
+            return {'type': target_type, 'slot': None}
+        if target_type == 'enemy':
+            enemies = [i for i, enemy in enumerate(base['enemies']) if enemy['exist']]
+            if len(enemies) == 1:
+                return {'type': target_type, 'slot': enemies[0]}
+        dialog = TargetSelectionDialog(self.owner, target_type, slot, base, self)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            return {'type': target_type, 'slot': dialog.selected_slot}
+
+    def change_action_target(self, position):
+        base = self.state_data['base']
+        slot = base['order'][position]
+        action = base['actions'][slot]
+        if not action:
+            return
+        skill = next((skill for skill in base['members'][slot]['skills'] if skill['id'] == action['id']), None)
+        if skill is None or skill['target_type'] == 'ignore':
+            return
+        target = self.select_action_target(skill['target_type'], slot, base)
+        if target is not None and target != action['target']:
+            action['target'] = target
+            self.update_state_from_simulation()
+            self.refresh()
+
     # 用户取消选择时调用，用于恢复上一个选择的技能
     def restore_action(self, position, old_action):
         box = self.action_boxes[position]
 
         box.blockSignals(True)
-        box.setCurrentIndex(box.findData(old_action['id']))
+        box.setCurrentIndex(box.findData(old_action['id']) if old_action else -1)
         box.blockSignals(False)
 
     # 更新od值同时调用refresh
@@ -1517,21 +1561,6 @@ class BattleTurn(QGroupBox):
             adjust['members'][slot]['sp'] = controls['sp'].value()
             adjust['members'][slot]['token'] = controls['token'].value()
             base['members'][slot]['dp'] = controls['dp'].value()
-
-        # 判断目标是否改变，如改变则给出提示框
-        checks = self.enemy_presence_checks
-        re_target_actions = []
-        new_target = next(i for i, check in enumerate(checks) if check.isChecked())
-        for action in base["actions"]:
-            if action is None:
-                continue
-            target = action["target"]
-            if target["type"] == "enemy" and not checks[target["slot"]].isChecked():  # 如果有目标type，那么不应该出现slot为None的情况
-                target["slot"] = new_target
-                re_target_actions.append(action["name"])
-        if re_target_actions:
-            warning = "、".join(re_target_actions)
-            QMessageBox.warning(self,"技能目标调整",f"敌人配置发生变化，以下技能已自动调整目标：{warning}")
 
     def toggle_mode(self):
         if self.stack.currentIndex() == 0:
@@ -1684,9 +1713,9 @@ class BattleTurn(QGroupBox):
         level = max(0, min(3, int(od // 100)))
         # od发动选择框
         # 前置od发动条件是当前刚刚开启前置od，或者当前处于od外的非附加回合中
-        available_before = 3 if (now_timing == "before" and bonus == 1) or (now_od == 0 and not additional_turn) else 0
+        available_before = 3 if (now_timing == "before" and bonus == 1 and not additional_turn) or (now_od == 0 and not additional_turn) else 0
         # 后置od发动条件是当前刚刚开启前置od，或者当前处于od外
-        available_after = 3 if (now_timing == "before" and bonus == 1) or now_od == 0 else 0
+        available_after = 3 if (now_timing == "before" and bonus == 1 and not additional_turn) or now_od == 0 else 0
         for timing, caption, box, available in (('before', self.before_od_caption, self.before_od, available_before), ('after', self.after_od_caption, self.after_od, available_after)):
             if caption.isHidden() == bool(available):
                 caption.setVisible(bool(available))
@@ -1823,9 +1852,11 @@ class SimulationTab(QWidget):
             '为方便排轴，目前不对任何技能和OD使用进行限制（检查OD/SP消耗、技能次数限制、冷却回合等）。\n\n'
             '战斗设定\n'
             '左键选风格，依次右键两个上场角色可交换战斗设定中的位置。再设置技能、突破、饰品、共鸣和敌人信息。'
+            '单体默认居中，双体按实际战斗选择位置。'
             '「开始战斗」会创建新战斗，「应用调整」会从首回合重算现有排轴。\n\n'
             '编辑回合\n'
             '从下拉框选择技能和OD发动情况。依次左键两个头像可交换站位，右键点击头像可设置破盾及角色专属特殊行动。'
+            '左键点击头像右下角的目标徽章可以重新选择目标。'
             '点击「调整」可修改本回合的资源、DP、敌人和场地，用于一些特殊被动的触发和技能费用计算等。\n\n'
             '查看与推进\n'
             '点击状态栏查看该单位的状态详情。状态较多时，可用横向滚轮或 Shift 加滚轮查看后续状态。'
@@ -1834,9 +1865,9 @@ class SimulationTab(QWidget):
             '用「导出模拟数据」保存设定和排轴，再用「导入模拟数据」可以恢复并继续编辑。'
             '「从HBRF导入」会以默认战斗设定重放单队排轴，导入后请检查并调整。\n\n'
             '目前暂未支持\n'
-            '我方DP、敌方破坏率、倒地和技能破盾等需要手动填写。\n'
+            '我方DP、敌方破坏率、倒地和技能破盾等需要手动填写。受击被动按手动设置的受击次数触发。\n'
             '实际伤害、回复DP等与排轴无关的效果尚未结算。\n'
-            '敌方上buff、给予我方的异常状态等，以及受击触发尚未模拟。部分概率效果默认触发。'
+            '敌方行动、敌方施加的增益和异常状态等尚未自动模拟。部分概率效果默认触发。'
             
         )
         settings.mark_tips_seen('simulation')
@@ -2070,11 +2101,11 @@ class SimulationTab(QWidget):
                             role.skills.append(f'{skill}/{linked}' if linked else skill)
                         used[slot][pair] = (len(role.skills), skill)
                     choice = action['target']
-                    if choice['slot'] is not None:
-                        if choice['type'] != 'enemy':
-                            target = choice['slot'] + 1
-                        elif enemy_count > 1:
+                    if choice['type'] == 'enemy':
+                        if enemy_count > 1:
                             target = choice['slot'] + 7
+                    elif choice['slot'] is not None:
+                        target = choice['slot'] + 1
                     moves.append((slot, skill, pair, target))
                 else:
                     moves.append((slot, None, None, None))
@@ -2226,14 +2257,13 @@ class SimulationTab(QWidget):
         from hbrf import model as m
         from simulation import Skill, json_records_to_dict
 
-        # HBRF的7对应左侧敌人，只有三体配置才会出现左侧位置
-        targets = {move.target for turn in script.actions if isinstance(turn, m.BattleTurn)
-                   for move in turn.actions}
-        enemy_count = 3 if 7 in targets else 2 if targets & {8, 9} else 1
-        enemy_slots = {1: [1], 2: [1, 2], 3: [0, 1, 2]}[enemy_count]
+        # 从显式指定的敌人位置还原出场配置，没有指定时默认单体居中
+        enemy_slots = sorted({move.target - 7 for turn in script.actions if isinstance(turn, m.BattleTurn)
+                              for move in turn.actions if move.target in (7, 8, 9)}) or list(DEFAULT_ENEMY_SLOTS[1])
         setup = {
             'styles': [], 'resonances': [None] * 6,
-            'enemy_count': enemy_count, 'enemy_weaknesses': [value for _, value in ELEMENTS[1:]],
+            'enemy_count': len(enemy_slots), 'enemy_slots': enemy_slots,
+            'enemy_weaknesses': [value for _, value in ELEMENTS[1:]],
             'initial_od': 0.0, 'global_od_rate': 100,
         }
         records = json_records_to_dict(self.engine.skills_path)

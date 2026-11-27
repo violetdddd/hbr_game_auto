@@ -81,6 +81,7 @@ Duration：
   resource 支持 sp、od、ep、sp_modify 等资源变化。
   additional_turn、double_action_extra_skill、double_attack_skill 控制追加行动或重复执行。
   heal_sp_by_token(limit)、over_drive_point_up_by_token、specify_sp、overwrite_sp、sp_limit_overwrite 需按各自独立的含义处理。
+  已验证技能 511「盛夏的冰凉冲击！」消耗全部信念，OD 预测按每点信念增加 10 个百分点（无额外倍率时），行动结算不重复加算。
 
 场地机制：
   zone(field) 与 territory 分开储存和更新，二者可以互相共存，但多个场或域不能共存，是覆盖关系。
@@ -114,14 +115,14 @@ Duration：
   on_additional_turn_start: 17
   on_overdrive_start: 13
   on_kill_enemy: 11       # 默认不发动
-  on_use_specific_skill: 9
+  on_use_specific_skill: 9  # 按技能ID匹配突破被动。已验证炯眼模式触发追加回合；极限游泳在扣除全部信念后才检查信念>=10，当前不会触发。
   on_sp_up_by_nonself_active_skill: 8
   user_select: 7          # 以GUI小按钮形式发动
   on_attack_weak: 5
-  on_attacked: 5          
+  on_attacked: 5          # 按回合特殊行动面板中手填的受击次数触发
   on_relieve_enemy_buff: 4          # 侦探等可以给敌方上buff，敌人行动的buff需要用户手动调整
   after_action: 5
-  on_use_specific_status_skill: 2
+  on_use_specific_status_skill: 2  # 按已解析的技能效果类型匹配。已验证恐怖的打针时间触发强化治疗疫苗，全队SP+2。
   on_active_zone: 1
   on_heal_dp: 1           # 默认不发动，token数用户手动调整
   on_pursuit: 1
