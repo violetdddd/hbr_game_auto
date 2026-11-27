@@ -122,7 +122,7 @@ def operate_role_button(game, button: str, member_position):
     wait_and_click(game, load_template(tpl.ROLE_BUTTON_CONFIG[button]), warning=f"未匹配到{button}按钮")
     time.sleep(3)
 
-def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mod.BattleTurn, need_od_check=False):
+def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mod.BattleTurn, special_actions_after_od: list, need_od_check=False):
     """
     操作游戏一回合，包含前置OD、调整位置、选择技能、后置OD
     """
@@ -209,6 +209,24 @@ def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mo
         wait_until(lambda: detect_start_button(game), 
                    warning="开OD后未匹配到回合结束按钮")
         time.sleep(0.2)
+
+    # 处理前置od后发动时机的特殊按钮行动
+    for action, local_role in special_actions_after_od:
+        if isinstance(action, mod.SpecialRoleButton):
+            log.info("正在于前置OD后启动 %s 按钮", action.button)
+            wait_until(lambda: detect_start_button(game),
+                    timeout=5*60,
+                    warning="未检测到回合结束按钮")
+
+            ensure_front(game, old_member_position, local_role, action.position)
+            operate_role_button(game, action.button, action.position)
+
+        elif isinstance(action, mod.SpecialGlobalButton):
+            log.info("正在于前置OD后使用 %s 小按钮", action.button)
+            wait_until(lambda: detect_start_button(game),
+                        timeout=5*60,
+                        warning="未检测到回合结束按钮")
+            wait_and_click(game, load_template(tpl.GLOBAL_BUTTON_CONFIG[action.button]), warning=f"未检测到{action.button}按钮")
 
     # 先调整位置
     steps, member_position_output = generate_swaps(old_member_position, new_member_position)
@@ -327,6 +345,8 @@ def fight(game, script: mod.BattleScript, auto_mode="none"):
     auto_pending = auto_mode != "none"
     # 设置检查od凹追击flag，理论上只有CheckOD紧接BattleTurn才会触发检查
     need_od_check = False
+    # 在前置od后发动的操作需要用一个队列保存
+    special_actions_after_od = []
 
     for action in script.actions:
         if auto_pending and not isinstance(action, mod.SkipEvent):
@@ -360,13 +380,19 @@ def fight(game, script: mod.BattleScript, auto_mode="none"):
                            warning="未检测到切换队伍后的OK按钮")
 
         elif isinstance(action, mod.SpecialRoleButton):
-            log.info("正在启动 %s 按钮", action.button)
-            wait_until(lambda: detect_start_button(game),
-                       timeout=5*60,
-                       warning="未检测到回合结束按钮")
+            # 在前置od前可以直接发动
+            if not action.after_pre_od:
+                log.info("正在启动 %s 按钮", action.button)
+                wait_until(lambda: detect_start_button(game),
+                        timeout=5*60,
+                        warning="未检测到回合结束按钮")
 
-            ensure_front(game, team_positions[current_team], local_role(action.role), action.position)
-            operate_role_button(game, action.button, action.position)
+                ensure_front(game, team_positions[current_team], local_role(action.role), action.position)
+                operate_role_button(game, action.button, action.position)
+            # 前置od后则要在operate one turn内发动
+            else:
+                log.info("检测到 %s 按钮在前置od后发动", action.button)
+                special_actions_after_od.append((action, local_role(action.role)))
 
         elif isinstance(action, mod.SkillSwitch):
             log.info("正在切换角色技能")
@@ -379,11 +405,17 @@ def fight(game, script: mod.BattleScript, auto_mode="none"):
             operate_skill_switch(game, action.position, local_slot, action.skill, team_skill_nums[current_team])
 
         elif isinstance(action, mod.SpecialGlobalButton):
-            log.info("正在使用 %s 小按钮", action.button)
-            wait_until(lambda: detect_start_button(game),
-                        timeout=5*60,
-                        warning="未检测到回合结束按钮")
-            wait_and_click(game, load_template(tpl.GLOBAL_BUTTON_CONFIG[action.button]), warning=f"未检测到{action.button}按钮")
+            # 在前置od前可以直接发动
+            if not action.after_pre_od:
+                log.info("正在使用 %s 小按钮", action.button)
+                wait_until(lambda: detect_start_button(game),
+                            timeout=5*60,
+                            warning="未检测到回合结束按钮")
+                wait_and_click(game, load_template(tpl.GLOBAL_BUTTON_CONFIG[action.button]), warning=f"未检测到{action.button}按钮")
+            # 前置od后则要在operate one turn内发动
+            else:
+                log.info("检测到 %s 按钮在前置od后发动", action.button)
+                special_actions_after_od.append((action, None))
             
         elif isinstance(action, mod.BattleTurn):  # 表示正常进行行动回合
             Turn = action.label
@@ -419,7 +451,9 @@ def fight(game, script: mod.BattleScript, auto_mode="none"):
                 old_member_position=team_positions[current_team].copy(), 
                 role_skill_num=team_skill_nums[current_team],
                 action=local_action,
-                need_od_check=need_od_check)
+                special_actions_after_od=special_actions_after_od,
+                need_od_check=need_od_check
+                )
             # 防止重复点击，可等待一段时间
             time.sleep(3)
 

@@ -45,6 +45,7 @@ class ChangeTeamEvent:
 @dataclass
 class SpecialGlobalButton:
     button: str
+    after_pre_od: bool
 
 # 切换技能属性
 @dataclass
@@ -59,6 +60,7 @@ class SpecialRoleButton:
     role: int
     position: int  # 这里直接0，1，2但写在脚本里+1变成更易读的1，2，3
     button: str
+    after_pre_od: bool
 
 # 凹追击检测od行动
 @dataclass
@@ -87,7 +89,6 @@ def validate_hbrf(script: BattleScript):
 
     role_ids = {role.slot for role in script.roles}
     role_by_id = {role.slot: role for role in script.roles}
-    moster_ids = {7, 8, 9}
 
     if role_ids != set(range(1, len(script.roles) + 1)):
         raise ValueError("一队角色编号为1-6，二队编号为7-12")
@@ -140,6 +141,10 @@ def validate_hbrf(script: BattleScript):
                 raise ValueError(
                     f"{action.button}的对应角色必须站在前排"
                 )
+            if not isinstance(action.after_pre_od, bool):
+                raise ValueError(
+                    f"{action.button}必须选择前置od前/后发动"
+                )
             
         elif isinstance(action, SkillSwitch):
             if action.role not in active_role_ids:
@@ -159,6 +164,10 @@ def validate_hbrf(script: BattleScript):
             if action.button not in tpl.GLOBAL_BUTTON_CONFIG:
                 raise ValueError(
                     f"非法全局按钮: {action.button}"
+                )
+            if not isinstance(action.after_pre_od, bool):
+                raise ValueError(
+                    f"{action.button}必须选择前置od前/后发动"
                 )
 
         elif isinstance(action, BattleTurn):
@@ -286,18 +295,37 @@ def load_hbrf(filepath) -> BattleScript:
             actions.append(TeamEvent(int(line.split("=", 1)[1].strip())))
             continue
 
-        if line in tpl.GLOBAL_BUTTON_CONFIG:
-            actions.append(SpecialGlobalButton(line))
+        # 所有特殊全局行动
+        if line in tpl.GLOBAL_BUTTON_CONFIG:  # 向前兼容没有after_od字段的脚本
+            actions.append(SpecialGlobalButton(line, False))
             continue
+        if "after_od:" in line:
+            line, after_od = [x.strip() for x in line.split("after_od:")]
+            if after_od not in ("0","1"):
+                raise ValueError(
+                    f"{line}指示的特殊行动发动顺序after_od必须为0或1"
+                )
 
-        # 可怜/司令这种前排点击技能按钮或切换技能的行动：code | name | 技能/无 | 位置
+            if line in tpl.GLOBAL_BUTTON_CONFIG:
+                actions.append(SpecialGlobalButton(line, bool(after_od)))
+                continue
+
+        # 可怜/司令这种前排点击技能按钮的行动：code | name | 技能/无 | 位置
         if "|" in line:
             parts = [x.strip() for x in line.split("|")]
             command = parts[0]
 
             # 可怜/司令这种前排点击技能按钮的行动
             if command in tpl.ROLE_BUTTON_CONFIG and len(parts) == 3:
-                name, need_pos = parts[1], int(parts[2])
+                if "after_od:" in parts[2]:
+                    if after_od not in ("0","1"):
+                        raise ValueError(
+                            f"{line}指示的特殊行动发动顺序after_od必须为0或1"
+                        )
+                    need_pos, after_od = [int(x.strip()) for x in parts[2].split("after_od:")]
+                else:  # 向前兼容没有after_od的前排点击按钮行动
+                    need_pos, after_od = int(parts[2]), 0
+                name = parts[1]
                 if name not in role_by_name:
                     raise ValueError(
                         f"{command}指示的角色名: {name}不存在"
@@ -311,12 +339,13 @@ def load_hbrf(filepath) -> BattleScript:
                     SpecialRoleButton(
                         role=role_by_name[name].slot,
                         button=command,
-                        position=need_pos-1
+                        position=need_pos-1,
+                        after_pre_od=bool(after_od)
                     )
                 )
                 continue
 
-            # 切换某角色的技能属性
+            # 切换某角色的技能属性行动：skill | name | 技能/无 | 位置
             elif command == "skill" and len(parts) == 4:
                 switch_role_name, switch_skill, need_pos = parts[1], int(parts[2]), int(parts[3])
                 if switch_role_name not in role_by_name:
@@ -476,10 +505,10 @@ def save_hbrf(script: BattleScript, filepath, style_metadata=None):
                 f.write("check_od\n")
 
             elif isinstance(action, SpecialGlobalButton):
-                f.write(f"{action.button}\n")
+                f.write(f"{action.button} after_od: {int(action.after_pre_od)}\n")
 
             elif isinstance(action, SpecialRoleButton):
-                f.write(f"{action.button} | {role_by_id[action.role].name} | {action.position+1}\n")
+                f.write(f"{action.button} | {role_by_id[action.role].name} | {action.position+1} after_od: {int(action.after_pre_od)}\n")
 
             elif isinstance(action, SkillSwitch):
                 f.write(f"skill | {role_by_id[action.role].name} | {action.skill} | {action.position+1}\n")
