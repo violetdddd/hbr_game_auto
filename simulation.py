@@ -42,7 +42,6 @@ PASSIVE_EFFECT_TYPES_NEEDED = {
     "element_mark",
     "motivation",
     "zone",
-    "mocktail",
     "talisman",
     "inscription",
     "rice_field_zone",
@@ -106,7 +105,6 @@ ACTIVE_EFFECT_TYPES_NEEDED = {
     "steak",
     "tea",
     "diva",
-    "mocktail",
     "super_break_down",
     # buff
     "attack_up",
@@ -838,7 +836,7 @@ def calculate_funnel(style: Style, consume=False):
     )
 
 # 根据行动的参数计算od增加数值
-def calculate_od(hit, funnel, enemy, direct, earring: int, extra_rate: float, default_hit: float, passive=False) -> float:
+def calculate_od(hit, funnel, enemy, direct, earring: int, extra_rate: int, default_hit: float, passive=False) -> float:
     if earring != 0:  # 10,12,15
         if hit != 0:
             od_rate_100 = 105 + (earring-5) / 9 * min(hit - 1, 9) + extra_rate
@@ -1377,7 +1375,7 @@ class Simulation:
                     value = effect.get("od", 0)
                     if isinstance(value, list):
                         raise ValueError("OD 数值尚未按共鸣等级展开")
-                    if trigger == "on_break_enemy":
+                    if trigger in ("on_break_enemy", "after_ex_use"):
                         action = turn.actions[owner.slot]
                         hit = 0
                         if action != None:
@@ -1502,9 +1500,6 @@ class Simulation:
             case "motivation":
                 for target in targets:
                     add_status(target, level=effect.get("level", 1), max_level=5,)
-            case "mocktail":
-                for target in targets:
-                    add_status(target, unique=True)
             case "makeup":
                 for target in targets:
                     add_status(target, unique=True)
@@ -1781,10 +1776,12 @@ class Simulation:
             # 消耗连击珠
             calculate_funnel(style, consume=True)
             # 以下3种buff如果有ally_turn的就是单独发动，默认不消耗use的层数
-            # 消耗心眼
+            # 消耗心眼，有对应弱点才消耗
             if not any(status.id == 78 and status.duration_type == "ally_turn" for status in style.statuses):
-                mind_eyes = get_use_buff(style, 78, "on_attack_weak")
-                consume_use_turn_buff(mind_eyes)
+                if (skill.elements and skill.elements[0] in ctx.turn.battle.enemy_weaknesses) or \
+                self.skill_has_effect_with(skill, action, ctx, effect_type="penetration_critical_attack"):
+                    mind_eyes = get_use_buff(style, 78, "on_attack_weak")
+                    consume_use_turn_buff(mind_eyes)
             # 消耗加攻
             if not any(status.id == 1 and status.duration_type == "ally_turn" for status in style.statuses):
                 attack_ups = get_use_buff(style, 1, "use")
@@ -2005,6 +2002,12 @@ class Simulation:
         """
         # new_turn_start
         if new_turn:
+            # specify_sp需要最先结算
+            for style in turn.team:
+                for status in style.statuses:
+                    if status.id == 26 and not status.trash:
+                        style.sp = max(style.sp, status.data.get("value"))
+                        status.trash = True
             # 回合开始先加2sp
             for style in turn.team:
                 add_sp(style, {"sp": 2})
@@ -2082,17 +2085,14 @@ class Simulation:
                             skill.now_cost = skill.cost.get("yes").get(skill.cost_type)
                         else:
                             skill.now_cost = skill.cost.get("no").get(skill.cost_type)
-                    # 消耗sp的技能，消耗全部sp的不参与判断
-                    if skill.cost_type == "sp" and skill.now_cost >= 0:
+                    # 消耗sp的技能，消耗全部sp或0费的的不参与判断
+                    if skill.cost_type == "sp" and skill.now_cost > 0:
                         # 检查 overwrite_sp
                         for status in style.statuses:
                             if status.id == 175 and status.data.get("skill_id") == skill.id:
                                 condition = status.data.get("condition")
                                 if not condition or check(condition, Context(turn, style)):
                                     skill.now_cost = status.data.get("sp")
-                        # 检查沉浸和鬼神化
-                        if has_status_id(style, 228) or has_status_id(style, 229):
-                            skill.now_cost = 0
                         # 检查轻快状态
                         spri = [status for status in style.statuses if status.id == 194]
                         if spri:
@@ -2103,7 +2103,7 @@ class Simulation:
                                     if status.data.get("value") == value_max:
                                         status.trash = True
                                         break
-                        # 最后检查sp_modify
+                        # 检查sp_modify
                         sp_modify_list = [status for status in style.statuses if status.id == 6]
                         if sp_modify_list:
                             sp_add = sp_minus = 0
@@ -2116,6 +2116,9 @@ class Simulation:
                                     elif modify < 0:
                                         sp_minus = min(sp_minus, modify)
                             skill.now_cost = max(skill.now_cost + sp_add + sp_minus, 0)
+                        # 最后检查沉浸和鬼神化对sp进行覆盖
+                        if has_status_id(style, 228) or has_status_id(style, 229):
+                            skill.now_cost = 0
                     # 消耗od的技能有一个是cases
                     elif skill.cost_type == "od":
                         if skill.cases and "cost" in skill.cases:

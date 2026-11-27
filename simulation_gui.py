@@ -222,15 +222,19 @@ class StatusRow(QScrollArea):
             remaining = status.get('remaining')
             element = status.get('element')
             level = status.get('level')
+            if status.get('data') and "mode" in status.get('data'):
+                name += f"×{status.get('data').get('mode').get('number')}"
             if element:
                 name = ELEMENT_NAMES[element] + name
             if level:
                 name += f" Level {level} "
             if duration == 'permanent':
                 name += '（永久）'
-            elif duration not in ('use_immersion_ex', 'on_attack_weak'):
+            elif duration == "during_down":
+                name += "（倒下状态）"
+            elif duration != 'use_immersion_ex':
                 label = {'ally_turn': '我方回合', 'enemy_turn': '敌方回合'}.get(duration, '剩余次数')
-                name += f'（{label}：{remaining if remaining is not None else "—"}）'
+                name += f'（{label}：{remaining if remaining is not None else "bug"}）'
             title = QLabel(name)
             title.setTextFormat(Qt.TextFormat.PlainText)
             details.addWidget(self.status_icon(path), i * 2, 0, Qt.AlignmentFlag.AlignCenter)

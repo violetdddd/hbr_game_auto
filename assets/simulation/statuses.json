@@ -173,7 +173,6 @@
   "171": {"name": "curry", "zh_cn": "咖喱", "category": "buff", "removable": true, "forced_one": true, "icon": "Curry.png"},
   "172": {"name": "shchi", "zh_cn": "白菜汤", "category": "buff", "removable": true, "forced_one": true, "icon": "Shchi.png"},
   "174": {"name": "motivation", "zh_cn": "干劲", "category": "buff", "forced_one": true, "has_level": true, "icon": "Motivation.webp", "special": true},
-  "179": {"name": "mocktail", "zh_cn": "鸡尾酒", "category": "buff", "removable": true, "forced_one": true, "icon": "Mocktail.png"},
   "190": {"name": "steak", "zh_cn": "牛排", "category": "buff", "removable": true, "forced_one": true, "icon": "Steak.webp"},
   "191": {"name": "gelato", "zh_cn": "意式冰淇淋", "category": "buff", "removable": true, "forced_one": true, "icon": "Gelato.webp"},
   "194": {
@@ -275,6 +274,7 @@
   "133": {"name": "babied", "zh_cn": "幼儿化", "category": "buff", "forced_one": true, "not_display": true},
   "148": {"name": "damage_rate_up_per_token", "zh_cn": "每层Token破坏率提升", "category": "buff", "stack_group": "damage_rate_up", "removable": true, "not_display": true},
   "186": {"name": "border_ref_p_down_by_admiral", "zh_cn": "超越量表敌方属性降低", "category": "debuff", "removable": true, "debuff_guard": true, "forced_one": true, "not_display": true},
+  "179": {"name": "mocktail", "zh_cn": "鸡尾酒", "category": "buff", "removable": true, "forced_one": true, "not_display": true},
   "209": {"name": "e_a_guard", "zh_cn": "埃癸斯无敌护盾", "category": "buff", "removable": true, "forced_one": true, "not_display": true},
   "226": {"name": "toughness_up_value_per_revenge_level", "zh_cn": "按复仇层数提升体力", "category": "buff", "not_display": true}
 }

@@ -5015,7 +5015,7 @@
     "target": "single",
     "attack_type": "slash",
     "effects": [
-      {"type": "super_break_down", "target": "single", "status_id": 170},
+      {"type": "super_break_down", "target": "single", "status_id": 170, "duration": {"type": "during_down"}},
       {"type": "penetration_critical_attack", "target": "single", "attack_type": "slash"}
     ]
   },
