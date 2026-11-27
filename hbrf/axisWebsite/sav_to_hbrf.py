@@ -19,7 +19,7 @@ DATA_DIR = ROOT_DIR / "assets" / "char-data"
 DEFAULT_SKILLS = {0, 1, 2, 3, 4, 5, 8001, 8002, 8003, 8004, 9999}
 POST_OD = {4: 1, 5: 2, 6: 3}
 KAREN_STYLES = {176: 1, 177: 2}  # 176=009-1(形态001), 177=009-2(形态002)
-INTRO = '# 此hbrf文件为解析https://www.hbr-tool.com/网站保存的sav文件生成，不包含特殊行动，需要手动检查调整并重新保存'
+INTRO = '# 此hbrf文件由 https://www.hbr-tool.com/ 的 SAV 转换，已保留可怜切换姿态，需要手动检查调整并重新保存'
 
 
 def decode_sav(path):
@@ -104,7 +104,7 @@ def convert(axis: dict, mapping: dict, output_path):
         if len(places) < 6 or len(selections) < 6:
             raise ValueError(f'第{index}行行动的上场角色不满6人')
         for style_id, selection in zip(places[:3], selections[:3]):
-            slot = style_to_slot[style_id]
+            slot = style_to_slot[int(style_id)]
             sid = int(selection.get('skill_id') or 0)
             if sid in DEFAULT_SKILLS:
                 continue
@@ -180,7 +180,7 @@ def convert(axis: dict, mapping: dict, output_path):
                 if slot not in active_form:
                     active_form[slot] = 1
                 if active_form[slot] != new_form:
-                    switches.append(m.SpecialRoleButton(slot, position, 'kelian'))
+                    switches.append(m.SpecialRoleButton(slot, position, 'kelian', after_pre_od=False))
                 active_form[slot] = new_form
             sid = int(selection.get('skill_id') or 0)
             # 默认行动

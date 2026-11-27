@@ -115,7 +115,7 @@ Duration：
   on_additional_turn_start: 17
   on_overdrive_start: 13
   on_kill_enemy: 11       # 默认不发动
-  on_use_specific_skill: 9  # 按技能ID匹配突破被动。已验证炯眼模式触发追加回合；极限游泳在扣除全部信念后才检查信念>=10，当前不会触发。
+  on_use_specific_skill: 8  # 按技能ID匹配突破被动。极限游泳用skill_token()检查该技能消耗的信念，和扣除后剩余的信念无关。
   on_sp_up_by_nonself_active_skill: 8
   user_select: 7          # 以GUI小按钮形式发动
   on_attack_weak: 5

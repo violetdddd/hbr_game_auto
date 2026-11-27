@@ -5,7 +5,11 @@ from pathlib import Path
 from paths import ROOT_DIR
 
 SOURCE = "https://hbr-axletool.pages.dev/"
-IGNORED = {None, "", "普攻", "指揮行動", "魔界騎兵起動！", "鬼神化"}
+DEFAULT_ACTIONS = {None, "", "普攻", "指揮行動"}
+SPECIAL_BUTTONS = {
+    "魔界騎兵起動": "waki",
+    "鬼神化": "siling",
+}
 DATA_DIR = ROOT_DIR / "assets" / "char-data"
 
 def extract_axle_json(image_path: str | Path) -> dict:
@@ -43,7 +47,7 @@ def convert_axle_data(data, output_path):
         db = json.loads((DATA_DIR / f"{team}.json").read_text(encoding="utf-8"))
         record = db.get(name)
         style_record = next(
-            (v for v in record.get("style", {}).values()
+            (v for v in (record or {}).get("style", {}).values()
             if isinstance(v, dict) and v.get("value") == title),
             None
         )
@@ -81,7 +85,8 @@ def convert_axle_data(data, output_path):
             skill = cell.get("skill")
             slot = slots.get((str(cell.get("selectedTab")), cell.get("style")))
             # 排除普攻、指挥、null和特殊行动等
-            if slot is None or skill in IGNORED:
+            button = skill.rstrip("!！") if skill else None
+            if slot is None or skill in DEFAULT_ACTIONS or button in SPECIAL_BUTTONS:
                 continue
             # 可切换技能用技能对frozenset表示，不可切换则是技能value本身
             link = links.get((slot, skill))
@@ -107,31 +112,38 @@ def convert_axle_data(data, output_path):
             continue
         # 首先解析行动部分
         moves, switches, buttons = [], [], []
+        battle_action = False
+        row_slots = [slots.get((str(cell.get("selectedTab")), cell.get("style"))) for cell in row]
+        unused = [slot for slot in range(1, 7) if slot not in row_slots]
         # 对3个前排position分别确定行动
         for position, cell in enumerate(row):
-            now_slot = slots.get((str(cell.get("selectedTab")), cell.get("style")))
+            now_slot = row_slots[position]
             # 例如单人追加回合里其他位置会是null，沿用之前角色
             if now_slot is None:
-                slot = previous_front[position]
+                slot = previous_front[position] if previous_front[position] in unused else unused[0]
+                unused = [candidate for candidate in unused if candidate != slot]
             else:
                 slot = now_slot
             skill = cell.get("skill")  # 如果now_slot就没有那skill也是None
-            if skill == "魔界騎兵起動！":
-                buttons.append(m.SpecialGlobalButton("waki"))
+            button_name = skill.rstrip("!！") if skill else None
+            button = SPECIAL_BUTTONS.get(button_name)
+            if button:
+                if button == "siling":
+                    if now_slot is None:
+                        raise ValueError(f"第 {index} 行的{skill}未指定角色")
+                    buttons.append(m.SpecialRoleButton(slot, position, button, after_pre_od=False))
+                else:
+                    buttons.append(m.SpecialGlobalButton(button, after_pre_od=False))
                 skill = None
-            elif skill == "鬼神化":
-                buttons.append(m.SpecialRoleButton(slot, position, "siling"))
-                skill = None
+            battle_action |= skill not in (None, "")
             form = cell.get("activeFormId")
-            if form is not None:
-                # 可怜第一次见默认009-1
-                if slot not in current_form:
-                    current_form[slot] = "009-1"
-                if current_form[slot] != form:
-                    switches.append(m.SpecialRoleButton(slot, position, "kelian"))
+            if now_slot is not None and form in ("009-1", "009-2"):
+                previous_form = current_form.get(slot, "009-1")
+                if previous_form != form:
+                    buttons.append(m.SpecialRoleButton(slot, position, "kelian", after_pre_od=False))
                 current_form[slot] = form
             # 确定一般技能行动
-            if skill in (None, "", "普攻", "指揮行動"):
+            if skill in DEFAULT_ACTIONS:
                 skill_id = 0
             else:
                 link = links.get((slot, skill))
@@ -146,10 +158,10 @@ def convert_axle_data(data, output_path):
         actions.extend(buttons)
         actions.extend(switches)
         # 既有waki/司令按钮又有index非0的普通技能
-        if buttons and any(a.skill for a in moves):
+        if buttons and battle_action:
             warnings.append(f"第 {index} 行特殊按钮与技能混用，已拆分行动")
         # 只有特殊按钮就直接下一回合
-        if buttons and not any(a.skill for a in moves):
+        if buttons and not battle_action:
             continue
 
         # 由于特殊按钮不需要label，因此后解析label
