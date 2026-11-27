@@ -630,13 +630,7 @@ class Conditions:
     
     @staticmethod
     def skill_sp(ctx: Context):
-        slot = ctx.subject.slot
-        action = ctx.turn.actions[slot]
-        if action == None:
-            return 0
-        else:
-            skill = find_skill_by_id(ctx.subject, action.get("id"))
-        return skill.now_cost if skill.cost_type == "sp" else 0
+        return Conditions.skill_cost(ctx, "sp")
 
     @staticmethod
     def normal_attack(ctx: Context):
@@ -682,13 +676,16 @@ class Conditions:
 
     @staticmethod
     def skill_token(ctx: Context):
-        slot = ctx.subject.slot
-        action = ctx.turn.actions[slot]
-        if action == None:
+        return Conditions.skill_cost(ctx, "token")
+
+    @staticmethod
+    def skill_cost(ctx: Context, resource):
+        action = ctx.turn.actions[ctx.subject.slot]
+        # 基础行动和自动追击不算主动选择的技能费用
+        if not action or action["id"] in (0, 1, 2, 3, 4):
             return 0
-        else:
-            skill = find_skill_by_id(ctx.subject, action.get("id"))
-        return skill.now_cost if skill.cost_type == "token" else 0
+        skill = find_skill_by_id(ctx.subject, action["id"])
+        return skill.now_cost if skill.cost_type == resource else 0
 
 # AST语法树解析
 import ast
@@ -918,7 +915,7 @@ class Simulation:
         self.turns: List[Turn] = []  # 存储每一个turn运行到on action start并预测出od的位置
         self.initial_config: Optional[JsonDict] = None
 
-    def turn_to_dict(self, turn: Turn) -> dict:
+    def turn_to_dict(self, turn: Turn, preview_team=None) -> dict:
         """
         将 Turn 转换为 GUI 可序列化的字典。
         simulation_state = {
@@ -949,7 +946,7 @@ class Simulation:
         """
         # 先解析members
         members = []
-        for style in turn.team:
+        for style, preview in zip(turn.team, preview_team if preview_team is not None else turn.team):
             # 把style的skills转换为字典
             if turn.actions[style.slot] is None:  # 无法行动时才隐藏基础技能
                 skills = []
@@ -974,9 +971,9 @@ class Simulation:
                     })
 
             members.append({
-                'sp': style.sp,
-                'ep': style.ep,
-                'token': style.token,
+                'sp': preview.sp,
+                'ep': preview.ep,
+                'token': preview.token,
                 'dp': style.dp,
                 'statuses': [asdict(status) for status in style.statuses],
                 'skills': skills,
@@ -1174,6 +1171,9 @@ class Simulation:
     def trigger_style_passives(self, turn: Turn, style: Style, trigger: str, *, only_od=False, without_od=False):
         """触发一个角色的全部被动"""
         if trigger in style.passive_triggers:
+            # 先排除追加回合开始时实际不处于追加回合的角色
+            if trigger == "on_additional_turn_start" and not has_status_id(style, 20, True):
+                return
             for passive in iter_passives(style):
                 if style.id == 49 and isinstance(passive, LimitBreak):
                     if turn.special_actions["kelian_form_change"] == 0 and passive.id in (490002, 490005):
@@ -1800,26 +1800,28 @@ class Simulation:
         for effect in effects:
             self.apply_effect(turn, siling, effect, source="鬼神化")
 
-    def od_up_through_action(self, turn: Turn, tmp_turn: Turn, tmp_style: Style, effects, skill: Skill, attack_skill, hit, enemy_count, second=False):
+    def od_up_through_action(self, turn: Turn, style: Style, effects, skill: Skill, attack_skill, hit, enemy_count, second=False):
         direct = 0
         for effect in effects:
             # 临时应用连击珠效果
             if effect.get("type") == "funnel":
-                self.apply_effect(tmp_turn, tmp_style, effect)
+                self.apply_effect(turn, style, effect)
             # 解析od相关，存储直充od数值
             elif effect.get("type") == "resource" and effect.get("target") == "od":
                 direct = 0 if second and effect.get("need_break") else effect.get("od")  # 需要破盾的第二次不发动
             # 目前有唯一一个消耗全部token获得od的技能，暂时按照可以吃od加深算
             elif effect.get("type") == "over_drive_point_up_by_token":
                 direct = effect.get("od") * skill.now_cost
-        funnel = calculate_funnel(tmp_style, consume=True) if attack_skill else 0
-        turn.stage_tmp_od += calculate_od(hit, funnel, enemy_count, direct, tmp_style.od_earring, tmp_style.od_rate_extra, turn.battle.default_hit)
+        funnel = calculate_funnel(style, consume=True) if attack_skill else 0
+        turn.stage_tmp_od += calculate_od(hit, funnel, enemy_count, direct, style.od_earring, style.od_rate_extra, turn.battle.default_hit)
 
-    def resolve_simei_pursuit(self, simei_style: Style, turn: Turn, simei_ex: bool, attack_skill: bool, skill: Skill, only_od=True):
+    def resolve_simei_pursuit(self, simei_style: Style, turn: Turn, simei_ex: bool, attack_skill: bool, skill: Skill, only_od=True, *, starting_sp=None):
         """完成四妹的自动追击的od计算或buff计算，目前认为不会触发任何其他被动"""
         if simei_style and attack_skill and skill.now_cost <= 8 and skill.cost_type == "sp":
             simei_skill = find_skill_by_id(simei_style, 4)
-            if simei_ex or simei_style.sp < simei_skill.now_cost:  # 本回合已经发动过或者sp不够发动不出来大招
+            # 如果是shortcut则风格sp不会变化，因此不需要传入starting_sp，实际apply actions需要传入
+            sp = simei_style.sp if starting_sp is None else starting_sp
+            if simei_ex or sp < simei_skill.now_cost:  # 本回合已经发动过或者行动前SP不足
                 if only_od:  # 计算od
                     turn.stage_tmp_od += calculate_od(simei_style.hit, 0, 1, 0, 0, simei_style.od_rate_extra, turn.battle.default_hit)
                 # 仅追击则不给任何buff，仅触发被动
@@ -1833,6 +1835,7 @@ class Simulation:
                     # 四妹大招吃连击珠但是不吃od耳环
                     turn.stage_tmp_od += calculate_od(hit, funnel, 1, 0, 0, simei_style.od_rate_extra, turn.battle.default_hit)
                 else:  # 计算buff
+                    self.spend_skill_cost(turn, simei_style, simei_skill)
                     effects = [deepcopy(effect) for effect in simei_skill.effects if effect.get("type") in ACTIVE_EFFECT_TYPES_NEEDED]
                     for effect in effects:
                         self.apply_effect(turn, simei_style, effect, source="猫咪喷射打靶")
@@ -2120,20 +2123,31 @@ class Simulation:
                         continue
                     style.skills.append(skill)
 
-    def apply_actions_od_shortcut(self, turn: Turn):
+    @staticmethod
+    def spend_skill_cost(turn: Turn, style: Style, skill: Skill):
+        """apply actions中需要调用的实际消耗资源的的函数"""
+        resource = skill.cost_type
+        if resource in ("sp", "token", "ep"):
+            setattr(style, resource, getattr(style, resource) - skill.now_cost)
+        elif resource == "od":
+            turn.od -= skill.now_cost
+        elif resource != "ct":
+            raise NotImplementedError(f"不存在的技能消耗资源类型: {resource}")
+
+    def apply_actions_od_shortcut(self, actual_turn: Turn):
         """
-        在recalculate中调用，位于action start之后，只结算actions的消耗、od增长（predict）
+        在action start之后预测资源消耗和OD，正式资源在apply_member_actions中扣除
         临时应用effect中的连击珠效果
         after_ex_use
         on_sp_up_by_nonself_active_skill
         on_relieve_enemy_buff
         on_break_enemy
         """
-        # 预测只给队友临时增加连击珠，并标记已消费的珠子
-        tmp_turn = replace(turn, team=[
+        # 预测使用临时角色资源和连击珠（新建status列表，保证连击珠状态不会append到/funnel的浅拷贝，保证trash不会应用到actual turn上）
+        turn = replace(actual_turn, team=[
             replace(style, statuses=[replace(status) if status.id == 13 else status
                                     for status in style.statuses])
-            for style in turn.team
+            for style in actual_turn.team
         ])
         turn.stage_tmp_od = 0
         # 判断超越量表
@@ -2160,7 +2174,7 @@ class Simulation:
             elif i > 2:
                 action_type.append(3)
                 if skill_id == 4:
-                    simei_style = tmp_turn.team[slot]
+                    simei_style = style
             else:
                 if skill_id == 1:  # 普通行动
                     action_type.append(2)
@@ -2183,29 +2197,15 @@ class Simulation:
                 turn.stage_tmp_od += calculate_od(style.hit, 0, 1, 0, 0, style.od_rate_extra, turn.battle.default_hit)
             else:  # 一般的skill
                 skill = find_skill_by_id(style, skill_id)
-                # 先消耗资源
-                match skill.cost_type:
-                    case "sp":
-                        style.sp -= skill.now_cost
-                    case "token":
-                        style.token -= skill.now_cost
-                    case "ep":
-                        style.ep -= skill.now_cost
-                    case "od":
-                        turn.stage_tmp_od -= skill.now_cost
-                    case "ct":
-                        pass
-                    case _:
-                        raise NotImplementedError(
-                            f"不存在的技能消耗资源类型: {skill.cost_type}"
-                        )
-                # 进行技能effect相关od计算，使用tmp turn和style
-                tmp_style = tmp_turn.team[slot]  # 和style的status是完全一致的
-                ctx = Context(tmp_turn, tmp_style)
+                self.spend_skill_cost(turn, style, skill)
+                if skill.cost_type == "od":
+                    turn.stage_tmp_od -= skill.now_cost
+                # 进行技能effect相关od计算
+                ctx = Context(turn, style)
                 if skill.conditions and skill.conditions.get("effects"):  # 这里有可能是target.作为起始
                     expr = skill.conditions.get("effects")
                     if expr.startswith("target."):
-                        ctx = Context(tmp_turn, tmp_turn.battle.monsters[action.get("target").get("slot")])
+                        ctx = Context(turn, turn.battle.monsters[action.get("target").get("slot")])
                 effects = self.resolve_active_effects(skill, action, ctx)
                 hit = enemy_count = 0
                 # 先判断是否是攻击性技能并存储hit数
@@ -2217,15 +2217,15 @@ class Simulation:
                     elif skill.target == "all":
                         enemy_count = monster_num(turn)
                 # 再判断具体效果
-                self.od_up_through_action(turn, tmp_turn, tmp_style, effects, skill, attack_skill, hit, enemy_count)
+                self.od_up_through_action(turn, style, effects, skill, attack_skill, hit, enemy_count)
                 simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill, True)  # 四妹追击
                 # 白虎的攻击双动，不会和技能双动同时存在
                 if has_status_id(style, 227) and attack_skill:
-                    self.od_up_through_action(turn, tmp_turn, tmp_style, effects, skill, attack_skill, hit, enemy_count, second=True)
+                    self.od_up_through_action(turn, style, effects, skill, attack_skill, hit, enemy_count, second=True)
                     simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill, True)  # 四妹追击
                 # ex技能双动
                 elif has_status_id(style, 125) and skill.ex_skill:
-                    self.od_up_through_action(turn, tmp_turn, tmp_style, effects, skill, attack_skill, hit, enemy_count, second=True)
+                    self.od_up_through_action(turn, style, effects, skill, attack_skill, hit, enemy_count, second=True)
                     simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill, True)  # 四妹追击
 
                 # 结算和od相关的被动效果，白虎的ex双动不会引发od相关被动因此暂不考虑
@@ -2249,6 +2249,8 @@ class Simulation:
                             self.resolve_sp_up_effect_passive(effect, turn, style, ctx, only_od=True)
 
         self.resolve_tmp_od(turn, direct=False)
+        actual_turn.predicted_od = turn.predicted_od
+        return turn.team
 
     def apply_member_actions(self, turn: Turn):
         """
@@ -2299,6 +2301,8 @@ class Simulation:
                         action_type.append(2)
                     else:
                         action_type.append(1)
+        # 四妹大招只检查行动前的SP
+        simei_starting_sp = simei_style.sp if simei_style is not None else None
         # 应用每个角色的技能
         for _, slot in sorted(zip(action_type, turn.order), key=lambda item: item[0]):
             skill_id, style, action = skill_ids[slot], turn.team[slot], turn.actions[slot]
@@ -2313,6 +2317,8 @@ class Simulation:
                 fresh_sprightly(style)
             else:  # 一般的skill
                 skill = find_skill_by_id(style, skill_id)
+                # 在技能生效前扣除已经计算好的费用
+                self.spend_skill_cost(turn, style, skill)
                 attack_skill = is_attack_skill(skill)
                 # 攻击技能需要把灵符等级增加1
                 if attack_skill:
@@ -2343,21 +2349,24 @@ class Simulation:
                             status.trash = True
                 # 确定buff的消耗
                 self.consume_buff_by_use(skill, style, ctx, action)
-                simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill, False)  # 四妹追击
+                simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill,
+                                                      False, starting_sp=simei_starting_sp)  # 四妹追击
                 # 白虎的攻击双动，不会和ex技能双动同时存在
                 if has_status_id(style, 227) and attack_skill:
                     # 正式结算effects
                     self.trigger_active_actions(style, skill, action, ctx, second=True)
                     # 确定buff的消耗
                     self.consume_buff_by_use(skill, style, ctx, action)
-                    simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill, False)  # 四妹追击
+                    simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill,
+                                                          False, starting_sp=simei_starting_sp)  # 四妹追击
                 # ex技能双动
                 elif has_status_id(style, 125, allow_trash=True) and skill.ex_skill and skill.id != 741:  # 排除可怜的刻蚀大招
                     # 正式结算effects
                     self.trigger_active_actions(style, skill, action, ctx, second=True)
                     # 确定buff的消耗
                     self.consume_buff_by_use(skill, style, ctx, action)
-                    simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill, False)  # 四妹追击
+                    simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill,
+                                                          False, starting_sp=simei_starting_sp)  # 四妹追击
 
                 # 结算非od的被动效果
                 if skill.cost_type == "od":
@@ -2404,14 +2413,13 @@ class Simulation:
 
         # token增加
         self.trigger_passives(turn, "after_action")
-        # 四妹的buff清除和sp消耗
+        # 四妹的buff清除
         if simei_style:
             if not simei_ex:  # 实际没有使用ex技能
                 fresh_sprightly(simei_style)
-            else:  # 实际使用了ex技能，则扣费和buff消耗
+            else:  # 实际使用了ex技能，消耗buff
                 simei_skill = find_skill_by_id(simei_style, 4)
                 ctx = Context(turn, simei_style)
-                simei_style.sp -= simei_skill.now_cost
                 self.consume_buff_by_use(simei_skill, simei_style, ctx, simei_action)
 
 
@@ -2419,10 +2427,11 @@ class Simulation:
         """
         在应用完actions之后调用，把该清除掉的status进行清除
         同时把predict od存到od中
+        附加回合trash完全清除，仅剩余新上的追加回合状态
         """
         # 消耗status我方回合数
         for style in turn.team:
-            # 附加回合不在行动中的不消耗
+            # 上回合是附加回合，不在行动中的不消耗
             if turn.additional_turn and not has_status_id(style, 20, True):
                 continue
             for status in style.statuses:
@@ -2479,6 +2488,7 @@ class Simulation:
         """
         根据上一回合的GUI给的label得到本回合的label，调用位于GUI的任何改动之前，返回当前是否为新回合
         消耗duration为敌方回合数的buff
+        全部附加回合状态标记为trash，与当回合apply effect的附加回合进行区分
         additional_turn
         od_timing
         od_level
@@ -2486,7 +2496,7 @@ class Simulation:
         turn_num
         """
         new_turn = False
-        # 追加回合
+        # 追加回合确定并标记各种渠道引入的追加回合状态为trash，以与当回合新加入的非trash追加回合状态共存
         if any(has_status_id(style, 20) for style in turn.team):
             turn.additional_turn = True
             for style in turn.team:
@@ -2542,9 +2552,9 @@ class Simulation:
         self.trigger_passives(turn, "on_action_start")
 
         # 应用turn_start(turn)产生的默认行动
-        self.apply_actions_od_shortcut(turn)
+        preview_team = self.apply_actions_od_shortcut(turn)
 
-        return self.turn_to_dict(turn)
+        return self.turn_to_dict(turn, preview_team)
 
     def recalculate(self, gui_add_state, turn_number: int, *, inherit_battle=False) -> dict:
         """
@@ -2678,10 +2688,10 @@ class Simulation:
         # 结算on_action_start被动
         self.trigger_passives(turn, "on_action_start")
 
-        self.apply_actions_od_shortcut(turn)
+        preview_team = self.apply_actions_od_shortcut(turn)
 
         # 转换为GUI的字典
-        result = self.turn_to_dict(turn)
+        result = self.turn_to_dict(turn, preview_team)
 
         # 只有整个计算成功，才提交
         if turn_number == len(self.turns):
@@ -2724,10 +2734,10 @@ class Simulation:
         self.trigger_passives(turn, "on_action_start")
 
         # 运行turn_start给出的default行动，更新od等资源
-        self.apply_actions_od_shortcut(turn)
+        preview_team = self.apply_actions_od_shortcut(turn)
 
         # 转换为GUI的字典
-        result = self.turn_to_dict(turn)
+        result = self.turn_to_dict(turn, preview_team)
 
         # 只有整个计算成功，才提交
         self.turns.append(turn)
