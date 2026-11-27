@@ -45,7 +45,7 @@ class ChangeTeamEvent:
 @dataclass
 class SpecialGlobalButton:
     button: str
-    after_pre_od: bool
+    after_pre_od: bool = False
 
 # 切换技能属性
 @dataclass
@@ -60,7 +60,7 @@ class SpecialRoleButton:
     role: int
     position: int  # 这里直接0，1，2但写在脚本里+1变成更易读的1，2，3
     button: str
-    after_pre_od: bool
+    after_pre_od: bool = False
 
 # 凹追击检测od行动
 @dataclass
@@ -100,8 +100,11 @@ def validate_hbrf(script: BattleScript):
     # 区分2个team和1个team
     current_team = 1
     team_count = len(script.roles) // 6
+    pending_after_od = False
 
     for i, action in enumerate(script.actions):
+        if pending_after_od and isinstance(action, (TeamEvent, ChangeTeamEvent, SkipEvent)):
+            raise ValueError("前置OD后发动的特殊行动后，须先安排同一队伍的战斗回合")
 
         if isinstance(action, TeamEvent):
             if team_count != 2:
@@ -145,6 +148,7 @@ def validate_hbrf(script: BattleScript):
                 raise ValueError(
                     f"{action.button}必须选择前置od前/后发动"
                 )
+            pending_after_od |= action.after_pre_od
             
         elif isinstance(action, SkillSwitch):
             if action.role not in active_role_ids:
@@ -169,8 +173,10 @@ def validate_hbrf(script: BattleScript):
                 raise ValueError(
                     f"{action.button}必须选择前置od前/后发动"
                 )
+            pending_after_od |= action.after_pre_od
 
         elif isinstance(action, BattleTurn):
+            pending_after_od = False
 
             if not -3 <= action.od <= 3:
                 raise ValueError(
@@ -214,6 +220,9 @@ def validate_hbrf(script: BattleScript):
                         f"{role.name}不存在技能{move.skill}"
                     )
 
+    if pending_after_od:
+        raise ValueError("前置OD后发动的特殊行动后没有战斗回合")
+
 def load_hbrf(filepath) -> BattleScript:
     filepath = Path(filepath)
 
@@ -232,7 +241,7 @@ def load_hbrf(filepath) -> BattleScript:
     role_lines = []
 
     for line in lines:
-        if ":" not in line or "=" in line:
+        if ":" not in line or "=" in line or "after_od:" in line:
             break
         role_lines.append(line)
 
@@ -295,20 +304,22 @@ def load_hbrf(filepath) -> BattleScript:
             actions.append(TeamEvent(int(line.split("=", 1)[1].strip())))
             continue
 
-        # 所有特殊全局行动
-        if line in tpl.GLOBAL_BUTTON_CONFIG:  # 向前兼容没有after_od字段的脚本
-            actions.append(SpecialGlobalButton(line, False))
-            continue
+        # 兼容旧脚本省略after_od时，默认为前置OD前
+        after_od = False
         if "after_od:" in line:
-            line, after_od = [x.strip() for x in line.split("after_od:")]
-            if after_od not in ("0","1"):
+            line, timing = [x.strip() for x in line.split("after_od:", 1)]
+            if timing not in ("0","1"):
                 raise ValueError(
                     f"{line}指示的特殊行动发动顺序after_od必须为0或1"
                 )
-
-            if line in tpl.GLOBAL_BUTTON_CONFIG:
-                actions.append(SpecialGlobalButton(line, bool(after_od)))
-                continue
+            # 解析after_od的bool数值
+            after_od = timing == "1"
+            if line not in tpl.GLOBAL_BUTTON_CONFIG and line.split("|", 1)[0].strip() not in tpl.ROLE_BUTTON_CONFIG:
+                raise ValueError(f"{line}不是支持after_od的特殊行动")
+        # 所有特殊全局行动
+        if line in tpl.GLOBAL_BUTTON_CONFIG:
+            actions.append(SpecialGlobalButton(line, after_od))
+            continue
 
         # 可怜/司令这种前排点击技能按钮的行动：code | name | 技能/无 | 位置
         if "|" in line:
@@ -317,15 +328,7 @@ def load_hbrf(filepath) -> BattleScript:
 
             # 可怜/司令这种前排点击技能按钮的行动
             if command in tpl.ROLE_BUTTON_CONFIG and len(parts) == 3:
-                if "after_od:" in parts[2]:
-                    if after_od not in ("0","1"):
-                        raise ValueError(
-                            f"{line}指示的特殊行动发动顺序after_od必须为0或1"
-                        )
-                    need_pos, after_od = [int(x.strip()) for x in parts[2].split("after_od:")]
-                else:  # 向前兼容没有after_od的前排点击按钮行动
-                    need_pos, after_od = int(parts[2]), 0
-                name = parts[1]
+                name, need_pos = parts[1], int(parts[2])
                 if name not in role_by_name:
                     raise ValueError(
                         f"{command}指示的角色名: {name}不存在"
@@ -340,7 +343,7 @@ def load_hbrf(filepath) -> BattleScript:
                         role=role_by_name[name].slot,
                         button=command,
                         position=need_pos-1,
-                        after_pre_od=bool(after_od)
+                        after_pre_od=after_od
                     )
                 )
                 continue

@@ -2108,24 +2108,28 @@ class SimulationTab(QWidget):
         previous = None
         for label, base, moves in rows:
             special = base['special_actions']
-            # 小按钮统一安排在本回合发动OD之前
-            for trigger, button in (('kelian_form_change', 'kelian'), ('demonic_rage', 'siling')):
-                if trigger == 'kelian_form_change':
-                    count = int(special[trigger] != form)
-                    form = special[trigger]
-                else:
-                    count = special[trigger] + special[trigger + '_after']
-                if count:
-                    slot = next((i for i, member in enumerate(base['members'])
-                                 if member['special_trigger'] == trigger), None)
-                    if slot is None:
-                        raise ValueError(f'{label}缺少发动{button}的角色。')
-                    position = base['order'].index(slot)
-                    actions.extend(m.SpecialRoleButton(slot + 1, position if position < 3 else 0, button)
-                                   for _ in range(count))
-            for trigger, button in (('demon_cavalry', 'waki'), ('all_out_attack', 'attack')):
-                count = special[trigger] + special[trigger + '_after']
-                actions.extend(m.SpecialGlobalButton(button) for _ in range(count))
+            # 可怜形态在模拟中先切换，其余按钮按结算顺序分别导出前后两段
+            for after_pre_od in (False, True):
+                suffix = '_after' if after_pre_od else ''
+                for trigger, button in (('kelian_form_change', 'kelian'), ('demonic_rage', 'siling')):
+                    if trigger == 'kelian_form_change':
+                        if after_pre_od:
+                            continue
+                        count = int(special[trigger] != form)
+                        form = special[trigger]
+                    else:
+                        count = special[trigger + suffix]
+                    if count:
+                        slot = next((i for i, member in enumerate(base['members'])
+                                     if member['special_trigger'] == trigger), None)
+                        if slot is None:
+                            raise ValueError(f'{label}缺少发动{button}的角色。')
+                        position = base['order'].index(slot)
+                        actions.extend(m.SpecialRoleButton(slot + 1, position if position < 3 else 0, button, after_pre_od)
+                                       for _ in range(count))
+                for trigger, button in (('all_out_attack', 'attack'), ('demon_cavalry', 'waki')):
+                    actions.extend(m.SpecialGlobalButton(button, after_pre_od)
+                                   for _ in range(special[trigger + suffix]))
 
             turn_moves = []
             for position, (slot, skill, pair, target) in enumerate(moves):
@@ -2269,11 +2273,15 @@ class SimulationTab(QWidget):
         special.update({key + '_after': 0 for key in SpecialActionDialog.SPECIAL_NAMES
                         if key != 'kelian_form_change'})
         states = []
+        positions_after_od = []
         for entry in script.actions:
             if isinstance(entry, (m.SkillSwitch, m.SpecialRoleButton)):
                 slot = entry.role - 1
-                index = order.index(slot)
-                order[index], order[entry.position] = order[entry.position], order[index]
+                if isinstance(entry, m.SpecialRoleButton) and entry.after_pre_od:
+                    positions_after_od.append((slot, entry.position))
+                else:
+                    index = order.index(slot)
+                    order[index], order[entry.position] = order[entry.position], order[index]
                 if isinstance(entry, m.SkillSwitch):
                     index = entry.skill - 1
                     if len(role_skills[slot][index]) < 2:
@@ -2282,10 +2290,15 @@ class SimulationTab(QWidget):
                 elif entry.button == 'kelian':
                     special['kelian_form_change'] ^= 1
                 elif entry.button == 'siling':
-                    special['demonic_rage'] += 1
+                    special['demonic_rage_after' if entry.after_pre_od else 'demonic_rage'] += 1
             elif isinstance(entry, m.SpecialGlobalButton):
-                special[{'waki': 'demon_cavalry', 'attack': 'all_out_attack'}[entry.button]] += 1
+                trigger = {'waki': 'demon_cavalry', 'attack': 'all_out_attack'}[entry.button]
+                special[trigger + ('_after' if entry.after_pre_od else '')] += 1
             elif isinstance(entry, m.BattleTurn):
+                for slot, position in positions_after_od:
+                    index = order.index(slot)
+                    order[index], order[position] = order[position], order[index]
+                positions_after_od.clear()
                 actions = [None] * 6  # 后排及技能编号0交给引擎补默认行动
                 for position, move in enumerate(entry.actions):
                     slot = move.role - 1

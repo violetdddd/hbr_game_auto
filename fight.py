@@ -211,22 +211,23 @@ def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mo
         time.sleep(0.2)
 
     # 处理前置od后发动时机的特殊按钮行动
-    for action, local_role in special_actions_after_od:
-        if isinstance(action, mod.SpecialRoleButton):
-            log.info("正在于前置OD后启动 %s 按钮", action.button)
+    for special_action, local_role in special_actions_after_od:
+        if isinstance(special_action, mod.SpecialRoleButton):
+            log.info("正在于前置OD后启动 %s 按钮", special_action.button)
             wait_until(lambda: detect_start_button(game),
                     timeout=5*60,
                     warning="未检测到回合结束按钮")
 
-            ensure_front(game, old_member_position, local_role, action.position)
-            operate_role_button(game, action.button, action.position)
+            ensure_front(game, old_member_position, local_role, special_action.position)
+            operate_role_button(game, special_action.button, special_action.position)
 
-        elif isinstance(action, mod.SpecialGlobalButton):
-            log.info("正在于前置OD后使用 %s 小按钮", action.button)
+        elif isinstance(special_action, mod.SpecialGlobalButton):
+            log.info("正在于前置OD后使用 %s 小按钮", special_action.button)
             wait_until(lambda: detect_start_button(game),
                         timeout=5*60,
                         warning="未检测到回合结束按钮")
-            wait_and_click(game, load_template(tpl.GLOBAL_BUTTON_CONFIG[action.button]), warning=f"未检测到{action.button}按钮")
+            wait_and_click(game, load_template(tpl.GLOBAL_BUTTON_CONFIG[special_action.button]),
+                           warning=f"未检测到{special_action.button}按钮")
 
     # 先调整位置
     steps, member_position_output = generate_swaps(old_member_position, new_member_position)
@@ -454,6 +455,7 @@ def fight(game, script: mod.BattleScript, auto_mode="none"):
                 special_actions_after_od=special_actions_after_od,
                 need_od_check=need_od_check
                 )
+            special_actions_after_od.clear()
             # 防止重复点击，可等待一段时间
             time.sleep(3)
 
