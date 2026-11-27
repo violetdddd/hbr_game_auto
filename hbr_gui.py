@@ -1127,7 +1127,11 @@ class MainWindow(QMainWindow):
             self, '温馨提示',
             '左键选择风格，依次右键两个角色可交换队伍位置。\n'
             '为每回合填写三名前排角色、技能、目标和 OD，再保存为 HBRF。\n'
-            '在普通战斗页选择脚本后，可点击「打印技能顺序」查看进游戏前的装备顺序。'
+            '从「特殊回合行动」添加切换姿态、鬼神化、魔界骑兵或总攻击。总攻击每战最多一次，'
+            '魔界骑兵每战最多三次，鬼神化须等上一次状态结束，可怜可多次切换。请自行确认发动条件。\n'
+            '双队脚本请核对游戏里的队伍与初始站位。「切换队伍」会点击游戏内按钮，'
+            '回合所属队伍决定脚本使用哪一队的角色编号。\n'
+            '运行前请在普通战斗页点击「打印技能顺序」，严格按日志中的顺序装备技能。'
         )
         settings.mark_tips_seen('editor')
         self.editor_tips.setStyleSheet('')
@@ -1746,7 +1750,9 @@ class MainWindow(QMainWindow):
             skills = ['/'.join(self.catalog.skill_zh(s) for s in skill.split('/'))
                     for skill in role.skills]
             self.log.append(f'位置{role.slot}：{role.name}：{"、".join(skills) if skills else "无"}')
-        self.log.append(f'[注意] 使用的技能可以少于3个，但每名角色都必须装备至少3个主动技能，防止技能所在位置变化')
+        self.log.append('[注意] 请严格按上方顺序装备主动技能，切换技能以斜杠左侧为开局形态。')
+        self.log.append('[注意] 列出的技能不足3个时，补足3个以保持点击位置。'
+                        '补位技能放在已列技能之后；暗四妹的「猫咪喷射打靶」需要保留在最后。')
 
     # 选择战斗脚本，选好后触发输出角色和技能顺序要求
     def select_run_file(self):
