@@ -1,5 +1,32 @@
 二、Simulation 实现约定（来自当前数据库及原日志；为功能约定，不代表代码已经实现）
-
+"光可怜、兔司、冰梢国服调整"
+      "0": [
+        {"id": 960001, "name": "寒冰鼓励", "trigger": "after_ex_use", "effects": [{"type": "morale", "target": "ally_all", "level": 2, "target_condition": "target.element('ice')", "duration": {"type": "permanent"}, "status_id": 119}]}
+      ],
+      {"type": "attack_up", "target": "ally_front", "elements": ["dark"], "status_id": 1, "duration": {"type": "ally_turn", "value": 3}, "solo": true}
+      {"type": "funnel", "target": "ally_front", "status_id": 13, "target_condition": "element('dark')", "duration": {"type": "ally_turn", "value": 3}, "solo": true, "mode": {"value": 12, "number": 5}},
+  "337": {
+    "id": 337,
+    "names": {"zh_cn": "冻结之咒", "zh_tw": "急凍咒語", "jp": "フリージング・スペル"},
+    "conditions": {"cost": "enemy.count(has(58)) > 0"},
+    "kind": "active",
+    "ex_skill": true,
+    "cost": {
+      "yes": {"sp": 6},
+      "no": {"sp": 12}
+    },
+    "hit_count": 6,
+    "target": "single",
+    "attack_type": "slash",
+    "elements": ["ice"],
+    "effects": [
+      {"type": "fragile", "target": "single", "status_id": 22, "duration": {"type": "enemy_turn", "value": 2}},
+      {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}},
+      {"type": "attack", "target": "single", "attack_type": "slash", "elements": ["ice"]}
+    ]
+  },
+      {"type": "misfortune", "target": "single", "status_id": 58, "duration": {"type": "enemy_turn", "value": 3}}
+      {"type": "funnel", "target": "ally_front", "status_id": 13, "duration": {"type": "use", "value": 1}, "mode": {"value": 25, "number": 3}},
 执行顺序：
   1. 评估技能使用条件、分支与费用。
   2. 扣除 SP、OD、Token、EP 等技能费用。
