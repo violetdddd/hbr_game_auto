@@ -159,8 +159,10 @@ class Catalog:
 
     def hbrf_skills_for(self, style):
         from hbrf.model import SIMEI_PURSUIT_SKILL
-        skills = self.skills_for(style)
-        return [skill for skill in skills if skill != SIMEI_PURSUIT_SKILL] if self.is_dark_simei(style) else skills
+        excluded = [self.special_for(style)]
+        if self.is_dark_simei(style):
+            excluded.append(SIMEI_PURSUIT_SKILL)
+        return [skill for skill in self.skills_for(style) if skill not in excluded]
 
     # 确认目标风格是否是有特殊前排技能的风格，并返回特殊技能名称
     def special_for(self, style):
@@ -381,7 +383,6 @@ class TurnRow(QGroupBox):
         outer.addLayout(head)
         # body部分是role，skill和target
         body = QHBoxLayout()
-        self._syncing = False
         self._front_swap_source = None  # 存储第一次点击的source
         self.position_buttons = []
         self.roles, self.skills, self.targets = [], [], []
@@ -478,7 +479,6 @@ class TurnRow(QGroupBox):
                         self.roles[j].setCurrentIndex(0)
                         self.roles[j].blockSignals(False)
                         self.update_skills(j)
-        self._sync_special()
         if getattr(self, '_team_frozen', False):  # frozen时不允许编辑
             for widget in [*self.roles, *self.skills, *self.targets, *self.position_buttons]:
                 widget.setEnabled(False)
@@ -496,8 +496,6 @@ class TurnRow(QGroupBox):
         s.clear()
         s.addItem(self.editor.catalog.skill_label(default), default)
         # 添加特殊行动的skill
-        special = self.editor.catalog.special_for(style)
-        if special: s.addItem(f'{special}（特殊行动）', f'@special:{special}')
         # 添加其他skill
         for name in self.editor.catalog.hbrf_skills_for(style):
             if name != default: s.addItem(self.editor.catalog.skill_label(name), name)
@@ -521,41 +519,9 @@ class TurnRow(QGroupBox):
     # 负责禁止指挥行动和特殊技能选择目标
     def _skill_changed(self, i):
         skill = self.skills[i].currentData()
-        no_target = skill == '指揮行動' or (isinstance(skill,str) and skill.startswith('@special:'))
+        no_target = skill == '指揮行動'
         if no_target: self.targets[i].setCurrentIndex(0)
         self.targets[i].setEnabled(not no_target)
-        self._sync_special(i)
-
-    def _sync_special(self, source=None):
-        # 防止_sync_special→indexchange→_sync_special递归调用
-        if self._syncing: return
-        self._syncing = True
-        try:
-            # 先确定special技能的位置
-            special_indices = [i for i, s in enumerate(self.skills) if str(s.currentData() or '').startswith('@special:')]
-            if len(special_indices) > 1 and source in special_indices:
-                special_indices = [source]
-            # 有特殊技能时其他角色只能默认技能无目标，不允许其他选项
-            if special_indices:
-                active = special_indices[0]
-                for i, s in enumerate(self.skills):
-                    if i != active:
-                        slot = self.roles[i].currentData() or 0
-                        style = self.editor.slots[slot-1] if slot else None
-                        default = self.editor.catalog.default_action(style)
-                        ix = s.findData(default)
-                        if ix >= 0: s.setCurrentIndex(ix)
-                        self.targets[i].setCurrentIndex(0)
-                        s.setEnabled(False); self.targets[i].setEnabled(False)
-                    else: s.setEnabled(True)
-            # 无特殊技能了就允许重新打开选项，指挥行动仍然默认无目标
-            else:
-                for i, s in enumerate(self.skills):
-                    s.setEnabled(True)
-                    skill = s.currentData()
-                    self.targets[i].setEnabled(skill != '指揮行動')
-        finally:
-            self._syncing = False
 
     # 更改od数时触发，用于更改bonus选项
     def refresh_bonus(self):
@@ -714,6 +680,8 @@ class TurnRow(QGroupBox):
         self.refresh_check_od()
 
 class EventRow(QGroupBox):
+    labels = {'waki': '魔界骑兵', 'attack': '总攻击', 'kelian': '切换姿态', 'siling': '鬼神化'}
+    role_buttons = {'kelian', 'siling'}
     remove_requested = Signal(object)
     copy_requested = Signal(object)
     move_requested = Signal(object, int)
@@ -721,6 +689,10 @@ class EventRow(QGroupBox):
     def __init__(self, kind, state=None, available=None):
         super().__init__('异时层行动' if kind == 'yishi' else '特殊回合行动')
         self.kind = kind
+        state = state or {}
+        self.team = state.get('team', 1)
+        if kind == 'special':
+            self.setTitle(f'特殊回合行动 · 队伍{self.team}')
         layout = QHBoxLayout(self)
         layout.addWidget(QLabel('行动'))
         self.action = NoWheelComboBox()
@@ -728,10 +700,24 @@ class EventRow(QGroupBox):
         if kind == 'yishi':
             self.action.addItem('跳过剧情', 'skip')
             self.action.addItem('切换队伍', 'change')
-        # 特殊回合行动
-        else:
-            self.refresh_choices(available or [])
         layout.addWidget(self.action, 1)
+        if kind == 'special':
+            self.timing_label = QLabel('发动时机')
+            layout.addWidget(self.timing_label)
+            self.timing = NoWheelComboBox()
+            self.timing.addItem('前置OD前', False)
+            self.timing.addItem('前置OD后', True)
+            self.timing.setCurrentIndex(int(state.get('after_pre_od', False)))
+            layout.addWidget(self.timing)
+            self.position_label = QLabel('前排位置')
+            self.position = NoWheelComboBox()
+            for position in range(3):
+                self.position.addItem(str(position + 1), position)
+            self.position.setCurrentIndex(state.get('position', 0))
+            layout.addWidget(self.position_label)
+            layout.addWidget(self.position)
+            self.action.currentIndexChanged.connect(self.refresh_action_fields)
+            self.refresh_choices(available or [])
         for label, callback in [('↑',lambda: self.move_requested.emit(self,-1)),
                                 ('↓',lambda: self.move_requested.emit(self,1)),
                                 ('复制',lambda: self.copy_requested.emit(self)),
@@ -739,20 +725,25 @@ class EventRow(QGroupBox):
             b=QPushButton(label); b.clicked.connect(callback); layout.addWidget(b)
         # 右上角index编号
         self.index_label = QLabel(); self.index_label.setStyleSheet('color: #7A8494; background: white; font-size: 9pt;'); layout.addWidget(self.index_label)
-        if state:
-            ix=self.action.findData(state['action'])
-            if ix>=0: self.action.setCurrentIndex(ix)
+        ix = self.action.findData(state.get('action'))
+        if ix >= 0: self.action.setCurrentIndex(ix)
+
+    def refresh_action_fields(self):
+        action = self.action.currentData()
+        show_timing = action is not None and action != 'kelian'
+        self.timing_label.setVisible(show_timing)
+        self.timing.setVisible(show_timing)
+        self.position_label.setVisible(action in self.role_buttons)
+        self.position.setVisible(action in self.role_buttons)
 
     # 新建和slot选角变化时调用，available传入mainwindow中检测可行的小按钮
     def refresh_choices(self, available):
-        from config import templates as tpl
         current = self.action.currentData()
-        labels = {'waki': '魔界骑兵', 'attack': '总攻击'}
         self.action.blockSignals(True)
         self.action.clear()
-        for command in tpl.GLOBAL_BUTTON_CONFIG:
+        for command, label in self.labels.items():
             if command in available:
-                self.action.addItem(labels.get(command, command), command)
+                self.action.addItem(label, command)
         # 有current就恢复，没有就清空/选择其他合法小按钮
         index = self.action.findData(current)
         if index >= 0: self.action.setCurrentIndex(index)
@@ -760,11 +751,16 @@ class EventRow(QGroupBox):
         have_choice = self.action.count() > 0
         self.action.setEnabled(have_choice)
         self.action.blockSignals(False)
+        self.refresh_action_fields()
         # 用于弹窗提示，返回true则无弹窗，即有行动/一直没有行动，只有原来有现在没有才弹窗
         return current is None or have_choice
 
     def state(self):
-        return {'action': self.action.currentData(), 'kind': self.kind}
+        state = {'action': self.action.currentData(), 'kind': self.kind}
+        if self.kind == 'special':
+            state.update(team=self.team, after_pre_od=state['action'] != 'kelian' and self.timing.currentData(),
+                         position=self.position.currentData())
+        return state
 
 def setup_worker_output():
     """EXE 子进程使用 UTF-8 向 GUI 的 PIPE 输出日志。"""
@@ -1204,26 +1200,29 @@ class MainWindow(QMainWindow):
         self.refresh_special_rows()
 
     # 检测可用的global button
-    def available_global_buttons(self):
-        from config import templates as tpl
-        styles = [s for s in self.slots if s]
-        allowed = set()
+    def available_special_buttons(self, team):
+        slots = [i for i in self.team_indices(team) if self.slots[i]]
+        styles = [self.slots[i] for i in slots]
+        allowed = {}
         if any(s.title == "高傲魔王的凱旋歸來" for s in styles):
-            allowed.add('waki')
+            allowed['waki'] = None
         if any(s.team == 'P5R' for s in styles):
-            allowed.add('attack')
-        return allowed.intersection(tpl.GLOBAL_BUTTON_CONFIG)
+            allowed['attack'] = None
+        for i in slots:
+            button = {'切换姿态': 'kelian', '鬼神化': 'siling'}.get(self.catalog.special_for(self.slots[i]))
+            if button:
+                allowed[button] = i + 1
+        return allowed
 
     # 更新特殊行动选项，保留原先不可用时询问是否删除的弹窗
     def refresh_special_rows(self):
-        available = self.available_global_buttons()
         for row in list(self.rows):
             if isinstance(row, EventRow) and row.kind == 'special':
-                valid = row.refresh_choices(available)
+                valid = row.refresh_choices(self.available_special_buttons(row.team))
                 if not valid:
                     box = QMessageBox(self)
                     box.setWindowTitle('特殊行动不可用')
-                    box.setText('当前队伍不再支持任何特殊行动（魔界骑兵启动或总攻击）。')
+                    box.setText(f'队伍{row.team}不再支持任何特殊行动。')
                     box.setInformativeText('是否删除该行动块？')
                     delete = box.addButton('删除行动块', QMessageBox.ButtonRole.DestructiveRole)
                     box.addButton('保留空行动块', QMessageBox.ButtonRole.RejectRole)
@@ -1259,9 +1258,11 @@ class MainWindow(QMainWindow):
 
     # 新增一行，默认turn，连接删除复制移动行的功能，有index则可以在目标位置插入行
     def add_row(self, state=None, index=None, kind='turn', scroll=True):
-        available = self.available_global_buttons() if kind == 'special' else None
-        if kind == 'special' and not available and state is None:
-            QMessageBox.information(self, '无法添加特殊回合行动', '队伍中需要魔王山胁才能使用魔界骑兵，或需要 P5R 角色才能使用总攻击。')
+        if kind == 'special':
+            state = {'team': self.current_team, **(state or {})}
+        available = self.available_special_buttons(state['team']) if kind == 'special' else None
+        if kind == 'special' and not available:
+            QMessageBox.information(self, '无法添加特殊回合行动', '请先在该队伍中选择可以使用特殊行动的风格。')
             return None
         if kind == 'turn':
             row = TurnRow(self, state)
@@ -1287,10 +1288,10 @@ class MainWindow(QMainWindow):
     # 按原有行动序号批量插入：1 表示原第 1 行之前，超过原行数则追加到末尾
     def batch_add_rows(self, kind):
         # 特殊回合行动需要队伍支持；先检查，避免弹窗输入后只插入一部分
-        if kind == 'special' and not self.available_global_buttons():
+        if kind == 'special' and not self.available_special_buttons(self.current_team):
             QMessageBox.information(
                 self, '无法添加特殊回合行动',
-                '队伍中需要魔王山胁才能使用魔界骑兵，或需要 P5R 角色才能使用总攻击。'
+                '请先在该队伍中选择可以使用特殊行动的风格。'
             )
             return
 
@@ -1490,32 +1491,21 @@ class MainWindow(QMainWindow):
                 # 按照team获取队伍角色存储开始位置
                 base = (current_team - 1) * 6
                 if isinstance(a, m.SpecialRoleButton):
-                    name = {'kelian': '切换姿态', 'siling': '鬼神化'}.get(a.button)
-                    if not name or not chosen[a.role-1]:
+                    if self.available_special_buttons(current_team).get(a.button) != a.role:
                         self.other_actions.append((len(self.rows), a))
                         continue
-
-                    # HBRF 的 SpecialRoleButton 只保存操作角色和前排位置。
-                    moves = [(0, '普通攻击', None) for _ in range(3)]
-                    moves[a.position] = (a.role, '@special:' + name, None)
-                    # 尽量沿用之前回合的另外两名角色
-                    previous = next((r for r in reversed(self.rows) if isinstance(r, TurnRow) and r.team == current_team), None)
-                    candidates = [slot for slot, _, _ in previous.state()['moves']] if previous else []
-                    candidates += [base+i for i, style in enumerate(chosen[base:base+6], 1) if style]
-
-                    for i in range(3):
-                        if i == a.position: continue
-                        slot = next((s for s in candidates if s and s != a.role
-                                    and s not in [v[0] for v in moves]), 0)
-                        if slot:
-                            moves[i] = (slot, self.catalog.default_action(chosen[slot-1]), None)
-
-                    self.add_row({'moves': moves, 'team': current_team}, scroll=False)
+                    self.add_row({'action': a.button, 'team': current_team, 'position': a.position,
+                                  'after_pre_od': a.button != 'kelian' and a.after_pre_od}, kind='special', scroll=False)
                     continue
                 if isinstance(a, (m.SkipEvent,m.ChangeTeamEvent)):
                     self.add_row({'action':'skip' if isinstance(a,m.SkipEvent) else 'change'},kind='yishi'); continue
                 if isinstance(a, m.SpecialGlobalButton):
-                    self.add_row({'action':a.button},kind='special'); continue
+                    if a.button not in self.available_special_buttons(current_team):
+                        self.other_actions.append((len(self.rows), a))
+                        continue
+                    self.add_row({'action': a.button, 'team': current_team, 'after_pre_od': a.after_pre_od},
+                                 kind='special', scroll=False)
+                    continue
                 # 什么都不是的行动扔到垃圾桶里
                 if not isinstance(a, m.BattleTurn):
                     self.other_actions.append((len(self.rows), a)); continue
@@ -1550,6 +1540,8 @@ class MainWindow(QMainWindow):
         for row in self.rows:
             if isinstance(row, TurnRow) and any(slot for slot, _, _ in row.state()['moves']):
                 used_teams.add(row.team)
+            elif isinstance(row, EventRow) and row.kind == 'special':
+                used_teams.add(row.team)
         # 单队模式下即使只使用Tab2，也压缩为HBRF的1-6
         dual = len(used_teams) > 1
         team_order = [1, 2] if dual else [next(iter(used_teams), 1)]  # 提取该set中的唯一team
@@ -1575,8 +1567,6 @@ class MainWindow(QMainWindow):
             if not isinstance(row, TurnRow): continue
             seen = set()
             moves = row.state()['moves']
-            special = [i for i, (_,sk,_) in enumerate(moves) if str(sk or '').startswith('@special:')]
-            if len(special)>1: raise ValueError(f'{row.label_text()}：只能选择一个特殊前排行动')
             if row.team not in team_order and any(slot for slot, _, _ in moves):
                 raise ValueError(f'{row.label_text()}：该回合使用的队伍未纳入导出')
             for position,(slot,skill,target) in enumerate(moves):
@@ -1584,8 +1574,8 @@ class MainWindow(QMainWindow):
                 if slot in seen: raise ValueError(f'{row.label_text()}：角色重复')
                 seen.add(slot)
                 style=self.slots[slot-1]
-                if skill == "指揮行動" or str(skill).startswith('@special:'):
-                    if target is not None: raise ValueError(f'{row.label_text()}：指挥/特殊行动不能指定目标')
+                if skill == "指揮行動":
+                    if target is not None: raise ValueError(f'{row.label_text()}：指挥行动不能指定目标')
                 elif skill == '普通攻击':
                     pass
                 else:
@@ -1598,10 +1588,6 @@ class MainWindow(QMainWindow):
                         item=key[1]
                     else: item=skill
                     if item not in used[slot_map[slot]-1]: used[slot_map[slot]-1].append(item)
-            if special:
-                for i,(slot,skill,target) in enumerate(moves):
-                    if i != special[0] and skill != self.catalog.default_action(self.slots[slot-1]):
-                        raise ValueError(f'{row.label_text()}：特殊前排行动时其他角色必须使用默认行动')
         # 四妹追击弹窗
         pursuit_slots = set()
         for index, items in enumerate(used):
@@ -1648,28 +1634,34 @@ class MainWindow(QMainWindow):
         current_output_team = 1  # 存储当前使用队伍
         for row in self.rows:
             # EventRow存储为action
-            if isinstance(row, EventRow):
+            if isinstance(row, EventRow) and row.kind == 'yishi':
                 action=row.action.currentData()
-                if row.kind == 'special' and action not in self.available_global_buttons():
-                    raise ValueError('特殊回合行动与当前队伍不匹配，请重新选择角色或删除该行动')
                 if action == 'skip': actions.append(m.SkipEvent())
                 elif action == 'change': actions.append(m.ChangeTeamEvent())
-                elif action is not None: actions.append(m.SpecialGlobalButton(action))
                 continue
             # TurnRow存储为action之前的处理
             output_team = team_order.index(row.team) + 1 if row.team in team_order else 1
             if dual and output_team != current_output_team:
                 actions.append(m.TeamEvent(output_team))
                 current_output_team = output_team
-            moves=[]; special_action=None
+            if isinstance(row, EventRow):
+                state = row.state()
+                button = state['action']
+                available = self.available_special_buttons(row.team)
+                if button not in available:
+                    raise ValueError('特殊回合行动与当前队伍不匹配，请重新选择角色或删除该行动')
+                role = available[button]
+                if role is None:
+                    actions.append(m.SpecialGlobalButton(button, state['after_pre_od']))
+                else:
+                    actions.append(m.SpecialRoleButton(slot_map[role], state['position'], button, state['after_pre_od']))
+                continue
+            moves=[]
             for position,(slot,skill,target) in enumerate(row.state()['moves']):
                 new_slot=slot_map[slot]; style=self.slots[slot-1]
                 default=self.catalog.default_action(style)
-                # 特殊行动，不存在技能列表中，skill_id设为0
-                if str(skill or '').startswith('@special:'):
-                    special_action=(new_slot,position,skill.partition(':')[2]); skill_id=0
                 # 默认技能，不存在技能列表中，skill_id设为0
-                elif skill in (default,'普通攻击'):
+                if skill in (default,'普通攻击'):
                     skill_id=0
                 # 其他需要使用的技能
                 else:
@@ -1691,23 +1683,13 @@ class MainWindow(QMainWindow):
                         raise ValueError(f'{row.label_text()}：不能指定其他队伍的目标')
                     target_id = (slot_map[target] - 1) % 6 + 1
                 moves.append(m.SkillAction(new_slot,skill_id,target_id))
-            # 是特殊行动则加入SpecialRoleButton进action
-            if special_action:
-                if row.execution_od():
-                    raise ValueError('特殊前排行动不能同时发动 OD')
-                role,position,name=special_action
-                button={'切换姿态':'kelian','鬼神化':'siling'}.get(name)
-                if not button: raise ValueError(f'未知特殊行动：{name}')
-                actions.append(m.SpecialRoleButton(role,position,button))
-                continue
-            # 不是特殊行动先看是否需要凹追击check od
+            # 先看是否需要凹追击check od
             if row.check_od.isChecked():
                 if row.execution_od() == 0:
                     raise ValueError(
                         f'{row.label_text()}：凹追击要求本回合发动 OD'
                     )
                 actions.append(m.CheckOD())
-            # 不是特殊行动则加入BattleTurn进action
             actions.append(m.BattleTurn(row.label_text(),row.execution_od(),moves))
         # 垃圾桶里真有东西
         if self.other_actions:
