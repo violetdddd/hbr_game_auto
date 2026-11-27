@@ -2320,8 +2320,10 @@ class SimulationTab(QWidget):
                     },
                     'adjustments': {'od': 0, 'members': [{'sp': 0, 'token': 0} for _ in range(6)]},
                 })
-                for key in ('demonic_rage', 'demon_cavalry', 'all_out_attack'):
-                    special[key] = 0
+                # 每个战斗回合用完后清零按钮次数，可怜形态继续继承
+                for key in special:
+                    if key != 'kelian_form_change':
+                        special[key] = 0
         return {'setup': setup, 'turns': states}
 
     @staticmethod

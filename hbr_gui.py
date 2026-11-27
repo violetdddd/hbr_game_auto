@@ -413,9 +413,11 @@ class TurnRow(QGroupBox):
     def set_team_frozen(self, frozen):
         """非当前编辑队伍的回合仅冻结角色/技能/目标，保留行操作。"""
         self._team_frozen = frozen
-        for widget in [*self.roles, *self.skills, *self.targets, *self.position_buttons,
+        for widget in [*self.roles, *self.skills, *self.position_buttons,
                        self.od, self.activate_od, self.check_od, self.bonus, self.extra, self.turn_no]:
             widget.setEnabled(not frozen)
+        for i in range(len(self.targets)):
+            self._skill_changed(i)
         # 由原有背景方法统一设置边框，避免OD背景覆盖冻结状态
         self.update_background()
         self.refresh_check_od()
@@ -516,12 +518,12 @@ class TurnRow(QGroupBox):
         s.blockSignals(False); t.blockSignals(False)
         self._skill_changed(i)
 
-    # 负责禁止指挥行动和特殊技能选择目标
+    # 普攻和指挥行动默认无目标
     def _skill_changed(self, i):
         skill = self.skills[i].currentData()
-        no_target = skill == '指揮行動'
+        no_target = skill in ('普通攻击', '指揮行動')
         if no_target: self.targets[i].setCurrentIndex(0)
-        self.targets[i].setEnabled(not no_target)
+        self.targets[i].setEnabled(not no_target and not getattr(self, '_team_frozen', False))
 
     # 更改od数时触发，用于更改bonus选项
     def refresh_bonus(self):
