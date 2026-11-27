@@ -19,6 +19,7 @@ from typing import Any, Dict, List, Optional, Union
 JsonDict = Dict[str, Any]
 
 ELEMENTS = ('fire','ice','thunder','light','dark')
+DEFAULT_ENEMY_SLOTS = {1: (1,), 2: (1, 2), 3: (0, 1, 2)}
 
 PASSIVE_EFFECT_TYPES_NEEDED = {
     # 资源
@@ -75,6 +76,7 @@ ACTIVE_EFFECT_TYPES_NEEDED = {
     "token",
     "heal_sp_by_token",
     "specify_sp",
+    "over_drive_point_up_by_token",
     # rule
     "additional_turn",
     "zone",
@@ -630,7 +632,11 @@ class Conditions:
     def skill_sp(ctx: Context):
         slot = ctx.subject.slot
         action = ctx.turn.actions[slot]
-        return find_skill_by_id(ctx.subject, action.get("id")).now_cost if action else 0
+        if action == None:
+            return 0
+        else:
+            skill = find_skill_by_id(ctx.subject, action.get("id"))
+        return skill.now_cost if skill.cost_type == "sp" else 0
 
     @staticmethod
     def normal_attack(ctx: Context):
@@ -673,6 +679,16 @@ class Conditions:
     @staticmethod
     def territory_is(ctx: Context, territory_id: int):
         return ctx.turn.battle.territory == territory_id
+
+    @staticmethod
+    def skill_token(ctx: Context):
+        slot = ctx.subject.slot
+        action = ctx.turn.actions[slot]
+        if action == None:
+            return 0
+        else:
+            skill = find_skill_by_id(ctx.subject, action.get("id"))
+        return skill.now_cost if skill.cost_type == "token" else 0
 
 # AST语法树解析
 import ast
@@ -1008,6 +1024,7 @@ class Simulation:
             }, ... 六项],
             'resonances': [None | {'style_id': int, 'break_level': int}, ... 六项],
             'enemy_count': 1..3,
+            'enemy_slots': [int],  # 敌人从左到右编号为0-2，旧存档可省略
             'enemy_weaknesses': ['fire', ...],
             'initial_od': float,
             'global_od_rate': float,
@@ -1030,6 +1047,11 @@ class Simulation:
         enemy_count = config.get('enemy_count', 1)
         if type(enemy_count) is not int or not 1 <= enemy_count <= 3:
             raise ValueError('enemy_count 必须为 1、2 或 3')
+        enemy_slots = config.get('enemy_slots', DEFAULT_ENEMY_SLOTS[enemy_count])
+        if not isinstance(enemy_slots, (list, tuple)) or len(enemy_slots) != enemy_count or \
+           any(type(slot) is not int or slot not in range(3) for slot in enemy_slots) or \
+           len(set(enemy_slots)) != enemy_count:
+            raise ValueError('enemy_slots 必须包含与敌人数量一致且不重复的位置（0-2）')
         weaknesses = config.get('enemy_weaknesses', [])
         if not isinstance(weaknesses, list) or any(not isinstance(e, str) for e in weaknesses):
             raise ValueError('enemy_weaknesses 必须是字符串列表')
@@ -1114,10 +1136,9 @@ class Simulation:
             style.slot = slot
             result_styles.append(style)
 
-        default_enemy_config = {1: (1,), 2: (1,2), 3: (0,1,2)}
         battle = Battle(
             enemy_weaknesses=list(dict.fromkeys(weaknesses)),
-            monsters=[Monster(position=i, exist=i in default_enemy_config[enemy_count]) for i in range(3)],
+            monsters=[Monster(position=i, exist=i in enemy_slots) for i in range(3)],
             default_hit=math.floor(2.5 * global_od_rate) / 100  # 2位小数
         )
         turn = Turn(
@@ -1790,7 +1811,7 @@ class Simulation:
                 direct = 0 if second and effect.get("need_break") else effect.get("od")  # 需要破盾的第二次不发动
             # 目前有唯一一个消耗全部token获得od的技能，暂时按照可以吃od加深算
             elif effect.get("type") == "over_drive_point_up_by_token":
-                direct = effect.get("value") * skill.now_cost
+                direct = effect.get("od") * skill.now_cost
         funnel = calculate_funnel(tmp_style, consume=True) if attack_skill else 0
         turn.stage_tmp_od += calculate_od(hit, funnel, enemy_count, direct, tmp_style.od_earring, tmp_style.od_rate_extra, turn.battle.default_hit)
 

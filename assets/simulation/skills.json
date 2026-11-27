@@ -8039,7 +8039,7 @@
     "cost": {"resource": "token", "token": -1, "mode": "use_all"},
     "target": "self",
     "effects": [
-      {"type": "over_drive_point_up_by_token", "target": "self", "value": 10}
+      {"type": "over_drive_point_up_by_token", "target": "od", "od": 10}
     ]
   },
   "512": {

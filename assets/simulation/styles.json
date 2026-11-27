@@ -4177,7 +4177,7 @@
       "0": [
         {"id": 2810001, "name": "光之印", "trigger": "on_first_battle_start", "effects": [{"type": "element_mark", "target": "ally_all", "elements": ["light"], "target_condition": "target.element('light')", "duration": {"type": "permanent"}, "status_id": 166}]},
         {"id": 2810002, "name": "抖M的精髓", "trigger": "on_attacked", "effects": [{"type": "token", "target": "self", "level": 1}]},
-        {"id": 2810003, "name": "极限游泳", "trigger": "on_use_specific_skill", "trigger_condition": "token()>=10", "effects": [{"type": "morale", "target": "ally_all", "level": 10, "duration": {"type": "permanent"}, "status_id": 119}], "skill_id": 512}
+        {"id": 2810003, "name": "极限游泳", "trigger": "on_use_specific_skill", "trigger_condition": "skill_token()>=10", "effects": [{"type": "morale", "target": "ally_all", "level": 10, "duration": {"type": "permanent"}, "status_id": 119}], "skill_id": 512}
       ],
       "1": [
         {"id": 2810004, "name": "内在力量", "trigger": "on_new_turn_start", "effects": [{"type": "token", "target": "self", "level": 1}]}

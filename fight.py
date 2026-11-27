@@ -242,7 +242,9 @@ def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mo
 
     # 后置OD
     if OD_mode > 0:
-        # 防止动画过短点不到，先快速点一次OD
+        # 防止动画过短点不到，先快速点2次OD
+        time.sleep(0.05)
+        click_in_game(game, pos.OD, sleep=False)
         time.sleep(0.05)
         click_in_game(game, pos.OD, sleep=False)
 
