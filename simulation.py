@@ -571,7 +571,9 @@ class Conditions:
 
     @staticmethod
     def has(ctx: Context, status_id: int):
-        return any(status.id == status_id for status in ctx.subject.statuses)
+        if status_id in (20, 125):  # 可以为trash的状态
+            return any(status.id == status_id for status in ctx.subject.statuses)
+        return any(status.id == status_id and not status.trash for status in ctx.subject.statuses)
 
     @staticmethod
     def dp_rate(ctx: Context):
@@ -1218,15 +1220,21 @@ class Simulation:
         """实际应用的主动技能触发函数，过滤掉od相关的内容，在shortcut里做"""
         # 解析是否有case等结构，过滤不模拟的effect，返回实际生效的effect列表
         turn = ctx.turn
-        effects = self.resolve_active_effects(skill, action, ctx)
-        effects = [effect for effect in effects if effect.get("target") != "od"]
+        effects = self.resolve_active_effects(skill, action, ctx, include_penetration=True)
+        penetrates = False
         # 应用效果
         for effect in effects:
             if second and effect.get("need_break"):  # 双动不触发破盾相关buff
                 continue
+            if effect["type"] == "penetration_critical_attack":
+                penetrates = True
+                continue
+            if effect.get("target") == "od":
+                continue
             self.apply_effect(turn, style, effect, source=skill.names.get("zh_cn"))
         # 增加使用次数
         skill.used += 1
+        return penetrates
 
     # 解析passive的结构，提取实际生效的effect列表
     def resolve_passive_effects(self, passive, ctx):
@@ -1243,7 +1251,7 @@ class Simulation:
         # 未知结构
         raise ValueError(f"未知被动效果结构: {effects}")
 
-    def resolve_active_effects(self, skill: Skill, action: dict, ctx: Context):
+    def resolve_active_effects(self, skill: Skill, action: dict, ctx: Context, *, include_penetration=False):
         # 破盾的技能
         if skill.on_break:
             if action.get("on_break"):
@@ -1279,7 +1287,9 @@ class Simulation:
         tmp_effect = None
         if isinstance(ctx.subject, Style) and ctx.subject.style_has_passive_id(556) and before_filter and any(effect.get("type") in DP_HEAL_GROUP for effect in before_filter):
             tmp_effect = {"type": "infantilized", "target": "all", "status_id": 214, "duration": {"type": "permanent"}, "level": 1, "target_condition": "target.has(214)"}
-        after_filter = [deepcopy(effect) for effect in before_filter if effect.get("type") in ACTIVE_EFFECT_TYPES_NEEDED]
+        after_filter = [deepcopy(effect) for effect in before_filter
+                        if effect.get("type") in ACTIVE_EFFECT_TYPES_NEEDED or
+                        (include_penetration and effect.get("type") == "penetration_critical_attack")]
         if tmp_effect:
             after_filter.append(tmp_effect)
         # 对每个effect确定单体的target
@@ -1391,7 +1401,7 @@ class Simulation:
                             add_sp(target, effect)
 
                         if "ep" in effect:
-                            target.ep = max(0, min(target.ep + effect["ep"], target.ep_limit))
+                            target.ep = max(target.ep, min(target.ep + effect["ep"], target.ep_limit))
             case "token":
                 for target in targets:
                     target.token = max(0, min(target.token + effect.get("level", 0), 10))
@@ -1700,9 +1710,11 @@ class Simulation:
         for style in turn.team:
             for status in style.statuses[::-1]:
                 if status.trash and status.duration_type == "od_end":
+                    if status.id == 187:
+                        style.ep_limit = 10  # OD结束后只还原上限，保留现有EP
                     style.statuses.remove(status)
 
-    def consume_buff_by_use(self, skill: Skill, style: Style, ctx: Context, action):
+    def consume_buff_by_use(self, skill: Skill, style: Style, ctx: Context, action, *, penetrates=False):
         """apply actions的时候调用，将发动的叠层buff进行trash"""
         def consume_use_turn_buff(statuses: list[Status], element=None):
             # 非元素一定都要消耗
@@ -1778,8 +1790,7 @@ class Simulation:
             # 以下3种buff如果有ally_turn的就是单独发动，默认不消耗use的层数
             # 消耗心眼，有对应弱点才消耗
             if not any(status.id == 78 and status.duration_type == "ally_turn" for status in style.statuses):
-                if (skill.elements and skill.elements[0] in ctx.turn.battle.enemy_weaknesses) or \
-                self.skill_has_effect_with(skill, action, ctx, effect_type="penetration_critical_attack"):
+                if penetrates or (skill.elements and skill.elements[0] in ctx.turn.battle.enemy_weaknesses):
                     mind_eyes = get_use_buff(style, 78, "on_attack_weak")
                     consume_use_turn_buff(mind_eyes)
             # 消耗加攻
@@ -2360,7 +2371,7 @@ class Simulation:
                 # 结算effect前先判断是否有buff
                 relieve_buff = monster_has_buff(turn, action["target"]["slot"])
                 # 正式结算effects
-                self.trigger_active_actions(style, skill, action, ctx)
+                penetrates = self.trigger_active_actions(style, skill, action, ctx)
                 # 刻蚀的解除
                 if skill.id == 741:
                     enemy = turn.battle.monsters[action["target"]["slot"]]
@@ -2368,23 +2379,23 @@ class Simulation:
                         if status.id == 223:
                             status.trash = True
                 # 确定buff的消耗
-                self.consume_buff_by_use(skill, style, ctx, action)
+                self.consume_buff_by_use(skill, style, ctx, action, penetrates=penetrates)
                 simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill,
                                                       False, starting_sp=simei_starting_sp)  # 四妹追击
                 # 白虎的攻击双动，不会和ex技能双动同时存在
                 if has_status_id(style, 227) and attack_skill:
                     # 正式结算effects
-                    self.trigger_active_actions(style, skill, action, ctx, second=True)
+                    penetrates = self.trigger_active_actions(style, skill, action, ctx, second=True)
                     # 确定buff的消耗
-                    self.consume_buff_by_use(skill, style, ctx, action)
+                    self.consume_buff_by_use(skill, style, ctx, action, penetrates=penetrates)
                     simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill,
                                                           False, starting_sp=simei_starting_sp)  # 四妹追击
                 # ex技能双动
                 elif has_status_id(style, 125, allow_trash=True) and skill.ex_skill and skill.id != 741:  # 排除可怜的刻蚀大招
                     # 正式结算effects
-                    self.trigger_active_actions(style, skill, action, ctx, second=True)
+                    penetrates = self.trigger_active_actions(style, skill, action, ctx, second=True)
                     # 确定buff的消耗
-                    self.consume_buff_by_use(skill, style, ctx, action)
+                    self.consume_buff_by_use(skill, style, ctx, action, penetrates=penetrates)
                     simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill,
                                                           False, starting_sp=simei_starting_sp)  # 四妹追击
 
