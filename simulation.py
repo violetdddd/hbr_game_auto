@@ -137,6 +137,12 @@ ACTIVE_EFFECT_TYPES_NEEDED = {
     "hacking",
 }
 
+ATTACK_SKILL ={
+    "stab",
+    "slash",
+    "strike",
+}
+
 ATTACK_UP_GROUP = {
     "attack_up",
     "attack_up_by_token",
@@ -832,7 +838,7 @@ def calculate_funnel(style: Style, consume=False):
     )
 
 # 根据行动的参数计算od增加数值
-def calculate_od(hit, funnel, enemy, direct, earring: int, extra_rate: float, default_hit: float) -> float:
+def calculate_od(hit, funnel, enemy, direct, earring: int, extra_rate: float, default_hit: float, passive=False) -> float:
     if earring != 0:  # 10,12,15
         if hit != 0:
             od_rate_100 = 105 + (earring-5) / 9 * min(hit - 1, 9) + extra_rate
@@ -842,6 +848,8 @@ def calculate_od(hit, funnel, enemy, direct, earring: int, extra_rate: float, de
         od_rate_100 = 100 + extra_rate
     per_hit_od = math.floor(od_rate_100 * default_hit) / 100  # 2位小数
     direct_od = math.floor(od_rate_100 * direct) / 100  # 2位小数
+    if passive:
+        return direct_od
     return direct_od if hit == 0 else per_hit_od * (hit + funnel) * enemy + direct_od 
 
 # sp回复
@@ -858,7 +866,7 @@ def has_status_id(owner: Style | Monster, status_id: int, allow_trash: bool = Fa
 
 # 判断某技能是否是攻击技能
 def is_attack_skill(skill: Skill) -> bool:
-    return bool(skill.attack_type)
+    return skill.attack_type in ATTACK_SKILL
 
 # 通过skill_id寻找某风格的非默认技能
 def find_skill_by_id(style: Style, skill_id: int) -> Skill:
@@ -1183,9 +1191,9 @@ class Simulation:
                 # 判断trigger时机
                 if passive.trigger != trigger:
                     continue
-                self.trigger_one_passive(passive, turn, style, only_od=only_od, without_od=without_od)
+                self.trigger_one_passive(passive, turn, style, only_od=only_od, without_od=without_od, trigger=trigger)
 
-    def trigger_one_passive(self, passive: LimitBreak | Passive | SupportSkill, turn: Turn, style: Style, *, only_od=False, without_od=False):
+    def trigger_one_passive(self, passive: LimitBreak | Passive | SupportSkill, turn: Turn, style: Style, *, only_od=False, without_od=False, trigger=None):
         """触发一个传入的被动"""
         # 判断trigger condition是否满足
         ctx = Context(turn=turn, subject=style)
@@ -1206,7 +1214,7 @@ class Simulation:
                 continue
             if without_od and effect.get("target") == "od":
                 continue
-            self.apply_effect(turn, style, effect)
+            self.apply_effect(turn, style, effect, trigger=trigger)
 
     def trigger_active_actions(self, style: Style, skill: Skill, action: dict, ctx: Context, second=False):
         """实际应用的主动技能触发函数，过滤掉od相关的内容，在shortcut里做"""
@@ -1292,7 +1300,7 @@ class Simulation:
         return after_filter
         
     # 实际解析并应用effect的函数
-    def apply_effect(self, turn: Turn, owner: Style, effect: dict, source=None):
+    def apply_effect(self, turn: Turn, owner: Style, effect: dict, source=None, trigger=None):
         effect_type = effect["type"]
         target_type = effect.get("target", "self")
 
@@ -1369,7 +1377,16 @@ class Simulation:
                     value = effect.get("od", 0)
                     if isinstance(value, list):
                         raise ValueError("OD 数值尚未按共鸣等级展开")
-                    turn.stage_tmp_od += value
+                    if trigger == "on_break_enemy":
+                        action = turn.actions[owner.slot]
+                        hit = 0
+                        if action != None:
+                            skill_for_od = find_skill_by_id(owner, action["id"])
+                            if is_attack_skill(skill_for_od):
+                                hit = find_skill_by_id(owner, action["id"]).hit_count
+                        turn.stage_tmp_od += calculate_od(hit, 0, 1, value, owner.od_earring, owner.od_rate_extra, turn.battle.default_hit, passive=True)
+                    else:
+                        turn.stage_tmp_od += value
                 else:
                     for target in targets:
                         if "sp" in effect:
@@ -2182,7 +2199,7 @@ class Simulation:
                     action_type.append(1)
                 else:  # 一般的skill
                     skill = find_skill_by_id(style, skill_id)
-                    if is_attack_skill(skill):
+                    if is_attack_skill(skill) or skill.attack_type == "fix_damage":
                         action_type.append(2)
                     else:
                         action_type.append(1)
@@ -2297,7 +2314,7 @@ class Simulation:
                     action_type.append(1)
                 else:  # 一般的skill
                     skill = find_skill_by_id(style, skill_id)
-                    if is_attack_skill(skill):
+                    if is_attack_skill(skill) or skill.attack_type == "fix_damage":
                         action_type.append(2)
                     else:
                         action_type.append(1)

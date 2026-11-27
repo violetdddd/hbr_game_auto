@@ -778,6 +778,7 @@
     "cost": {"sp": 6},
     "hit_count": 1,
     "target": "single",
+    "attack_type": "fix_damage",
     "elements": ["dark"],
     "effects": [
       {"type": "defense_down", "target": "single", "elements": ["dark"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
@@ -790,6 +791,7 @@
     "cost": {"sp": 6},
     "hit_count": 1,
     "target": "single",
+    "attack_type": "fix_damage",
     "elements": ["fire"],
     "effects": [
       {"type": "defense_down", "target": "single", "elements": ["fire"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
@@ -802,6 +804,7 @@
     "cost": {"sp": 6},
     "hit_count": 1,
     "target": "single",
+    "attack_type": "fix_damage",
     "elements": ["ice"],
     "effects": [
       {"type": "defense_down", "target": "single", "elements": ["ice"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
@@ -814,6 +817,7 @@
     "cost": {"sp": 6},
     "hit_count": 1,
     "target": "single",
+    "attack_type": "fix_damage",
     "elements": ["light"],
     "effects": [
       {"type": "defense_down", "target": "single", "elements": ["light"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
@@ -826,6 +830,7 @@
     "cost": {"sp": 6},
     "hit_count": 1,
     "target": "single",
+    "attack_type": "fix_damage",
     "elements": ["thunder"],
     "effects": [
       {"type": "defense_down", "target": "single", "elements": ["thunder"], "status_id": 3, "duration": {"type": "enemy_turn", "value": 1}}
@@ -5666,8 +5671,9 @@
     "kind": "active",
     "ex_skill": true,
     "cost": {"sp": 0},
-    "hit_count": 0,
+    "hit_count": 1,
     "target": "single",
+    "attack_type": "fix_damage",
     "effects": [
       {"type": "fixed_hp_damage_rate_attack", "target": "single"},
       {"type": "defense_down", "target": "single", "status_id": 3, "duration": {"type": "enemy_turn", "value": 2}}
