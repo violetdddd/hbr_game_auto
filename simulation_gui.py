@@ -2424,6 +2424,8 @@ class SimulationTab(QWidget):
                 if len(gui_add_state['actions']) != 6 or len(gui_add_state['member_dp']) != 6 or \
                    len(gui_add_state['enemies']) != 3 or len(gui_add_state['adjustments']['members']) != 6:
                     raise ValueError('角色、行动或敌人数量无效。')
+                if not any(enemy['exist'] for enemy in gui_add_state['enemies']):
+                    raise ValueError('每个回合至少需要一名敌人存在。')
                 for action in gui_add_state['actions']:
                     if action is None:
                         continue

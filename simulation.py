@@ -2352,6 +2352,9 @@ class Simulation:
             skill_id, style, action = skill_ids[slot], turn.team[slot], turn.actions[slot]
             if not skill_id or skill_id in (1, 3):  # 没有行动、普攻、追击
                 fresh_sprightly(style)
+                if skill_id == 1:
+                    monster = turn.battle.monsters[action["target"]["slot"]]
+                    self.resolve_talisman(monster)
                 continue
             elif skill_id == 4:  # 四妹自动追击，在最后未使用ex时fresh_sprightly
                 continue
