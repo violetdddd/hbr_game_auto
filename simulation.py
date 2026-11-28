@@ -1754,31 +1754,24 @@ class Simulation:
                                 none_skill.elements = elements
         # 加攻加深去除
         effects = self.resolve_active_effects(skill, action, ctx)
-        buff_num = sum(effect.get("type") in ATTACK_UP_GROUP for effect in effects)
-        if buff_num:
-            remove_buff = 0
+        with_buff = any(effect.get("type") in ATTACK_UP_GROUP for effect in effects)
+        if with_buff:
             for status in style.statuses:
                 if status.id == 54 and not status.trash:
-                    remove_buff += 1
                     status.trash = True
-                if remove_buff == buff_num:
                     break
         # debuff加深去除
-        debuff_num = sum(effect.get("type") in DEBUFF_UP_GROUP for effect in effects)
-        if debuff_num:
-            remove_debuff = 0  # 减益加深
+        with_debuff = any(effect.get("type") in DEBUFF_UP_GROUP for effect in effects)
+        if with_debuff:
+            # 减益加深
             for status in style.statuses:
                 if status.id == 118 and not status.trash:
-                    remove_debuff += 1
                     status.trash = True
-                if remove_debuff == debuff_num:
                     break
-            remove_debuff = 0  # 樱花箭
+            # 樱花箭
             for status in style.statuses:
                 if status.id == 120 and not status.trash:
-                    remove_debuff += 1
                     status.trash = True
-                if remove_debuff == debuff_num:
                     break
         # 去除攻击技能相关
         attack_skill = is_attack_skill(skill)
