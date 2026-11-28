@@ -7,9 +7,9 @@ from anti import human_position, human_time
 from config import positions as pos
 from config import settings
 
-def find_window(title = "HeavenBurnsRed"):
+def find_window(title=None):
     # 1. 找到游戏窗口
-    game_title = title
+    game_title = title if title is not None else settings.read_config()['window_title']
     windows = gw.getWindowsWithTitle(game_title)
 
     if not windows:
@@ -22,11 +22,13 @@ def find_window(title = "HeavenBurnsRed"):
     return windows[0]  # 取第一个匹配窗口
 
 # 2. 定义函数：点击窗口内某个坐标（相对左上角）
-def click_in_game(game, position, jitter = 10, sleep=True, sleep_time=0.8):
+def click_in_game(game, position, jitter = 10, sleep=True, sleep_time=None):
     x, y = position
 
     # 先经过一定延迟再点击
     if sleep:
+        if sleep_time is None:
+            sleep_time = settings.read_config()['click_interval']
         time.sleep(human_time(sleep_time))
 
     while True:

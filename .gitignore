@@ -12,3 +12,4 @@ build/*
 dist/*
 scripts/*
 assets/simulation/tmp.log
+/config/configs.json

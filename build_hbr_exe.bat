@@ -99,6 +99,8 @@ for %%F in (
     )
 )
 echo.
+python -c "from pathlib import Path; from config import settings; settings.write_config(settings.DEFAULT_CONFIG, Path('dist/HBRTool/_internal/config/configs.json'))"
+if errorlevel 1 goto :fail
 echo Packaging completed!
 pause
 exit /b 0

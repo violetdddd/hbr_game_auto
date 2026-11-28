@@ -16,7 +16,7 @@ from pathlib import Path
 from PySide6.QtCore import Qt, QThread, Signal, QSize, QTimer, QEvent
 from PySide6.QtGui import QIcon, QPixmap, QPainter, QPainterPath
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QGridLayout, QLabel, QPushButton, QComboBox, QSpinBox, QLineEdit, QScrollArea,
+    QGridLayout, QLabel, QPushButton, QComboBox, QSpinBox, QDoubleSpinBox, QLineEdit, QScrollArea,
     QFileDialog, QMessageBox, QDialog, QCheckBox, QGroupBox,
     QTabWidget, QTabBar, QTextEdit, QFormLayout, QInputDialog, QSizePolicy)
 from config import settings
@@ -935,7 +935,8 @@ class MainWindow(QMainWindow):
         # 普通战斗 tab，先设置窗口权限与脚本，再选择单次或重复战斗
         runner = QWidget(); tabs.addTab(runner, '普通战斗')
         form = QFormLayout(runner)
-        self.window_title = QLineEdit('HeavenBurnsRed')
+        config = settings.read_config()
+        self.window_title = QLineEdit(config['window_title'])
         form.addRow('游戏窗口标题', self.window_title)
         self.admin_status = QLabel('管理员：' + ('是' if self.is_admin() else '否'))
         form.addRow('当前权限', self.admin_status)
@@ -1034,7 +1035,7 @@ class MainWindow(QMainWindow):
         card_runner = QWidget(); tabs.addTab(card_runner, '技术模拟战')
         card_form = QFormLayout(card_runner)
         # 技术模拟战单独保留窗口标题和日志，但与普通战斗共用一个 Worker
-        self.card_window_title = QLineEdit('HeavenBurnsRed')
+        self.card_window_title = QLineEdit(config['window_title'])
         card_form.addRow('游戏窗口标题', self.card_window_title)
         self.card_admin_status = QLabel('管理员：' + ('是' if self.is_admin() else '否'))
         card_form.addRow('当前权限', self.card_admin_status)
@@ -1065,6 +1066,7 @@ class MainWindow(QMainWindow):
         from simulation_gui import SimulationTab
         self.simulation_tab = SimulationTab(self.catalog, StyleDialog, round_pixmap)
         tabs.addTab(self.simulation_tab, '战斗模拟')
+        tabs.addTab(self.make_settings_tab(config), '设置')
         # 样式表设置在主窗口上，会影响它的子控件
         self.setStyleSheet('''QMainWindow{background: #f7f8fa;} QWidget{color: #242933;font-size: 10pt;}
             QGroupBox{border:1px solid #dce2eb;border-radius:12px;margin-top:12px;padding:14px;background:white}
@@ -1106,6 +1108,59 @@ class MainWindow(QMainWindow):
         # 左侧没有重复次数和体力类型，按右侧实际内容高度补齐
         single_box.setMinimumHeight(repeat_box.sizeHint().height())
 
+    def make_settings_tab(self, config):
+        page = QWidget()
+        form = QFormLayout(page)
+        form.setContentsMargins(20, 20, 20, 20)
+        form.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.AllNonFixedFieldsGrow)
+        form.setHorizontalSpacing(24)
+        form.setVerticalSpacing(16)
+        title = QLineEdit(config['window_title'])
+        restart = QCheckBox()
+        restart.setChecked(config['auto_restart_admin'])
+        interval = QDoubleSpinBox()
+        interval.setMinimumHeight(32)
+        interval.setStyleSheet('QDoubleSpinBox{background:white;border:1px solid #d6deea;'
+                               'border-radius:7px;padding:4px 6px;}')
+        interval.setDecimals(2)
+        interval.setRange(settings.MIN_CLICK_INTERVAL, settings.MAX_CLICK_INTERVAL)
+        interval.setSingleStep(0.1)
+        interval.setSuffix(' s')
+        interval.setValue(config['click_interval'])
+        form.addRow('默认游戏窗口标题', title)
+        form.addRow('自动以管理员权限启动', restart)
+        form.addRow('自动点击时间间隔', interval)
+
+        def save_setting(key, value):
+            try:
+                settings.update_config(**{key: value})
+            except OSError as error:
+                if key == 'window_title':
+                    title.setText(config[key])
+                else:
+                    widget, restore = (restart, restart.setChecked) if key == 'auto_restart_admin' else (interval, interval.setValue)
+                    blocked = widget.blockSignals(True)
+                    restore(config[key])
+                    widget.blockSignals(blocked)
+                QMessageBox.warning(self, '无法保存设置', str(error))
+                return
+            if key == 'window_title':
+                for widget in (self.window_title, self.card_window_title):
+                    if widget.text() == config[key]:
+                        widget.setText(value)
+            config[key] = value
+
+        def save_title():
+            value = title.text().strip() or settings.DEFAULT_CONFIG['window_title']
+            title.setText(value)
+            if value != config['window_title']:
+                save_setting('window_title', value)
+
+        title.editingFinished.connect(save_title)
+        restart.toggled.connect(lambda checked: save_setting('auto_restart_admin', checked))
+        interval.valueChanged.connect(lambda value: save_setting('click_interval', value))
+        return page
+
     # 调整可使用的team角色
     def on_team_tab_changed(self, index):
         self.current_team = index + 1  # 修改current_team，1和2
@@ -1136,7 +1191,11 @@ class MainWindow(QMainWindow):
             '运行前请在普通战斗页面点击「打印技能顺序」，严格按日志中的顺序和数量装备技能。\n'
             '自动战斗中请尽量不要操作电脑，保证游戏窗口处于激活的焦点状态，否则运行将暂停。\n'
         )
-        settings.mark_tips_seen('editor')
+        try:
+            settings.mark_tips_seen('editor')
+        except OSError as error:
+            QMessageBox.warning(self, '无法保存设置', str(error))
+            return
         self.editor_tips.setStyleSheet('')
 
     def clear_slot_swap(self):
@@ -1776,6 +1835,12 @@ class MainWindow(QMainWindow):
         try: return bool(ctypes.windll.shell32.IsUserAnAdmin())
         except Exception: return False
 
+    @staticmethod
+    def launch_admin():
+        args = sys.argv[1:] if getattr(sys, 'frozen', False) else [str(Path(sys.argv[0]).resolve()), *sys.argv[1:]]
+        return ctypes.windll.shell32.ShellExecuteW(None, 'runas', sys.executable,
+                                                   subprocess.list2cmdline(args), str(APP_DIR), 1)
+
     # 重启以获得管理员权限
     def restart_admin(self):
         if sys.platform!='win32':
@@ -1783,8 +1848,7 @@ class MainWindow(QMainWindow):
         if self.is_admin():
             QMessageBox.information(self,'提示','当前已经以管理员身份运行'); return
         if QMessageBox.question(self,'重启确认','未保存的 GUI 编辑内容将丢失，确定以管理员权限重启？') != QMessageBox.StandardButton.Yes: return
-        args = ' '.join('"'+x.replace('"','\\"')+'"' for x in sys.argv)
-        result=ctypes.windll.shell32.ShellExecuteW(None,'runas',sys.executable,args,str(ROOT),1)
+        result = self.launch_admin()
         if result>32: QApplication.quit()
         else: QMessageBox.warning(self,'提权失败',f'ShellExecuteW 返回 {result}')
 
@@ -1911,6 +1975,12 @@ if __name__=='__main__':
             sys.exit(1)
     else:
         app=QApplication(sys.argv)
+
+        if sys.platform == 'win32' and settings.read_config()['auto_restart_admin'] and not MainWindow.is_admin():
+            result = MainWindow.launch_admin()
+            if result > 32:
+                sys.exit(0)
+            QMessageBox.warning(None, '提权失败', f'ShellExecuteW 返回 {result}')
 
         # 统一设置所有 Qt 窗口的图标
         app.setWindowIcon(QIcon(str(ROOT / 'logo.ico')))

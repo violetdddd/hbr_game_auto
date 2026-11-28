@@ -1870,7 +1870,11 @@ class SimulationTab(QWidget):
             '目前暂未支持\n'
             '敌方行动、敌方施加的增益和异常状态等尚未自动模拟。部分概率效果默认触发。'
         )
-        settings.mark_tips_seen('simulation')
+        try:
+            settings.mark_tips_seen('simulation')
+        except OSError as error:
+            QMessageBox.warning(self, '无法保存设置', str(error))
+            return
         self.tips_button.setStyleSheet('')
 
     def read_setup(self, warning_title):
