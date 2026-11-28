@@ -1785,9 +1785,9 @@ class BattleTurn(QGroupBox):
             if position < 3:
                 options = [(skill['name'], skill['id']) for skill in skills[:1]]
                 options.extend((f"{skill['name']}（{skill['cost']} {skill['cost_type']}）", skill['id'])
-                               for skill in skills[3:])
-            else:  # 后排只有无和追击
-                options = [(skill['name'], skill['id']) for skill in skills[1:3]]
+                               for skill in skills[1:] if skill['id'] not in (0, 3, 4))
+            else:  # 后排只显示基础行动
+                options = [(skill['name'], skill['id']) for skill in skills if skill['id'] in (0, 3, 4)]
             self.refresh_combo(self.action_boxes[position], options, effect_action['id'] if effect_action else None)
         self.height_timer.start(0)
         if self in self.owner.turns:

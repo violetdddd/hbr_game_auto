@@ -501,9 +501,8 @@ class Style:
         # 舰长的行动为指挥+无+追击，其他为普攻+无+追击
         basic_ids = [2 if instance.role == 'admiral' else 1, 0, 3]
         # 两个追击/普攻替换技能
-        if "replace_pursuit" in instance.passive_triggers and simei_auto:  # 暗四妹是普攻+自动追击+无
-            basic_ids[2] = 0
-            basic_ids[1] = 4
+        if "replace_pursuit" in instance.passive_triggers and simei_auto:  # 暗四妹默认自动追击，也可选择普通追击
+            basic_ids[1:] = [4, 3, 0]  # 默认前4个为普攻、自动追击，追击，无
             raw = skill_records[int(7280001)]
             instance.active_skills.append(Skill.from_record(raw))
         elif "replace_normal_skill" in instance.passive_triggers:
@@ -954,7 +953,7 @@ class Simulation:
             'bonus': int,
             'additional_turn': bool,
             "special_actions": {"demonic_rage": 0, "all_out_attack": 0, "demon_cavalry": 0, "kelian_form_change": 0} before/after
-        其中，技能的第0个为默认主动技能，第1个为默认被动技能（无），第2个为追击，普通攻击默认无目标
+        其中，技能的第0个为前排默认技能，1-2/3个（四妹）开始为后排基础技能，普通攻击默认无目标
         """
         # 先解析members
         members = []
@@ -963,7 +962,7 @@ class Simulation:
             if turn.actions[style.slot] is None:  # 无法行动时才隐藏基础技能
                 skills = []
             else:
-                skills = deepcopy(style.basic_skills)  # 3个，默认的顺序为：前排默认技能，无，追击
+                skills = deepcopy(style.basic_skills)  # 前排默认技能在先，后排默认技能在第1个下标
                 for skill in style.skills:
                     # 处理target type，GUI仅需要知道是敌人还是友方（是否可选自己）
                     target_type = skill.selection_target_type()
@@ -1914,7 +1913,7 @@ class Simulation:
             action = turn.actions[slot]
             skill_id = action.get("id") if action else None
             # 基础技能已经包含指挥、曙光普攻和暗四妹自动追击的替换，这里根据基础技能和站位选择默认技能
-            basic_skills = style.basic_skills[:1] if front else style.basic_skills[1:3]
+            basic_skills = style.basic_skills[:1] if front else style.basic_skills[1:]
             basic_skill = next((skill for skill in basic_skills if skill["id"] == skill_id), None)
             # 当前选择的action就是基础技能
             if basic_skill is not None:
@@ -2356,6 +2355,8 @@ class Simulation:
                 if skill_id == 1:
                     monster = turn.battle.monsters[action["target"]["slot"]]
                     self.resolve_talisman(monster)
+                elif skill_id == 3:
+                    self.trigger_style_passives(turn, style, "on_pursuit", without_od=True)
                 continue
             elif skill_id == 4:  # 四妹自动追击，在最后未使用ex时fresh_sprightly
                 continue
