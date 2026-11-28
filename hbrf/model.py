@@ -93,10 +93,6 @@ def validate_hbrf(script: BattleScript):
     if role_ids != set(range(1, len(script.roles) + 1)):
         raise ValueError("一队角色编号为1-6，二队编号为7-12")
 
-    for role in script.roles:
-        if len(role.skills) > 6:
-            raise ValueError("角色暂不支持超过6个技能")
-
     # 区分2个team和1个team
     current_team = 1
     team_count = len(script.roles) // 6
@@ -269,9 +265,6 @@ def load_hbrf(filepath) -> BattleScript:
 
         if not name:
             raise ValueError(f"第{slot}名角色没有名称")
-
-        if len(skills) > 6:
-            raise ValueError("角色暂不支持超过6个技能")
 
         roles.append(
             Role(
@@ -476,7 +469,7 @@ def save_hbrf(script: BattleScript, filepath, style_metadata=None):
 
     with filepath.open("w", encoding="utf-8") as f:
 
-        f.write("# 配队和技能（每名角色最多6个技能，暗四妹的打靶计入上限，角色最少需要装备3个技能）\n")
+        f.write("# 配队和技能（请按列出的顺序在游戏内装备技能，用于初始化角色编号为1-6）\n")
 
         role_num = len(script.roles)
 

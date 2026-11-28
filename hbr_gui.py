@@ -929,7 +929,7 @@ class MainWindow(QMainWindow):
             button_pair.addWidget(batch, 3)
             add_actions.addLayout(button_pair, 1 if kind != 'turn' else 2)
         root.addLayout(add_actions)
-        root.addWidget(QLabel('提示：HBRF 限制每回合恰好 3 个不同角色行动，且每名角色最多记录 6 个技能。'))
+        root.addWidget(QLabel('提示：HBRF 每回合需要恰好 3 个不同角色行动。'))
         # 普通战斗 tab，先设置窗口权限与脚本，再选择单次或重复战斗
         runner = QWidget(); tabs.addTab(runner, '普通战斗')
         form = QFormLayout(runner)
@@ -1597,13 +1597,12 @@ class MainWindow(QMainWindow):
                     if item not in used[slot_map[slot]-1]: used[slot_map[slot]-1].append(item)
         # 四妹追击弹窗
         pursuit_slots = set()
-        for index, items in enumerate(used):
+        for index in range(len(roles)):
             if self.catalog.is_dark_simei(styles[index]):
                 answer = QMessageBox.question(
                     self, '温泉通行木牌',
                     f'队伍{team_order[index // 6]}的{roles[index].name}是否使用「温泉通行木牌」被动？\n'
-                    '是：最多安排5个其他技能，最后一栏追加猫咪喷射打靶。\n'
-                    '否：最多安排6个技能。',
+                    '选择「是」将添加猫咪喷射打靶技能。',
                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel,
                     QMessageBox.StandardButton.Cancel,
                 )
@@ -1611,11 +1610,6 @@ class MainWindow(QMainWindow):
                     return
                 if answer == QMessageBox.StandardButton.Yes:
                     pursuit_slots.add(index)
-                    if len(items) > 5:
-                        raise ValueError(f'{roles[index].name}启用了「温泉通行木牌」，第6栏需保留给猫咪喷射打靶。'
-                                         f'当前安排了{len(items)}个其他技能，上限为5个。')
-            if len(items) > 6:
-                raise ValueError(f'{roles[index].name}当前安排了{len(items)}个技能，上限为6个。')
         # 收集switchable pair初始默认选择
         defaults = {}  # (角色slot, 技能pair的set) → 初始选择
         for (slot,pair),(a,b) in used_pairs.items():
@@ -1752,8 +1746,7 @@ class MainWindow(QMainWindow):
                     for skill in role.skills]
             self.log.append(f'位置{role.slot}：{role.name}：{"、".join(skills) if skills else "无"}')
         self.log.append('[注意] 请严格按上方顺序装备主动技能，切换技能以斜杠左侧为开局形态。')
-        self.log.append('[注意] 列出的技能不足3个时，补足3个以保持点击位置。'
-                        '补位技能放在已列技能之后；暗四妹的「猫咪喷射打靶」需要保留在最后。')
+        self.log.append('[注意] 游戏内装备的技能数量应与上方列表一致，以匹配点击位置。')
 
     # 选择战斗脚本，选好后触发输出角色和技能顺序要求
     def select_run_file(self):

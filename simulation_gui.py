@@ -2130,16 +2130,9 @@ class SimulationTab(QWidget):
             rows.append((label, base, moves))
 
         for slot, role in enumerate(roles):
-            count = len(role.skills)
             if pursuit_enabled[slot]:
-                if count > 5:
-                    raise ValueError(f'{role.name}启用了「温泉通行木牌」，第6栏需保留给猫咪喷射打靶。'
-                                     f'当前排轴使用了{count}个其他技能，上限为5个，无法导出HBRF。')
                 role.skills.append(m.SIMEI_PURSUIT_SKILL)
                 used[slot][pursuit] = (len(role.skills), m.SIMEI_PURSUIT_SKILL)
-            elif count > 6:
-                prefix = '未启用「温泉通行木牌」，' if self.catalog.is_dark_simei(self.styles[slot]) else ''
-                raise ValueError(f'{role.name}：{prefix}当前排轴使用了{count}个技能，上限为6个，无法导出HBRF。')
 
         actions = []
         form = 0

@@ -120,8 +120,6 @@ def convert(axis: dict, mapping: dict, output_path):
                 else:
                     label = skill_name(sid, index)
                 used[slot][key] = label
-                if len(used[slot]) > 6:
-                    raise ValueError(f'槽位 {slot}：超过 6 个不同的技能槽')
     # 构建一个slot和技能id（pair是frozenset）到技能栏位的映射
     skill_index = {slot: {key: i for i, key in enumerate(skills, 1)} for slot, skills in used.items()}
     # 加入Role技能列表
