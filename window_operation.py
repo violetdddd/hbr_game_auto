@@ -23,7 +23,6 @@ def find_window(title = "HeavenBurnsRed"):
 # 2. 定义函数：点击窗口内某个坐标（相对左上角）
 def click_in_game(game, position, jitter = 10, sleep=True, sleep_time=0.5):
     x, y = position
-    print(position)
 
     # 先经过一定延迟再点击
     if sleep:
@@ -33,7 +32,6 @@ def click_in_game(game, position, jitter = 10, sleep=True, sleep_time=0.5):
         if game.isActive:
             # 等窗口重新激活后再读取坐标，避免使用切回前的位置
             abs_x, abs_y = human_position(game.left + x, game.top + y, jitter)
-            print(abs_x, abs_y)
             if game.isActive:
                 pyautogui.click(abs_x, abs_y)
                 return
