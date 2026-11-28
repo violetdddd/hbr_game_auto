@@ -5,7 +5,7 @@ from config import settings
 from config import positions as pos
 from config import templates as tpl
 from vision.images import load_template
-from window_operation import click_in_game, drag_in_game, find_window, capture_window, click_circle_in_game
+from window_operation import click_in_game, drag_in_game, find_window, capture_window, click_circle_in_game, fast_drag_in_game
 from utils import match_template, detect_button, wait_and_click, wait_until, wait_until_any_template
 from hbrf import model as mod
 from paths import SCRIPTS_DIR
@@ -103,15 +103,27 @@ def operate_skill_switch(game, member_pos, member_slot, skill_index, role_skill_
     已经在前排的角色使用此函数进行技能属性切换
     """
     click_in_game(game, pos.member[member_pos])
+    # 保证回到最上方
+    fast_drag_in_game(game, pos.skill_back_drug)
+    # 获取该角色最大技能数
+    role_skill_max = role_skill_num[member_slot]
     if skill_index in (1,2,3):
-        click_in_game(game, pos.switch_skills[skill_index-1])
-    # validate过，认为一定不会超过角色技能数，同时技能数不超过6
+        if role_skill_max == 1:
+            click_in_game(game, pos.switch_skills[1])
+        elif role_skill_max == 2:
+            click_in_game(game, pos.switch_12_skills[skill_index-1])
+        else:
+            click_in_game(game, pos.switch_skills[skill_index-1])
+    # validate过，认为一定不会超过角色技能数
     else:
-        drag_in_game(game, pos.skill_4_drug)
-        # 获取该角色最大技能数
-        role_skill_max = role_skill_num[member_slot]
-        # 可以兼容技能数4-6
-        click_in_game(game, pos.switch_skills[2+skill_index-role_skill_max])
+        drag_2_times = (skill_index-3) // 2
+        drag_1_times = (skill_index-3) % 2
+        for i in range(drag_2_times):
+            drag_in_game(game, pos.skill_2_drug)
+        for i in range(drag_1_times):
+            drag_in_game(game, pos.skill_1_drug)
+        # 可以兼容任意技能数
+        click_in_game(game, pos.switch_skills[2])
     click_in_game(game, pos.member[member_pos])
 
 def operate_role_button(game, button: str, member_position):
@@ -151,14 +163,26 @@ def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mo
                 click_in_game(game, pos.member[i])
 
                 # 选择技能
+                # 获取该角色最大技能数，支持任意数量的技能，此处不是普攻
+                role_skill_max = role_skill_num[member_position_output[i]]
+                # 保证回到最上方
+                fast_drag_in_game(game, pos.skill_back_drug)
                 if skill_position <= 3:  # 不需要滑动
-                    click_in_game(game, pos.skill_123[skill_position])
-                else:  # 只支持最多6个技能，先滑动再点击3个技能的位置
-                    drag_in_game(game, pos.skill_4_drug)
-                    # 获取该角色最大技能数
-                    role_skill_max = role_skill_num[member_position_output[i]]
-                    # 可以兼容技能数4-6
-                    click_in_game(game, pos.skill_123[3+skill_position-role_skill_max])
+                    if role_skill_max == 1:
+                        click_in_game(game, pos.skill_123[2])
+                    elif role_skill_max == 2:
+                        click_in_game(game, pos.skill_12[skill_position])
+                    else:
+                        click_in_game(game, pos.skill_123[skill_position])
+                else:  # 先滑动再点击3个技能的位置
+                    drag_2_times = (skill_position-3) // 2
+                    drag_1_times = (skill_position-3) % 2
+                    for i in range(drag_2_times):
+                        drag_in_game(game, pos.skill_2_drug)
+                    for i in range(drag_1_times):
+                        drag_in_game(game, pos.skill_1_drug)
+                    # 永远选最靠下的技能
+                    click_in_game(game, pos.skill_123[3])
 
                 # 选择技能目标我方角色
                 if target_position in {1,2,3,4,5,6}:

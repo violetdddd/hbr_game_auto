@@ -29,9 +29,13 @@ _radius = 60
 _next_turn = (1760, 1070)
 # 此处可以放平A的坐标
 _skill_123 = [(250, 760), (1200, 380), (1200, 560), (1200, 750)]
-_skill_4_drug = [(1100, 800), (1100, 200)]
+_skill_12 = [(250, 760), (1200, 500), (1200, 680)]
+_skill_back_drug = [(1260, 385), (1260, 1070)]
+_skill_1_drug = [(1190, 770), (1220, 570)]
+_skill_2_drug = [(1190, 770), (1260, 385)]
 _OD = (1770, 150) 
-_switch_skills = [(1840, 410), (1810, 600), (1770, 790)]
+_switch_skills = [(1850, 400), (1820, 590), (1790, 775)]
+_switch_12_skills = [(1850, 490), (1820, 668)]
 
 _no_where = (1850, 1200)
 
@@ -43,9 +47,13 @@ _positions = {
     "radius": _radius,
     "next_turn": _next_turn,
     "skill_123": _skill_123,
-    "skill_4_drug": _skill_4_drug,
+    "skill_12": _skill_12,
+    "skill_back_drug": _skill_back_drug,
+    "skill_1_drug": _skill_1_drug,
+    "skill_2_drug": _skill_2_drug,
     "OD": _OD,
     "switch_skills": _switch_skills,
+    "switch_12_skills": _switch_12_skills,
     "no_where": _no_where,
     "start_cardgame_position": _start_cardgame_position
 }
