@@ -911,6 +911,10 @@ def matches_element(style: Style, element: str) -> bool:
         or ("void" in style.elements and element in ELEMENTS)
     )
 
+# 排除可怜的刻蚀大招
+def ex_double_skill(skill: Skill):
+    return skill.ex_skill and skill.id != 741
+
 class Simulation:
     """持有静态数据库与初始化后的 Turn。进行实际的模拟并实现与gui的dict state传递接口"""
     def __init__(self):
@@ -1737,7 +1741,7 @@ class Simulation:
                         break
 
         # ex技能连续发动和沉浸状态去除
-        if skill.ex_skill:
+        if ex_double_skill(skill):
             for status in style.statuses:
                 if status.duration_type in ("use_ex", "use_immersion_ex"):
                     status.trash = True
@@ -2255,14 +2259,14 @@ class Simulation:
                     self.od_up_through_action(turn, style, effects, skill, attack_skill, hit, enemy_count, second=True)
                     simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill, True)  # 四妹追击
                 # ex技能双动
-                elif has_status_id(style, 125) and skill.ex_skill:
+                elif has_status_id(style, 125) and ex_double_skill(skill):
                     self.od_up_through_action(turn, style, effects, skill, attack_skill, hit, enemy_count, second=True)
                     simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill, True)  # 四妹追击
 
                 # 结算和od相关的被动效果，白虎的ex双动不会引发od相关被动因此暂不考虑
                 if skill.ex_skill:
                     self.trigger_style_passives(turn, style, "after_ex_use", only_od=True)
-                    if has_status_id(style, 125):  
+                    if has_status_id(style, 125) and ex_double_skill(skill):  
                         self.trigger_style_passives(turn, style, "after_ex_use", only_od=True)
                 # 破盾被动认为只发动一次
                 if action.get("on_break"):
@@ -2276,7 +2280,7 @@ class Simulation:
                     for effect in effects:
                         self.resolve_sp_up_effect_passive(effect, turn, style, ctx, only_od=True)
                         # 对于非破盾时恢复sp的ex双动技能
-                        if has_status_id(style, 125) and skill.ex_skill and not effect.get("need_break"):
+                        if has_status_id(style, 125) and ex_double_skill(skill) and not effect.get("need_break"):
                             self.resolve_sp_up_effect_passive(effect, turn, style, ctx, only_od=True)
 
         self.resolve_tmp_od(turn, direct=False)
@@ -2391,7 +2395,7 @@ class Simulation:
                     simei_ex = self.resolve_simei_pursuit(simei_style, turn, simei_ex, attack_skill, skill,
                                                           False, starting_sp=simei_starting_sp)  # 四妹追击
                 # ex技能双动
-                elif has_status_id(style, 125, allow_trash=True) and skill.ex_skill and skill.id != 741:  # 排除可怜的刻蚀大招
+                elif has_status_id(style, 125, allow_trash=True) and ex_double_skill(skill):  # 排除可怜的刻蚀大招
                     # 正式结算effects
                     penetrates = self.trigger_active_actions(style, skill, action, ctx, second=True)
                     # 确定buff的消耗
@@ -2430,7 +2434,7 @@ class Simulation:
                         self.resolve_sp_up_effect_passive(effect, turn, style, ctx, only_od=False)
 
                 # ex技能双动可能触发2次after_ex_use和on_sp_up_by_nonself_active_skill
-                if has_status_id(style, 125, allow_trash=True) and skill.ex_skill:
+                if has_status_id(style, 125, allow_trash=True) and ex_double_skill(skill):
                     self.trigger_style_passives(turn, style, "after_ex_use", without_od=True)
                     # 有恢复sp的主动技能（resource和heal_sp_by_token）
                     if self.skill_has_effect_with(skill, action, ctx, effect_key="sp"):
