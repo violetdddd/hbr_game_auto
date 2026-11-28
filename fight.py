@@ -166,9 +166,13 @@ def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mo
 
                 # 区分指向星癌体
                 elif target_position in {7,8,9}:
-                    # 不知道为啥一定点两次才起作用
-                    click_in_game(game, pos.monster[target_position-7])
-                    click_in_game(game, pos.monster[target_position-7])
+                    # 防止点击不到目标，在中心的周围一圈进行多次点击
+                    center_x, center_y = pos.monster[target_position-7]
+                    x_shift = (0, 0.7, 1, 0.7, 0, -0.7, -1, -0.7)
+                    y_shift = (-1, -0.7, 0, 0.7, 1, 0.7, 0, -0.7)
+                    for i in range(8):
+                        x, y = center_x + int(x_shift[i] * pos.radius), center_y + int(y_shift[i] * pos.radius)
+                        click_in_game(game, (x, y))
 
             elif target_position in {7,8,9}:
                 # 点击2次角色
@@ -228,6 +232,9 @@ def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mo
                         warning="未检测到回合结束按钮")
             wait_and_click(game, load_template(tpl.GLOBAL_BUTTON_CONFIG[special_action.button]),
                            warning=f"未检测到{special_action.button}按钮")
+    wait_until(lambda: detect_start_button(game), 
+            warning="开前置OD后的特殊行动按钮后未匹配到回合结束按钮")
+    time.sleep(0.2)
 
     # 先调整位置
     steps, member_position_output = generate_swaps(old_member_position, new_member_position)

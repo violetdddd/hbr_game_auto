@@ -10,6 +10,9 @@ def scale_position(position):
 
     sx, sy = settings.template_scale()
 
+    if isinstance(position, int):
+        return round(position * sx)
+
     if isinstance(position, tuple) and len(position) == 2:
         return (round(position[0] * sx), round(position[1] * sy))
 
@@ -20,8 +23,9 @@ def scale_position(position):
 
 # 以resolution = (1920, 1200)为标准的相对位置坐标
 _member = [(160, 1070), (450, 1070), (740, 1070), (1010, 1070), (1250, 1070), (1500, 1070)]
-# 三个星癌体的左中右，两个星癌体是中右
-_monster = [(1070, 550), (1314, 590), (1650, 600)]
+# 三个星癌体的左中右，两个星癌体是需游戏内自行判断
+_monster = [(1010, 660), (1314, 680), (1650, 700)]
+_radius = 60
 _next_turn = (1760, 1070)
 # 此处可以放平A的坐标
 _skill_123 = [(250, 760), (1200, 380), (1200, 560), (1200, 750)]
@@ -36,6 +40,7 @@ _start_cardgame_position = (1250,1000)
 _positions = {
     "member": _member,
     "monster": _monster,
+    "radius": _radius,
     "next_turn": _next_turn,
     "skill_123": _skill_123,
     "skill_4_drug": _skill_4_drug,
