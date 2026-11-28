@@ -1503,7 +1503,7 @@ class BattleTurn(QGroupBox):
                         'on_break': False,
                         "be_attacked_times": 0
                     }
-                # recoil时无法行动
+                # 当前没有可用技能时交给模拟重新判断
                 else:
                     base['actions'][slot] = None
 
