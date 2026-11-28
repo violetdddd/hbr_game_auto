@@ -22,7 +22,7 @@ def find_window(title = "HeavenBurnsRed"):
     return windows[0]  # 取第一个匹配窗口
 
 # 2. 定义函数：点击窗口内某个坐标（相对左上角）
-def click_in_game(game, position, jitter = 10, sleep=True, sleep_time=0.5):
+def click_in_game(game, position, jitter = 10, sleep=True, sleep_time=0.8):
     x, y = position
 
     # 先经过一定延迟再点击
@@ -68,13 +68,13 @@ def drag_in_game(game, trajectory, duration=0.4):
     while True:
         if game.isActive:
             win_left, win_top = game.left, game.top
-            abs_x1, abs_y1 = human_position(win_left + x1, win_top + y1, only_x=True)
-            abs_x2, abs_y2 = human_position(win_left + x2, win_top + y2, only_x=True)
             # 对16:9的y轴进行微调修正
             resolution = settings.current_resolution
             if resolution not in ((1680, 1050), (1920, 1200), (2560, 1600)):
-                abs_y1 *= 1.08
-                abs_y2 *= 1.04
+                y1 *= 1.08
+                y2 *= 1.04
+            abs_x1, abs_y1 = human_position(win_left + x1, win_top + y1, only_x=True)
+            abs_x2, abs_y2 = human_position(win_left + x2, win_top + y2, only_x=True)
             if game.isActive:
                 pyautogui.moveTo(abs_x1, abs_y1)
                 if game.isActive:

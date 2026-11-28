@@ -205,13 +205,13 @@ def validate_hbrf(script: BattleScript):
                     raise ValueError(
                         f"非法技能目标: {move.target}"
                     )
-                if move.skill == 0 and move.target in range(1, 7):
+                if move.skill in (-1, 0) and move.target in range(1, 7):
                     raise ValueError(f"{action.label}: 普攻/指挥不能指定友方目标")
 
                 role = role_by_id[move.role]
 
-                if move.skill < 0:
-                    raise ValueError("技能编号不能小于0")
+                if move.skill < -1:
+                    raise ValueError("技能编号不能小于-1")
 
                 if move.skill > len(role.skills):
                     raise ValueError(

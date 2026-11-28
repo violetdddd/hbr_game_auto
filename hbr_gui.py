@@ -495,8 +495,9 @@ class TurnRow(QGroupBox):
         default = self.editor.catalog.default_action(style)
         s.blockSignals(True)
         s.clear()
-        s.addItem(self.editor.catalog.skill_label(default), default)
-        # 添加特殊行动的skill
+        s.addItem(self.editor.catalog.skill_label(default) + '/无', default)
+        restore = '还原指挥行动' if default == '指揮行動' else '还原普通攻击'
+        s.addItem(restore, restore)
         # 添加其他skill
         for name in self.editor.catalog.hbrf_skills_for(style):
             if name != default: s.addItem(self.editor.catalog.skill_label(name), name)
@@ -513,18 +514,19 @@ class TurnRow(QGroupBox):
         if target is None: target = t.currentData()
         t.blockSignals(True)
         t.clear(); t.addItem('无目标', None)
-        if skill not in ('普通攻击', '指揮行動'):
+        command = skill in ('指揮行動', '还原指挥行动')
+        if not command and skill not in ('普通攻击', '还原普通攻击'):
             for local, slot in enumerate(self.editor.team_indices(self.team), 1):
                 if self.editor.slots[slot]:
                     t.addItem(f'{local} · {self.editor.nickname(slot + 1)}', slot + 1)
-        if skill != '指揮行動':
+        if not command:
             # 怪物在内部先使用107, 108, 109避免和二队冲突
             t.addItem('左侧敌人', 107)
             t.addItem('中间敌人', 108)
             t.addItem('右侧敌人', 109)
         t.setCurrentIndex(max(0, t.findData(target)))
         t.blockSignals(False)
-        t.setEnabled(skill != '指揮行動' and not getattr(self, '_team_frozen', False))
+        t.setEnabled(not command and not getattr(self, '_team_frozen', False))
 
     # 更改od数时触发，用于更改bonus选项
     def refresh_bonus(self):
@@ -1128,11 +1130,11 @@ class MainWindow(QMainWindow):
             self, '温馨提示',
             '左键选择风格，依次右键两个角色可交换队伍位置。\n'
             '为每回合填写三名前排角色、技能、目标和 OD，再保存为 HBRF。\n'
-            '从「特殊回合行动」添加切换姿态、鬼神化、魔界骑兵或总攻击。总攻击每战最多一次，'
-            '魔界骑兵每战最多三次，鬼神化须等上一次状态结束，可怜可多次切换。请自行确认发动条件。\n'
-            '双队脚本请核对游戏里的队伍与初始站位。「切换队伍」会点击游戏内按钮，'
-            '回合所属队伍决定脚本使用哪一队的角色编号。\n'
-            '运行前请在普通战斗页点击「打印技能顺序」，严格按日志中的顺序装备技能。'
+            '从「特殊回合行动」添加切换姿态、鬼神化、魔界骑兵或总攻击。\n'
+            '支持「异时层行动」以及双队脚本。骨龙自动换队不需要添加「切换队伍」来点击游戏内按钮。\n'
+            '请自行确认技能和OD的发动条件，不满足发动条件时运行不会自动停止。\n'
+            '运行前请在普通战斗页面点击「打印技能顺序」，严格按日志中的顺序和数量装备技能。\n'
+            '自动战斗中请尽量不要操作电脑，保证游戏窗口处于激活的焦点状态，否则运行将暂停。\n'
         )
         settings.mark_tips_seen('editor')
         self.editor_tips.setStyleSheet('')
@@ -1520,7 +1522,10 @@ class MainWindow(QMainWindow):
                 moves=[]
                 for mv in a.actions:
                     role_index = mv.role - 1
-                    if mv.skill == 0: text = self.catalog.default_action(chosen[role_index])
+                    if mv.skill == -1:
+                        default = self.catalog.default_action(chosen[role_index])
+                        text = '还原指挥行动' if default == '指揮行動' else '还原普通攻击'
+                    elif mv.skill == 0: text = self.catalog.default_action(chosen[role_index])
                     else:
                         value = script.roles[role_index].skills[mv.skill-1]
                         text = active.get((mv.role,mv.skill), value.split('/',1)[0])
@@ -1581,8 +1586,11 @@ class MainWindow(QMainWindow):
                 if slot in seen: raise ValueError(f'{row.label_text()}：角色重复')
                 seen.add(slot)
                 style=self.slots[slot-1]
-                if skill == "指揮行動":
+                if skill in ('指揮行動', '还原指挥行动'):
                     if target is not None: raise ValueError(f'{row.label_text()}：指挥行动不能指定目标')
+                elif skill == '还原普通攻击':
+                    if self.catalog.default_action(style) != '普通攻击':
+                        raise ValueError(f'{row.label_text()}：{self.nickname(slot)}不能还原普通攻击')
                 elif skill == '普通攻击':
                     pass
                 else:
@@ -1662,7 +1670,9 @@ class MainWindow(QMainWindow):
                 new_slot=slot_map[slot]; style=self.slots[slot-1]
                 default=self.catalog.default_action(style)
                 # 默认技能，不存在技能列表中，skill_id设为0
-                if skill in (default,'普通攻击'):
+                if skill in ('还原普通攻击', '还原指挥行动'):
+                    skill_id=-1
+                elif skill in (default,'普通攻击'):
                     skill_id=0
                 # 其他需要使用的技能
                 else:
@@ -1878,23 +1888,26 @@ class MainWindow(QMainWindow):
 if __name__=='__main__':
     # EXE 子进程通过指定参数直接运行战斗函数，不创建 Qt 窗口
     if len(sys.argv) >= 3 and sys.argv[1] == '--hbr-worker':
-        # 打包后的子进程先恢复 UTF-8 标准输出
-        if getattr(sys, 'frozen', False):
-            setup_worker_output()
-
-        mode = sys.argv[2]
-        sys.argv = [sys.argv[0], *sys.argv[3:]]
-        if mode == 'battle':
-            from run_battle import main
-        elif mode == 'card':
-            from run_card_game import main
-        else:
-            raise ValueError(f'未知的工作模式：{mode}')
         try:
+            # 打包后的子进程先恢复 UTF-8 标准输出
+            if getattr(sys, 'frozen', False):
+                setup_worker_output()
+
+            mode = sys.argv[2]
+            sys.argv = [sys.argv[0], *sys.argv[3:]]
+            if mode == 'battle':
+                from run_battle import main
+            elif mode == 'card':
+                from run_card_game import main
+            else:
+                raise ValueError(f'未知的工作模式：{mode}')
             main()
         except KeyboardInterrupt:
             print('用户中断任务', flush=True)
             sys.exit(130)
+        except Exception:
+            traceback.print_exc(file=sys.stdout)
+            sys.exit(1)
     else:
         app=QApplication(sys.argv)
 

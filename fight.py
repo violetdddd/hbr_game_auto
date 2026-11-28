@@ -159,7 +159,7 @@ def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mo
         for i in range(3):  # 前排的3名角色
             skill_position = skills_setting[i][0]
             target_position = skills_setting[i][1]
-            if skill_position != 0:  # 不是普通攻击
+            if skill_position > 0:  # 不是普通攻击
                 # 点击角色
                 click_in_game(game, pos.member[i])
 
@@ -195,14 +195,22 @@ def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mo
                     # 防止点击不到目标，在中心的周围一圈进行多次点击
                     click_circle_in_game(game, pos.monster[target_position-7])
 
-            elif target_position in {7,8,9}:
-                # 点击2次角色
+            # 普通攻击
+            else:
+                # 默认行动或无行动，无需操作
+                if skill_position == 0 and target_position not in {7,8,9}:
+                    continue
+                # 需要还原普通行动或普通行动需要有目标
+                # 点击角色
                 click_in_game(game, pos.member[i])
-                time.sleep(1.5)
-                click_in_game(game, pos.member[i])
-                time.sleep(1)
-                # 防止点击不到目标，在中心的周围一圈进行多次点击
-                click_circle_in_game(game, pos.monster[target_position-7])
+                # 点击普通攻击
+                click_in_game(game, pos.skill_123[0])
+
+                # 有目标
+                if target_position in {7,8,9}:
+                    time.sleep(0.5)
+                    # 防止点击不到目标，在中心的周围一圈进行多次点击
+                    click_circle_in_game(game, pos.monster[target_position-7])
 
     def OD_condition(OD_mode):
         pt = detect_button(game, load_template(tpl.od_figs_big[0]))
