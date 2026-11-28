@@ -14,7 +14,7 @@ from PySide6.QtWidgets import (
     QComboBox, QAbstractButton, QInputDialog,
 )
 
-from paths import ROOT_DIR, SCRIPTS_DIR
+from paths import ROOT_DIR, SCRIPTS_DIR, SIMULATIONS_DIR
 from config import settings
 from simulation import DEFAULT_ENEMY_SLOTS
 SIMULATION_DIR = ROOT_DIR / 'assets' / 'simulation'
@@ -1855,24 +1855,20 @@ class SimulationTab(QWidget):
             '声明\n'
             '为方便排轴，目前不对任何技能和OD使用进行限制（检查OD/SP消耗、技能次数限制、冷却回合等）。\n\n'
             '战斗设定\n'
-            '左键选风格，依次右键两个上场角色可交换战斗设定中的位置。再设置技能、突破、饰品、共鸣和敌人信息。'
-            '单体默认居中，双体按实际战斗选择位置。'
+            '左键选风格，依次右键两个风格可交换位置。设置对应技能、突破、饰品、共鸣和敌人信息。\n'
+            '单体默认居中，双体按实际战斗选择位置。\n'
             '「开始战斗」会创建新战斗，「应用调整」会从首回合重算现有排轴。\n\n'
             '编辑回合\n'
-            '从下拉框选择技能和OD发动情况。依次左键两个头像可交换站位，右键点击头像可设置破盾及角色专属特殊行动。'
-            '左键点击头像右下角的目标徽章可以重新选择目标。'
-            '点击「调整」可修改本回合的资源、DP、敌人和场地，用于一些特殊被动的触发和技能费用计算等。\n\n'
-            '查看与推进\n'
-            '点击状态栏查看该单位的状态详情。状态较多时，可用横向滚轮或 Shift 加滚轮查看后续状态。'
-            '点击「下一回合」结算行动，「回到本回合」会移除之后的回合。\n\n'
+            '依次左键两个头像可交换站位，右键点击头像可设置破盾、受击及角色专属特殊行动。\n'
+            '技能有分支或目标时会弹出选择提示框。左键点击头像右下角的目标徽章可以重新选择目标。\n'
+            '点击「调整」可修改角色资源、DP、敌人和场地等。\n'
+            '点击「下一回合」结算行动，「回到本回合」会移除之后的回合。\n'
+            '点击状态栏查看该单位的状态详情。状态较多时，可用横向滚轮或 Shift 加滚轮查看后续状态。\n\n'
             '保存与恢复\n'
-            '用「导出模拟数据」保存设定和排轴，再用「导入模拟数据」可以恢复并继续编辑。'
+            '用「导出模拟数据」保存设定和排轴，再用「导入模拟数据」可以恢复并继续编辑。\n'
             '「从HBRF导入」会以默认战斗设定重放单队排轴，导入后请检查并调整。\n\n'
             '目前暂未支持\n'
-            '我方DP、敌方破坏率、倒地和技能破盾等需要手动填写。受击被动按手动设置的受击次数触发。\n'
-            '实际伤害、回复DP等与排轴无关的效果尚未结算。\n'
             '敌方行动、敌方施加的增益和异常状态等尚未自动模拟。部分概率效果默认触发。'
-            
         )
         settings.mark_tips_seen('simulation')
         self.tips_button.setStyleSheet('')
@@ -2054,11 +2050,15 @@ class SimulationTab(QWidget):
         state = self.state()
         if state is None:
             QMessageBox.information(self, '未开始战斗', '请先开始战斗。'); return
-        filename, _ = QFileDialog.getSaveFileName(self, '保存模拟状态',
-                                                   'simulation_state.json', 'JSON (*.json)')
-        if filename:
-            Path(filename).write_text(json.dumps(state, ensure_ascii=False, indent=2),
-                                      encoding='utf-8')
+        try:
+            SIMULATIONS_DIR.mkdir(exist_ok=True)
+            filename, _ = QFileDialog.getSaveFileName(self, '保存模拟状态',
+                                                       str(SIMULATIONS_DIR / 'simulation_state.json'), 'JSON (*.json)')
+            if filename:
+                Path(filename).write_text(json.dumps(state, ensure_ascii=False, indent=2),
+                                          encoding='utf-8')
+        except OSError as error:
+            QMessageBox.warning(self, '无法保存模拟状态', str(error))
 
     def build_hbrf(self):
         from hbrf import model as m
@@ -2193,7 +2193,8 @@ class SimulationTab(QWidget):
 
         try:
             script = self.build_hbrf()
-            filename, _ = QFileDialog.getSaveFileName(self, '导出 HBRF', 'simulation.hbrf', 'HBRF (*.hbrf)')
+            filename, _ = QFileDialog.getSaveFileName(self, '导出 HBRF',
+                                                       str(SCRIPTS_DIR / 'simulation.hbrf'), 'HBRF (*.hbrf)')
             if not filename:
                 return
             path = Path(filename)
@@ -2383,7 +2384,11 @@ class SimulationTab(QWidget):
     def import_state(self, data=None, *, inherit_battle=False):
         # QPushButton.clicked传入的布尔值不代表存档
         if not isinstance(data, dict):
-            filename, _ = QFileDialog.getOpenFileName(self, '导入模拟数据', '', 'JSON (*.json)')
+            try:
+                SIMULATIONS_DIR.mkdir(exist_ok=True)
+            except OSError as error:
+                QMessageBox.warning(self, '无法导入模拟数据', str(error)); return
+            filename, _ = QFileDialog.getOpenFileName(self, '导入模拟数据', str(SIMULATIONS_DIR), 'JSON (*.json)')
             if not filename:
                 return
             try:

@@ -62,6 +62,9 @@ if errorlevel 1 goto :fail
 
 if exist "dist\HBRTool\scripts" rmdir /s /q "dist\HBRTool\scripts"
 mkdir "dist\HBRTool\scripts" || goto :fail
+if not exist "dist\HBRTool\simulations\" (
+    mkdir "dist\HBRTool\simulations" || goto :fail
+)
 copy /y "scripts\blank.hbrf" "dist\HBRTool\scripts\blank.hbrf" >nul || goto :fail
 copy /y "scripts\HS-65.hbrf" "dist\HBRTool\scripts\HS-65.hbrf" >nul || goto :fail
 rmdir /s /q "%STAGE%"

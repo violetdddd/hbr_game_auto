@@ -21,7 +21,7 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
     QTabWidget, QTabBar, QTextEdit, QFormLayout, QInputDialog, QSizePolicy)
 from config import settings
 
-from paths import ROOT_DIR, SCRIPTS_DIR
+from paths import APP_DIR, ROOT_DIR, SCRIPTS_DIR
 ROOT = ROOT_DIR
 SCRIPTS = SCRIPTS_DIR
 DATA = ROOT / 'assets' / 'char-data'
@@ -1367,7 +1367,7 @@ class MainWindow(QMainWindow):
             '转换结果不包含部分特殊行动等信息，导入后请检查并重新保存。'
         )
         sav_path, _ = QFileDialog.getOpenFileName(
-            self, '选择 SAV 文件', str(SCRIPTS), 'SAV (*.sav);;All files (*)'
+            self, '选择 SAV 文件', str(APP_DIR), 'SAV (*.sav);;All files (*)'
         )
         if not sav_path: return
         # 转换结果先保存为 HBRF 文件，再交给原有编辑器载入
@@ -1399,7 +1399,7 @@ class MainWindow(QMainWindow):
             '转换结果不包含部分特殊行动等信息，导入后请检查并重新保存。'
         )
         jpg_path, _ = QFileDialog.getOpenFileName(
-            self, '选择 jpg 文件', str(SCRIPTS), 'JPG (*.jpg);;All files (*)'
+            self, '选择 jpg 文件', str(APP_DIR), 'JPG (*.jpg);;All files (*)'
         )
         if not jpg_path: return
         # 转换结果先保存为 HBRF 文件，再交给原有编辑器载入
@@ -1719,7 +1719,8 @@ class MainWindow(QMainWindow):
         script, styles = result
         path = self.current_path
         if save_as or not path:
-            filename,_ = QFileDialog.getSaveFileName(self,'保存 HBRF',str(path or SCRIPTS / 'new.hbrf'),'HBRF (*.hbrf)')
+            filename,_ = QFileDialog.getSaveFileName(
+                self, '保存 HBRF', str(SCRIPTS / (path.name if path else 'new.hbrf')), 'HBRF (*.hbrf)')
             if not filename: return False
             path=Path(filename)
         try:
