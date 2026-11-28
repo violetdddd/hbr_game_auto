@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from anti import human_position, human_time
 from config import positions as pos
+from config import settings
 
 def find_window(title = "HeavenBurnsRed"):
     # 1. 找到游戏窗口
@@ -69,6 +70,11 @@ def drag_in_game(game, trajectory, duration=0.4):
             win_left, win_top = game.left, game.top
             abs_x1, abs_y1 = human_position(win_left + x1, win_top + y1, only_x=True)
             abs_x2, abs_y2 = human_position(win_left + x2, win_top + y2, only_x=True)
+            # 对16:9的y轴进行微调修正
+            resolution = settings.current_resolution
+            if resolution not in ((1680, 1050), (1920, 1200), (2560, 1600)):
+                abs_y1 *= 1.08
+                abs_y2 *= 1.04
             if game.isActive:
                 pyautogui.moveTo(abs_x1, abs_y1)
                 if game.isActive:

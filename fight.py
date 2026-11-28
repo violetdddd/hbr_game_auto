@@ -103,10 +103,11 @@ def operate_skill_switch(game, member_pos, member_slot, skill_index, role_skill_
     已经在前排的角色使用此函数进行技能属性切换
     """
     click_in_game(game, pos.member[member_pos])
-    # 保证回到最上方
-    fast_drag_in_game(game, pos.skill_back_drug)
     # 获取该角色最大技能数
     role_skill_max = role_skill_num[member_slot]
+    # 保证回到最上方
+    if role_skill_max > 3:
+        fast_drag_in_game(game, pos.skill_back_drug)
     if skill_index in (1,2,3):
         if role_skill_max == 1:
             click_in_game(game, pos.switch_skills[1])
@@ -166,7 +167,8 @@ def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mo
                 # 获取该角色最大技能数，支持任意数量的技能，此处不是普攻
                 role_skill_max = role_skill_num[member_position_output[i]]
                 # 保证回到最上方
-                fast_drag_in_game(game, pos.skill_back_drug)
+                if role_skill_max > 3:
+                    fast_drag_in_game(game, pos.skill_back_drug)
                 if skill_position <= 3:  # 不需要滑动
                     if role_skill_max == 1:
                         click_in_game(game, pos.skill_123[2])
