@@ -154,6 +154,8 @@ def convert_axle_data(data, output_path):
                     current_skill[(slot, key)] = skill
             target = cell.get("target")
             target = style_slots.get(target, target) if isinstance(target, str) else target  # 有就是1-6，没有就是None
+            if skill_id == 0 and (skill == "指揮行動" or target not in (7, 8, 9)):
+                target = None
             moves.append(m.SkillAction(slot, skill_id, target))
         actions.extend(buttons)
         actions.extend(switches)

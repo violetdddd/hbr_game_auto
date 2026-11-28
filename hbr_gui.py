@@ -487,14 +487,13 @@ class TurnRow(QGroupBox):
 
     def update_skills(self, i, skill=None, target=None):
         # 获取当前style，skill，target
-        r, s, t = self.roles[i], self.skills[i], self.targets[i]
+        r, s = self.roles[i], self.skills[i]
         if skill is None: skill = s.currentData()
-        if target is None: target = t.currentData()
         slot = r.currentData() or 0
         style = self.editor.slots[slot - 1] if slot else None
         # 清除原skill并获取默认skill
         default = self.editor.catalog.default_action(style)
-        s.blockSignals(True); t.blockSignals(True)
+        s.blockSignals(True)
         s.clear()
         s.addItem(self.editor.catalog.skill_label(default), default)
         # 添加特殊行动的skill
@@ -504,26 +503,28 @@ class TurnRow(QGroupBox):
         # 如果之前的选中的技能现在角色也有，则恢复技能，没有就默认技能
         ix = s.findData(skill)
         s.setCurrentIndex(ix if ix >= 0 else 0)
-        # 目标也按类似处理，确保只使用当前team的角色
-        t.clear(); t.addItem('无目标', None)
-        start = (self.team - 1) * 6
-        for local, selected_style in enumerate(self.editor.slots[start:start+6], 1):
-            j = start + local
-            if selected_style: t.addItem(f'{local} · {self.editor.nickname(j)}', j)
-        # 怪物在内部先使用107, 108, 109避免和二队冲突
-        t.addItem('左侧敌人', 107)
-        t.addItem('中间敌人', 108)
-        t.addItem('右侧敌人', 109)
-        ix = t.findData(target); t.setCurrentIndex(max(0, ix))
-        s.blockSignals(False); t.blockSignals(False)
-        self._skill_changed(i)
+        s.blockSignals(False)
+        self._skill_changed(i, target)
 
-    # 普攻和指挥行动默认无目标
-    def _skill_changed(self, i):
+    # 普攻只允许选择敌人，指挥行动不指定目标
+    def _skill_changed(self, i, target=None):
         skill = self.skills[i].currentData()
-        no_target = skill in ('普通攻击', '指揮行動')
-        if no_target: self.targets[i].setCurrentIndex(0)
-        self.targets[i].setEnabled(not no_target and not getattr(self, '_team_frozen', False))
+        t = self.targets[i]
+        if target is None: target = t.currentData()
+        t.blockSignals(True)
+        t.clear(); t.addItem('无目标', None)
+        if skill not in ('普通攻击', '指揮行動'):
+            for local, slot in enumerate(self.editor.team_indices(self.team), 1):
+                if self.editor.slots[slot]:
+                    t.addItem(f'{local} · {self.editor.nickname(slot + 1)}', slot + 1)
+        if skill != '指揮行動':
+            # 怪物在内部先使用107, 108, 109避免和二队冲突
+            t.addItem('左侧敌人', 107)
+            t.addItem('中间敌人', 108)
+            t.addItem('右侧敌人', 109)
+        t.setCurrentIndex(max(0, t.findData(target)))
+        t.blockSignals(False)
+        t.setEnabled(skill != '指揮行動' and not getattr(self, '_team_frozen', False))
 
     # 更改od数时触发，用于更改bonus选项
     def refresh_bonus(self):

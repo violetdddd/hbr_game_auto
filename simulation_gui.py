@@ -2111,6 +2111,9 @@ class SimulationTab(QWidget):
                     elif choice['slot'] is not None:
                         target = choice['slot'] + 1
                     moves.append((slot, skill, pair, target))
+                elif skill_id == 1 and enemy_count > 1:
+                    target_slot = action['target']['slot']
+                    moves.append((slot, None, None, target_slot + 7 if target_slot is not None else None))
                 else:
                     moves.append((slot, None, None, None))
             # 使用HBRF编辑器支持的标签，显示标题不参与导出
@@ -2339,9 +2342,13 @@ class SimulationTab(QWidget):
                     index = order.index(slot)
                     order[index], order[position] = order[position], order[index]
                 for move in entry.actions:
-                    if not move.skill:
-                        continue
                     slot = move.role - 1
+                    if not move.skill:
+                        if move.target in (7, 8, 9):
+                            actions[slot] = {'id': 1, 'name': '普通攻击', 'user_selected': None,
+                                             'target': {'type': 'enemy', 'slot': move.target - 7},
+                                             'on_break': False, 'be_attacked_times': 0}
+                        continue
                     skill = role_skills[slot][move.skill - 1][selected[slot][move.skill - 1]]
                     if setup['styles'][slot]['style_id'] == 266 and skill.id == 737:
                         continue  # 该技能只通过后排自动追击发动

@@ -209,6 +209,8 @@ def validate_hbrf(script: BattleScript):
                     raise ValueError(
                         f"非法技能目标: {move.target}"
                     )
+                if move.skill == 0 and move.target in range(1, 7):
+                    raise ValueError(f"{action.label}: 普攻/指挥不能指定友方目标")
 
                 role = role_by_id[move.role]
 
@@ -424,6 +426,9 @@ def load_hbrf(filepath) -> BattleScript:
                 )
 
             skill, target = values
+            # 旧脚本里的普攻友方目标原本不会执行，导入时按无目标处理
+            if skill == 0 and target in range(1, 7):
+                target = 0
 
             turn_actions.append(
                 SkillAction(

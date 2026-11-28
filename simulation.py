@@ -417,7 +417,7 @@ class Style:
     @staticmethod
     def generate_default_skills_from_skill(skill: Skill) -> dict:
         return {"name": skill.names["zh_cn"], "id": skill.id, "cost": 0, "cost_type": "sp",
-                "target_type": "ignore", "user_select": None}
+                "target_type": "enemy" if skill.id == 1 else "ignore", "user_select": None}
 
     def style_has_passive_id(self, skill_id: int) -> bool:
         if not self.skill_passive:
@@ -1898,6 +1898,8 @@ class Simulation:
 
     def action_legalization(self, turn: Turn):
         """合法化turn.actions，允许recalculate的action和初始化的[None]*6"""
+        enemy_slots = [i for i, monster in enumerate(turn.battle.monsters) if monster.exist]
+        first_enemy = next(iter(enemy_slots), None)
         # actions按slot存放，前后排按本回合的order判断
         for position, slot in enumerate(turn.order):
             style = turn.team[slot]
@@ -1915,7 +1917,14 @@ class Simulation:
             # 当前选择的action就是基础技能
             if basic_skill is not None:
                 action["name"] = basic_skill["name"]
-                action["target"] = {"type": "ignore", "slot": None}
+                target_type = basic_skill["target_type"]
+                target_slot = (action.get("target") or {}).get("slot")
+                if target_type == "enemy":
+                    if type(target_slot) is not int or target_slot not in enemy_slots:
+                        target_slot = first_enemy
+                else:
+                    target_slot = None
+                action["target"] = {"type": target_type, "slot": target_slot}
                 action["user_selected"] = None
                 continue
 
@@ -1928,8 +1937,7 @@ class Simulation:
                     target_slot = target.get("slot")
                     target_valid = target_type in ("ignore", "ally_single", "ally_single_without_self")
                     if target_type == "enemy":
-                        target_valid = type(target_slot) is int and target_slot in range(len(turn.battle.monsters)) and \
-                            turn.battle.monsters[target_slot].exist
+                        target_valid = type(target_slot) is int and target_slot in enemy_slots
                     elif target_type == "ally_single_front_without_self":
                         target_valid = type(target_slot) is int and target_slot in turn.order[:3] and target_slot != slot
                     selected = action.get("user_selected")
@@ -1941,7 +1949,8 @@ class Simulation:
             turn.actions[slot] = {
                 "name": default_skill["name"],
                 "id": default_skill["id"],
-                "target": {"type": "ignore", "slot": None},
+                "target": {"type": default_skill["target_type"],
+                           "slot": first_enemy if default_skill["target_type"] == "enemy" else None},
                 "user_selected": None,
                 "on_break": False,
                 "be_attacked_times": 0
