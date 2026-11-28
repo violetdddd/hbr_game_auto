@@ -5,7 +5,7 @@ from config import settings
 from config import positions as pos
 from config import templates as tpl
 from vision.images import load_template
-from window_operation import click_in_game, drag_in_game, find_window, capture_window
+from window_operation import click_in_game, drag_in_game, find_window, capture_window, click_circle_in_game
 from utils import match_template, detect_button, wait_and_click, wait_until, wait_until_any_template
 from hbrf import model as mod
 from paths import SCRIPTS_DIR
@@ -167,12 +167,7 @@ def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mo
                 # 区分指向星癌体
                 elif target_position in {7,8,9}:
                     # 防止点击不到目标，在中心的周围一圈进行多次点击
-                    center_x, center_y = pos.monster[target_position-7]
-                    x_shift = (0, 0.7, 1, 0.7, 0, -0.7, -1, -0.7)
-                    y_shift = (-1, -0.7, 0, 0.7, 1, 0.7, 0, -0.7)
-                    for i in range(8):
-                        x, y = center_x + int(x_shift[i] * pos.radius), center_y + int(y_shift[i] * pos.radius)
-                        click_in_game(game, (x, y))
+                    click_circle_in_game(game, pos.monster[target_position-7])
 
             elif target_position in {7,8,9}:
                 # 点击2次角色
@@ -180,9 +175,8 @@ def operate_one_turn(game, old_member_position, role_skill_num: dict, action: mo
                 time.sleep(1.5)
                 click_in_game(game, pos.member[i])
                 time.sleep(1)
-                # 不知道为啥一定点两次才起作用
-                click_in_game(game, pos.monster[target_position-7])
-                click_in_game(game, pos.monster[target_position-7])
+                # 防止点击不到目标，在中心的周围一圈进行多次点击
+                click_circle_in_game(game, pos.monster[target_position-7])
 
     def OD_condition(OD_mode):
         pt = detect_button(game, load_template(tpl.od_figs_big[0]))

@@ -4,6 +4,7 @@ import time
 import cv2
 import numpy as np
 from anti import human_position, human_time
+from config import positions as pos
 
 def find_window(title = "HeavenBurnsRed"):
     # 1. 找到游戏窗口
@@ -20,12 +21,12 @@ def find_window(title = "HeavenBurnsRed"):
     return windows[0]  # 取第一个匹配窗口
 
 # 2. 定义函数：点击窗口内某个坐标（相对左上角）
-def click_in_game(game, position, jitter = 10, sleep=True):
+def click_in_game(game, position, jitter = 10, sleep=True, sleep_time=0.5):
     x, y = position
 
     # 先经过一定延迟再点击
     if sleep:
-        time.sleep(human_time())
+        time.sleep(human_time(sleep_time))
 
     while True:
         if game.isActive:
@@ -35,6 +36,15 @@ def click_in_game(game, position, jitter = 10, sleep=True):
                 pyautogui.click(abs_x, abs_y)
                 return
         time.sleep(0.2)
+
+def click_circle_in_game(game, position, sleep_time=0.3):
+    center_x, center_y = position
+    x_shift = (0, 0.7, 1, 0.7, 0, -0.7, -1, -0.7)
+    y_shift = (-1, -0.7, 0, 0.7, 1, 0.7, 0, -0.7)
+    click_in_game(game, (center_x, center_y), sleep_time=sleep_time)
+    for i in range(8):
+        x, y = center_x + int(x_shift[i] * pos.radius), center_y + int(y_shift[i] * pos.radius)
+        click_in_game(game, (x, y), sleep_time=sleep_time)
 
 def drag_in_game(game, trajectory, duration=0.3):
     x1, y1 = trajectory[0]
